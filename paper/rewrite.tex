@@ -1,0 +1,425 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage[hidelinks]{hyperref}
+\geometry{margin=2.5cm}
+
+\lstdefinelanguage{rewrite}{
+  morekeywords={SORT,NUM,CONST,VAR,TERM,FUNC,OTHER,BRA,ATT,ALG,SPEC,ADDSPEC,
+                REWR,LIFT,TO,IF,ELSE,FOR,STEP,DO,WHILE,INC,PRT,PRTNUM,OUT,
+                DATA,RETURN,QUIT,NIN,IN,LB,LA1,LA2,LA3,LA4,LA5,RA,RU},
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]",
+}
+\lstset{
+  language=rewrite,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\bfseries,
+  commentstyle=\itshape\color{black!60},
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  framesep=4pt,
+  xleftmargin=6pt,
+  xrightmargin=6pt,
+  aboveskip=8pt,
+  belowskip=8pt,
+}
+
+\title{\texttt{rewrite}: a programming language that learns its\\
+       mathematics from rule files}
+\author{Rainer Heintzmann\\
+        Friedrich-Schiller-Universit\"at Jena, Germany\\
+        \texttt{rainer.heintzmann@uni-jena.de}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\texttt{rewrite} is a small interpreted language for symbolic and numerical
+mathematics, written in the early 1990s and revived in 2026. Unlike most
+computer algebra systems, its kernel contains no mathematics: data types,
+operators, the laws of algebra, differentiation and integration rules are
+all defined in plain-text include files and applied by term rewriting. Rule
+sets (``algebras'') are first-class objects that can be combined into
+sequences and fixpoint iterations. A \texttt{LIFT} statement transfers all
+rules of one set of operations to another, so that, for example, the rules
+of an abelian group written for $+$ also apply to $\cdot$ in a field.
+Numerical evaluation is interleaved with rewriting: as soon as all
+arguments of a function are numbers, an attached C function computes the
+value. We describe the design of the language, its revival on current
+64-bit compilers including a regression test suite, and a case study in
+which part of the rule-based integrator Rubi was translated into
+\texttt{rewrite}. The case study shows how the mechanisms of the language
+replace features such as optional pattern arguments, and where its limits
+are.
+\end{abstract}
+
+\section{Introduction}
+
+Computer algebra systems such as Mathematica~\cite{mathematica} or
+SymPy~\cite{meurer2017sympy} come with a large body of built-in mathematical
+knowledge. A user can add rules, but the core simplification and the
+calculus routines are part of the system and are mostly hidden from the
+user. Term rewriting systems such as Maude~\cite{clavel2007maude} take the
+opposite view: they provide a general rewriting engine and leave the
+mathematics to the user, but they are usually not aimed at numerical work.
+
+\texttt{rewrite} sits between these positions. Its interpreter knows how to
+parse expressions with user-defined operators, how to match and replace
+terms, and how to call C functions for numerical values. Everything else is
+defined in include files: the sort \texttt{real}, the operators \texttt{+},
+\texttt{*} and \texttt{\^}, the group, ring and field laws, the
+differentiation rules, and numerical algorithms such as Simpson integration.
+The language was designed by the author between 1992 and 1996 on Unix and
+the Amiga, on top of a scanner and parser framework by Axel T.\ Schreiner.
+In 2026 it was ported to current compilers and extended with a test suite
+and a rule-based integration library.
+
+The main contributions of this paper are:
+\begin{itemize}
+  \item a description of a language in which mathematics is a library of
+        rewrite rules, including the \texttt{LIFT} mechanism for transferring
+        rules between algebraic structures;
+  \item the interleaving of symbolic rewriting and numerical evaluation,
+        which allows numerical algorithms to be written as rewrite rules;
+  \item a case study translating rules of the rule-based integrator
+        Rubi~\cite{rich2018rubi} into \texttt{rewrite}, with a discussion of
+        what this translation requires from the matching engine.
+\end{itemize}
+
+\section{Language design}
+
+\subsection{Sorts, operators and numbers}
+
+A program first declares sorts (types) and operators. The following
+complete program defines real numbers with three operators and evaluates
+expressions:
+
+\begin{lstlisting}
+SORT real                                 # a data type
+NUM real                                  # numbers typed in have sort real
+FUNC + : real,real >> real LA2 ATT plus   # left-associative, priority 2
+FUNC * : real,real >> real LA3 ATT mal    # binds tighter than +
+FUNC ^ : real,real >> real RA  ATT hoch   # right-associative
+1+2*3                                     # prints 7
+2^3^2                                     # prints 512
+CONST x,y : real
+x+y*2                                     # prints x + y * 2
+\end{lstlisting}
+
+The format words \texttt{LA1}--\texttt{LA5}, \texttt{RA} and \texttt{RU}
+define left-associative binary operators of five priorities,
+right-associative operators and right unary operators such as the
+factorial. \texttt{ATT name} attaches a C function from a table of user
+functions. It is called whenever all arguments of the function are numbers;
+otherwise the term stays symbolic. \texttt{OTHER} adds further meanings to
+an existing name for other argument sorts, so that \texttt{+} can mean
+addition of reals, complex numbers or vectors. \texttt{BRA} defines
+functions written with brackets, such as a scalar product
+$\langle a,b\rangle$.
+
+Numbers are stored as C \texttt{double} values. Other sorts can carry
+arbitrary C data: the standard library defines complex numbers, real
+vectors and matrices, whose values are C arrays. Operations on whole
+vectors and matrices are executed by C functions, so they run at compiled
+speed.
+
+\subsection{Rules and algebras}
+
+Rules are collected in named rule sets, called \emph{algebras}. A rule has
+a left side, a right side, an optional condition and an optional block of
+instructions that is executed before the replacement:
+
+\begin{lstlisting}
+VAR A : real
+ALG simp
+SPEC    simp : A*1 = A             # SPEC starts a new rule set
+ADDSPEC simp : A+0 = A             # ADDSPEC adds a rule
+CONST u : real
+REWR (u*1)+0 : simp                # prints u
+\end{lstlisting}
+
+\texttt{VAR} declares meta variables that match any term of their sort.
+\texttt{NUM} declares meta variables that only match numbers, which makes
+rules like ``evaluate if the argument is a number'' easy to write.
+Conditions test whether a term occurs in another one (\texttt{IN},
+\texttt{NIN}), compare terms in a total order (\texttt{LB}, used for
+sorting sums), or evaluate any expression with a boolean result.
+
+Algebras are combined into lists. A list in parentheses is applied
+repeatedly until no rule changes the term any more. The standard rule list
+of the library is defined like this:
+
+\begin{lstlisting}
+SPEC All : Std,Doit,(Linear,Compl,diff,GrRi),AGroup,integr,
+           (Subst,GrRi),Std,Zus,unaerweg
+\end{lstlisting}
+
+With the library loaded, \texttt{REWR D(sin cos x,x) : All} returns
+\texttt{- cos (cos (x ))* sin (x )}.
+
+\subsection{Transferring rules with LIFT}
+
+A distinctive feature of \texttt{rewrite} is the \texttt{LIFT} statement.
+It declares that all rules valid for one set of functions and constants
+also hold for another set. The standard library writes the laws of a group
+once and transfers them step by step:
+
+\begin{lstlisting}
+LIFT (Ag+Ag,Ag-Ag,-Ag,0g) TO (Aag+Aag,Aag-Aag,-Aag,0ag)
+LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
+LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
+\end{lstlisting}
+
+The last line reuses the rules of an abelian group for multiplication,
+division, the multiplicative inverse \texttt{mi} and the neutral element 1
+of a ring. In the same way, linearity is written once for a generic linear
+function and lifted to differentiation, integration, Taylor expansion and
+summation. This corresponds closely to the algebraic hierarchies of
+modern proof assistants~\cite{mathlib2020}, but here it acts directly on
+the rewrite rules.
+
+\subsection{Interleaving rewriting and numerics}
+
+After every single rewrite step, the interpreter evaluates all subterms
+whose arguments are numbers. Constants that have a value are replaced by
+their value when a term is copied. Together with the procedural part of
+the language (\texttt{FOR}, \texttt{WHILE}, \texttt{IF}, blocks with local
+constants, and user functions), this allows numerical algorithms to be
+written as rewrite rules. The library defines Simpson integration as a
+rule whose \texttt{DO} block computes the value:
+
+\begin{lstlisting}
+ALG rechne
+SPEC rechne : I(N,M,A,_x)=_myerg DO { _myerg=0;_zw1=0;_zw2=0  # Simpson
+        FOR n=N+_step/2 TO M-_step STEP _step DO { _x=n;_zw1=_zw1+A
+        _x=n+_step/2
+        _zw2=_zw2+A }
+        _x=M-_step/2
+        _zw1=_zw1+A
+        _x=N;_myerg=A+4*_zw1+2*_zw2
+        _x=M;_myerg=(_myerg+A)*_step/2/3
+        _x=dummi }
+\end{lstlisting}
+
+A second rule set first substitutes the integration variable by the
+internal variable \texttt{\_x}. With \texttt{\_step=0.01},
+\texttt{REWR I(0,pi,sin(x),x) : numerik,rechne} returns 2. The same
+mechanism gives Newton's method and the search for minima and maxima. The
+symbolic part can prepare the numerical part: \texttt{newton} expects the
+derivative as an argument, which is computed symbolically by \texttt{D}.
+
+The original application of the language was physics. The library contains
+physical constants, units and formulas, and an example program computes
+Bragg angles, structure factors and X-ray absorption of lithium niobate
+crystals from tabulated atomic data.
+
+\section{Case study: rule-based integration}
+
+Differentiation is easy to express with rewrite rules, because every rule
+takes the term apart and the product and chain rules always apply.
+Integration is harder. Complete decision procedures exist for elementary
+functions~\cite{risch1969problem,bronstein2005symbolic}, but they are not
+pattern based. Rubi~\cite{rich2018rubi,rubirepo} showed that an extensive
+system of carefully ordered rules with conditions can integrate a very
+large class of functions. Its rule files contain about 8500 rule
+definitions in Mathematica syntax, published under the MIT license. We
+translated a closed subset of them to test how far the mechanisms of
+\texttt{rewrite} carry.
+
+\subsection{Translation scheme}
+
+Rubi's patterns rely on two features of the Mathematica pattern matcher
+that \texttt{rewrite} does not have: optional arguments with default values
+and matching modulo commutativity. A typical rule is
+
+\begin{lstlisting}
+Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /;
+    FreeQ[{a, b, m}, x] && NeQ[m, -1]
+\end{lstlisting}
+
+where \texttt{a\_.} matches a missing summand with default 0 and
+\texttt{b\_.} a missing factor with default 1. We replaced these features
+by four measures.
+
+\paragraph{Canonical linear form.} A preparatory rule set rewrites every
+linear expression in the integration variable into a canonical term
+$\mathrm{lin}(a,b,x)$ that stands for $a+bx$. Its rules propagate through
+the integrand and combine linear terms with numbers:
+
+\begin{lstlisting}
+ADDSPEC IntCanon : canon(Xv,Xv) = lin(0,1,Xv)
+ADDSPEC IntCanon : IF NIN(Xv,Uv) canon(Uv,Xv) = Uv
+ADDSPEC IntCanon : canon(Uv*Vv,Xv) = canon(Uv,Xv)*canon(Vv,Xv)
+ADDSPEC IntCanon : Kc*lin(Ka,Kb,Xv) = lin(Kc*Ka,Kc*Kb,Xv)
+ADDSPEC IntCanon : lin(Ka,Kb,Xv)+lin(Kc,Kd,Xv) = lin(Ka+Kc,Kb+Kd,Xv)
+\end{lstlisting}
+
+One translated rule then covers $x$, $2x$, $x+1$ and $3+2x$. After
+integration, $\mathrm{lin}(a,b,x)$ is turned back into $a+bx$ and the
+standard algebra simplifies the result.
+
+\paragraph{Numeric parameters.} The parameters $a$, $b$, $m$ of the Rubi
+rules are \texttt{NUM} variables. They only match numbers, which makes
+Rubi's \texttt{FreeQ} tests unnecessary. The price is that the subset is
+restricted to numeric coefficients. Symbolic constant factors are still
+handled by the linearity rules, which do use \texttt{NIN}.
+
+\paragraph{Combined conditions.} A rule in \texttt{rewrite} has a single
+condition, but the condition can be any boolean expression. Rubi's
+conditions become, for example, \texttt{IF ((Km > 0) \&\& is\_int(2*Km))}.
+
+\paragraph{Factor order.} Rules with two factors are written for both
+orders. Rubi expresses $\cos z$ as $\sin(z+\pi/2)$; the cosine rules were
+obtained by working out this shift.
+
+The translated version of the rule above reads
+
+\begin{lstlisting}
+ADDSPEC IntRubi : IF (Km != -1) IntL(lin(Ka,Kb,Xv)^Km,Xv) =
+                  lin(Ka,Kb,Xv)^(Km+1)*mi(Kb*(Km+1))
+\end{lstlisting}
+
+and the complete integration is the rule list
+\texttt{(IntCanon,IntRubi),IntUnlin,All}. The original Mathematica form of
+each rule is kept as a comment in the rule files.
+
+\subsection{Results}
+
+The subset consists of 13 Rubi rules from sections 9.1 (integrand
+simplification), 1.1.1.1 ($(a+bx)^m$), 2.1 and 2.3 (exponentials), and
+4.1.1.1 and 4.1.10 (sine), which became 24 \texttt{rewrite} rules. It
+integrates sums of powers of linear expressions, possibly multiplied by one
+exponential, sine or cosine of a linear argument. Table~\ref{tab:int} shows
+examples. The test suite checks every result by differentiating it again
+and comparing the derivative numerically with the integrand.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Integrand & Result of \texttt{REWR Int(f,x) : Integrate} \\
+\midrule
+\texttt{1/(2*x+3)}   & \texttt{0.5 * ln (3 + 2 * x )} \\
+\texttt{5/(x+1)\^{}2} & \texttt{-5 * (1 + x )\^{} -1} \\
+\texttt{sqrt(x)}     & \texttt{0.666667 * x \^{} 1.5} \\
+\texttt{x*exp(2*x)}  & \texttt{0.5 * exp (2 * x )* x - 0.25 * exp (2 * x )} \\
+\texttt{x\^{}2*cos(x)} & \texttt{2 * cos (x )* x + x \^{} 2 * sin (x )- 2 * sin (x )} \\
+\texttt{(x+1)*cos(x)} & \texttt{sin (x )* x + cos (x )+ sin (x )} \\
+\texttt{sqrt(x)*sin(x)} & \texttt{0.5 * Int (x \^{} -0.5 * cos (x ),x )- x \^{} 0.5 * cos (x )} \\
+\bottomrule
+\end{tabular}
+\caption{Indefinite integrals computed with the translated Rubi subset. In
+the last example the reduction stops at an integral that would need
+Fresnel functions, which are not part of the subset.}
+\label{tab:int}
+\end{table}
+
+During this work, the translation also served as a test of the library
+itself. It revealed two incorrect simplification rules in the standard
+algebra, which turned $\ln(x+y)$ into $\ln x\cdot\ln y$ and $a^{b^c}$ into
+$a^{bc}$, and two incorrect derivatives (of $\arcsin$ and $\arccos$). They
+have been corrected.
+
+\section{Implementation and revival}
+
+The interpreter consists of about 6500 lines of C and a grammar of about
+450 lines for the scanner and parser generators flex and bison. Terms are
+binary trees of nodes taken from memory pools; symbols carry their sort,
+value and the links used by \texttt{LIFT}. The rules of an algebra are
+merged into a single tree, in which rules with a common left-hand-side
+structure share nodes and alternatives branch off where they differ. This
+tree is matched against every subterm, innermost first.
+
+The program was written for 32-bit Unix and the Amiga and no longer worked
+with current tools. The port to 64-bit Linux and Windows (MSYS2) required
+only small changes to the C code itself. The main problems were changed
+semantics in the scanner generator, the release of static memory that old
+C libraries tolerated, and errors in the handling of declarations inside
+loops and included files. A regression test suite with 23 test programs
+now covers the core language, the library, the integration rules and the
+original example programs. Memory leaks were removed with an instrumented
+build that counts allocations per source line, so that repeated
+calculations run in constant memory.
+
+Performance is adequate for interactive use. Loading the complete standard
+library and computing a derivative or an integral takes well below
+0.1\,s on a current laptop. A scalar loop written in the language itself
+needs about 0.25\,$\mu$s per iteration (measured for $10^7$ iterations of
+\texttt{s = s + k*k}). We estimate this to be about two orders of magnitude
+slower than an equivalent compiled loop. Operations on whole vectors and
+matrices run in C.
+
+\section{Discussion}
+
+\paragraph{Strengths.} The main strength of \texttt{rewrite} is that all
+mathematics is visible and changeable. Correcting the derivative of
+$\arcsin$ meant editing one line of a text file, not the interpreter.
+\texttt{LIFT} allows algebraic structure to be expressed once and reused,
+and \texttt{NUM} variables together with conditions give precise control
+over when a rule fires. The interleaving of rewriting and numerical
+evaluation makes it natural to derive formulas symbolically and evaluate
+them numerically in the same program, for example derivatives for Newton's
+method.
+
+\paragraph{Limitations.} The matcher does not support associative or
+commutative matching; sums are kept in a canonical order by rules, and
+products sometimes have to be matched in both orders. Nothing checks that
+a rule set terminates or is confluent~\cite{baader1998term}, and the order
+of rules matters. Optional pattern arguments are missing, which the
+integration case study had to replace by a canonical form. Error messages
+are minimal.
+
+\paragraph{Related work.} Rule-based simplification is at the core of
+Mathematica~\cite{mathematica} and of Rubi~\cite{rich2018rubi}. General
+rewriting logic is provided by Maude~\cite{clavel2007maude}. More recently,
+equality saturation with e-graphs, as in egg~\cite{willsey2021egg} and
+Metatheory.jl~\cite{cheli2021metatheory}, avoids the dependence on rule
+order by representing many equivalent terms at once. Proof assistants
+organize mathematical knowledge in algebraic hierarchies and simplification
+rule sets~\cite{mathlib2020}. \texttt{rewrite} anticipated several of these
+ideas in a small and self-contained system.
+
+\paragraph{Outlook.} Natural next steps are commutative matching and
+optional arguments in the matcher, which would allow a more direct
+translation of the Rubi rules, and code generation that turns symbolically
+derived expressions into compiled numerical code.
+
+\section{Conclusion}
+
+\texttt{rewrite} shows that a small interpreter can host a complete
+computer algebra library when the mathematics is expressed as rewrite rules
+and rule sets can be combined and lifted between algebraic structures. The
+translation of part of Rubi demonstrates that established rule-based
+algorithms can be imported, and it clarifies which matching features such
+an import requires.
+
+\section*{Availability}
+
+The source code, the standard library, the integration rules and the test
+suite are available at \url{https://github.com/RainerHeintzmann/rewrite}
+under the MIT license~\cite{rewriterepo}. The translated integration rules
+are derived from Rubi~\cite{rubirepo} and keep its MIT license notice.
+
+\section*{Acknowledgements}
+
+The scanner and parser framework of the original program is based on code
+by Axel T.\ Schreiner. The 2026 port, the test suite, the memory leak
+analysis and the translation of the integration rules were carried out
+with the assistance of an AI coding assistant (Claude, Anthropic).
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

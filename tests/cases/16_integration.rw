@@ -1,0 +1,160 @@
+# Rule-based integration (Rubi subset in inc/integration).
+# Each integral is printed, then checked numerically: |D(Int(f,x),x) - f|
+# at x = 0.7 must be below 1e-9 (prints true).
+INC "inc/all"
+INC "inc/integration/all"
+TERM FF,GG,HH : real
+CONST yy : real
+REWR Int(a*x,x) : Integrate
+x = yy
+FF = REWR Int(x^2,x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = x^2
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(1/x,x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = 1/x
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(1/(2*x+3),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = 1/(2*x+3)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(5/(x+1)^2,x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = 5/(x+1)^2
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(sqrt(x),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = sqrt(x)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(3*x^2+2*x+1,x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = 3*x^2+2*x+1
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(x*(x+1),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = x*(x+1)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int((2*x-1)*(x+3),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = (2*x-1)*(x+3)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(exp(2*x+1),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = exp(2*x+1)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(e^x,x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = e^x
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(2^x,x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = 2^x
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(x*exp(2*x),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = x*exp(2*x)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(exp(-x)*x^3,x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = exp(-x)*x^3
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int((2*x+1)^2*exp(3*x),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = (2*x+1)^2*exp(3*x)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(sin(x),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = sin(x)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(cos(3*x+1),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = cos(3*x+1)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(x*sin(x),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = x*sin(x)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(x^2*cos(x),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = x^2*cos(x)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(x^3*sin(2*x),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = x^3*sin(2*x)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int((x+1)*cos(x),x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = (x+1)*cos(x)
+x = 0.7
+abs(GG-HH) < 1e-9
+x = yy
+FF = REWR Int(sin(x)+cos(x)+x,x) : Integrate
+FF
+GG = REWR D(FF,x) : All
+HH = sin(x)+cos(x)+x
+x = 0.7
+abs(GG-HH) < 1e-9
+# not (yet) covered: the remaining integral is returned unchanged
+x = yy
+REWR Int(sqrt(x)*sin(x),x) : Integrate
+REWR Int(sin(x)^2,x) : Integrate
+REWR Int(1/(x^2+1),x) : Integrate

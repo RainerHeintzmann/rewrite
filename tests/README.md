@@ -43,6 +43,7 @@ can be used in scripts and CI.
 | `13_regressions` | Crashes fixed in 2026. |
 | `14_rule_conditions` | Rules with conditions (`IF (...)`, `NIN`) and `NUM` meta variables. |
 | `15_memory_paths` | The code paths that free memory, so that a tree freed too early shows up. |
+| `16_integration` | Rule-based integration from [inc/integration](../inc/integration), each result checked by differentiation. |
 | `ex_*` | The example programs of the original project, for example `LiNbO3/abso1`. |
 
 Files used by the tests are in [data](data). All paths in the tests are

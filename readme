@@ -388,6 +388,10 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    Bloecken und Benutzerfunktionen.
  - inc/alg: Ableitungen von arcsin und arccos benutzten 1+x^2 statt 1-x^2.
    Behoben. Neue Ableitungsregeln fuer exp, sqrt, sinh, cosh, tanh und abs.
+ - inc/alg: falsche Regeln ln(X+Y)=ln X * ln Y und X^Y^Z=X^(Y*Z) ersetzt durch
+   ln(X*Y)=ln X + ln Y und (X^Y)^Z=X^(Y*Z).
+ - Neues Verzeichnis inc/integration: regelbasierte Integration, eine
+   Auswahl der Rubi-Regeln (A. D. Rich, MIT-Lizenz), siehe README.md dort.
 
 Maengel des Systems:
 Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie

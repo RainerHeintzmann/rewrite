@@ -289,6 +289,22 @@ REWR newton(1,x^2-2,D(x^2-2,x),x) : numerik,rechne    # prints 1.41421
 REWR fmin(-1,1,(x-0.3)^2,x) : numerik,rechne          # prints 0.3
 ```
 
+### Rule-based integration
+
+[inc/integration](inc/integration) adds indefinite integration with a
+translation of a subset of the [Rubi](https://github.com/RuleBasedIntegration/Rubi)
+rules (MIT license). It covers powers of linear expressions, exponentials,
+sine and cosine, and polynomials times them:
+
+```text
+INC "inc/integration/all"
+REWR Int(x^2*cos(x),x) : Integrate      # prints 2 * cos (x )* x + x ^ 2 * sin (x )- 2 * sin (x )
+REWR Int(1/(2*x+3),x) : Integrate      # prints 0.5 * ln (3 + 2 * x )
+```
+
+See [inc/integration/README.md](inc/integration/README.md) for what is
+covered and how the rules are translated.
+
 Larger example programs are [LiNbO3/abso1](LiNbO3/abso1) and
 [LiNbO3/compute](LiNbO3/compute) (X-ray absorption and structure factors
 of LiNbO3), [inc/chaos](inc/chaos), [inc/molekuel](inc/molekuel) and
@@ -348,6 +364,11 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
 - The derivatives of `arcsin` and `arccos` used `1+x^2` instead of `1-x^2`.
   Fixed. New derivative rules for `exp`, `sqrt`, `sinh`, `cosh`, `tanh` and
   `abs`.
+- Two wrong rules in [inc/alg](inc/alg) fixed: `ln(x+y)` was turned into
+  `ln x * ln y` (now `ln(x*y) = ln x + ln y`), and `a^(b^c)` into `a^(b*c)`
+  (now `(a^b)^c = a^(b*c)`).
+- New folder [inc/integration](inc/integration) with rule-based integration
+  translated from Rubi.
 - [LiNbO3/abso1](LiNbO3/abso1) runs again, and the test suite was added.
 
 ## License

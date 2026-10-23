@@ -1,0 +1,22 @@
+# inc/integration/1.1.1.1_linear_power
+# Uebersetzung von Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi,
+# Commit 61e9c18), Abschnitt
+#   1 Algebraic functions / 1.1 Binomial products / 1.1.1 Linear /
+#   1.1.1.1 (a+b x)^m
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi. Uebersetzung 2026.
+#
+# Die Muster x_, a_.+b_.*x_ werden durch lin(a,b,x) ersetzt, siehe base.
+# a, b und m muessen Zahlen sein (NUM-Variablen).
+
+# Int[1/x_, x_Symbol] := Log[x]
+# Int[1/(a_ + b_.*x_), x_Symbol] := Log[RemoveContent[a + b*x, x]]/b /; FreeQ[{a, b}, x]
+#   (beide Faelle: lin(a,b,x)^-1)
+ADDSPEC IntRubi : IF (Km == -1) IntL(lin(Ka,Kb,Xv)^Km,Xv) = ln(lin(Ka,Kb,Xv))*mi(Kb)
+
+# Int[x_^m_., x_Symbol] := x^(m + 1)/(m + 1) /; FreeQ[m, x] && NeQ[m, -1]
+# Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /; FreeQ[{a, b, m}, x] && NeQ[m, -1]
+ADDSPEC IntRubi : IF (Km != -1) IntL(lin(Ka,Kb,Xv)^Km,Xv) = lin(Ka,Kb,Xv)^(Km+1)*mi(Kb*(Km+1))
+
+# m = 1 (das Muster x_^m_. erlaubt m = 1; hier ohne Potenz geschrieben)
+ADDSPEC IntRubi : IntL(lin(Ka,Kb,Xv),Xv) = lin(Ka,Kb,Xv)^2*mi(2*Kb)

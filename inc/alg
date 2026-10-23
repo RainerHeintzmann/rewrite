@@ -253,13 +253,13 @@ ADDSPEC Real : (A*B)^X=A^X*B^X
 ADDSPEC Real : X^1   = X
 ADDSPEC Real : X^0   = 1
 ADDSPEC Real : X^(-Y)  = mi (X^Y)
-ADDSPEC Real : X^Y^Z=X^(Y*Z)
+ADDSPEC Real : (X^Y)^Z=X^(Y*Z)        # 2026: war X^Y^Z (= X^(Y^Z), falsch)
 ADDSPEC Real : X^(Y+Z)=X^Y*X^Z
 ADDSPEC Real : IF (is_int(N/2)) (-X)^N=X^N
 ADDSPEC Real : IF (is_int((N- 1)/2)) (-X)^N= -(X^N)
 
 ADDSPEC Real : ln e  = 1
-ADDSPEC Real : ln (X+Y)=ln X * ln Y
+ADDSPEC Real : ln (X*Y)=ln X + ln Y   # 2026: war ln(X+Y)=ln X * ln Y (falsch)
 
 ADDSPEC Real : sin(-A) = -sin A
 ADDSPEC Real : cos(-A) =  cos A

@@ -1,0 +1,82 @@
+# inc/integration/base
+# Grundlagen fuer die Integration nach Rubi (Rule-based integration, A. Rich).
+# Benoetigt inc/all. Wird von inc/integration/all geladen.
+#
+# Int(f,x)        unbestimmtes Integral (Ergebnis ohne Integrationskonstante)
+# IntL(f,x)       internes Integral ueber den kanonischen Integranden
+# lin(a,b,x)      steht fuer a+b*x mit Zahlen a,b (ersetzt Rubis optionale
+#                 Muster a_.+b_.*x_)
+# canon(f,x)      bringt f in die kanonische Form mit lin(...)
+
+FUNC Int   : real,real >> real
+FUNC IntL  : real,real >> real
+FUNC canon : real,real >> real
+FUNC lin   : real,real,real >> real
+
+VAR Uv,Vv,Wv,Xv : real          # beliebige Terme
+NUM Ka,Kb,Kc,Kd,Ke,Kf,Km,Kn : real   # nur Zahlen (ersetzt Rubis FreeQ[..,x])
+
+# ---------------- kanonische Form ----------------
+ALG IntCanon
+SPEC    IntCanon : Int(Uv,Xv) = IntL(canon(Uv,Xv),Xv)
+ADDSPEC IntCanon : canon(Xv,Xv) = lin(0,1,Xv)
+ADDSPEC IntCanon : IF NIN(Xv,Uv) canon(Uv,Xv) = Uv
+ADDSPEC IntCanon : canon(Uv+Vv,Xv) = canon(Uv,Xv)+canon(Vv,Xv)
+ADDSPEC IntCanon : canon(Uv-Vv,Xv) = canon(Uv,Xv)+(-canon(Vv,Xv))
+ADDSPEC IntCanon : canon(Uv*Vv,Xv) = canon(Uv,Xv)*canon(Vv,Xv)
+ADDSPEC IntCanon : canon(Uv/Vv,Xv) = canon(Uv,Xv)*mi canon(Vv,Xv)
+ADDSPEC IntCanon : canon(-Uv,Xv)   = -canon(Uv,Xv)
+ADDSPEC IntCanon : canon(mi Uv,Xv) = mi canon(Uv,Xv)
+ADDSPEC IntCanon : canon(Uv^Vv,Xv) = canon(Uv,Xv)^canon(Vv,Xv)
+ADDSPEC IntCanon : canon(sqrt Uv,Xv) = canon(Uv,Xv)^0.5
+# e hat einen Zahlenwert; e^u wird als exp(u) geschrieben
+ADDSPEC IntCanon : IF (abs(Kf - e) < 1e-9) Kf^lin(Ka,Kb,Xv) = exp(lin(Ka,Kb,Xv))
+ADDSPEC IntCanon : canon(exp Uv,Xv)  = exp canon(Uv,Xv)
+ADDSPEC IntCanon : canon(ln Uv,Xv)   = ln canon(Uv,Xv)
+ADDSPEC IntCanon : canon(sin Uv,Xv)  = sin canon(Uv,Xv)
+ADDSPEC IntCanon : canon(cos Uv,Xv)  = cos canon(Uv,Xv)
+# Rechnen mit lin(a,b,x)
+ADDSPEC IntCanon : Kc*lin(Ka,Kb,Xv) = lin(Kc*Ka,Kc*Kb,Xv)
+ADDSPEC IntCanon : lin(Ka,Kb,Xv)*Kc = lin(Kc*Ka,Kc*Kb,Xv)
+ADDSPEC IntCanon : Kc+lin(Ka,Kb,Xv) = lin(Kc+Ka,Kb,Xv)
+ADDSPEC IntCanon : lin(Ka,Kb,Xv)+Kc = lin(Kc+Ka,Kb,Xv)
+ADDSPEC IntCanon : -lin(Ka,Kb,Xv) = lin(-Ka,-Kb,Xv)
+ADDSPEC IntCanon : lin(Ka,Kb,Xv)+lin(Kc,Kd,Xv) = lin(Ka+Kc,Kb+Kd,Xv)
+ADDSPEC IntCanon : IF (Kb == 0) lin(Ka,Kb,Xv) = Ka
+ADDSPEC IntCanon : mi lin(Ka,Kb,Xv) = lin(Ka,Kb,Xv)^(-1)
+ADDSPEC IntCanon : mi (lin(Ka,Kb,Xv)^Km) = lin(Ka,Kb,Xv)^(-Km)
+ADDSPEC IntCanon : lin(Ka,Kb,Xv)*lin(Ka,Kb,Xv) = lin(Ka,Kb,Xv)^2
+ADDSPEC IntCanon : lin(Ka,Kb,Xv)^Km*lin(Ka,Kb,Xv) = lin(Ka,Kb,Xv)^(Km+1)
+ADDSPEC IntCanon : lin(Ka,Kb,Xv)*lin(Ka,Kb,Xv)^Km = lin(Ka,Kb,Xv)^(Km+1)
+ADDSPEC IntCanon : lin(Ka,Kb,Xv)^Km*lin(Ka,Kb,Xv)^Kn = lin(Ka,Kb,Xv)^(Km+Kn)
+# (a+b x)(c+d x) ausmultiplizieren (wie Rubis ExpandIntegrand)
+ADDSPEC IntCanon : IF ((Ka != Kc) || (Kb != Kd)) lin(Ka,Kb,Xv)*lin(Kc,Kd,Xv) = \
+                   lin(Ka*Kc,Ka*Kd+Kb*Kc,Xv)+(Kb*Kd)*lin(0,1,Xv)^2
+ADDSPEC IntCanon : IF (Km == 0) Uv^Km = 1
+ADDSPEC IntCanon : IF (Km == 1) Uv^Km = Uv
+ADDSPEC IntCanon : IF (Kc == 1) Kc*Uv = Uv
+ADDSPEC IntCanon : IF (Kc == 1) Uv*Kc = Uv
+ADDSPEC IntCanon : (Kc*Uv)*Vv = Kc*(Uv*Vv)
+ADDSPEC IntCanon : Uv*(Kc*Vv) = Kc*(Uv*Vv)
+
+# ---------------- Rueckwandlung ----------------
+ALG IntUnlin
+SPEC    IntUnlin : IF (Ka != 0) lin(Ka,Kb,Xv) = Ka+Kb*Xv
+ADDSPEC IntUnlin : IF ((Ka == 0) && (Kb == 1))  lin(Ka,Kb,Xv) = Xv
+ADDSPEC IntUnlin : IF ((Ka == 0) && (Kb == -1)) lin(Ka,Kb,Xv) = -Xv
+ADDSPEC IntUnlin : IF ((Ka == 0) && (Kb != 1) && (Kb != -1)) lin(Ka,Kb,Xv) = Kb*Xv
+ADDSPEC IntUnlin : IF (Kc == 1) Kc*Uv = Uv
+ADDSPEC IntUnlin : IF (Kc == 1) Uv*Kc = Uv
+ADDSPEC IntUnlin : IntL(Uv,Xv) = Int(Uv,Xv)   # nicht integrierbarer Rest
+
+# ---------------- Rubi 9.1 Integrand simplification rules (Auswahl) -----
+# Int[a_, x_Symbol] := a*x /; FreeQ[a, x]
+# Int[-u_, x_Symbol] := Identity[-1]*Int[u, x]
+# Int[a_*u_, x_Symbol] := a*Int[u, x] /; FreeQ[a, x]
+# Int[u_, x_Symbol] := IntSum[u, x] /; SumQ[u]
+ALG IntRubi
+SPEC    IntRubi : IntL(Uv+Vv,Xv) = IntL(Uv,Xv)+IntL(Vv,Xv)
+ADDSPEC IntRubi : IntL(-Uv,Xv) = -IntL(Uv,Xv)
+ADDSPEC IntRubi : IF NIN(Xv,Uv) IntL(Uv*Vv,Xv) = Uv*IntL(Vv,Xv)
+ADDSPEC IntRubi : IF NIN(Xv,Vv) IntL(Uv*Vv,Xv) = Vv*IntL(Uv,Xv)
+ADDSPEC IntRubi : IF NIN(Xv,Uv) IntL(Uv,Xv) = Uv*Xv

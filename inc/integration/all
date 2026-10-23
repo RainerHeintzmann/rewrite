@@ -1,0 +1,14 @@
+# inc/integration/all
+# Regelbasierte Integration nach Rubi (Auswahl), siehe inc/integration/README.md
+# Benutzung:
+#   INC "inc/all"
+#   INC "inc/integration/all"
+#   REWR Int(x*exp(2*x),x) : Integrate
+
+INC "inc/integration/base"
+INC "inc/integration/1.1.1.1_linear_power"
+INC "inc/integration/2_exponentials"
+INC "inc/integration/4.1_sine"
+
+ALG Integrate
+SPEC Integrate : (IntCanon,IntRubi),IntUnlin,All
