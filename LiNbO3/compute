@@ -1,0 +1,211 @@
+# Program for the computation of Bragg-angles, structure factors
+# angles of grating vector to the crystal axis for LiNBO3
+
+# indices of the reciprocal lattice "h,k,l" , 
+# and Egy and lambda of incoming X-Ray beam have to be set before this program is
+# invoked !
+
+# assign datafile for crytal data:
+
+DATA "LiNbO3/struct"
+
+# CONST h,k,l : real
+
+# Definition of the used variables :
+
+CONST Coord,Indices,a1,a2,a3,b1,b2,b3,p1,p2,p3,S,G : rvector
+
+CONST c1,c2,c3,aa,ca,para,d,sin30,cos30,Vuc,Aw,C1,D1,MuDivRho,rho,Zges,MuDivRhoGes : real
+CONST DiffAtoms,ThisAtoms,SFA,SFB,SFC,Za,atom,SumA : real
+CONST ThetaB,sinThetaB,t05,mu,angx,angy,angz : real
+
+CONST Fg : complex # Structur Factor
+CONST fb : complex # Atomic Form Factor
+
+CONST indj,indk,number,value : real
+CONST d1jk,d2jk,d3jk : rmatrix
+
+# for saving computation time:
+
+sin30 = sin(30*_deg)
+cos30 = cos(30*_deg)
+
+
+Indices= [h,k,l] # h,k,l have to be set before !
+
+
+# Definition of the real space basis vectors of the crystal lattice of
+# LiNbO3 :
+
+aa=5.148                 # Length of a1,a2 -axis
+ca=13.863                # Length of c -axis
+
+a1= [aa,0,0]             # real space latice vectors [in Angstroem]
+a2= [ -sin30*aa,cos30*aa,0]
+a3= [0,0,ca]             # == c-axis
+
+Vuc = a1*(a2 _x_ a3)     # Volume of unit Cell
+
+# calculation of the inverse grating vectors (without the 2*pi)
+
+b1= a2 _x_ a3 / Vuc
+b2= a3 _x_ a1 / Vuc
+b3= a1 _x_ a2 / Vuc
+
+G = h*b1+k*b2+l*b3
+S = G/2
+
+# Calculation of Parameter for Atomic Form Factor : sinTheta/lambda = 1/2d
+
+para = abs(G) / 2
+d = 1/(2*para)                       # distance of layer separation
+
+# Calculation of Bragg Angle (lambda given in _Ang)
+
+sinThetaB = para*lambda
+ThetaB = arcsin(sinThetaB)
+
+angx= arccos([1,0,0]*G/abs(G)) / _deg # Calculate angles of the reciprocal
+angy= arccos([0,1,0]*G/abs(G)) / _deg # lattice vector to all crystal axes.
+angz= arccos([0,0,1]*G/abs(G)) / _deg # This is particularily usefull for
+																			# finding a special reflection.
+
+# "reflex : ",Indices
+# "parameter sin Theta/Lambda : ",para,"[1/A]"
+
+DATA c1; DATA c2; DATA c3             # read equivalent points from datafile
+
+p1= [c1,c2,c3]                        # first point
+
+DATA c1; DATA c2; DATA c3
+
+p2= [c1,c2,c3]                        # second point
+
+DATA c1; DATA c2; DATA c3
+
+p3= [c1,c2,c3]                        # third point
+
+
+#-------------------------------------------------------------------------
+# calculation of the absorbtion properties and structure factor
+#-------------------------------------------------------------------------
+
+Fg = Cpx(0,0)                    # initialize Structure Factor
+Zges = 0                         # initialize counter for protons in unit cell
+MuDivRhoGes = 0                  # initialize mass absorbtion coeff.
+SumA = 0                         # initialize counter for complete weight of unit cell
+
+DATA DiffAtoms                   # read number of different kinds of atoms
+
+FOR atom=1 TO DiffAtoms DO {     # for every kind of atom do
+
+DATA Za                                   # read number of protons
+
+DATA Aw                                   # read Atomic weight in Atomic Units
+
+DATA SFA;DATA SFB;DATA SFC                # read form factor of this atom
+																					# The values given are from
+																					# International Tables for X-Ray Crystallography
+																					# Vol. III, Kynoch Press 1968, pp. 201
+
+
+DATA C1;DATA D1                           # read self defined coefficients for absorbtion
+    																			# This coef. is calculated from a fit
+	   																			# of tabled data given in
+																					# International Tables for X-Ray Crystallography
+																					# Vol. III, Kynoch Press 1968, pp. 157
+																					#
+																					# The next eqation is the equation of
+																					# this empirical fit. It has no
+																					# theoretical background, exept for
+																					# fitting the given values quite well.
+
+MuDivRho = (C1*lambda^3-D1*lambda^4)*1000/100^2 
+# Units in the abouve eq. : lambda = _Ang;-> MuDivRho = cm^2/g (now m^2/kg)
+
+DATA ThisAtoms    # read number of atoms of this kind in unit cell per equiv. point
+
+Zges = Zges+Za*ThisAtoms*3                # add protons up for the sum
+																					# of protons in unit cell
+																					# *3 is because of 3 equivalent points
+
+SumA = SumA + Aw*ThisAtoms*3              # add up weight
+
+                          # for computing average mass absorbtion coefficient:
+                          # it will be divided by SumA later on
+MuDivRhoGes = MuDivRhoGes + MuDivRho*ThisAtoms*3*Aw 
+
+fb = Cpx((Za-SFA)*exp(-SFB*para*para)+SFA*exp(-SFC*para),0)
+
+"Atomic Number : ",Za,"  Form Factor : ",fb
+
+FOR a=1 TO ThisAtoms DO {    # read position of atoms
+DATA c1; DATA c2; DATA c3
+Coord= [ c1,c2,c3 ]          # coord system is orthohexagonal
+
+Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p1))) # Calculate structure factor out of
+Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p2))) # form-factors. Add up for every
+Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p3))) # atom in unit cell.
+}                             # end of for a
+
+}                             # end of for atom (counting the kinds of atoms)
+
+DATA rho   # read density of the whole crystal
+
+MuDivRhoGes = MuDivRhoGes/SumA   # compute average mass absorbtion coeff.
+mu = rho*MuDivRhoGes             # compute absorbtion coefficient
+
+""                               # generate empty line in output
+
+# calculate approx. penetration depth of the X-ray in bragg case
+# this value is also called 'extinction length'
+
+t05=Vuc*_Ang^3/(2*2^0.5*d*_Ang*bel*abs(Fg)) # d : layer separation (see above)
+																						# bel : electron scattering length=2.81fm
+
+#--------------------------------------------------------------------------------
+# Print calculated values on the screen
+#--------------------------------------------------------------------------------
+
+"index : ",Indices,"  Structure Factor : ",Fg
+"angle of G to axis X: ",angx,", Y: ",angy,", Za:",angz
+"lambda [_Ang]: ",lambda,"ThetaB [deg]: ",ThetaB/ _deg
+"t0.5 [m]: ",t05
+"MuGes/rho (cm^2/g) : ",MuDivRhoGes*100^2/1000
+"absorbtionlength [m]: ",- sinThetaB*ln 0.5 /mu
+
+"" # empty line for separation
+
+# read the piezoelectric constants from the datafile
+
+d1jk = nullmat(3,3)               # initialize
+
+DATA number                       # number of constants != 0
+FOR b = 1 TO number DO {
+DATA indj;DATA indk; DATA value
+d1jk = chmat(d1jk,indj-1,indk-1,value)
+d1jk = chmat(d1jk,indk-1,indj-1,value)   # coefficients are symmetric !
+}
+
+d2jk = nullmat(3,3)
+
+DATA number   # Number of Constants != 0
+FOR b = 1 TO number DO {
+DATA indj;DATA indk; DATA value
+d2jk = chmat(d2jk,indj-1,indk-1,value)
+d2jk = chmat(d2jk,indk-1,indj-1,value)   # coefficients are symmetric !
+}
+
+d3jk = nullmat(3,3)
+
+DATA number   # Number of Constants != 0
+FOR b = 1 TO number DO {
+DATA indj;DATA indk; DATA value
+d3jk = chmat(d3jk,indj-1,indk-1,value)
+d3jk = chmat(d3jk,indk-1,indj-1,value)   # coefficients are symmetric !
+}
+
+
+INC "LiNbO3/modulation"                  # execute file for calculation
+																				 # of modulated lattice
+

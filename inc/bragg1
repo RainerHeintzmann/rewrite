@@ -1,0 +1,76 @@
+# Berchnung der Beugung am durch die scharfe Braggbedingung 
+# erzeugten Spalt
+
+CONST Phi0,Phi,Steps1,Steps2,PhiMax,l,DThetaB,sinThetaB,ld,k,t,SUM,a,step1,step2,I0 : real
+l = 30             # Abstand zur Quelle
+DThetaB = 10 * _my # 3 * _my
+ld = 1.09e-10
+
+Phi0 = (0) * _my
+PhiMax = (150) * _my
+
+Steps1 = 150 # Fuer Betragsaddition (pro PhiMax-Phi0)
+Steps2 = 154 # 04 # Fuer Amplitudenaddition (pro DThetaB)
+
+"# l = ",l
+"# DThetaB = ",DThetaB
+"# ld = ",ld
+"# Phi0 = ",Phi0
+"# PhiMax = ",PhiMax
+"# Steps1 = ",Steps1
+"# Steps2 = ",Steps2
+
+
+k=2*pi/ld
+
+sinThetaB= 1.920e-10/(2*ld)
+
+a = (l*DThetaB)/2*k*sinThetaB
+
+b = k/2/l
+
+step2 = DThetaB/(Steps2+0.1)
+
+FUNC Ages : real >> complex ATT (CONST Phi : real)  {
+CONST Phi0s : real
+CONST A1 : complex
+
+A1=Cpx(0,0)
+
+FOR Phi0s= -DThetaB/2 TO DThetaB/2 STEP step2 DO  {
+  IF ((Phi-Phi0s)^2 <= step2^2/10) A1=A1+ a*exp(Cpx(0, -b*Phi0s*Phi0s)) ELSE         A1=A1+ sin(a*(Phi-Phi0s))/(Phi-Phi0s)*exp(Cpx(0, -b*Phi0s*Phi0s))
+  }
+
+# "Phi : ",Phi-Phi0,A1
+RETURN A1*step2
+}
+
+step1 = (PhiMax-Phi0)/Steps1
+
+FUNC Idetektor : real >> real ATT (CONST Phi0 : real) {
+CONST SUM : real
+SUM=0
+
+FOR Phi=Phi0-DThetaB/2 TO Phi0+DThetaB/2 STEP step2 DO {
+SUM = SUM + asqr(Ages(Phi))
+}
+
+RETURN SUM
+}
+
+
+# Ages(0.001)
+
+
+# SUM = Idetektor(Phi0)
+
+# "# I0 = ",I0
+
+FOR Phi = Phi0 TO PhiMax STEP step1 DO {
+SUM=Idetektor(Phi)
+Phi,SUM,ln(SUM)
+
+# SUM = SUM - asqr(Ages(Phi-DThetaB/2))
+# SUM = SUM + asqr(Ages(Phi+DThetaB/2+step1))
+}
+

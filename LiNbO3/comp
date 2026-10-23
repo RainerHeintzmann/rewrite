@@ -1,0 +1,23 @@
+# Program for setting Energy and index of reflection
+
+# definition of some constants
+
+CONST h,k,l,lambda,Egy : real
+
+h=0
+k=0
+l=6
+
+# lambda = 0.7107                     # Kalpha1 (Mo) [_Ang]
+# lambda = 1.540598                   # Kalpha1 (Cu) [_Ang]
+# Egy = c/(lambda* _Ang)*hq*2*pi/e0   # Energy in eV
+
+Egy = 12480 # 13900                      # set X-Ray Energy [eV]
+lambda = c/(Egy*_Ang)*hq*2*pi/e0 # calculate lambda [_Ang]
+
+# OUT "xxx"   # print all following into a file
+
+" Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)"
+
+# OUT "stdout" # reset output to screen
+

@@ -1,0 +1,59 @@
+#	Amiga-makefile
+
+#  Reihenfolge bei Libraries wichtig !!!
+L	= -lm -lc
+O	= scan.o sym.o sync.o syn.o run.o stack.o userfkt.o forms.o lib/tload.o \
+lib/tsearch.o lib/bsearch.o lib/fatal.o lib/strsave.o lib/alloca.o
+
+T	= rewrite
+
+# -DDEBUG -DBISON -DYY_USE_PROTOS
+CFLAGS = -iinclude -DYY_USE_PROTOS
+
+CC	= LC:lc 
+LN	= lc:blink FROM
+LIBS = LIB:lcm.lib LIB:lc.lib
+LEX	= flex
+MV	= cp
+RM	= rm 
+YACC	= bison
+
+all	: $(T)
+
+$(T): $(O)
+	$(LN) LIB:c.o $(O) TO $(T) LIB $(LIBS)
+
+scan.c:	scan.l
+	$(LEX) scan.l 
+   $(MV) lex.yy.c scan.c
+
+syn.c: syn.tab.c
+	$(MV) syn.tab.c syn.c
+	$(MV) syn.tab.h syn.h
+	touch syn.c syn.h
+
+syn.tab.c: syn.y sync.h
+	$(YACC) -d syn.y
+
+sync.o: sync.c sync.h syn.c
+
+scan.o: scan.c syn.c run.h sym.h 
+
+syn.o: syn.c run.h sym.h
+
+sym.o: sym.c run.h sym.h
+
+forms.o: forms.c syn.c forms.h
+
+stack.o: stack.c stack.h
+
+userfkt.o: userfkt.c userfkt.h sym.h
+
+run.o: run.c stack.c syn.c sync.h
+
+rmall:
+	$(RM) *.o scan.c syn.c syn.h y.tab.* y.tok.*
+	$(RM) $(T)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<

@@ -1,0 +1,26 @@
+CONST h,k,l,lambda,Egy : real
+
+h=0
+k=0
+l=0
+
+# lambda = 0.7107 # Kalpha1 (Mo) [_Ang]
+# lambda = 1.540598 # Kalpha1 (Cu) [_Ang]
+# Egy = c/(lambda* _Ang)*hq*2*pi/e0   # Energy in eV
+
+Egy = 13900 # 12480 # 9120 , 8395 # eV
+lambda = c/(Egy*_Ang)*hq*2*pi/e0
+
+x=3
+y=0
+z=0
+
+# OUT "xxx"
+" Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)"
+
+# FOR x=0 TO 1 DO INC "LiNbO3/compute"
+# FOR y=1 TO 2 DO INC "LiNbO3/compute"
+# FOR z=1 TO 7 DO INC "LiNbO3/compute"
+
+OUT "stdout"
+

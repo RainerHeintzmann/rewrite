@@ -1,0 +1,48 @@
+CONST _step  : real
+CONST _steps : real
+CONST _myerg : real
+CONST _zw1   : real
+CONST _zw2   : real
+CONST _zw3   : real
+CONST _best  : real
+CONST _bestx : real
+
+TERM num : real
+
+FUNC fmin   : real,real,real,real >> real # fmin(-1,1,x^2,x)    find minimum
+FUNC fmax   : real,real,real,real >> real # fmax(-1,1,- x^2,x) find maximum
+FUNC flext  : real,real,real      >> real # flmax(1,- x^2,x) find local extremum
+FUNC flzero : real,real,real      >> real # flmax(1,x^2,x)    find local zero
+FUNC newton : real,real,real,real >> real # newton(start,f,f',x) find local zero
+
+ALG num1
+SPEC    num1 : IF NIN(_x,B) I(X,Y,A,B)=I(X,Y,Sub(A,B,_x),_x)
+ADDSPEC num1 : IF NIN(_x,B) newton(X,A,C,B)=newton(X,Sub(A,B,_x),Sub(C,B,_x),_x)
+ADDSPEC num1 : IF NIN(_x,B) flzero(X,A,B)=newton(X,Sub(A,B,_x),D(Sub(A,B,_x),_x),_x)
+ADDSPEC num1 : IF NIN(_x,B) flext(X,A,B)=flzero(X,D(Sub(A,B,_x),_x),_x)
+ADDSPEC num1 : IF NIN(_x,B) fmin(X,Y,A,B)=fmin(X,Y,Sub(A,B,_x),_x)
+ADDSPEC num1 : IF NIN(_x,B) fmax(X,Y,A,B)=fmin(X,Y,- A,B)
+
+ALG rechne
+SPEC    rechne : I(N,M,A,_x)=_myerg DO { _myerg=0;_zw1=0;_zw2=0 # Simpson
+        FOR n=N+_step/2 TO M-_step STEP _step DO { _x=n;_zw1=_zw1+A	
+        _x=n+_step/2
+				_zw2=_zw2+A }
+				_x=M-_step/2
+				_zw1=_zw1+A
+				_x=N;_myerg=A+4*_zw1+2*_zw2
+				_x=M;_myerg=(_myerg+A)*_step/2/3
+				_x=dummi }
+
+ADDSPEC rechne : fmin(N,M,A,_x)=_myerg DO {_myerg=0;_bestx=dummi;_best=maxreal
+        FOR _x=N TO M STEP _step DO IF (_best>A) { _best=A;_bestx=_x }
+        _myerg=_bestx}
+
+ADDSPEC rechne : newton(N,A,B,_x) = _myerg DO { _x=N
+        FOR n=1 TO _steps DO { _x=_x-A/B }; _myerg=_x; _x=dummi }
+
+ALG numerik
+SPEC numerik : (num1,Subst),All
+
+_step =.1
+_steps=10

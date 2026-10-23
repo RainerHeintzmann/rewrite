@@ -1,0 +1,14 @@
+# Numerisches Loesen von expliziten Diff-gleichungen
+# Eingabe : f(x,y) = y'
+# x0 = Anfangswert x (normal : == 0)
+# y0 = Anfangswert y
+# dx = Schrittweite x
+
+y=y0
+
+FOR x=x0 TO xmax- dx STEP dx DO {
+y=TAY
+x+dx,y
+}
+y=dummi
+

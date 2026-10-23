@@ -1,0 +1,414 @@
+SORT real
+NUM real
+
+DEBUG 2
+
+SORT group
+SORT agroup
+SORT ring
+SORT koerper
+SORT vkoerper   # vollst. Koerper
+SORT complex
+
+
+VAR A,B,C,X,Y,Z : real
+VAR Ag,Bg,Cg,Xg,Yg,Zg : group
+VAR Aag,Bag,Cag,Xag,Yag,Zag : agroup
+VAR Ar,Br,Cr,Xr,Yr,Zr : ring
+VAR Ak,Bk,Ck,Xk,Yk,Zk : koerper
+VAR Avk,Bvk,Cvk,Xvk,Yvk,Zvk : vkoerper
+VAR Ac,Bc,Cc,Xc,Yc,Zc : complex
+NUM N,M : real
+
+CONST 0g      : group # Neutrales Element
+CONST 0ag     : agroup # Neutrales Element
+CONST 0r,1r   : ring
+CONST 0k,1k   : koerper
+CONST 0vk,1vk : vkoerper
+# CONST 0re,1re : real    0 und 1 sind nur einmal existent ! 
+CONST 0c,1c   : complex
+
+CONST x,y,z,a,b,c,dummi,merk : real
+CONST _x : real # allg. Integrationsvariable
+CONST maxreal  : real
+CONST minreal  : real
+maxreal=  1e38
+minreal= -1e38
+
+
+CONST i,e,pi : real  # sqrt(-1),e,pi
+
+#  e  = 2.718281828459			siehe mathnum
+#  pi = 3.141592653589793
+
+TERM _erg  : real
+TERM q,s : real
+
+TERM P0,P1,P2,P3,P4,P5,P6	: real			# Parameter-Terme fuer Include-Files
+
+TERM DGL : real	# speichert DGL
+
+FUNC and    : real,real >> real LA1  # zum Verketten fuer Integralbed.
+FUNC inx    : real,real >> real LA4	                # Index-Funktion 	
+FUNC ln     : real >> real	ATT  7
+FUNC lg     : real >> real				          
+FUNC exp    : real >> real	ATT 12
+FUNC sin    : real >> real	ATT  9
+FUNC arcsin : real >> real	ATT 16
+FUNC cos    : real >> real	ATT 10
+FUNC arccos : real >> real	ATT 17
+FUNC tan    : real >> real	ATT 11
+FUNC arctan : real >> real	ATT 18
+
+FUNC  -      : group,group >> group LA2
+OTHER -      : agroup,agroup >> agroup
+OTHER -      : ring,ring >> ring
+OTHER -      : koerper,koerper >> koerper
+OTHER -      : vkoerper,vkoerper >> vkoerper
+OTHER -      : complex,complex >> complex
+OTHER -      : real,real >> real 		ATT  3
+
+FUNC  +      : group,group >> group LA2
+OTHER +      : agroup,agroup >> agroup
+OTHER +      : ring,ring >> ring
+OTHER +      : koerper,koerper >> koerper
+OTHER +      : vkoerper,vkoerper >> vkoerper
+OTHER +      : complex,complex >> complex
+OTHER +      : real,real >> real ATT  2
+
+FUNC  *      : ring,ring >> ring LA3
+OTHER *      : koerper,koerper >> koerper
+OTHER *      : vkoerper,vkoerper >> vkoerper
+OTHER *      : complex,complex >> complex
+OTHER *      : real,real >> real ATT  4
+
+FUNC  /      : ring,ring >> ring LA3
+OTHER /      : koerper,koerper >> koerper
+OTHER /      : vkoerper,vkoerper >> vkoerper
+OTHER /      : complex,complex >> complex
+OTHER /      : real,real >> real ATT  5
+
+FUNC ai     : group >> group                     # additiv Inverses
+OTHER ai    : agroup >> agroup                       
+OTHER ai    : ring >> ring                       
+OTHER ai    : koerper >> koerper                 
+OTHER ai    : vkoerper >> vkoerper               
+OTHER ai    : complex >> complex                 
+OTHER ai    : real >> real             ATT  13   
+
+FUNC mi     : ring >> ring                       # multiplikativ Inverses
+OTHER mi    : koerper >> koerper                  
+OTHER mi    : vkoerper >> vkoerper               
+OTHER mi    : complex >> complex                 
+OTHER mi    : real >> real             ATT  14   
+
+#	FUNC nget  : real,real >> real LA3	ATT  5
+FUNC ^      : real,real >> real LA4		ATT  6
+FUNC !      : real >> real RU					ATT 15		# Fakultaet : z.B. 5!
+FUNC abs    : real >> real 			            		# Abs.Wert |Cpx(1,2)|
+FUNC sgn    : real >> real 			      ATT 19 		# Vorzeichen (+ ->1,- ->-1)
+BRA | |     : real >> real 			            		# Abs.Wert |Cpx(1,2)|
+
+FUNC Cpx    : real,real >> real           # Komplexe Zahl
+FUNC D      : real,real >> real           # Ableitung
+FUNC Dn     : real,real,real >> real      # n. Ableitung
+FUNC Tay    : real,real,real,real >> real # Taylor-entwicklung Tay(1/x^2,x,Stelle,bis)
+FUNC S      : real,real,real,real >> real # Summe
+FUNC Sub    : real,real,real >> real      # Substituieren(in Tern,Var .,ersetzen zu .)
+FUNC Sum    : real,real,real,real >> real # Summe(Variable,Anfang,Ende,Term)
+FUNC I      : real,real,real,real >> real # Integral
+
+LIFT (Ag+Ag,ai(Ag),0g) TO (Aag+Aag,ai(Aag),0ag)
+LIFT (Ag+Ag,ai(Ag),0g) TO (Ar+Ar,ai(Ar),0r)
+LIFT (Ag+Ag,ai(Ag),0g) TO (Ar*Ar,mi(Ar),1r) # entscheidende Zeile !!
+LIFT (Ar+Ar,ai(Ar),0r) TO (Ak+Ak,ai(Ak),0k)
+LIFT (Ar*Ar,mi(Ar),1r) TO (Ak*Ak,mi(Ak),1k)
+LIFT (Ak+Ak,ai(Ak),0k) TO (Avk+Avk,ai(Avk),0vk) # muessen einzeln geliftet werden
+LIFT (Ak*Ak,mi(Ak),1k) TO (Avk*Avk,mi(Avk),1vk) 
+LIFT (Avk+Avk,ai(Avk),0vk) TO (A+A,ai(A),0) 
+LIFT (Avk*Avk,mi(Avk),1vk) TO (A*A,mi(A),1) 
+LIFT (Avk+Avk,ai(Avk),0vk) TO (Ac+Ac,ai(Ac),0c)
+LIFT (Avk*Avk,mi(Avk),1vk) TO (Ac*Ac,mi(Ac),1c)
+
+# ++ Links-ass. Standart +++++++++++++
+ALG LaStd
+SPEC 	  LaStd : 0+X   = X         # spezielle Konstanten
+ADDSPEC LaStd : X+0   = X         # spezielle Konstanten
+ADDSPEC LaStd : ai X+X  = 0
+ADDSPEC LaStd : X+ai X  = 0
+ADDSPEC LaStd : X+(Y+Z)=X+Y+Z      # Assoziativgesetz
+ADDSPEC LaStd : 0*X   = 0
+ADDSPEC LaStd : X*0   = 0
+ADDSPEC LaStd : 1*X   = X
+ADDSPEC LaStd : X*1   = X
+ADDSPEC LaStd : 1^X   = 1
+ADDSPEC LaStd : 0^X   = 0
+ADDSPEC LaStd : X^1   = X
+ADDSPEC LaStd : X^0   = 1
+
+# +++++++++++++++++++++ Allgemeine Gruppen +++++++++++++++++++++++
+ALG Group
+SPEC    Group : 0g+Xg=Xg
+ADDSPEC Group : Xg+0g=Xg
+ADDSPEC Group : ai Xg+Xg = 0g
+ADDSPEC Group : Xg+ai Xg  = 0g
+ADDSPEC Group : Xg+(Yg+Zg)=Xg+Yg+Zg  # Assoziativgesetz
+
+# +++++++++++++++++++++ Spezifikationen der Algebren ++++++++++++++++++++++++
+ALG Real
+SPEC 	      Real : 0+X   = X         # spezielle Konstanten
+ADDSPEC 	  Real : X+0   = X         # spezielle Konstanten
+ADDSPEC     Real : ai X+X  = 0
+ADDSPEC     Real : X+ai X  = 0
+ADDSPEC     Real : X+(Y+Z)=X+Y+Z      # Assoziativgesetz
+
+ADDSPEC     Real : 0*X   = 0
+ADDSPEC     Real : X*0   = 0
+ADDSPEC     Real : 1*X   = X
+ADDSPEC     Real : X*1   = X
+ADDSPEC     Real : ai X*Y  = ai(X*Y)     
+ADDSPEC     Real : mi X*X  = 1
+ADDSPEC     Real : X*mi X  = 1
+ADDSPEC     Real : X*ai Y   = ai (X*Y)       # alle ai multiplikativ nach vorne
+ADDSPEC     Real : X*(Y*Z)=X*Y*Z 
+ADDSPEC     Real : X*(Y+Z)=X*Y+X*Z , (X+Y)*Z=X*Z+Y*Z  # Distributivgesetz
+
+ADDSPEC     Real : 1^X   = 1
+ADDSPEC     Real : 0^X   = 0
+ADDSPEC     Real : (A*B)^X=A^X*B^X
+ADDSPEC     Real : X^1   = X
+ADDSPEC     Real : X^0   = 1
+ADDSPEC     Real : X^ai Y   = mi (X^Y)
+ADDSPEC     Real : X^Y^Z=X^(Y*Z)
+ADDSPEC     Real : X^(Y+Z)=X^Y*X^Z
+ADDSPEC     Real : ISINT(N/2) (ai X)^N=X^N
+ADDSPEC     Real : ISINT((N- 1)/2) (ai X)^N=ai(X^N)
+
+ADDSPEC     Real : ln e  = 1
+ADDSPEC     Real : ln (X+Y)=ln X * ln Y
+
+ADDSPEC     Real : sin (0.5*pi) = 1
+ADDSPEC     Real : sin pi     = 0
+ADDSPEC     Real : sin (2*pi) = 0
+
+ADDSPEC     Real : cos (0.5*pi) = 0
+ADDSPEC     Real : cos pi     = -1
+ADDSPEC     Real : cos (2*pi) =  1
+
+ADDSPEC     Real : X/Y=X*mi Y         # kein - und kein /
+ADDSPEC     Real : X-Y=X+ai Y
+
+ADDSPEC     Real : ai ai X  = X     
+ADDSPEC     Real : ai (Y+X) = ai X +ai Y   
+ADDSPEC     Real : mi ai X  = ai mi X     
+
+ADDSPEC     Real : mi mi X = X
+ADDSPEC     Real : mi (X*Y) = mi X * mi Y
+
+
+# ++++++++++++++++++ Komplexe Zahlen +++++++++++++++++++++++++++++++++++++
+ALG Summe
+SPEC    Summe : NIN(X,Y) Sum(X,A,B,Y)=(B-A+1)*Y
+ADDSPEC Summe : NIN(X,Y) Sum(X,A,B,Y*Z)=Y*Sum(X,A,B,Z)
+ADDSPEC Summe : NIN(X,Y) Sum(X,A,B,Z*Y)=Y*Sum(X,A,B,Z)
+ADDSPEC Summe : Sum(X,A,B,Y+Z)=Sum(X,A,B,Y)+Sum(X,A,B,Z)
+ADDSPEC Summe : Sum(X,A,B,ai Y)=ai Sum(X,A,B,Y)
+
+ADDSPEC Summe : Sum(X,A,B,X)=.5*B^2+.5*B+.5*A*A+ai(.5*A)
+
+ALG Summen
+SPEC    Summen : GT(M,N) Sum(X,N,M,Y)=Sub(Y,X,M)+Sum(X,N,M- 1,Y)
+ADDSPEC Summen :         Sum(X,N,N,Y)=Sub(Y,X,N)
+
+# ++++++++++++++++++ Komplexe Zahlen +++++++++++++++++++++++++++++++++++++
+ALG Compl
+SPEC     Compl : 0*X=0,0+X=X,1*X=X
+ADDSPEC  Compl : i=Cpx(0,1)            # multiplikativ hinten
+ADDSPEC  Compl : NIN(Cpx(X,Y),C) C*Cpx(A,B)=Cpx(A*C,B*C)
+ADDSPEC  Compl : NIN(Cpx(X,Y),C) Cpx(A,B)*C=Cpx(A*C,B*C)
+ADDSPEC  Compl : NIN(Cpx(X,Y),C) Cpx(A,B)+C=Cpx(A+C,B)
+ADDSPEC  Compl : NIN(Cpx(X,Y),C) C+Cpx(A,B)=Cpx(A+C,B)
+ADDSPEC  Compl : Cpx(A,B)*Cpx(X,Y)=Cpx(A*X+ai(B*Y),A*Y+B*X)
+ADDSPEC  Compl : Cpx(A,B)+Cpx(X,Y)=Cpx(A+X,B+Y)
+ADDSPEC  Compl : ai Cpx(A,B) = Cpx(ai A,ai B)
+ADDSPEC  Compl : mi Cpx(A,B) = Cpx(A*mi(A^2+ai(B^2)),A+ai B)
+
+# ++++++++++++++++++ ordnen der Terme multiplikativ ++++++++++++++++++++++++
+# Achtung : -2 * x
+ALG Mulord
+SPEC        Mulord : X*X = X^2
+ADDSPEC     Mulord : X^N*X = X^(N+1)
+ADDSPEC     Mulord : X^N*X^M = X^(N+M)
+ADDSPEC     Mulord : Y*X*X = Y*X^2
+ADDSPEC     Mulord : Y*X^N*X = Y*X^(N+1)
+ADDSPEC     Mulord : Y*X^N*X^M = Y*X^(N+M)
+ADDSPEC     Mulord : LB(X,Y) X*Y = Y*X
+ADDSPEC     Mulord : LB(Y,Z) X*Y*Z = X*Z*Y
+# ++++++++++++++++++ ordnen der Terme additiv ++++++++++++++++++++++++++++++
+ALG Addord
+SPEC        Addord : X+X = 2*X
+ADDSPEC     Addord : N*X+X = (N+1)*X
+ADDSPEC     Addord : N*X+M*X = (N+M)*X
+ADDSPEC     Addord : Y+X+X = Y+2*X
+ADDSPEC     Addord : Y+N*X+X = Y+(N+1)*X
+ADDSPEC     Addord : Y+N*X+M*X = Y+(N+M)*X
+ADDSPEC     Addord : LB(X,Y) X+Y = Y+X
+ADDSPEC     Addord : LB(Y,Z) X+Y+Z = X+Z+Y
+
+# ++++++++++++++++++++++++ Lineare Funktionen  ++++++++++++++++++++++++++
+ADDSPEC     Real : D(X+Y,Z)    = D(X,Z)+D(Y,Z)
+ADDSPEC     Real : D(N*X,Z)    = N*D(X,Z)
+ADDSPEC     Real : Dn(X+Y,Z,M) = Dn(X,Z,M)+Dn(Y,Z,M)
+ADDSPEC     Real : Dn(N*X,Z,M) = N*Dn(X,Z,M)
+ADDSPEC     Real : Tay(X+Y,Z,A,B) = Tay(X,Z,A,B)+Tay(Y,Z,A,B)
+ADDSPEC     Real : Tay(N*X,Z,A,B) = N*Tay(X,Z,A,B)
+
+
+# ++++++++++++++++++++++++ DIFFERENTIALRECHNUNG ++++++++++++++++++++++++++
+ALG diff
+SPEC        diff : 1*X=X,X*1=X
+ADDSPEC     diff : 0*X=0,X*0=0,X+0=X,0+X=X
+ADDSPEC     diff : X^1=X,1^X=1,X^0=1,0^X=0
+
+ADDSPEC     diff : D(e,X) = 0         # Rheinfolge wichtig (erst e pruefen dann X ersetzen)
+ADDSPEC     diff : D(pi,X)= 0
+ADDSPEC     diff : D(_x,X)= 0
+ADDSPEC     diff : D(N,X) = 0         # Zahlen sind konstant
+ADDSPEC     diff : D(X,X) = 1         # spezielle Konstanten
+
+ADDSPEC     diff : Dn(X,Y,0) = X
+ADDSPEC     diff : Dn(X,Y,N) = Dn(D(X,Y),Y,N - 1)
+
+ADDSPEC     diff : D(ai X,Y) = ai D(X,Y)
+ADDSPEC     diff : D(mi X,Y) = ai D(X,Y)*mi(X^2)
+ADDSPEC     diff : D(ln X,Z) = D(X,Z)*mi X
+ADDSPEC     diff : D(lg X,Z) = D(X,Z)*mi (X*ln 10)
+ADDSPEC     diff : D(sin X,Z)= D(X,Z)*cos X
+ADDSPEC     diff : D(arcsin X,Z)= D(X,Z)*mi((1+X^2)^.5)
+ADDSPEC     diff : D(cos X,Z)   = ai D(X,Z)*sin X
+ADDSPEC     diff : D(arccos X,Z)= ai D(X,Z)*mi((1+X^2)^.5)
+ADDSPEC     diff : D(tan X,Z)   = D(X,Z)*mi(cos(X)^2)
+ADDSPEC     diff : D(arctan X,Z)= D(X,Z)*mi(1+X^2)
+
+ADDSPEC     diff : D(N*X,Z)=N*D(X,Z)            # wird so schneller
+ADDSPEC     diff : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # Allg. Differenziationsregeln
+ADDSPEC     diff : D(X+Y,Z)=D(X,Z)+D(Y,Z)
+
+ADDSPEC     diff : D(e^X,Z)  = D(X,Z)*e^X
+ADDSPEC     diff : D(X^N,X)=N*X^(N - 1)      # wird so schneller
+ADDSPEC     diff : D(X^Y,Z)=D(X,Z)*Y*X^(Y+ai 1)+D(Y,Z)*ln X*X^Y
+
+ADDSPEC     diff : D(I(A,B,C,_x),Z)=Sub(C,_x,B)*D(B,Z)-Sub(C,_x,A)*D(A,Z)+I(A,B,D(C,Z),_x)
+
+ADDSPEC     diff : Tay(X,Y,Z,0) = Sub(X,Y,Z)
+ADDSPEC     diff : Tay(X,Y,Z,N) = Tay(X,Y,Z,N - 1)+Sub(Dn(X,Y,N),Y,Z)*mi(N!)*(Y+ai Z)^N 
+
+# ++++++++++++++++++++++++ Substitution ++++++++++++++++++++++++++
+ALG Subst
+SPEC        Subst : 1*X=X,0*X=0,X*0=0,X*1=X
+ADDSPEC     Subst : 0+X=X,X+0=X
+ADDSPEC     Subst : 1^X=1,0^X=0,X^1=X,X^0=1
+ADDSPEC     Subst : Sub(X,X,A) = A
+ADDSPEC     Subst : NIN(Z,X) Sub(X,Z,A) = X
+ADDSPEC     Subst : Sub(X+Y,Z,A) = Sub(X,Z,A) + Sub(Y,Z,A)
+ADDSPEC     Subst : Sub(X*Y,Z,A) = Sub(X,Z,A) * Sub(Y,Z,A)
+ADDSPEC     Subst : Sub(X^Y,Z,A) = Sub(X,Z,A) ^ Sub(Y,Z,A)
+ADDSPEC     Subst : Sub(sin X,Z,A) = sin Sub(X,Z,A) 
+ADDSPEC     Subst : Sub(cos X,Z,A) = cos Sub(X,Z,A) 
+ADDSPEC     Subst : Sub(ln X,Z,A) = ln Sub(X,Z,A) 
+ADDSPEC     Subst : Sub(ai X,Z,A) = ai Sub(X,Z,A) 
+ADDSPEC     Subst : Sub(mi X,Z,A) = mi Sub(X,Z,A) 
+
+# ++++++++++++++++++++++++ INTERALE ++++++++++++++++++++++++++++++++++++++
+ALG substint
+SPEC substint : NIN(_x,X) I(A,B,C,X) = _erg DO {_erg=REWR I(A,B,Sub(C,X,_x),_x) : Subst}
+
+ALG integr
+SPEC        integr : I(A,B,X+Y,Z) = I(A,B,X,Z)+I(A,B,Y,Z)
+ADDSPEC     integr : NIN (Y,C) I(A,B,C*X,Y) = C*I(A,B,X,Y)
+ADDSPEC     integr :           I(A,B,ai X,Y) = ai I(A,B,X,Y)
+
+ADDSPEC     integr : I(A,A,X,Y) = 0
+ADDSPEC     integr : NIN (Z,C) I(A,B,C,Z)   = C*(B+ ai A)
+
+ADDSPEC     integr : NIN (X,Y) I(A,B,Y^X,X) = (Y^B + ai (Y^A)) * mi (ln Y)
+ADDSPEC     integr : NIN (X,Y) I(A,B,sin X,X) = ai (cos B + ai cos A)
+ADDSPEC     integr : NIN (X,Y) I(A,B,cos X,X) = sin B + ai sin A
+
+
+ADDSPEC     integr : NIN (Z,C and Y) I(A,B,(X+C)^Y,X) = I(A+C,B+C,X^Y,X)
+ADDSPEC     integr : NIN (Z,C and Y) I(A,B,(C+X)^Y,X) = I(A+C,B+C,X^Y,X)
+
+ADDSPEC     integr :                 I(A,B,mi X,X)   = ln B + ai ln A
+
+ADDSPEC     integr : NIN (X,Y)       I(A,B,X^Y,X)    = mi(Y+1)*(B^(Y+1)+ ai(A^(Y+1)))
+ADDSPEC     integr :                 I(A,B,X,X)      = .5*(B^2+ ai(A^2))
+
+
+# +++++++++++ Algebra fuer *, - Standart +++++++++++++++++++++++++++++++++++++++
+ALG zu1
+SPEC        zu1 : mi X *mi Y = mi (X*Y)
+ADDSPEC     zu1 : mi X * Y = Y * mi X
+ADDSPEC     zu1 : mi mi X  = X
+ADDSPEC     zu1 : ai X * Y = ai (X*Y)
+ADDSPEC     zu1 : X * ai Y = ai (X*Y)
+ADDSPEC     zu1 : ai X +ai Y = ai (X+Y)
+ADDSPEC     zu1 : ai X + Y =  Y + ai X
+ADDSPEC     zu1 : ai ai X  = X
+
+ADDSPEC     zu1 : sin(ai X) = ai sin X         # Antisymetirsch
+ADDSPEC     zu1 : cos(ai X) = cos X            # Symetrisch
+ADDSPEC     zu1 : (mi X)^Y  = mi (X^Y)
+ADDSPEC     zu1 : X^(ai Y)  = mi (X^Y)
+
+ADDSPEC     zu1 : X*Y*Z=X*(Y*Z),X+Y+Z=X+(Y+Z)  # Assoziativgesetz
+
+# +++++++++++ Komplexe Zahlen zurueck +++++++++++++++++
+ALG Complz
+SPEC Complz : Cpx(A,B)=A+B*i
+
+# +++++++++++ Algebra zum weiteren Vereinfachen und zusammenfassen ++++++++++++
+ALG more
+SPEC        more : X*(Y*Z)=X*Y*Z
+ADDSPEC     more : X+(Y+Z)=X+Y+Z  # Assoziativgesetz
+ADDSPEC     more : X*(Y/Z)=X*Y/Z,X+(Y-Z)=X+Y-Z  # Assoziativgesetz
+
+ADDSPEC     more : X^Y*X^Z=X^(Y+Z),X^Y*X=X^(Y+1),X*X^Y=X^(Y+1)
+ADDSPEC     more : X+X=2*X
+
+ADDSPEC     more : X * mi Y=X/Y
+ADDSPEC     more : X+ai Y=X-Y  
+
+ADDSPEC     more : 0+X   = X         # spezielle Konstanten
+ADDSPEC     more : X+0   = X
+ADDSPEC     more : X*0   = 0
+ADDSPEC     more : 0*X   = 0
+ADDSPEC     more : 1*X   = X
+ADDSPEC     more : X*1   = X
+# ++++++++++++++++++++++++ NUMERIK ++++++++++++++++++++++++++
+ADDSPEC     more : X+N = N+X
+ADDSPEC     more : X*N = N*X
+
+ALG unaerweg
+SPEC    unaerweg : mi X=1/X
+ADDSPEC unaerweg : ai X=0-X
+
+# Real   = (real;+,*)
+# integr = (real;+,*)
+# diff   = (real;+,*)
+# Subst  = (real;+,*)
+# zu1    = (real;+,*)
+# more   = (real;+,*)
+
+ALG Std
+SPEC Std : Compl;Real;Compl;Mulord;Addord # Rechenregeln integrieren in Real ?
+
+ALG Doit
+SPEC Doit : Summe;Summen;Subst
+
+ALG Zus
+SPEC Zus : zu1;more;Complz
+
+ALG All 
+SPEC All : Std;Doit;diff;integr;Subst;Std;Zus;unaerweg
+

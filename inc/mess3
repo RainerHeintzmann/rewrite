@@ -1,0 +1,18 @@
+
+#                     Messwerterfassung   
+# Inputs : 
+#
+CONST m1,m2,m3,m4,m5,m6 : real
+
+DATA "inc/xxx"
+OUT "inc/yyy"
+
+DATA m1;DATA m2; DATA m3;DATA m4;DATA m5; DATA m6
+
+WHILE ((sgn(m1)*m1 >= 8e-314) || (m1 == 0)) { #EOF
+m1,m5
+DATA m1;DATA m2; DATA m3;DATA m4;DATA m5; DATA m6
+}
+
+DATA "stdin"
+OUT  "stdout"

@@ -1,0 +1,323 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6400 64-bit) (preloaded format=pdflatex 2018.8.8)  3 NOV 2018 16:56
+entering extended mode
+**./readme.tex
+(readme.tex
+LaTeX2e <2017-04-15>
+Babel <3.12> and hyphenation patterns for 74 language(s) loaded.
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\latex209.def"
+File: latex209.def 2015/02/22 v0.53 Standard LaTeX file
+
+
+          Entering LaTeX 2.09 COMPATIBILITY MODE
+ *************************************************************
+    !!WARNING!!    !!WARNING!!    !!WARNING!!    !!WARNING!!   
+ 
+ This mode attempts to provide an emulation of the LaTeX 2.09
+ author environment so that OLD documents can be successfully
+ processed. It should NOT be used for NEW documents!
+ 
+ New documents should use Standard LaTeX conventions and start
+ with the \documentclass command.
+ 
+ Compatibility mode is UNLIKELY TO WORK with LaTeX 2.09 style
+ files that change any internal macros, especially not with
+ those that change the FONT SELECTION or OUTPUT ROUTINES.
+ 
+ Therefore such style files MUST BE UPDATED to use
+          Current Standard LaTeX: LaTeX2e.
+ If you suspect that you may be using such a style file, which
+ is probably very, very old by now, then you should attempt to
+ get it updated by sending a copy of this error message to the
+ author of that file.
+ *************************************************************
+
+\footheight=\dimen102
+\@maxsep=\dimen103
+\@dblmaxsep=\dimen104
+\@cla=\count79
+\@clb=\count80
+\mscount=\count81
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\tracefnt.sty"
+Package: tracefnt 2015/02/21 v3.0k Standard LaTeX package (font tracing)
+\tracingfonts=\count82
+LaTeX Info: Redefining \selectfont on input line 106.
+)
+\symbold=\mathgroup4
+\symsans=\mathgroup5
+\symtypewriter=\mathgroup6
+\symitalic=\mathgroup7
+\symsmallcaps=\mathgroup8
+\symslanted=\mathgroup9
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 268.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 269.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 270.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 276.
+LaTeX Info: Redefining \em on input line 286.
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\latexsym.sty"
+Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup10
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
+)
+LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 332.
+LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 334.
+LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 336.
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\article.cls"
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\size10.clo"
+File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count83
+\c@section=\count84
+\c@subsection=\count85
+\c@subsubsection=\count86
+\c@paragraph=\count87
+\c@subparagraph=\count88
+\c@figure=\count89
+\c@table=\count90
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+Compatibility mode: definition of \rm ignored.
+Compatibility mode: definition of \sf ignored.
+Compatibility mode: definition of \tt ignored.
+Compatibility mode: definition of \bf ignored.
+Compatibility mode: definition of \it ignored.
+Compatibility mode: definition of \sl ignored.
+Compatibility mode: definition of \sc ignored.
+LaTeX Info: Redefining \cal on input line 496.
+LaTeX Info: Redefining \mit on input line 497.
+\bibindent=\dimen105
+)
+("C:\Program Files\MiKTeX 2.9\tex\generic\german\german.sty" v2.5e 1998-07-08
+Package: german 1998/07/08 v2.5e Support for writing german texts (br)
+\grmnU@D=\dimen106
+german -- \language number for Austrian undefined, default 22 used.
+)
+(readme.aux)
+\openout1 = `readme.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 2.
+LaTeX Font Info:    ... okay on input line 2.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 2.
+LaTeX Font Info:    ... okay on input line 2.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 2.
+LaTeX Font Info:    ... okay on input line 2.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 2.
+LaTeX Font Info:    ... okay on input line 2.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 2.
+LaTeX Font Info:    ... okay on input line 2.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 2.
+LaTeX Font Info:    ... okay on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 9.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 9.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 9.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 9.
+ ("C:\Program Files\MiKTeX 2.9\tex\latex\base\ulasy.fd"
+File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 9.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 35.
+ [1
+
+{C:/Users/pi96doc/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
+Overfull \hbox (10.77089pt too wide) in paragraph at lines 44--47
+[]\OT1/cmr/m/n/10 Unter `fi-lena-me' ab-ge-spei-cher-te Pro-gram-me wer-den aus
+-gef[]uhrt.
+ []
+
+
+Overfull \hbox (3.2993pt too wide) in paragraph at lines 101--106
+[]\OT1/cmr/m/n/10 Deklaration ei-ner Kon-stan-ten. Es wird
+ []
+
+
+Overfull \hbox (0.67995pt too wide) in paragraph at lines 101--106
+\OT1/cmr/m/n/10 (Al-so ei-ne Va-ria-ble). Im Ge-gen-satz zu mit VAR er-zeug-ten
+ Metha-Variablen
+ []
+
+[2]
+Overfull \hbox (17.91243pt too wide) in paragraph at lines 125--136
+[]\OT1/cmr/m/n/10 Erzeugung
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 125--136
+
+ []
+
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 160.
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\omscmr.fd"
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 160.
+ [3]
+Overfull \hbox (28.14587pt too wide) in paragraph at lines 163--167
+[]\OT1/cmr/m/n/10 Setzt den Re-sul-tat-wert (einen Term) der Funk-ti-on. Die Au
+sf[]uhrung
+ []
+
+
+Overfull \hbox (3.96837pt too wide) in paragraph at lines 169--172
+[]\OT1/cmr/m/n/10 Definiert zu ei-nem exi-
+ []
+
+
+Overfull \hbox (2.86172pt too wide) in paragraph at lines 169--172
+\OT1/cmr/m/n/10 stie-ren-den Funk-ti-ons-na-men ei-ne wei-te-re Ab-bil-dung mit
+ an-de-ren Argument-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 184--187
+
+ []
+
+
+Overfull \hbox (5.82758pt too wide) in paragraph at lines 205--209
+[]\OT1/cmr/m/n/10 Hinzuf[]ugen
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 212--219
+
+ []
+
+[4]
+Underfull \hbox (badness 10000) in paragraph at lines 230--233
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 249--250
+
+ []
+
+
+Overfull \hbox (11.73022pt too wide) in paragraph at lines 259--264
+[]\OT1/cmr/m/n/10 Deklaration ei-ner Term-Variable. Ei-ne Term-Variable
+ []
+
+
+Overfull \hbox (41.11177pt too wide) in paragraph at lines 259--264
+\OT1/cmr/m/n/10 kann einen be-lie-bi-gen Aus-druck des glei-chen Typs auf-neh-m
+en.Ineianderschachtelung
+ []
+
+[5]
+Overfull \hbox (20.42375pt too wide) in paragraph at lines 277--280
+[]\OT1/cmr/m/n/10 Einem Typ wird Anzeige-
+ []
+
+
+Overfull \hbox (8.56892pt too wide) in paragraph at lines 301--303
+[]\OT1/cmr/m/n/10 IF-Bedingung. Fkt ist der Na-me ei-ner Funk-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 304--307
+
+ []
+
+
+Overfull \hbox (15.00055pt too wide) in paragraph at lines 320--328
+[]\OT1/cmr/m/n/10 Der letz-te aus-ge-ge-be-ne Aus-druck ist un-ter `%' als Ter-
+m-na-me im-mer verf[]ugbar.
+ []
+
+[6]
+Overfull \hbox (0.24724pt too wide) in paragraph at lines 365--365
+ []\OT1/cmtt/m/n/10 2                  # wird ausgegeben (q bleibt aber erhalte
+n)[] 
+ []
+
+
+Overfull \hbox (52.74678pt too wide) in paragraph at lines 365--365
+ []\OT1/cmtt/m/n/10 Der letzte Ausgedruckte Wert ist unter dem Term \% wieder z
+u erreichen.[] 
+ []
+
+
+Overfull \hbox (31.74696pt too wide) in paragraph at lines 365--365
+ []\OT1/cmtt/m/n/10 Bestehende Abh"angigkeiten zu anderen Termen werden hier ig
+noriert.[] 
+ []
+
+[7]
+Underfull \hbox (badness 10000) in paragraph at lines 383--394
+
+ []
+
+
+Overfull \hbox (80.24629pt too wide) in paragraph at lines 598--598
+[]\OT1/cmtt/m/n/10 %token CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFE
+IL TERM NUM ATT IS EQ[] 
+ []
+
+
+Overfull \hbox (95.99615pt too wide) in paragraph at lines 598--598
+[]\OT1/cmtt/m/n/10 %token LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM
+ FOR TO STEP DO DBG LAST[] 
+ []
+
+
+Overfull \hbox (85.49625pt too wide) in paragraph at lines 598--598
+[]\OT1/cmtt/m/n/10 %token BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE P
+RTNUM LIFT QUIT RETURN[] 
+ []
+
+
+Overfull \hbox (22.4968pt too wide) in paragraph at lines 598--598
+[]\OT1/cmtt/m/n/10 %token <y\_sym> La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra
+ Bra1 Bra2[] 
+ []
+
+
+Overfull \hbox (227.24501pt too wide) in paragraph at lines 598--598
+[]\OT1/cmtt/m/n/10 %type <y\_nod> vinstr definition instruction aninstruction i
+nstructions prntexpr  tinstructions oinstructions[] 
+ []
+
+
+Overfull \hbox (211.49515pt too wide) in paragraph at lines 598--598
+[]\OT1/cmtt/m/n/10 %type <y\_nod> idlist l\_thing l\_list sortlist vsortlist fu
+nclist formlist termlist alglist Alg2 prntlist[] 
+ []
+
+[8] [9] [10] [11] [12] (readme.aux) ) 
+Here is how much of TeX's memory you used:
+ 602 strings out of 493323
+ 6893 string characters out of 3138989
+ 61748 words of memory out of 3000000
+ 4172 multiletter control sequences out of 15000+200000
+ 19210 words of font info for 70 fonts, out of 3000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 22i,9n,21p,168b,232s stack positions out of 5000i,500n,10000p,200000b,50000s
+<C:/Program Files/MiKTeX 2.9/fonts/type1/p
+ublic/amsfonts/cm/cmbx10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/am
+sfonts/cm/cmbx12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/c
+m/cmbx9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi5.p
+fb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Pr
+ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Fil
+es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTeX
+ 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts
+/type1/public/amsfonts/cm/cmr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/pub
+lic/amsfonts/cm/cmsl10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsf
+onts/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/
+cmsy6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy8.pfb
+><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on readme.pdf (12 pages, 207546 bytes).
+PDF statistics:
+ 97 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

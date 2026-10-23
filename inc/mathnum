@@ -1,0 +1,12 @@
+# mathnum        Numerische Werte fuer Mathematik
+
+e  = 2.718281828459	
+pi = 3.141592653589793
+
+CONST _deg, _sec, _min, _rad : real
+
+_deg = pi/180  # transform rad -> degree
+_min = _deg/60  # transform rad -> degree
+_sec = _min/60  # transform rad -> degree
+_rad = 1/ _deg # transform degree -> rad
+

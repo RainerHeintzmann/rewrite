@@ -1,0 +1,20 @@
+CONST al,n0,merk,wi,dn,n,be,Ref : real
+TERM tmp : real
+
+# tmp = arccos((cos al)/(1.0/n))
+# Ref = ((sin al - (1.0/n)*sin tmp)/(sin al + (1.0/n)*sin tmp))^2
+n0 = 2.3
+dn = 1e-5
+
+FOR al = 0.1*_deg TO 89.9*_deg STEP 1.0*_deg DO {
+n = n0
+be = arcsin( sin al * 1.0/n)
+Ref = ((sin be * cos al - sin al * cos be) /(sin be * cos al + sin al * cos be))^2
+merk = Ref
+n = n0+dn
+be = arcsin( sin al * 1.0/n)
+Ref = ((sin be * cos al - sin al * cos be) /(sin be * cos al + sin al * cos be))^2
+
+merk = merk- Ref
+al/_deg,Ref,merk
+}

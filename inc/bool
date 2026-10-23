@@ -1,0 +1,20 @@
+SORT bool
+
+ATT bool show_bool,cmp_bool,cpy_real,del_real
+
+FUNC >   : real,real >> bool LA1 ATT greater_than
+FUNC >=  : real,real >> bool LA1 ATT greater_equal
+FUNC <   : real,real >> bool LA1 ATT lower_than
+FUNC <=  : real,real >> bool LA1 ATT lower_equal
+FUNC ==  : real,real >> bool LA1 ATT equal
+FUNC !=  : real,real >> bool LA1 ATT not_equal
+FUNC not : bool >> bool          ATT not
+FUNC &&  : bool,bool >> bool LA1 ATT and
+FUNC ||  : bool,bool >> bool LA1 ATT or
+FUNC is_int : real >> bool       ATT is_int
+
+CONST true,false : bool
+
+true  = (1==1)
+false = (1==0)
+

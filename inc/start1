@@ -1,0 +1,10 @@
+# diese Include-File includet in der richtigen Reihenfolge alle wichtigen 
+# mathematischen und Physikalischen Formeln
+
+INC "inc/alg"
+INC "inc/rvector"
+INC "inc/physik"
+INC "inc/physnum"
+INC "inc/mathnum"
+# INC "inc/iterate"
+

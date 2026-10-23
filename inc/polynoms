@@ -1,0 +1,16 @@
+
+FUNC polynom : real,real,real++ >> real  # Maskiert in:1. grad:2. ,koeff.: 3.++
+
+ALG PolStd1a
+SPEC    PolStd1a : SLV*A=A*SLV^1
+ADDSPEC PolStd1a :  SLV=  SLV^1
+ADDSPEC PolStd1a : A*SLV=A*SLV^1
+ADDSPEC PolStd1a : SLV^N*A=A*SLV^N
+ADDSPEC PolStd1a : B*SLV^N*A=(B*A)*SLV^N
+ADDSPEC PolStd1a : GT(M,N) A*SLV^N+B*SLV^M = B*SLV^M+A*SLV^N
+ADDSPEC PolStd1a : GT(M,N)   SLV^N+B*SLV^M = B*SLV^M+  SLV^N
+ADDSPEC PolStd1a : GT(M,N) A*SLV^N+  SLV^M =   SLV^M+A*SLV^N
+ADDSPEC PolStd1a : GT(M,N)   SLV^N+  SLV^M =   SLV^M+  SLV^N
+
+ALG PolStd1
+SPEC PolStd1 : Std;PolStd1

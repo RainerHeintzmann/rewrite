@@ -1,0 +1,16 @@
+CONST n,tt,tts,nx,nc,d,lambda,n2 : real
+
+d=0.79e-3
+lambda= 488e-09
+nx=2.3489
+nc=2.2561
+
+
+tt = 5* _deg
+FOR tt = -10*_deg TO 25.2*_deg STEP 1*_deg DO {  # Innenwinkel
+n2 = 1/((cos(tt))^2/nx^2+(sin(tt))^2/nc^2)^0.5
+
+n= 2*d/lambda*(nx/(1-(sin(tt))^2/nx^2)^0.5 - n2/(1-(sin(tt))^2/nc^2)^0.5)
+tts = arcsin(sin(tt)*nx) # Aussenwinkel
+tts/_deg,n
+}

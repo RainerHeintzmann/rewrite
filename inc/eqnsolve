@@ -1,0 +1,155 @@
+# braucht TERM SLV als Input (aufloesen nach slv)
+
+TERM SLV : real
+
+FUNC EQN  : real >> real           # GLEICHUNG (Term == 0)
+FUNC ALL  : real >> real           # alles ist Loesung
+FUNC poly : real >> real           # Maskiert zeitweise Polynom
+FUNC _    : real,real >> real  LA1 # Maskiert + Verknuepfung im Polynom
+
+
+# +++++++++++++++++ Additiv-Inverse zu1 -1 + Damit Polinome ++++
+ALG ai_m1
+SPEC     ai_m1 : -A = -1*A
+
+# +++++++++++++++++ Spezifikationen Term multiplikativ nach hinten  +++++++++++
+# +++++++++++++++++ STD : A*SLV^X+B*SLV^Y ...  +++++++++++
+ALG Mulhinten
+SPEC       Mulhinten : X*Y*Z=X*(Y*Z)
+ADDSPEC    Mulhinten : SLV*X=X*SLV
+ADDSPEC    Mulhinten : SLV*SLV=SLV^2
+ADDSPEC    Mulhinten : SLV*SLV^X=SLV^(X+1)
+ADDSPEC    Mulhinten : SLV^X*SLV=SLV^(X+1)
+ADDSPEC    Mulhinten : SLV^X*SLV^Y=SLV^(X+Y)
+
+# +++++++++++++++++ Spezifikationen Term multiplikativ nach hinten  +++++++++++
+ALG Mulass
+SPEC       Mulass : X*(Y*Z)=X*Y*Z
+
+# +++++++++++++++++ Spezifikationen Term additiv nach vorne  ++++++++++++++++++
+# +++++++++++++++++ STD : A*SLV+B  +++++++++++
+ALG Addvorne
+SPEC       Addvorne : X+(Y+Z)=X+Y+Z
+ADDSPEC    Addvorne : X+SLV=SLV+X
+ADDSPEC    Addvorne : X+Y*SLV=Y*SLV+X
+ADDSPEC    Addvorne : SLV+SLV=2*SLV
+ADDSPEC    Addvorne : X*SLV+SLV=(X+1)*SLV
+ADDSPEC    Addvorne : SLV+X*SLV=(X+1)*SLV
+ADDSPEC    Addvorne : X*SLV+Y*SLV=(X+Y)*SLV
+
+
+# +++++++++++++++++ Vorsortierung alles, was A*SLV^B entspricht nach vorne ++++
+
+ALG Vorsort
+SPEC      Vorsort :          A+(B+C)=A+B+C
+ADDSPEC   Vorsort :      A _ (B _ C)=A _ B _ C
+ADDSPEC   Vorsort :            X+SLV=poly(SLV)+X
+ADDSPEC   Vorsort :            SLV+X=poly(SLV)+X
+ADDSPEC   Vorsort :          X+A*SLV=poly(A*SLV)+X
+ADDSPEC   Vorsort :          A*SLV+X=poly(A*SLV)+X
+ADDSPEC   Vorsort :          X+SLV^N=poly(SLV^N)+X
+ADDSPEC   Vorsort :          SLV^N+X=poly(SLV^N)+X
+ADDSPEC   Vorsort :        X+A*SLV^N=poly(A*SLV^N)+X
+ADDSPEC   Vorsort :        A*SLV^N+X=poly(A*SLV^N)+X
+ADDSPEC   Vorsort :  poly(A)+poly(B)=poly(A _ B)
+ADDSPEC   Vorsort :        A+poly(B)=poly(B)+A
+
+# +++++++++ Konstanten nach ganz vorne +++++++++++++++++
+ALG Constvorn
+SPEC      Constvorn : A+(B+C)=A+B+C
+# ADDSPEC   Constvorn : IF (NIN(SLV,A) && IN(SLV,B)) B+A=A+B
+
+# +++++++++ Konstanten ins Polinom hinten Einfuegen ++++
+# Konstanten werden in poly hinten plaziert
+
+ALG Constsort
+SPEC      Constsort : IF NIN(SLV,A) A+poly(B)=poly(B+A)
+ADDSPEC   Constsort : A _ B = A+B
+
+# +++++++++++++++++ Spezifikationen Term auf Polinom bringen ++++++++++++++++++
+ALG Pln
+SPEC       Pln : X+(Y+Z)=X+Y+Z
+ADDSPEC    Pln : 0*X=0      # Fuer das Zusammenfassen
+ADDSPEC    Pln : X*0=0 
+ADDSPEC    Pln : 0+X=X
+ADDSPEC    Pln : X+0=X
+# ADDSPEC    Pln : IF NIN(SLV,X) X+SLV=SLV+X
+# ADDSPEC    Pln : IF NIN(SLV,X) X+SLV^N=SLV^N+X
+# ADDSPEC    Pln : IF NIN(SLV,X) X+Y*SLV=Y*SLV+X
+# ADDSPEC    Pln : IF NIN(SLV,X) X+Y*SLV^N=Y*SLV^N+X
+
+ADDSPEC    Pln : SLV+SLV^N=SLV^N+SLV               # Vertauschen
+ADDSPEC    Pln : SLV+X*SLV^N=X*SLV^N+SLV
+ADDSPEC    Pln : X*SLV+SLV^N=SLV^N+X*SLV
+ADDSPEC    Pln : X*SLV+Y*SLV^N=Y*SLV^N+X*SLV
+
+ADDSPEC    Pln : IF (N>M) SLV^M+SLV^N=SLV^N+SLV^M
+ADDSPEC    Pln : IF (N>M) SLV^M+X*SLV^N=X*SLV^N+SLV^M
+ADDSPEC    Pln : IF (N>M) X*SLV^M+SLV^N=SLV^N+X*SLV^M
+ADDSPEC    Pln : IF (N>M) X*SLV^M+Y*SLV^N=Y*SLV^N+X*SLV^M
+
+ADDSPEC    Pln : SLV+SLV=2*SLV							# Zusammenfassen
+ADDSPEC    Pln : X*SLV+SLV=(X+1)*SLV
+ADDSPEC    Pln : SLV+X*SLV=(X+1)*SLV
+ADDSPEC    Pln : X*SLV+Y*SLV=(X+Y)*SLV
+
+ADDSPEC    Pln : SLV^N+SLV^N=2*SLV^N
+ADDSPEC    Pln : X*SLV^N+SLV^N=(X+1)*SLV^N
+ADDSPEC    Pln : SLV^N+X*SLV^N=(X+1)*SLV^N
+ADDSPEC    Pln : X*SLV^N+Y*SLV^N=(X+Y)*SLV^N
+
+																# Nun alles wenn A + ...
+# ADDSPEC    Pln : IF NIN(SLV,X) A+X+SLV=A+SLV+X
+# ADDSPEC    Pln : IF NIN(SLV,X) A+X+SLV^N=A+SLV^N+X
+# ADDSPEC    Pln : IF NIN(SLV,X) A+X+Y*SLV=A+Y*SLV+X
+# ADDSPEC    Pln : IF NIN(SLV,X) A+X+Y*SLV^N=A+Y*SLV^N+X
+ADDSPEC    Pln : A+SLV+SLV^N=A+SLV^N+SLV               # Vertauschen 
+ADDSPEC    Pln : A+SLV+X*SLV^N=A+X*SLV^N+SLV
+ADDSPEC    Pln : A+X*SLV+SLV^N=A+SLV^N+X*SLV
+ADDSPEC    Pln : A+X*SLV+Y*SLV^N=A+Y*SLV^N+X*SLV
+
+ADDSPEC    Pln : IF (N>M) A+SLV^M+SLV^N=A+SLV^N+SLV^M
+ADDSPEC    Pln : IF (N>M) A+SLV^M+X*SLV^N=A+X*SLV^N+SLV^M
+ADDSPEC    Pln : IF (N>M) A+X*SLV^M+SLV^N=A+SLV^N+X*SLV^M
+ADDSPEC    Pln : IF (N>M) A+X*SLV^M+Y*SLV^N=A+Y*SLV^N+X*SLV^M
+
+ADDSPEC    Pln : A+SLV+SLV=A+2*SLV							# Zusammenfassen
+ADDSPEC    Pln : A+X*SLV+SLV=A+(X+1)*SLV
+ADDSPEC    Pln : A+SLV+X*SLV=A+(X+1)*SLV
+ADDSPEC    Pln : A+X*SLV+Y*SLV=A+(X+Y)*SLV
+
+ADDSPEC    Pln : A+SLV^N+SLV^N=A+2*SLV^N
+ADDSPEC    Pln : A+X*SLV^N+SLV^N=A+(X+1)*SLV^N
+ADDSPEC    Pln : A+SLV^N+X*SLV^N=A+(X+1)*SLV^N
+ADDSPEC    Pln : A+X*SLV^N+Y*SLV^N=A+(X+Y)*SLV^N
+
+# +++++++++++++++++ Polyweg +++++++++++++++++++++++++++++++++++++++++++++++
+ALG Polyweg
+SPEC    Polyweg : poly(A)=A
+ADDSPEC Polyweg : A _ B = A+B
+
+# +++++++++++++++++ -1 zu Additiv-Inversen ++++++++++++++++++++++++++++++++
+ALG xm1_ai
+SPEC     xm1_ai : -1*A= -A
+ADDSPEC  xm1_ai : A* -1= -A
+ADDSPEC  xm1_ai : (-A)*B= -(A*B)
+ADDSPEC  xm1_ai : A* -B= -(A*B)
+
+# +++++++++++++++++ Spezifikationen zum Gleichungsloesen ++++++++++++++++++
+ALG Slv
+SPEC       Slv : EQN (SLV)                     = SLV==0
+ADDSPEC    Slv : EQN(SLV^2)                    = SLV==0
+ADDSPEC    Slv : EQN(SLV^2+SLV)                = SLV==0
+ADDSPEC    Slv : IF NIN(SLV,Y) EQN(Y)             = SLV== ALL SLV
+ADDSPEC    Slv : IF NIN(SLV,X) EQN(SLV + X)       = SLV== - X
+ADDSPEC    Slv : IF NIN(SLV,Y) EQN(Y*X)           = EQN(X)
+ADDSPEC    Slv : IF NIN(SLV,A) EQN(A*X+B)         = EQN (X+(mi A * B))
+ADDSPEC    Slv : IF NIN(SLV,A) EQN(A*X+B+C)       = EQN (X+mi A *B+mi A*C)
+# ADDSPEC    Slv : IF (NIN(SLV,A) && (-A>0)) EQN(SLV^N+A)       = (SLV == (- A)^mi N) || (SLV == - ((- A)^mi N))
+ADDSPEC    Slv : IF NIN(SLV,A) EQN(SLV^2+A*SLV)   = (SLV == 0) || (SLV == -(A))
+ADDSPEC    Slv : IF NIN(SLV,B) EQN(SLV^2+SLV+B)   = (SLV == - .5 +(- B+.25)^.5) || (SLV == - .5 -(- B+.25)^.5)
+ADDSPEC    Slv : IF NIN(SLV,B) EQN(SLV^2+A*SLV+B) = (SLV == - .5*A +(- B+.25*A^2)^.5) || (SLV == - .5*A -(- B+.25*A^2)^.5)
+ADDSPEC    Slv : X*(Y*Z)=X*Y*Z
+
+ALG Eqn
+SPEC Eqn : ai_m1,Mulhinten,Mulass,Addvorne,Vorsort,Constvorn,Constsort,Pln,Polyweg,Slv,xm1_ai

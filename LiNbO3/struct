@@ -1,0 +1,132 @@
+# This file containes data related to LiNbO3-crytals
+# all data is for congruent crystals.
+# equivalent points :
+
+0 0 0
+0.333333333333333333 0.666666666666666667 0.666666666666666667
+0.666666666666666667 0.333333333333333333 0.333333333333333333
+
+# Number of different atoms in unit cell
+3
+
+# Z of this atom (Nb5+)
+36
+
+# A : atomic weight in atomic units
+92.91
+
+# Interpolated atomic form factor for Nb5+ 
+
+# The formula is empirical and interpolates
+# tabled values given in
+# International Tables for X-Ray Crystallography 
+# Vol. III, Kynoch Press 1968, pp. 201
+#
+#
+
+# (41-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+19.81 3.732 0.5574
+
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# These values are taken from
+# International Tables for X-Ray Crystallography 
+# Vol. III, Kynoch Press 1968, pp. 201
+# 
+# C D lambda(Kalpha) (lambda > lambdaKalpa=0.6529 _Ang)
+51.9 6.67 
+
+
+# number of Nb atoms
+2
+
+# positions of Nb atoms in relative grating coordinates
+
+0 0 0
+0 0 0.5
+
+
+# Z of this atom (Li+)
+2
+
+# A : atomic weight in atomic units
+6.94
+
+# interpolated atomic form factor for Li+ 
+# (2-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+
+0.6021 2.746 1.091
+
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# C D lambda(Kalpha) (lambda < lambdaKalpa)
+
+0.150 0.494e-03 
+
+# number of Li atoms
+2
+
+# positions of Li atoms in relative grating coordinates
+
+0 0 0.2806
+0 0 0.7806
+
+# Z of this atom (O2-)
+10
+
+# A : atomic weight in atomic units
+16.00
+
+# interpolated atomic form factor for O2- 
+# (10-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+
+3.687 11.81 0.7621
+
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# C D lambda(Kalpha) (lambda < lambdaKalpa)
+
+3.18 0.0654 
+
+# number of O atoms
+6
+
+# positions of O atoms
+
+0.0479 0.3436 0.0632
+-0.3436 -0.2957 0.0632
+0.2957 -0.0479 0.0632
+-0.3436 -0.0479 0.5632
+0.0479 -0.2957 0.5632
+0.2957 0.3436 0.5632
+
+#----------------------------------------
+# values for the complete crystal
+#----------------------------------------
+# density rho : [kg/m^3]
+4.628e3
+
+# piezoelectric coefficients (allways symmetric ! dijk == dikj !!)
+
+# d1jk :
+# number of Coeff 
+2
+# j k value
+1 2 -4.2e-11  # -2*d22 [C/N]
+1 3 6.8e-11   # d15 [C/N]
+
+# d2jk :
+# number of Coeff (because of field -> no d211)
+2
+# j k value
+2 2 2.1e-11   # d22 [C/N]
+2 3 6.8e-11   # d15 [C/N]
+
+# d3jk :
+# number of Coeff (because of field -> no d311,d322)
+1
+# j k value
+3 3 0.6e-11   # d33 [C/N]

@@ -1,0 +1,22 @@
+# Numerisches Loesen von expliziten Diff-gleichungen
+# Eingabe : f(x,y) = y'
+# x0 = Anfangswert x (normal : == 0)
+# y0 = Anfangswert y
+# dx = Schrittweite x
+
+y=y0
+
+FOR z=x0 TO xmax- dx STEP dx DO {
+a=y;x=z 
+k1=f
+x=z+.5*dx y=a+.5*dx*k1
+k2=f
+x=z+.5*dx y=a+.5*dx*k2
+k3=f 
+x=z+dx y=a+dx*k3
+k4=f
+y=a+dx/6*(k1+2*k2+2*k3+k4)
+x,y
+}
+
+y=dummi

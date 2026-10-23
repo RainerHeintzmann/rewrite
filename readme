@@ -1,0 +1,548 @@
+(c) Copyright: Rainer Heintzmann, Blumenhaller Weg 138,49078 Osnabrueck
+
+Rewrite ist ein Sytem zur Beieinflussung Symbolischer Ausdruecke,
+und zum durchfuehren numerischer Rechnungen.
+Mittels Umschreiben der Ausdruecke in einem Regelsystem von 'Algebren'
+lassen sich einfache algebraische Funktionen wie Differenzieren, loesen
+von Quadratischen Gleichungen usw. auf Termen ausfuehren.
+Die Regelsystem sind selbst zu definieren.Unter dem Verzeichnis 'inc' 
+sind einige Beispiele.
+
+Numerisches Auswerten der Terme ist auch moeglich. Benutzer koennen 
+eigene Funktionen schreiben und sie in die Liste vorhandener
+Funktionen in dem Modul 'userfkt.c' einfuegen.
+
+STARTEN DES PROGRAMMS :
+Starten sie das Programm 'rewrite' von der shell aus.
+Geben Sie nun 'INC "inc/all"' ein. Es werden nun eine Reihe von Include-Files
+geladen. Nun koenne Sie Ihre Aufgabe stellen z.B:
+'REWR D(sin cos x,x) : All'
+Das Programm bestimmt nun die Ableitung der Fkt. sin(cos(x)) nach x durch 
+Umschreiben des Terms in der Algebraliste 'All'.
+
+Benutzung von 'Rewrite' :
+
+Generell wird die Eingabe immer Zeilenweise verarbeitet. Bei groesseren
+Bloecken muss die Zeile durch ein '\' am Zeilenende fortgesetzt werden.
+Wichtig ist, dass kein Zeichen (auch kein Leerzeichen) hinter dem '\' steht.
+Kommentare beginnen mit '#' und gehen bis zum Ende der Zeile oder bis zum
+naechsten '\' gefolgt von einem Zeilentrenner.
+
+Befehl                   Erklaerung
+--------------|----------------------
+INC "filename"  Unter 'filename' abgespeicherte Programme werden ausgefuehrt.
+                'Filename' ist ein von '"' umschlossener String.
+                Mehrfache INCLUDES sind moeglich bis zu einer maximalen Tiefe. 
+                Bsp.: INC "inc/all" : alle wichtigen Include-files werden 
+                gelesen.
+                Der INC-Befehl wird einmalig beim verarbeiten der Eingabe
+                ausgefuehrt. Zeilen, die 'INC' enthalten duerfen nicht mit
+                '\' fortgesetzt werden. (Einzige Ausnahme !)
+
+REWR term : algname [;algname ..]
+                Der Term 'term' wird in den Algebren (Regellisten) algname
+                nacheinander umgeschrieben.
+
+PRTNUM "String" Das Standartformat fuer die Ausgabe von reelen Zahlen wird in
+                "String" geaendert. Z.B. : PRTNUM "%2.15g "
+
+OUT "filename"  Die Ausgabe wird in das File Id umgelenkt; dieses wird vorher
+                geloescht. Zusaetzlich ist noch 'OUT "stdout"' moeglich. Dadurch
+                findet die Ausgabe wieder auf stdout statt. Bei jeder Ausgabe-
+                aenderung wird die noch offene Datei geschlossen.
+                Grafische Darstellung von Funktionen mittels anderer Programme
+                ist so einfach moeglich.
+
+DATA "filename" Zusaetzlich zu der normalen Standarteingabe besteht die
+                Moeglichkeit mit 'DATA Const' aus einer Datei zu lesen.
+                Diese Datei muss mit 'DATA "filename"' geoeffnet werden.
+								Beim lesen wird beim erreichen von nicht numerischen Daten
+								der Rest, bis zum Zeilenende uebersprungen.
+
+DATA Const      Liest eine Real-Zahl aus der geoeffneten Datei in die Konstante
+                'Const'. So lassen sich z.B. auch Messwerte weiterverarbeiten.
+
+SYS "String"    fuert den in '"String"' angegebenen Befehl in der shell aus.
+
+SORT name [,name ..]
+								Erzeugung eines Datentyps. Der Typ wird bei Funktionen,
+                Variablen und Konstanten gebraucht.
+
+NUM sortname    Standartmaessig wird mit dem Datentyp 'double' gerechnet
+                Alle eingegebenen Zahlen (z.B.: 1.234) werden als 'double'
+                abgespeichert. Sie muessen aber einem selbstdefiniertem
+                Datentyp (mit 'SORT typname' erzeugt) zugeordnet werden.
+                Bsp.:
+											SORT real
+											NUM real    # ordnet Nummern den Typ real zu.
+
+CONST name [,name ..] : sortname  
+								Deklaration einer Konstanten. Es wird eigentlich
+                eine Konstante erzeugt, die beliebige Werte annehmen kann.
+                (Also Variable). Im Gegensatz zu mit VAR erzeugten Metha-
+                Variablen kann sie aber nicht als Ersatz fuer ganze Terme
+                benutzt werden.
+
+VAR name [,name ..] : sortname  
+								Erzeugung einer Metha-Variablen. Man kann diese Variable
+                als Platzhalter in Spezifikationen fuer Algebren verwenden.
+                Bsp.:
+											VAR A : real  SPEC xyz A+0=A
+
+NUM name [,name ..] : sortname  
+								Erzeugung einer Metha-Variablen. Man kann diese Variable
+                als Platzhalter nur fuer Numerische Werte in Spezifikationen 
+                fuer Algebren verwenden.
+                Bsp.:
+											NUM N : real 
+											SPEC xyz N+0=N
+
+FUNC name : sortname [,..] >> sortname [LA1..5|RU] [ATT name]
+																						 oder  [ATT ( Argdefs ) Block]
+                Erzeugung einer Funktion. Die erste sort-Liste gibt die
+                Anzahl und Typen der Argumente an ( ein ++ hinter dem
+								letzten Argument steht fuer variabel viele Argumente des 
+								letzen Types) , der andere sortname den
+                Resulttattyp der Funktion. LA1 bis LA5 legt das Ein- bzw.
+                Ausgabeformat fest. Es bedeuten:
+                   LA1 bis LA5   : Lings-assoziativer Operator (2 Argumente)
+                                   LA5 klammert vor LA4 usw. .
+                   RU            : Rechts-unaerer Operotor. (z.B. fakultaet) 
+									 RA            : Rechts-assoziativer Operator (z.B. a^b)
+
+                Ist kein spezielles Ein/Ausgabeformat angegeben, so wird die
+                Funktion in der Form : 'sin x' , 'sin(x)' bzw. 'f(x,y)'
+                eingelesen.
+
+                ATT name legt den Namen der Funktion in der Liste 
+                'userfunction' im Modul userfkt.c fest, die aufgerufen wird, 
+                wenn alle Argumente der Funktion einen numerischen Wert besitzen.
+								name ist nicht in "" zu setzen. 
+								Name darf frei geweahlt werden (auch gleichlautend mit einem Funkti
+								onsnamen).
+                z.B.: FUNC + : real,real >> real LA1 ATT 2
+
+							  ATT ( Argdefs ) Block
+								Haengt eine selbstdefinierte Funktion an. ( Argdefs ) sind 
+								vollstaendige Definitionen fuer die Argumente ( Konstanten,Terme
+								oder Funktionen ).
+							  Der entsprechende Funktionskoerper wird ausgefuehrt, wenn eine
+								Zuweisung eines Terms an eine Konstante erfolgt, oder ein Term
+								ausgegeben werden soll.
+							  z.B. FUNC test : real,real,real >> real ATT \
+							       (CONST a,b : real; TERM c : real) { RETURN c+a*b }
+
+RETURN Term     Setzt den Resultatwert (einen Term) der Funktion. Die Ausfuehrung
+                der Funktion wird NICHT!! beendet. Enthaelt der Term lokale
+								Variablen, so gibt es eine Fehlermeldung, und die Funktion gild
+								als nicht ausgefuehrt.
+
+OTHER name : sortname [,..] >> sortname [ATT name]
+                Definiert zu einem existierenden Funktionsnamen eine weitere
+                Abbildung mit anderen Argument- und Resultattypen. 
+								Funktionen koennen anhand ihrer Argumenttypen unterschieden werden.
+                z.B.: OTHER + : vector,vector >> vector
+
+BRA  auf zu : sortname [,..] >> sortname [ATT name]
+                Definiert eine Funktion, die in Klammerschreibweise benutzt
+                werden kann. 'auf' bezeichnet das Symbol fuer Klammer auf,
+                und 'zu' das Symbol fuer Klammer zu.
+                z.B: BRA < > : vector,vector >> real # Skalarprodukt <a,b>
+                Kennzeichnend fuer OTHER ist die erste Klammer.
+                z.B.: OTHER < : compl,compl >> real
+
+ALG name       Definiert eine neue Algebra , die Spezifikationen enthalten kann
+
+SPEC algname : [Fkt ...] was = zuwas [DO Block]
+               Alte Spezifikationen werden geloescht, die neue wird eingetragen.
+
+SPEC algname : algname [, algname ...]
+               Alte Spezifikationen werden geloescht, algname kann anstelle der
+               gesamten algnamelist verwendet werden. Hintereinander Umschreiben
+               in mehreren Algebren kann so elegant geschrieben werden. 
+               Prinzipiell duerfen Listen von Algebren immer mit '(' ')' Klammern
+               umgeben werden, was bedeutet, dass beim Umschreiben die Algebren
+               innerhalb der Klammern solange ausgefuehrt werden, bis kein
+               Umschreiben mehr stattfindet.
+
+ADDSPEC algname : [IF ( Fkt )] was = zuwas [DO Block]
+               Hinzufuegen einer Ersetzungsregel (Spezifikation) zur Algebra
+                'algname'. Es duerfen Metha-Variablen auf beiden Seiten
+               verwendet werden. Mit NUM definierte Metha-Variablen werden
+               nur bei Zahlen ersetzt.
+
+							 Fkt ist selbstdefiniert (siehe IF ) oder eine der Funktionen :
+
+                     LB(term,term)            'Lower or between' vergleicht
+                                              zwei Terme.
+                     ISINT(term)              stellt fest ob term ein int-wert
+                                              ist.
+                     IN(terma,termb)          stellt fest ob terma in termb
+                                              enthalten ist.
+                     NIN(terma,termb)         verneinung von IN.
+                     GT(nummer,nummer)        Numerischer Groessenvergleich.
+               Abhaengig vom Resultat der Funktionen wird die Regel angewandt
+               oder eben nicht. Das Hintereinanderschreiben mehrerer Funktionen
+               bewirkt eine und-verknuepfung der Resultate.
+
+               Bsp.: ADDSPEC real : LB(A,B) A+B=B+A
+               Ist DO in Verknuepfung mit einem Block (oder einem Befehl)
+               angegeben, so wird vor dem Ersetzen der linken durch die rechte+
+               Seite der Block ausgefuehrt.
+
+               Bsp.: ADDSPEC real : Tay(A,B,D)=q DO { q=0 
+                                    FOR i=1 TO N STEP 1 DO \
+                                    q=q+D^i/i!*Dp(B,D) }
+
+LIFT (Fkt(Args) [, ..]) TO (Fkt(Args) [, ..])
+							 Uebertragung saemtlicher auf eine Menge von Funktionen und
+							 Konstanten zutreffender Regeln auf eine andere solche Menge.
+							 Fkt(Args) ist eine durch Kommas getrennte Liste von Funktionen
+							 mit irgentwelchen Argumenten des gewuenschten Datentyps oder
+							 Konstanten.
+               Die jeweiligen Funktionen werden durch den Typ ihrer Argumente
+               eindeutig charakterisiert. Die Argumente spielen sonst im weiteren
+               keine Rolle. Als Konstanten sind auch die reellen Zahlen 1 und 0
+               moeglich.
+							 Alle Regeln, die in der linken Menge gelten werden
+							 nun automatisch auch auf die rechte Menge angewandt.
+							 Bsp. :
+											LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
+											LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
+                      # mit diesem Trick lassen sich die Eigenschaften eines
+											#	Ringes leicht aufgrund schon definierter Gruppeneigenschaften
+											#	definieren.
+
+TERM name : sortname
+               Deklaration einer TERM-Variable.
+               Eine TERM-Variable kann einen beliebigen Ausdruck des gleichen
+               Typs aufnehmen.Ineianderschachtelung von TERM-Variablen bewirkt
+               ein Einsetzen der Ausdruecke. Die Abhaengigkeit von dem anderen
+               Term wird nicht gespeichert.
+               Immer vorhanden ist der Term '%'. Er enthaelt den jeweils
+               zuletzt ausgegebenen Ausdruck. Soll dieser spaeter nochmals
+               benutzt werden, so muss er an eine andere TERM-Variable zugewie-
+               sen werden.
+               TERM-Variablen werden eigentlich im Sinne von Funktionen verwen-
+               det. So ist die Zuweisung 'TERM q  q=x^y*a' im Sinne von 
+               'q(x,y,a)' zu verstehen. Durch Zuweisungen an die einzelnen
+               Variablen 'x=4 y=2 a=3' kann dann einfach der Funktionswert von
+               q(4,2,3) mit 'q' ausgerechnet werden.
+               
+
+ATT sortname Name1 , Name2 , Name3 , Name4
+               Einem Typ wird Anzeige- ,Vergleichs- , Kopier- und Loeschfunktion
+               fuer numerische Werte zugewiesen.
+               Name1 bezeichnet die Anzeigefunktion in 'userfunction' mit der
+               numerische Werte vom Typ sortname angezeigt werden sollen.
+               Name2 bezeichnet die Vergleichsfunktion mit der zwei num.
+               Werte verglichen werden (1 : Zahl1 > Zahl2,0: Zahl1 == Zahl2,
+               -1 : Zahl1 < Zahl2).
+               Name3 bezeichnet die Kopierfunktion in 'userfunction' mit der
+               Numerische Werte kopiert werden.
+               Name3 bezeichnet die Loeschfunktion in 'userfunction' mit der
+               Numerische Werte geloescht werden.
+               Bsp.: ATT complex show_complex,cmp_complex,cpy_complex,del_complex
+               siehe Modul userfkt.c
+
+
+FOR Constname = N1 TO N2 [STEP N3] DO Block
+							For-Schleife.
+							Bsp.: FOR i = 20 TO 10 STEP -1 DO i
+
+IF ( Fkt ) Block [ ELSE Block ]
+              IF-Bedingung. Fkt ist Funktion mit double Resultat, die
+              TRUE/FALSE (1/0) zurueckgibt.
+              Bsp.: CONST inc_xxx : real
+                    inc_xxx = 1
+                    IF (inc_xxx > 0) INC "inc/xxx"
+
+WHILE ( Fkt ) Block
+              WHILE-Schleife. Fkt. siehe 'ADDSPEC'.
+              Bsp.: i = 1
+                    WHILE (10>i) 2^i
+WHILE Fkt. .. Block
+							WHILE-Schleife. Fkt. siehe 'ADDSPEC'.
+							Bsp.: i = 1
+										WHILE GT(10,i) 2^i
+							
+Nun die Befehle:
+
+Zuweisungen:
+TERM-name = term
+               term wird in TERM-name gespeichert
+               Bsp.: TERM q : real    q=1+1+a
+               Der letzte ausgegebene Ausdruck ist unter '%' als TERM-name
+               immer verfuegbar.
+               Lokale Variablen duerfen nicht an globalere Terme zugewiesen werden.
+               (daraus resultiert eine Fehlermeldung bei der Ausgabe. (Zuweisung an %))
+               Werden Term-Variablen an Term-Variablen zugewiesen, so wird der
+               Inhalt kopiert und gegebenenfalls numerisch ausgewertet. Wird also
+               eine Term-Variable veraendert hat dies keinen einfluss auf andere
+               Term-Variablen.
+
+
+Const-name = numerischer Wert
+               Die Konstante bekommt einen Wert
+               z.B.: x=1+1+3    (wenn + mit Funktion verbunden )
+               Steht bei 'numerischer Wert' kein Wert (z.B. andere Konst. ohne
+               Wert oder Funktion, die nicht rechnet) so wird der Wert der 
+               Konstanten geloescht.
+
+Sowohl eine Const- als auch eine Term-Variable koennen durch einfaches
+hinschreiben des Namens ausgegeben werden.
+Ausgegebene ganze Ausdruecke sind auch ein Term (%).
+
+Bsp.: 
+1+1
+2                  # wird ausgegeben
+TERM q : real
+q=1+1
+q
+2                  # wird ausgegeben (q bleibt aber erhalten)
+Der letzte Ausgedruckte Wert ist unter dem Term % wieder zu erreichen.
+Bestehende Abhaengigkeiten zu anderen Termen werden hier ignoriert.
+Bsp.:
+TERM q
+q=b
+a+q
+a+b                # wird ausgegeben
+q=c
+%+2
+a+b+2              # wird ausgegeben
+
+Werden von '"' begrenzte Strings hingeschrieben, so wird der Text ausgegeben.
+Sie koennen nicht zugewiesen werden. (String darf auch '"' enthalten.)
+
+Eine Reihe von "benutzerdefinieren" Funktionen sind schon implementiert.
+Dazu gehoeren wichtige Funktionen auf reelen Zahlen (real.c),
+complexen Zahlen (complex.c), reelen Vectoren (rvector.c) und reelen
+Matrizen (rmatrix.c) und Verbindungen der Datentypen. Alle Funktionen
+sind im Modul (userfkt.c) eingetragen. Neue Funktionen muessen immer
+ein array von Zeigern auf Argumente als Argument bekommen und einen Zeiger
+auf das Resultat zurueckliefern. Beispiele sind in den genannten c-Modulen
+zu finden.
+
+
+Die grundlegenden mathematischen Datentypen, Funktionen und Regeln sind
+im Modul "alg" im Verzeichniss "inc" definiert. Dort kann man auch nachlesen
+welche mathematischen Funktionen definiert sind.
+
+
+
+Wichtigste Fehler:
+Der Speicher wird nur unzureichend freigegeben.
+
+Maengel des Systems:
+Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie
+differenzieren usw. sind dann deutlich schneller (verschicken von Nachrichten).
+Es existieren keine bisher 'Container-Datentypen' wie Arrays, Matritzen, usw. .
+Diese muessen durch entsprechende Funktionen nachgebildet werden, was Rechenzeit
+kostet.
+
+
+Es folgt eine Zusammenfassung der yacc-syntax:
+
+
+%token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ
+%token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
+%token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
+%token	<y_sym>	Id String
+%token	<y_sym>	Sort Alg Term
+%token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
+%token			Terms Form Sorts Functs Forms Algs Cond2 Cond
+%type	<y_int>	VORRANG
+%type	<y_nod>	vinstr definition instruction aninstruction instructions prntexpr  tinstructions oinstructions
+%type	<y_nod> idlist l_thing l_list sortlist vsortlist funclist formlist termlist alglist Alg2 prntlist
+%type	<y_nod>	term func step att namedId d_list
+%type	<y_nod> formula cformula condition condfunc
+
+%left	La1 
+%left	La2 
+%left	La3 
+%left	La4 
+%left	La5
+%right	Ra 
+%right	Ru 
+%left	Func 
+%%
+
+
+prog		: line
+				| prog line
+
+line		: instructions '\n' 
+													
+definition	: FUNC namedId ':' vsortlist PFEIL Sort	VORRANG att 
+			| OTHER func ':' vsortlist PFEIL Sort att 
+			| ATT Sort Id ',' Id ',' Id ',' Id 
+			| BRA Id Id	':'  vsortlist PFEIL Sort	att 
+			| VAR idlist ':' Sort			 
+			| NUM Sort	 			  			 
+			| NUM idlist ':' Sort			 
+			| CST idlist ':' Sort			 
+			| SPEC Alg ':' alglist	   
+			| SPEC Alg ':' formlist		 
+			| ADDSPEC Alg ':' formlist 
+			| SORT idlist					     
+
+			| ALG idlist	             
+			| TERM idlist ':' Sort	   
+
+idlist	: namedId						
+			| namedId ',' idlist		
+
+l_thing : Const					
+			| Term						
+
+l_list	: l_thing			     
+			| l_thing ',' l_list 
+
+att 		: /* NULL */		
+			  | ATT namedId		
+				| ATT '(' 
+								 d_list ')' instruction 
+
+namedId : Id           
+        | Const        
+        | Var	         
+        | func         
+        | Sort         
+        | Alg          
+        | Term         
+
+
+VORRANG		: /* nothing */				
+			| LA1						
+			| LA2						
+			| LA3						
+			| LA4						
+			| LA5						
+			| RA						
+			| RU						
+
+condition : condfunc					
+
+condfunc : LB '(' termlist ')'
+			| IN '(' termlist ')' 	
+			| NIN '(' termlist ')'	
+			| '(' term ')'   				
+
+instructions  : instruction	
+							| instruction ';' instructions 
+
+tinstructions : oinstructions	
+							| oinstructions '\n' tinstructions 			
+
+oinstructions : instructions			
+
+trenner : '\n' 
+				| ';'
+
+d_list : definition						 
+			 | definition ';' d_list 
+
+instruction : aninstruction     
+			| definition		    			
+			| '{'
+				tinstructions '}' 			
+			| WHILE condition instruction	
+			| IF condition instruction	
+			| IF condition instruction ELSE instruction	
+			| FOR term EQ term TO term step DO instruction
+
+aninstruction	: /* Nichts */ 	
+			| SYS String					
+			| INC String					
+			| REWR term ':' alglist	
+			| prntlist						
+			| PRTNUM String				
+			| PRT prntlist				
+			| OUT String					
+			| DATA String					
+			| DATA Const					
+			| Term EQ term				
+			| Term EQ REWR term ':' alglist	
+			| Const EQ term			
+			| EXE func Id 			
+			| LIFT '(' termlist ')' TO '(' termlist ')'	
+			| DBG Const 	      	
+			| RETURN term								
+			| QUIT                      
+
+step  : /* NULL */	
+			| STEP term	
+
+prntexpr : term						
+			| String							
+
+prntlist : prntexpr						
+			| prntexpr ',' prntlist	
+
+alglist		: Alg2						
+			| Alg2 ',' alglist		
+
+Alg2 : Alg									
+			| '(' alglist ')'			
+
+sortlist	: Sort							
+			| Sort ',' sortlist			
+
+vsortlist : sortlist					
+			| sortlist VARPAR				
+
+func		: Func				
+			| La1						
+			| La2						
+			| La3						
+			| La4						
+			| La5						
+			| Ra						
+			| Ru						
+			| Bra						
+			| Bra1					
+
+funclist	: func						
+			| func ',' funclist		
+
+term		: Term							
+			| LAST								
+			| Const								
+			| Var				      		
+			| '(' term ')'		    
+			| term Ru				      
+			| Func term				    
+			| La1 term				    
+			| La2 term				    
+			| La3 term				    
+			| La4 term				    
+			| La5 term				    
+			| Bra termlist Bra	  
+			| Bra1 termlist Bra2	
+			| Func '(' termlist ')'		
+			| term La1 term		    
+			| term La2 term				
+			| term La3 term				
+			| term La4 term				
+			| term La5 term				
+			| term Ra  term				
+
+termlist	: term						
+			| term ',' termlist		
+
+formula		: term EQ term		
+
+vinstr : /* */							
+			| DO instruction			
+
+cformula	: formula	vinstr					
+																									 $2);$$ = $1;}
+          | IF condition formula	vinstr 
+																									 $4);$$ = $3;}
+
+formlist	: cformula					
+			/* | cformula ';' formlist 
+															}
+
+%%
+

@@ -1,0 +1,22 @@
+# diese Include-File includet in der richtigen Reihenfolge alle wichtigen 
+# mathematischen und Physikalischen Formeln
+
+INC "inc/alg"
+# INC "inc/bool"
+INC "inc/pdiff"
+INC "inc/rvector"
+INC "inc/rmatrix"
+INC "inc/physik"
+INC "inc/theophys"
+INC "inc/lagrange"
+
+INC "inc/physnum"
+INC "inc/eqnsolve"
+#  INC "inc/numerik.ini" ??
+INC "inc/numerik"
+INC "inc/mathnum"
+INC "inc/physnum"
+INC "LiNbO3/comp"
+l=6
+# INC "LiNbO3/compute"
+

@@ -1,0 +1,5 @@
+# Copyright : Rainer Heintzmann
+# In diesem Directory stehen Include-files, die von 'rewrite' aus
+# mit '! filename' aufgerufen werden koennen.
+
+# 

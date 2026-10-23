@@ -1,0 +1,31 @@
+# Numerisches Loesen von expliziten Diff-gleichungen
+# Eingabe : f(x,y) = y'
+# x0 = Anfangswert x (normal : == 0)
+# y0 = Anfangswert y
+# dx = Schrittweite x
+
+# 1. Erstellen der Ableitungen
+
+REWR f : pdiff;DIFFGLSUB
+D1=%
+REWR Dp(D1,x)+Dp(D1,y)*D(y,x) : pdiff;DIFFGLSUB
+D2=%
+REWR Dp(D2,x)+Dp(D2,y)*D(D(y,x),x) : pdiff;DIFFGLSUB
+D3=%
+
+y=y0
+
+FOR x=x0 TO xmax- dx STEP dx DO {
+d1 = D1
+d2 = D2 
+d3 = D3 
+
+y=y+dx*d1+dx^2/2*d2+dx^3/6*d3
+x+ dx,y
+}
+
+y=dummi
+d1=dummi
+d2=dummi
+d3=dummi
+

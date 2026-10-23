@@ -1,0 +1,12 @@
+
+TERM Koord : real # irgendeine Koordinate z.B x
+
+TERM Tkin : real	# Kinetische Energie
+TERM V : real	# Generalisiertes Potential
+TERM L : real # Lagrange-Funktion
+TERM H : real # Hamilton-Funktion
+
+Tkin=.5*m*D(z,t)^2   # Beispiel-Vorbelegung : Freier Fall
+V=m*g*z
+L=Tkin-V
+Koord = z

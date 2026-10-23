@@ -1,0 +1,17 @@
+SORT rmatrix
+ATT rmatrix  show_mat,cmp_mat,cpy_mat,del_mat
+
+OTHER + : rmatrix,rmatrix >> rmatrix  ATT mat_add      # Matrizenaddition
+OTHER * : rmatrix,rmatrix >> rmatrix  ATT mat_mul      # Matrizenmultiplikation
+OTHER * : real,rmatrix >> rmatrix     ATT real_mul_mat # reel mal Matrix
+OTHER * : rmatrix,real >> rmatrix     ATT mat_mul_real # reel mal Matrix
+OTHER * : rmatrix,rvector >> rvector  ATT mat_mul_vec  # Matrix mal Vector
+FUNC trans : rmatrix >> rmatrix ATT mat_trans
+
+FUNC det  : rmatrix >> real
+OTHER elem : rmatrix,real,real >> real ATT elem_mat        # Matrix,Zeile,Spalte
+OTHER [ : rmatrix,real,real >> real ATT elem_mat          # Matrix[Zeile,Spalte]
+FUNC nullmat : real,real >> rmatrix ATT null_mat          # Zeilen,Spalten
+FUNC einsmat : real,real >> rmatrix ATT eins_mat          # Zeilen,Spalten
+FUNC chmat : rmatrix,real,real,real >> rmatrix ATT ch_mat # Matrix,Zeile,Spalte,Wert
+

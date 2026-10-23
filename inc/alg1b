@@ -1,0 +1,244 @@
+ALG Bool
+SORT bool
+ALG Real
+ALG integr
+ALG diff1
+ALG Subst
+ALG zu1
+ALG more
+SORT real
+
+VAR A : real
+VAR B : real
+VAR C : real
+VAR X : real
+VAR Y : real
+VAR Z : real
+NUM N : real
+NUM M : real
+
+CONST x : real
+CONST y : real
+CONST z : real
+CONST a : real
+CONST b : real
+CONST c : real
+CONST e : real
+CONST pi : real
+
+NUM e  2.718281828
+NUM pi 3.141592654
+
+TERM q
+TERM s
+TERM h1
+TERM h2
+TERM h3
+
+CONST true : bool
+CONST false : bool
+
+FUNC fac   : real >> real RU
+FUNC ln    : real >> real
+ATT  ln 5
+FUNC sin   : real >> real
+ATT  sin 7
+FUNC cos   : real >> real
+ATT  cos 8
+FUNC or    : real,real >> real LA1
+FUNC and   : real,real >> real LA1
+FUNC -     : real,real >> real LA2
+FUNC nmin  : real,real >> real LA2
+ATT  nmin 1
+FUNC +     : real,real >> real LA2
+FUNC nplu  : real,real >> real LA2
+ATT  nplu 0
+FUNC *     : real,real >> real LA3
+FUNC nmal  : real,real >> real LA3
+ATT  nmal 2
+FUNC /     : real,real >> real LA3    
+FUNC nget  : real,real >> real LA3
+ATT  nget 3
+FUNC ^     : real,real >> real LA4
+ATT  ^ 4
+FUNC D     : real,real >> real           # Ableitung
+FUNC Dn    : real,real,real >> real      # n. Ableitung
+FUNC Tay   : real,real,real >> real      # Taylor-entwicklung Tay(1/x^2,x,3)
+FUNC S     : real,real,real,real >> real # Summe
+FUNC Sub   : real,real,real >> real      # Substituieren
+FUNC I     : real,real,real,real >> real # Integral
+FUNC mi    : real >> real                # multiplikativ Inverses
+FUNC ai    : real >> real                # additiv Inverses
+
+Real   = (real;+,*)
+integr = (real;+,*)
+diff1  = (real;+,*)
+Subst  = (real;+,*)
+zu1    = (real;+,*)
+more   = (real;+,*)
+
+SPEC 	      Real : 0+X   = X         # spezielle Konstanten
+ADDSPEC     Real : 0*X   = 0
+ADDSPEC     Real : ai 0  = 0
+ADDSPEC     Real : X*mi X  = 1
+ADDSPEC     Real : mi X*X  = 1
+ADDSPEC     Real : X+ai X  = 0
+ADDSPEC     Real : ai X+X  = 0
+ADDSPEC     Real : 1*X   = X
+ADDSPEC     Real : X^1   = X
+ADDSPEC     Real : X^0   = 1
+ADDSPEC     Real : 1^X   = 1
+ADDSPEC     Real : 0^X   = 0
+ADDSPEC     Real : ln e  = 1
+
+ADDSPEC     Real : X/Y=X*mi Y         # kein - und kein /
+ADDSPEC     Real : X-Y=X+ai Y
+
+ADDSPEC     Real : ai ai X = X     
+ADDSPEC     Real : ai (Y+X) = ai X +ai Y   
+ADDSPEC     Real : X*ai Y = ai (X*Y)       # alle ai nach aussen
+
+ADDSPEC     Real : mi mi X = X
+ADDSPEC     Real : mi (X*Y) = mi X * mi Y
+
+ADDSPEC     Real : X+(Y+Z)=X+Y+Z      # Assoziativgesetz
+ADDSPEC     Real : X*(Y*Z)=X*Y*Z 
+
+ADDSPEC     Real : X*(Y+Z)=X*Y+X*Z , (X+Y)*Z=X*Z+Y*Z  # Distributivgesetz
+ADDSPEC     Real : X^Y^Z=X^(Y*Z)
+ADDSPEC     Real : X^ai Y=mi (X^Y)
+ADDSPEC     Real : (A*B)^X=A^X*B^X
+ADDSPEC     Real : X^(Y+Z)=X^Y*X^Z
+ADDSPEC     Real : ln (X+Y)=ln X * ln Y
+# ++++++++++++++++++ ordnen der Terme ++++++++++++++++++++++++++++++++++++
+# Achtung : -2 * x
+# ADDSPEC     Real : LB(X+Y,Y+X) Y+X = X+Y
+# ADDSPEC     Real : LB(X*Y,Y*X) Y*X = X*Y
+
+# ++++++++++++++++++++++++ Lineare Funktionen  ++++++++++++++++++++++++++
+ADDSPEC     Real : D(X+Y,Z)    = D(X,Z)+D(Y,Z)
+ADDSPEC     Real : D(N*X,Z)    = N*D(X,Z)
+ADDSPEC     Real : Dn(X+Y,Z,M) = Dn(X,Z,M)+Dn(Y,Z,M)
+ADDSPEC     Real : Dn(N*X,Z,M) = N*Dn(X,Z,M)
+ADDSPEC     Real : Tay(X+Y,Z,A,B) = Tay(X,Z,A,B)+Tay(Y,Z,A,B)
+ADDSPEC     Real : Tay(N*X,Z,A,B) = N*Tay(X,Z,A,B)
+
+# ++++++++++++++++++++++++ NUMERIK ++++++++++++++++++++++++++
+ADDSPEC     Real : N+M   = N nplu M
+ADDSPEC     Real : N*M   = N nmal M
+ADDSPEC     Real : ai(N) = 0 nmin N
+ADDSPEC     Real : mi(N) = 1 nget N
+ADDSPEC     Real : X+N   = N+X        # Nummern nach vorne -> (Spezialfaelle einfach)
+ADDSPEC     Real : X*N   = N*X
+
+# ++++++++++++++++++++++++ DIFFERENTIALRECHNUNG ++++++++++++++++++++++++++
+
+SPEC        diff1 : 1*X=X,X*1=X
+ADDSPEC     diff1 : 0*X=0,X*0=0,X+0=X,0+X=X
+ADDSPEC     diff1 : X^1=X,1^X=1,X^0=1,0^X=0
+
+ADDSPEC     diff1 : Dn(X,Y,0) = X
+ADDSPEC     diff1 : Dn(X,Y,N) = Dn(D(X,Y),Y,N nmin 1)
+ADDSPEC     diff1 : D(X,X) = 1         # spezielle Konstanten
+ADDSPEC     diff1 : D(N,X) = 0         # Zahlen sind konstant
+ADDSPEC     diff1 : D(e,X) = 0
+ADDSPEC     diff1 : D(pi,X)= 0
+
+ADDSPEC     diff1 : D(ai X,Y) = ai D(X,Y)
+ADDSPEC     diff1 : D(mi X,Y) = D(X^ai 1,Y)
+ADDSPEC     diff1 : D(ln X,Z) = mi X * D(X,Z)
+ADDSPEC     diff1 : D(e^X,Z)  = e^X * D(X,Z)
+ADDSPEC     diff1 : D(sin X,Z)= cos X * D(X,Z)
+ADDSPEC     diff1 : D(cos X,Z)= ai  sin X * D(X,Z)
+
+ADDSPEC     diff1 : D(N*X,Z)=N*D(X,Z)            # wird so schneller
+ADDSPEC     diff1 : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # Allg. Differenziationsregeln
+ADDSPEC     diff1 : D(X+Y,Z)=D(X,Z)+D(Y,Z)
+ADDSPEC     diff1 : D(X^N,Z)=N*X^(N nmin 1)      # wird so schneller
+ADDSPEC     diff1 : D(X^Y,Z)=X^Y*D(ln X * Y,Z)
+
+ADDSPEC     diff1 : Tay(X,Y,Z,0) = Sub(X,Y,Z)
+ADDSPEC     diff1 : Tay(X,Y,Z,N) = Tay(X,Y,Z,N nmin 1)+Sub(Dn(X,Y,N),Y,Z)*mi(N fac)*(Y+ai Z)^N 
+
+
+# ++++++++++++++++++++++++ NUMERIK ++++++++++++++++++++++++++
+ADDSPEC     diff1 : N+M   = N nplu M
+ADDSPEC     diff1 : N*M   = N nmal M
+ADDSPEC     diff1 : ai(N) = 0 nmin N
+ADDSPEC     diff1 : mi(N) = 1 nget N
+ADDSPEC     diff1 : 0 fac =1, 1 fac = 1, N fac = N*(N nmin 1)fac
+
+# ++++++++++++++++++++++++ Substitution ++++++++++++++++++++++++++
+SPEC        Subst : 1*X=X,X*1=X
+ADDSPEC     Subst : 0*X=0,X*0=0,X+0=X,0+X=X
+ADDSPEC     Subst : X^1=X,1^X=1,X^0=1,0^X=0
+ADDSPEC     Subst : Sub(X,X,A) = A
+ADDSPEC     Subst : NIN(Z,X) Sub(X,Z,A) = X
+ADDSPEC     Subst : Sub(X+Y,Z,A) = Sub(X,Z,A) + Sub(Y,Z,A)
+ADDSPEC     Subst : Sub(X*Y,Z,A) = Sub(X,Z,A) * Sub(Y,Z,A)
+ADDSPEC     Subst : Sub(X^Y,Z,A) = Sub(X,Z,A) ^ Sub(Y,Z,A)
+ADDSPEC     Subst : Sub(sin X,Z,A) = sin Sub(X,Z,A) 
+ADDSPEC     Subst : Sub(cos X,Z,A) = cos Sub(X,Z,A) 
+ADDSPEC     Subst : Sub(ln X,Z,A) = ln Sub(X,Z,A) 
+ADDSPEC     Subst : Sub(ai X,Z,A) = ai Sub(X,Z,A) 
+ADDSPEC     Subst : Sub(mi X,Z,A) = mi Sub(X,Z,A) 
+
+# ++++++++++++++++++++++++ INTERALE ++++++++++++++++++++++++++++++++++++++
+
+SPEC        integr : I(A,B,X+Y,Z) = I(A,B,X,Z)+I(A,B,Y,Z)
+ADDSPEC     integr : NIN (Y,C) I(A,B,C*X,Y) = C*I(A,B,X,Y)
+
+ADDSPEC     integr : I(A,A,X,Y) = 0
+ADDSPEC     integr : NIN (Z,C) I(A,B,C,Z)   = C*(A+ ai B)
+
+ADDSPEC     integr : NIN (X,Y) I(A,B,Y^X,X) = (Y^A + ai (Y^B)) * mi (ln Y)
+ADDSPEC     integr : NIN (X,Y) I(A,B,sin X,X) = ai (cos A + ai cos B)
+ADDSPEC     integr : NIN (X,Y) I(A,B,cos X,X) = sin A + ai sin B
+
+
+ADDSPEC     integr : NIN (Z,C and Y) I(A,B,(X+C)^Y,X) = I(A+C,B+C,X^Y,X)
+ADDSPEC     integr : NIN (Z,C and Y) I(A,B,(C+X)^Y,X) = I(A+C,B+C,X^Y,X)
+
+ADDSPEC     integr :                 I(A,B,mi X,X)       = ln A + ai ln B
+
+ADDSPEC     integr : NIN (X,Y)       I(A,B,X^Y,X)       = mi(Y+1)*(A^(Y+1)+ ai(B^(Y+1)))
+
+# +++++++++++ Algebra fuer *, - Sandart +++++++++++++++++++++++++++++++++++++++
+SPEC        zu1 : mi X * Y = Y * mi X
+ADDSPEC     zu1 : mi X *mi Y = mi (X*Y)
+ADDSPEC     zu1 : mi mi X  = X
+ADDSPEC     zu1 : ai X * Y = ai (X*Y)
+ADDSPEC     zu1 : X * ai Y = ai (X*Y)
+ADDSPEC     zu1 : ai X + Y =  Y + ai X
+ADDSPEC     zu1 : ai X +ai Y = ai (X+Y)
+ADDSPEC     zu1 : ai ai X  = X
+ADDSPEC     zu1 : X*Y*Z=X*(Y*Z),X+Y+Z=X+(Y+Z)  # Assoziativgesetz
+
+# +++++++++++ Algebra zum weiteren Vereinfachen und zusammenfassen ++++++++++++
+
+SPEC        more : X*(Y*Z)=X*Y*Z,X+(Y+Z)=X+Y+Z  # Assoziativgesetz
+ADDSPEC     more : X*(Y/Z)=X*Y/Z,X+(Y-Z)=X+Y-Z  # Assoziativgesetz
+
+ADDSPEC     more : X^Y*X^Z=X^(Y+Z),X^Y*X=X^(Y+1),X*X^Y=X^(Y+1)
+ADDSPEC     more : X+X=2*X
+
+ADDSPEC     more : X * mi Y=X/Y
+ADDSPEC     more : X+ai Y=X-Y  
+
+ADDSPEC     more : 0+X   = X         # spezielle Konstanten
+ADDSPEC     more : X+0   = X
+ADDSPEC     more : X*0   = 0
+ADDSPEC     more : 0*X   = 0
+ADDSPEC     more : 1*X   = X
+ADDSPEC     more : X*1   = X
+
+# ++++++++++++++++++++++++ NUMERIK ++++++++++++++++++++++++++
+ADDSPEC     more : N+ M = N nplu M
+ADDSPEC     more : N- M = N nmin M
+ADDSPEC     more : N* M = N nmal M
+ADDSPEC     more : N/ M = N nget M
+ADDSPEC     more : X+N = N+X
+ADDSPEC     more : X*N = N*X
+ADDSPEC     more : ai(N) = 0 nmin N
+ADDSPEC     more : mi(N) = 1 nget N
+ADDSPEC     more : 0 fac =1, 1 fac = 1, N fac = N*(N nmin 1)fac

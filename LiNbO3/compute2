@@ -1,0 +1,62 @@
+DATA "LiNbO3/struct2"
+
+CONST Coord,Indices,a1,a2,a3,b1,b2,b3 : rvector
+CONST weight,c1,c2,c3,h,k,l,aa,ca,para,sin30,cos30 : real
+CONST StrucFa,FormNb,FormLi : complex
+
+sin30 = sin (30*pi/180)
+cos30 = cos (30*pi/180)
+
+h=0    # Indices of reziprocal lattice
+k=0
+l=6
+
+FormLi=Cpx(1.5,0)        # FormFactors of Atoms (para)
+FormNb=Cpx(27.8-0.6,2.6)
+
+aa=5.148                 # Length of a1,a2 -axis
+ca=13.863                # Length of c -axis
+
+a1= [aa,0,0]             # real space latice vectors
+a2= [ -sin30*aa,cos30*aa,0]
+a3= [0,0,ca]             # == c-axis
+
+# Inverse Grating Vectors (without 2*pi)
+
+b1= a2 _x_ a3 / (a1*(a2 _x_ a3))
+b2= a3 _x_ a1 / (a1*(a2 _x_ a3))
+b3= a1 _x_ a2 / (a1*(a2 _x_ a3))
+
+Indices= [h,k,l]
+
+# Calculation of Parameter for Atomic Form Factor : sinTheta/lamda = 1/2d
+
+para = abs(h*b1+k*b2+l*b3) / 2
+
+"Parameter : ",para
+
+StrucFa=Cpx(0,0)
+
+FOR a=1 TO 16 DO {    # read Nb Atoms
+DATA weight
+DATA c1
+DATA c2
+DATA c3
+Coord= [ c1,c2,c3 ]
+# Coord
+
+StrucFa = StrucFa + weight*FormNb*exp(-i*2*pi*(Indices*Coord))
+}
+
+FOR a=1 TO 12 DO  {  # read Li Atoms
+DATA weight
+DATA c1
+DATA c2
+DATA c3
+Coord= [ c1,c2,c3 ]
+# Coord
+
+StrucFa = StrucFa + weight*FormLi*exp(-i*2*pi*(Indices*Coord))
+}
+
+StrucFa

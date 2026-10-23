@@ -1,0 +1,17 @@
+# Numerisches Loesen von expliziten Diff-gleichungen
+# Eingabe : f(x,y) = y'
+# tiefe = Taylorverfahren der Ornung tiefe
+# f : y' = f(x,y)
+
+merk=dx
+dx=dummi
+
+TAY=y+dx*f
+FOR i=2 TO tiefe STEP 1 DO {
+REWR Dn(f,x,i- 1) : (diff;ERSDY)
+TAY=TAY+dx^i*%/(i!)    
+}
+REWR TAY : Real
+TAY=%
+
+dx=merk

@@ -1,0 +1,102 @@
+# This file is for computing intensities to be exspected by the
+# diffraction from a modulated crytal lattice.
+# file compute has to be executed first, to calculate
+# some values and read in piezoelectric constants
+
+# The calculations are based on a paper by
+#
+# E. J. W. Lam and P. T. Beurkens
+# A More General Expression for the Average X-ray Diffraction Intensity
+# of Crystals with an Incommensurate One-Dimensional Modulation
+#
+# Acta Crystallographica Section A (1994) 50, pp. 690-703
+#
+
+CONST g0,g1,P : complex
+CONST kp,Pa0,Pa1,betha1,LAMBDA,T,Ediff,rhoel,eprel,thick,densmod,dtn : real
+CONST U,E,Dholo : rvector # max displacement-vector, Electrical Fieldvector
+CONST Sjk : rmatrix # strain-Tensor
+
+
+Pa0 = 1.0               # amplitude of displacive modulation
+Pa1 = 0.00/1000         # amplitude of density modulation
+betha1 = 0.0*2*pi       # Phase
+thick= 0.79 * _m        # Thickness
+LAMBDA = 0.5 * _mu    # Gratingconstant of Hologramm
+T = TK+23               # Temprature is 23 Cesius
+
+# calculation of the maximal diffusion field in the crystal:
+Ediff = kb*T*0.9*2*pi/(LAMBDA*e0)
+
+Dholo = [0,1,0]   # Direction of Hologramm (k-Vector)
+
+Dholo = Dholo/abs(Dholo)
+
+E = Ediff*Dholo               # Photovoltaic : 2e6 V/m
+E = 353370* Dholo             # overwrite Field to a fixed value calculated from
+															# mesured diffraction efficiencies
+
+Sjk = d1jk*E[0]+d2jk*E[1]+d3jk*E[2] # calculate strain tensor for this field
+
+# attention !!! : d211,d311,d322 are clamped -> := 0
+
+
+U = LAMBDA/(2*pi)*(Sjk*Dholo) / _Ang # Vector of maximal displacive modulation
+																		 # It is independent of LAMBDA, if a diffusion
+																		 # grating is the case.
+
+g0=Cpx(0,0)                          # initialize modulation factor for primary reflex
+g1=Cpx(0,0)                          # initialize modulation fac. for first order ref.
+
+FOR kp = -1 TO 1 DO {                # calculate due to Lam's formula
+
+IF (kp == 1) P= -i*Pa1/2 * exp(-i*betha1) 
+IF (kp == 0) P=Cpx(Pa0,0)
+IF (kp == -1) P= i*Pa1/2 * exp(i*betha1)
+
+g0 = g0+ P*bessel(kp,2*pi*(S*U))*exp(i*kp*pi)
+g1 = g1+ P*bessel(kp+1,2*pi*(S*U))*exp(i*(kp+1)*pi)
+}
+
+#-----------------------------------------------------------------------
+# Print calculated values to screen
+#-----------------------------------------------------------------------
+
+"E : ",E,"V/m Ediff : ",Ediff," C/N LAMBDA : ",LAMBDA," m"
+"S : ",S," _Ang U : ",U," _Ang"
+
+"g0 for 0 order : ",g0
+"Intensity :",g0*g0
+" g1 for 1st order : ",g1
+" Intensity :",g1*g1
+
+#------------------------------------------------------------------------
+# calculate and print densety modulation (each part separetely)
+#------------------------------------------------------------------------
+
+# relative modulation of crystal density due to the deformation
+
+"Density Modulation (lattice-response) Sjk*Dholo : ",Sjk*Dholo
+
+# relative density modulation due to redistribution of charge in the crystal
+
+rhoel=Zges/(Vuc* _Ang^3)*e0              # total electron charge density
+eprel=85 # for LiNbO3 eprel33=85
+densmod=(4*pi/LAMBDA*ep0*eprel*E*Dholo)/rhoel
+"Electr. Density Modulation : ",densmod
+
+# calculate and print different angles, if diffracting in transmission
+
+"angle for transmission : ",lambda * _Ang/2/LAMBDA/ _deg," deg"
+# "Distance at 9.90 m ",2*9.9*lambda * _Ang/2/LAMBDA*1000," mm"
+# "in Pixel ",2*9.9*lambda * _Ang/2/LAMBDA*1000/0.340
+
+"Transmission normal to surface : ",exp( -mu *thick)
+
+# calculate and print the change of the X-ray refractive index due to
+# deformative density modulation
+
+dtn = (lambda*_Ang)^2*bel*((Sjk*Dholo)*Dholo*rhoel/e0)/(2*pi) # 1- 3e-6 # Refractive Index
+
+"refractive index change : ",dtn
+

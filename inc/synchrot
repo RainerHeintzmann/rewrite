@@ -1,0 +1,53 @@
+#                     Simulation von Synchrotronstrahlung
+# Inputs :
+#
+
+CONST pose : rvector # Position des Elektrons 
+# CONST pos2 : rvector # Position des Beobachters (zu setzen)
+
+CONST pe : rvector   # Impuls   des Elektrons 
+CONST e12a,e12b,e12c,vel : rvector  # Position Beobachter,Scheinbarer Relativer Einheitsvector
+CONST l12 : real                     # Entfernung
+CONST t12a,t12b,t12c,dummy,dt,s0,m0 : real          # Zeit beim Beobachter
+
+TERM E,B,d2dt2_e,Be : rvector # E=Elektrisches Feld,B = zugeh. Magnetfeld,Kraft,2.Abl (posrel), Magnetfeld fuer elektron
+TERM t12 : real
+
+d2dt2_e = 2*((e12b-e12a)/(t12b-t12a)-(e12c-e12b)/(t12c-t12b))/(t12c-t12a)
+
+
+t12= .5*(t12b+.5*(t12a+t12c)) # Zugehoerige Zeit
+
+E = (- e0) / (4*pi*ep0*c^2) * d2dt2_e
+B = - (e12b _x_ E/c)
+
+# Bewegung des Elektrons : (Naeherung : kein Energieverlust) d/dt pe = q*VxB
+
+Be = [0,0,4*sin(15*elem(pose,0)+0.6*pi)]  # Wiggler 4 Teslar, Period ca 40cm
+
+m0=me # pos2 = [200,0,10]
+e12a= [0,0,0] ;e12b= [0,0,0] ;e12c= [0,0,0]
+pose = [0,0,0] ; pe = [3*_G*_eV/c,0,0]
+dt= 1e-10
+s0=sqr(pos2-pose) ^.5
+
+t12a= -2*dt ;t12b= -dt ;t12c= 0
+
+"*TITLE*  Relativistic Electron"
+"*XLABEL*  posx [m]"
+"*YLABEL*  posy bzw B"
+
+FOR t = 0 TO 30  DO 	{
+
+vel=pe/(m0*m0+sqr(pe/c))^.5 # Achtung,m(vel neu) !
+pe=pe+dt*e0*vel _x_ Be # dt * F
+pose=pose+vel*dt
+e12a=e12b ; e12b=e12c
+t12a=t12b ; t12b=t12c
+e12c=pos2 - pose
+l12 = (sqr(e12c))^.5
+t12c = l12/c
+e12c=e12c/l12 # Einheitsvector
+
+elem(pose,0),elem(pose,1),elem(Be,2)/1000,(dt*t+t12)*c-s0,elem(B,2)*1e19
+}

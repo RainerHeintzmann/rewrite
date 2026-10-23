@@ -1,0 +1,20 @@
+#                     Ausfuerung von Graphiktabelle
+# Global Inputs : pos : Position, p : Impuls
+# Fkt Inputs : F=Kraft, dt=Zeitschritt, m0 = Ruhe-Masse oder m Masse
+# Bewegung eines Teilchens
+
+CONST dt,m0 : real
+
+CONST pos,p,vel : rvector    # Position des Teilchens,Impuls,Geschwindigkeit
+TERM m : real
+m= m0/(1-sqr(vel/c))^.5 # Relativistische Masse
+
+FUNC iterate : rvector,real >> real ATT (TERM F : rvector;TERM dt : real) {
+"hier Iterate"
+vel=p/(m0+sqr(p/c))^.5 # Achtung,m(vel neu) !
+p=p+dt*F
+pos
+pos=pos+vel*dt
+pos
+RETURN 0
+}

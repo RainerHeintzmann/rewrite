@@ -1,0 +1,76 @@
+CONST alpha0,nr : real
+
+CONST alpha1,alphatot,alpharef,alphar,alphar1,nbr,nbr2,alphartot, alphartot1 : real
+CONST alr2,alr2tot,thettot,Refl,Reflein,alout,aloutr,eps,scale,width,LAMBDA : real
+CONST pos,ergx,ergy : rvector
+
+lambda = 0.993378 # /3 
+
+LAMBDA= 39.062 *_mu # 39.062 * _mu 
+
+nbr = 1 - (lambda*_Ang)^2*bel*(rhoel/e0)/(2*pi) # 1- 3e-6 # Refractive Index
+nbr2 = 1 - (lambda/1*_Ang)^2*bel*(rhoel/e0)/(2*pi) # 1- 3e-6 # Refractive Index of 3rd Harmonic
+thettot= arccos(nbr) # total external reflection angle
+
+nr= -1
+scale = 0.98
+
+alpha0= 0.208/2/scale*_deg
+
+aloutr = arccos(cos(alpha0)/nbr)
+Reflein = ((sin (alpha0) - nbr*sin aloutr)/(sin (alpha0) + nbr*sin aloutr))^2
+# "Total Reflection angle : ",thettot/_deg," deg"
+
+pos = nullvec(18)
+
+FOR nr= 4 TO -5 STEP -1 DO {
+
+alpha1= arccos(cos (alpha0) - nr*lambda*_Ang/LAMBDA)
+alphatot = alpha0 + alpha1
+alpharef = alpha0*2
+
+# Now refracted Beam :
+
+alphar = arccos(cos(alpha0)/nbr)
+alphar1 = arccos((cos(alpha0)-nr*lambda/1*_Ang/LAMBDA)/nbr2)
+alr2 = arccos(nbr*cos(alpha0)-nr*lambda/1*_Ang/LAMBDA)
+
+alphartot=alpha0-alphar
+alphartot1=alpha0-alphar1
+alr2tot=alpha0-alr2
+
+pos=chvec(pos,4-nr,alphatot)
+
+# nr,alpha0/_deg,alphatot/_deg,alphartot/_deg ,alphartot1/_deg,alr2tot/_deg
+
+}
+
+# Fresnel Reflectivity :
+
+FOR alout = alpha0+0.0005*_deg TO pos[0]+0.05*_deg STEP 0.001*_deg DO {
+
+eps = 0.0 * _deg
+aloutr = arccos(cos(alout-alpha0)/nbr)
+
+Refl = ((sin (alout-alpha0) - nbr*sin aloutr)/(sin (alout-alpha0) + nbr*sin aloutr))^2
+aloutr = arccos(cos(alout+eps-alpha0)/nbr)
+Refl = Refl+((sin (alout+eps-alpha0) - nbr*sin aloutr)/(sin (alout+eps-alpha0) + nbr*sin aloutr))^2
+Refl = Refl/2
+
+width = -1.9e7
+
+alout/_deg*scale, (Refl*Reflein)^0.5 * (\
+0.0e4*exp(width*(alout-pos[0])^2)+\
+0.0e4*exp(width*(alout-pos[1])^2)+\
+0.2e4*exp(width*(alout-pos[2])^2)+\
+8.5e4*exp(width*(alout-pos[3])^2)+\
+141e4*exp(width*(alout-pos[4])^2)+\
+8.5e4*exp(width*(alout-pos[5])^2)+\
+0.2e4*exp(width*(alout-pos[6])^2)+\
+0.0e4*exp(width*(alout-pos[7])^2)+\
+0.0e4*exp(width*(alout-pos[8])^2)      ) + 1e-10
+
+}
+
+
+# " Total Reflectivity : ",Refl

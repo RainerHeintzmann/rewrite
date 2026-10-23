@@ -1,0 +1,91 @@
+DATA "LiNbO3/struct"
+
+# CONST h,k,l : real
+
+
+CONST Coord,Indices,a1,a2,a3,b1,b2,b3,p1,p2,p3,S,G,Cvec,Dvec : rvector
+
+CONST c1,c2,c3,aa,ca,para,d,sin30,cos30,Vuc,A,C,D,MuDivRho,rho,Zges,MuDivRhoGes : real
+CONST DiffAtoms,ThisAtoms,SFA,SFB,SFC,Z,atom,SumA : real
+CONST ThetaB,sinThetaB,kappa,t05,mu,thick : real
+
+CONST Fg : complex # Structur Factor
+CONST fb : complex # Atomic Form Factor
+CONST Xg : complex # Complex Susceptibility
+
+CONST indj,indk,num,value : real
+CONST d1jk,d2jk,d3jk : rmatrix
+
+Cvec=nullvec(100)
+Dvec=Cvec
+
+DATA c1             # Aequivalente Punkte lesen
+DATA c2
+DATA c3
+
+
+DATA c1; DATA c2; DATA c3
+
+
+DATA c1; DATA c2; DATA c3
+
+Zges = 0
+MuDivRhoGes = 0
+SumA = 0
+
+DATA DiffAtoms
+
+FOR atom=1 TO DiffAtoms DO {
+
+DATA Z
+
+Zges = Zges+Z
+
+DATA A  # Atomic weight in Atomic Units
+
+DATA SFA;DATA SFB;DATA SFC
+
+DATA C;DATA D # Absorbtionfactors
+
+
+
+DATA ThisAtoms
+
+Cvec=chvec(Cvec,atom,C*ThisAtoms*A)
+Dvec=chvec(Dvec,atom,D*ThisAtoms*A)
+
+SumA = SumA + A*ThisAtoms
+
+FOR a=1 TO ThisAtoms DO {    # read Atoms
+DATA c1
+DATA c2
+DATA c3
+# Coord
+
+}
+
+} # for atom
+
+DATA rho   # Of the whole Crystal
+OUT "absorbtion"
+
+thick=0.79e-3
+"# sample thickness = ",thick*1e3," mm"
+"# Energy/keV, lambda/Angstroem, mu/ m^-1, Transmission, d1/2"
+
+FOR Egy = 13900 TO 13900*5 STEP 13900 DO {
+lambda = c/(Egy*_Ang)*hq*2*pi/e0
+
+MuDivRhoGes = 0
+FOR atom=1 TO DiffAtoms DO {
+
+MuDivRho = (elem(Cvec,atom)*lambda^3-elem(Dvec,atom)*lambda^4)*1000/100^2 # Units : lambda = _Ang;-> MuDivRho = cm^2/g (now m^2/kg)
+MuDivRhoGes = MuDivRhoGes + MuDivRho # for computing average
+}
+
+MuDivRhoGes = MuDivRhoGes/SumA   # Computing average
+mu = rho*MuDivRhoGes
+
+Egy,lambda,mu,exp(-mu*thick),(ln 2)/mu
+}
+OUT "stdout"

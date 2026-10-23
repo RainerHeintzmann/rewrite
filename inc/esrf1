@@ -1,0 +1,39 @@
+
+TERM kappa,etha,ld,dn,thetaB,ny,Xi  : real
+
+CONST dN,E,d,LD,alpha,dalpha,theta : real
+
+dn=h^2/(8*pi^2*ep0*me) * (dN/E^2)
+# dn=0.05
+
+ld=c*h/(E*e0)
+
+thetaB=ld/(2*LD)
+
+
+kappa=pi*dn/ld + dalpha/4
+
+ny= kappa*d/cos theta
+
+thetaB=arcsin (ld/(2*LD))
+
+Xi= .5*d*pi*(sin theta - sin thetaB)/LD
+
+etha= e^(-alpha*d/cos theta) * ny^2 * (sin ((ny^2+Xi^2)^.5)/(ny^2+Xi^2)^.5)^2
+
+
+
+# Bsp. :
+theta = thetaB # keeps now track ...
+
+dN = 0.5E-03 * 1E30
+d  = 0.002
+alpha=0
+dalpha=0
+LD = 180.6* _n # 1.920 * _A # SI 220
+# LD = 400 * _n
+E  = 11380   # eV    z.B. 11.38 keV
+# E = c*h/(e0 * 300* _n)
+# etha
+
+FOR theta= thetaB - 2500 * _my TO thetaB + 2500 * _my STEP 15* _my DO theta,etha

@@ -1,0 +1,24 @@
+
+#                     Messwerterfassung   
+# Inputs : 
+#
+#			P4 :   Anz. Messwerte
+
+P4,"Messwerte zu erfasen ! "
+DATA "Labor/V9.2.1.pb"
+OUT "Labor/Graphen/V9.2.1.pb"
+
+"*TITLE*  Absorbtion von ß-Strahlung "
+"*XLABEL*  Dicke in mm"
+"*YLABEL*  Cts (1/s)"
+DATA a DATA b DATA c
+y= c/b
+a,c/b,c^.5/b,ln ((c/b)/y)- ln(.322/y)
+
+FOR x = 2 TO P4 STEP 1 DO {
+DATA a DATA b DATA c
+a,c/b,c^.5/b,ln ((c/b)/y)- ln(.322/y)
+}
+
+DATA "stdin"
+OUT  "stdout"

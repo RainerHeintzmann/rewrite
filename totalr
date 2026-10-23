@@ -1,0 +1,76 @@
+CONST alpha0,nr : real
+
+CONST alpha1,alphatot,alpharef,alphar,alphar1,nbr,nbr2,alphartot, alphartot1 : real
+CONST alr2,alr2tot,thettot,Reflein,eps,scale,width,LAMBDA,temp : real
+CONST pos,ergx,ergy,alout,aloutr,Refl,Intensity : rvector
+
+# lambda = 1.54 # CuKalpha
+
+lambda = 0.748 # /3 hc114 1st 16520 eV
+# lambda = 0.993378 # /3 hc114 12480 eV
+
+LAMBDA= 39.062 * _mu 
+
+nbr = 1 - (lambda*_Ang)^2*bel*(rhoel/e0)/(2*pi) # 1- 3e-6 # Refractive Index
+nbr2 = 1 - (lambda/1*_Ang)^2*bel*(rhoel/e0)/(2*pi) # 1- 3e-6 # Refractive Index of 3rd Harmonic
+
+thettot= arccos(nbr) # total external reflection angle
+# "Total Reflection angle : ",thettot/_deg," deg"
+
+scale = 1
+
+alpha0= 0.45/2/scale*_deg
+
+temp = arccos(cos(alpha0)/nbr)
+Reflein = ((sin (alpha0) - nbr*sin temp)/(sin (alpha0) + nbr*sin temp))^2
+
+pos = nullvec(18)
+
+FOR nr= 4 TO -5 STEP -1 DO {
+
+alpha1= arccos(cos (alpha0) - nr*lambda*_Ang/LAMBDA)
+alphatot = alpha0 + alpha1
+alpharef = alpha0*2
+
+# Now refracted Beam :
+
+alphar = arccos(cos(alpha0)/nbr)
+alphar1 = arccos((cos(alpha0)-nr*lambda/1*_Ang/LAMBDA)/nbr2)
+alr2 = arccos(nbr*cos(alpha0)-nr*lambda/1*_Ang/LAMBDA)
+
+alphartot=alpha0-alphar
+alphartot1=alpha0-alphar1
+alr2tot=alpha0-alr2
+
+pos=chvec(pos,4-nr,alphatot)
+
+# nr,alpha0/_deg,alphatot/_deg,alphartot/_deg ,alphartot1/_deg,alr2tot/_deg
+
+}
+
+# Fresnel Reflectivity :
+
+alout = gen(alpha0+0.0005*_deg,pos[0]+0.05*_deg,100)
+
+eps = 0.0 * _deg
+width = -0.5e8
+
+aloutr = arccos(cos(alout _minus alpha0)/nbr)
+
+Refl = ((sin (alout _minus alpha0)  -  nbr*sin aloutr) _div (sin (alout _minus alpha0) + nbr*sin aloutr)) _pow 2
+
+
+Intensity= 1.15e2*(Refl*Reflein) _pow 0.5 _mul (\
+0.08*exp(width*(alout _minus pos[0]) _pow 2)+\
+0.10*exp(width*(alout _minus pos[1]) _pow 2)+\
+0.13*exp(width*(alout _minus pos[2]) _pow 2)+\
+0.15*exp(width*(alout _minus pos[3]) _pow 2)+\
+1.0*exp(width*(alout _minus pos[4]) _pow 2)+\
+0.5*exp(width*(alout _minus pos[5]) _pow 2)+\
+0.13*exp(width*(alout _minus pos[6]) _pow 2)+\
+0.11*exp(width*(alout _minus pos[7]) _pow 2)+\
+0.08*exp(width*(alout _minus pos[8]) _pow 2)      ) _plus 1e-10
+
+dummi=vecs(alout*scale/_deg,Intensity*140000)
+
+# " Total Reflectivity : ",Refl

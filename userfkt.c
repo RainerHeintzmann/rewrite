@@ -1,0 +1,181 @@
+/*
+ * userfkt.c V1.00
+ * Copyright (c) : Rainer Heintzmann
+ * 
+ * Benutzerfunktionen fuer 'rewrite'
+ *
+ */
+
+#include <string.h>
+
+#include "inout.h"
+#include "real.h"
+#include "bool.h"
+#include "complex.h"
+#include "vector.h"
+#include "matrix.h"
+#include "userfkt.h"
+
+typedef struct {
+char * name;
+u_function * function;
+} t_funct;
+
+#define FKT(x) {#x,(u_function *) &(x)}
+
+t_funct (userfunction [])  = {
+	FKT(show_real),
+	FKT(cmp_real),	
+	FKT(cpy_real),	
+	FKT(del_real),	
+	FKT(show_bool),
+	FKT(cmp_bool),
+	FKT(greater_than),			
+	FKT(greater_equal),			
+	FKT(lower_than),			
+	FKT(lower_equal),			
+	FKT(equal),			
+	FKT(not_equal),			
+	FKT(and),			
+	FKT(or),			
+	FKT(not),			
+	FKT(is_int),			
+	FKT(plus),			
+	FKT(minus),			
+	FKT(mal),				
+	FKT(geteilt),		
+	FKT(ai),				
+	FKT(mi),				
+	FKT(ehoch),
+	FKT(hoch),			
+	FKT(logarithmus),
+	FKT(wurzel),
+	FKT(sinus),
+	FKT(cosinus),		
+	FKT(tangens),
+	FKT(sinush),
+	FKT(cosinush),		
+	FKT(tangensh),
+	FKT(asinus),
+	FKT(acosinus),
+	FKT(atangens),
+	FKT(fak),
+	FKT(bessel),
+	FKT(integer),
+	FKT(r_sqr),
+	FKT(r_sqrt),
+	FKT(r_abs),
+	FKT(signum),
+	FKT(show_complex),
+	FKT(cmp_complex),	
+	FKT(cpy_complex),	
+	FKT(del_complex),	
+	FKT(cpx),					
+	FKT(c_plus),			
+	FKT(c_plus_r),		
+	FKT(r_plus_c),		
+	FKT(c_minus),			
+	FKT(c_minus_r),		
+	FKT(r_minus_c),		
+	FKT(c_mal),				
+	FKT(c_mal_r),			
+	FKT(r_mal_c),			
+	FKT(c_geteilt),		
+	FKT(c_geteilt_r),	
+	FKT(r_geteilt_c),	
+	FKT(c_ai),				
+	FKT(c_mi),				
+	FKT(c_ehoch),			
+
+	FKT(c_logarithmus),
+	FKT(c_sinus),			
+	FKT(c_cosinus),		
+	FKT(c_tangens),		
+	FKT(c_hoch),      
+	FKT(c_hoch_r),
+	FKT(r_hoch_c),
+	FKT(c_real),
+	FKT(c_imag),
+	FKT(c_abs),
+	FKT(c_asqr),
+/* FKT(c_wurzel),
+	FKT(c_asinus),
+	FKT(c_acosinus),
+	FKT(c_atangens), */
+
+	FKT(show_mat),		
+	FKT(cmp_mat),
+	FKT(cpy_mat),
+	FKT(del_mat),
+	FKT(elem_mat),
+	FKT(null_mat),
+	FKT(eins_mat),
+	FKT(ch_mat),
+	FKT(mat_add),
+	FKT(real_mul_mat),
+	FKT(mat_mul_real),
+	FKT(mat_mul),
+	FKT(mat_trans),
+	FKT(mat_mul_vec),
+
+	FKT(show_vec),
+	FKT(cmp_vec),
+	FKT(cpy_vec),
+	FKT(del_vec),
+	FKT(elem_vec),
+	FKT(vec_part),
+	FKT(null_vec),
+	FKT(eins_vec),
+	FKT(ch_vec),
+	FKT(constr_vec),
+	FKT(vec_add),
+	FKT(vec_min_vec),
+	FKT(real_mul_vec),
+	FKT(vec_mul_real),
+	FKT(vec_div_real),
+	FKT(vec_x_vec),
+	FKT(vec_mul),
+	FKT(minus_vec),
+	FKT(vec_sqr),
+	FKT(vec_abs),
+	FKT(vec_middle),
+	FKT(vec_ms),
+	FKT(vec_rms),
+	FKT(vec_write),
+	FKT(sin_vec),
+	FKT(sinh_vec),
+	FKT(asin_vec),
+	FKT(cos_vec),
+	FKT(cosh_vec),
+	FKT(acos_vec),
+	FKT(tan_vec),
+	FKT(tanh_vec),
+	FKT(atan_vec),
+	FKT(log_vec),
+	FKT(exp_vec),
+	FKT(fak_vec),
+	FKT(sqr_vec),
+	FKT(sqrt_vec),
+	FKT(abs_vec),
+	FKT(gen_vec),
+	FKT(eplus1_vec),
+	FKT(eplus2_vec),
+	FKT(emin1_vec),
+	FKT(emin2_vec),
+	FKT(epow_vec),
+	FKT(emul_vec),
+	FKT(ediv_vec),
+	FKT(plttest)
+	} ;
+
+int LASTFUNC = sizeof(userfunction)/sizeof(userfunction[0]);
+
+u_function * give_ufkt (char * name)
+{	int i;
+	for (i=0;i<LASTFUNC;i++)
+	{
+     if (strcmp(name,userfunction[i].name)==0)
+     	 return userfunction[i].function;
+  }
+	printfErr(" --ERROR ATT : C-Function %s not Implemented \n",name);
+}

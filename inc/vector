@@ -1,0 +1,117 @@
+SORT vector
+VAR  A_v : vector
+VAR  B_v : vector
+VAR  C_v : vector
+VAR  X_v : vector
+VAR  Y_v : vector
+VAR  Z_v : vector
+
+CONST 1_v : vector                   # Einsvektor
+CONST e1 : vector                    # 1.Einheitsvektor
+CONST e2 : vector                    # 2.Einheitsvektor
+CONST e3 : vector                    # 3.Einheitsvektor
+
+OTHER +  : vector,vector >> vector   # Vektoraddition
+OTHER -  : vector,vector >> vector   # Vektorsubtruktion
+OTHER -  : vector >> vector          # Additivinverses
+OTHER *  : vector,vector >> real     # Skalarprodukt
+OTHER *  : vector,real >> vector     # reell mal Vektor
+OTHER *  : real,vector >> vector     # reell mal Vektor
+OTHER ^  : vector,real >> real       # z.B. a_v ^ 2
+OTHER D  : vector,real >> vector     # z.B. D(a_v,t)
+OTHER Dp : real,vector >> real       # z.B. D(a_v,t)
+
+FUNC vec  : real,real,real >> vector # Definition eines 3-Vektors
+BRA  [ ]  : real ++ >> vector # Definition eines n-Vektors
+FUNC grad : real >> vector           # Kreuzprodukt
+FUNC _x_   : vector,vector >> vector  LA4 # Kreuzprodukt (auf einer Stufe mit ^,inx)
+
+SORT matrix
+VAR  A_m : matrix
+VAR  B_m : matrix
+VAR  C_m : matrix
+VAR  X_m : matrix
+VAR  Y_m : matrix
+VAR  Z_m : matrix
+
+CONST E : matrix                    # Einheitsmatrix
+CONST 0_m : matrix						# Nullmatrix
+
+OTHER + : matrix,matrix >> matrix   # Matrizenaddition
+OTHER * : matrix,matrix >> matrix   # Matrizenmultiplikation
+OTHER * : real,matrix >> matrix     # reel mal Matrix
+OTHER * : matrix,real >> matrix     # reel mal Matrix
+OTHER * : matrix,vector >> vector   # z.B. Gleichungssystem
+
+FUNC det  : matrix >> real
+FUNC ohne : real,real,matrix >> matrix # Spalte,Zeile weg (fuer det)
+FUNC entwz : real,matrix >> matrix 		# zuende-entwickeln nach Zeile 
+FUNC trans : matrix >> matrix RU    # Transponiert
+FUNC mat : vector,vector,vector >> matrix # Definition einer 3*3-Matrix
+FUNC elem : real,real,real >> matrix # Zeile,Spalte,Wert
+
+ALG Vector
+SPEC    Vector : A_v+(B_v+C_v)=A_v+B_v+C_v
+ADDSPEC Vector : A*(A_v*B)=A*A_v*B
+ADDSPEC Vector : A_v*A=A*A_v
+ADDSPEC Vector : A_v - B_v = A_v + - B_v
+ADDSPEC Vector : A_v _x_ (B_v _x_ C_v)=B_v*(A_v*C_v)+ - (C_v*(A_v*B_v))
+ADDSPEC Vector : grad A = vec(Dp(A,e1),Dp(A,e2),Dp(A,e3))
+
+# explizite Vektoren
+ADDSPEC Vector : vec(A,B,C)*vec(X,Y,Z)=A*X+B*Y+C*Z
+ADDSPEC Vector : vec(A,B,C)^2=A^2+B^2+C^2
+# ADDSPEC Vector : A*vec(X,Y,Z)=vec(A*X,A*Y,A*Z)
+ADDSPEC Vector : N*vec(X,Y,Z)=vec(N*X,N*Y,N*Z)
+ADDSPEC Vector : vec(A,B,C)+vec(X,Y,Z)=vec(A+X,B+Y,C+Z)
+ADDSPEC Vector : - vec(A,B,C)=vec(-A,-B,-C)
+ADDSPEC Vector : vec(A,B,C) _x_ vec(X,Y,Z)=vec(B*Z+ -Y*C,C*X+ -Z*A,A*Y+ -X*B)
+ADDSPEC Vector : 1_v=vec(1,1,1)
+
+ADDSPEC Vector : mat(A_v,B_v,C_v)*X_v=vec(A_v*X_v,B_v*X_v,C_v*X_v)
+
+ALG Matrix
+
+SPEC    Matrix : elem(A,B,X)*elem(B,Z,Y)=elem(A,Z,X*Y)
+ADDSPEC Matrix : elem(N,M,X)+elem(N,M,Y)=elem(N,M,X+Y)
+ADDSPEC Matrix : A_m+elem(N,M,X)+elem(N,M,Y)=A_m+elem(N,M,X+Y)
+ADDSPEC Matrix : (A_m+B_m)*C_m=A_m*C_m+B_m*C_m
+ADDSPEC Matrix : C_m*(A_m+B_m)=C_m*A_m+C_m*B_m
+ADDSPEC Matrix : C_m+(A_m+B_m)=C_m+A_m+B_m
+ADDSPEC Matrix : det (A_m+B_m)=det A_m+ det B_m
+
+ALG wegdamit
+SPEC    wegdamit : elem(X,Y,Z)*elem(A,B,C)=0_m
+ADDSPEC wegdamit : 0_m+A_m=A_m
+ADDSPEC wegdamit : A_m+0_m=A_m
+
+ALG mso1
+SPEC    mso1 : IF (M>N) elem(M,A,X)+elem(N,B,Y)=elem(N,B,Y)+elem(M,A,X)
+ADDSPEC mso1 : IF (M>N) A_m+elem(M,A,X)+elem(N,B,Y)=A_m+elem(N,B,Y)+elem(M,A,X)
+ADDSPEC mso1 : A_m+(B_m+C_m)=A_m+B_m+C_m
+
+ALG mso2
+SPEC    mso2 : IF (M>N) elem(A,M,X)+elem(A,N,Y)=elem(A,N,Y)+elem(A,M,X)
+ADDSPEC mso2 : IF (M>N) A_m+elem(A,M,X)+elem(A,N,Y)=A_m+elem(A,N,Y)+elem(A,M,X)
+ADDSPEC mso2 : A_m+(B_m+C_m)=A_m+B_m+C_m
+
+ALG det1
+SPEC    det1 : det(A_m+elem(N,M,X))=det(entwz(N,A_m+elem(N,M,X)))
+ADDSPEC det1 : det(entwz(N,A_m+elem(N,M,X)))=X*sgn(-1^(N+M))*det(entwz(N- 1,ohne(N,M,A_m)))+det(entwz(N,A_m))
+ADDSPEC det1 : IF (N>M) det(entwz(N,A_m+elem(M,C,Y)))=0
+ADDSPEC det1 : IF (N>M) det(entwz(N,elem(M,C,Y)))=0
+ADDSPEC det1 : det(entwz(N,elem(N,M,X)))=X*sgn(-1^(N+M))
+ADDSPEC det1 : ohne(A,B,A_m+B_m)=ohne(A,B,A_m)+ohne(A,B,B_m)
+ADDSPEC det1 : ohne(A,B,elem(A,Y,Z))=0_m
+ADDSPEC det1 : ohne(A,B,elem(X,B,Z))=0_m
+# ADDSPEC det1 : IF (LB(A,X) && LB(B,Y)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z) # besser: Notequal
+# ADDSPEC det1 : IF (LB(A,X) && LB(Y,B)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)
+# ADDSPEC det1 : IF (LB(X,A) && LB(B,Y)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)
+# ADDSPEC det1 : IF (LB(X,A) && LB(Y,B)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)
+ADDSPEC det1 : 0_m+A_m=A_m
+ADDSPEC det1 : A_m+0_m=A_m
+ADDSPEC det1 : det 0_m=0
+
+
+ALG mamul
+SPEC mamul : Matrix,wegdamit,mso1,mso2,Matrix

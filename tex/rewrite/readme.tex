@@ -1,0 +1,600 @@
+\documentstyle[german]{article}
+\begin{document}
+
+\pagestyle{myheadings} \markright{Rewrite} \pagenumbering{roman}
+\title{Rewrite --- ein Mathematiksystem}
+\author{
+Rainer Heintzmann\thanks{Blumenhaller Weg 138,49078 Osnabr"uck}
+}
+\maketitle
+\begin{abstract}
+Rewrite ist ein Sytem zur Beieinflu"sung symbolischer Ausdr"ucke,
+und zum Durchf"uhren numerischer Rechnungen.
+Mittels Umschreiben der Ausdr"ucke in einem Regelsystem von `Algebren'
+lassen sich einfache algebraische Funktionen wie Differenzieren, L"osen
+von quadratischen Gleichungen usw. von Termen ausf"uhren.
+Die Regelsysteme sind selbst zu definieren. Unter dem Verzeichnis `inc' 
+sind einige Beispiele.
+
+Numerisches Auswerten der Terme ist auch m"oglich. Benutzer k"onnen 
+eigene Funktionen schreiben und sie in die Liste vorhandener
+Funktionen in dem Modul `userfkt.c' einf"ugen.
+\end{abstract}
+
+\section{Starten des Programms}
+Starten sie das Programm `rewrite' von der shell aus.
+Geben Sie nun `INC ''inc/all''' ein. Es werden nun eine Reihe von Include-Files
+geladen. Nun k"onnen Sie Ihre Aufgabe stellen z.B:
+`REWR D(sin cos x,x) : All'
+Das Programm bestimmt nun die Ableitung der Funktion `sin(cos(x))' nach x durch 
+Umschreiben dieses Terms in der Algebraliste `All'.
+
+\section{Benutzung von `Rewrite'}
+
+Generell wird die Eingabe immer Zeilenweise verarbeitet. Bei gr"o"seren
+Bl"ocken mu"s die Zeile durch ein `$\backslash$' am Zeilenende fortgesetzt werden.
+Wichtig ist, da"s kein Zeichen (auch kein Leerzeichen) hinter dem `$\backslash$' steht.
+Kommentare beginnen mit `\#' und gehen bis zum Ende der Zeile oder bis zum
+n"achsten `$\backslash$' gefolgt von einem Zeilentrenner.
+\newpage
+\section{Liste aller Rewritebefehle}
+\begin{description}
+\item[Befehl] Erkl"arung
+\item[INC ''filename'']
+								Unter `filename' abgespeicherte Programme werden ausgef"uhrt.
+                `Filename' ist ein von `''' umschlossener String.
+                Mehrfache INCLUDES sind m"oglich bis zu einer maximalen Tiefe. 
+
+                Bsp.: INC `'inc/all'' : alle wichtigen Include-files werden 
+                gelesen.
+
+                Der INC-Befehl wird einmalig beim verarbeiten der Eingabe
+                ausgef"uhrt. Zeilen, die `INC' enthalten d"urfen nicht mit
+                `$\backslash$' fortgesetzt werden. (Einzige Ausnahme !)
+
+\item[REWR term : algname [;algname ..\symbol{93}]
+                Der Term `term' wird in den Algebren (Regellisten) `algname'
+                nacheinander umgeschrieben.
+
+\item[PRTNUM ''String'']
+								Das Standartformat f"ur die Ausgabe von reelen Zahlen wird in
+                `String' ge"andert. Z.B. : PRTNUM ''\% 2.15g ''
+
+\item[OUT ''filename'']
+								Die Ausgabe wird in das File `filename' umgelenkt; dieses wird vorher
+                gel"oscht. Zus"atzlich ist noch `OUT ''stdout''' m"oglich. Dadurch
+                findet die Ausgabe wieder auf stdout (normalerweise der Bildschirm)
+								statt. Bei jeder Ausgabe"anderung wird die noch offene Datei
+								geschlossen.
+                Grafische Darstellung von Funktionen mittels anderer Programme
+                ist so einfach m"oglich.
+
+\item[DATA Const]
+								Liest eine Real-Zahl aus der ge"offneten Datei in die Konstante
+                `Const'. So lassen sich z.B. auch Me"swerte weiterverarbeiten.
+
+\item[DATA ''filename'']
+								Zus"atzlich zu der normalen Standarteingabe besteht die
+                M"oglichkeit mit `DATA Const' aus einer Datei zu lesen.
+                Diese Datei mu"s mit `DATA ''filename''' ge"offnet werden.
+								W"ahrend des Lesens wird beim Erreichen von nicht numerischen Daten
+								der Rest, bis zum Zeilenende "ubersprungen.
+
+\item[SYS ''String'']
+								f"urt den in `String' angegebenen Befehl in der shell aus.
+
+\item[SORT name [,name ..\symbol{93}]
+								Erzeugung eines Datentyps. Der Typ wird bei der Definition von
+								Funktionen, Variablen und Konstanten gebraucht.
+
+\item[NUM sortname]
+								Standartm"a"sig wird mit dem Datentyp `double' gerechnet
+                Alle eingegebenen Zahlen (z.B.: 1.234) werden als `double'
+                abgespeichert. Sie m"ussen aber einem selbstdefiniertem
+                Datentyp (mit `SORT typname' erzeugt) zugeordnet werden.
+
+                Bsp.: SORT real
+
+											NUM real    \# ordnet Nummern den Typ real zu.
+
+\item[CONST name [,name ..\symbol{93} : sortname]
+								Deklaration einer Konstanten. Es wird eigentlich
+                eine Konstante erzeugt, die beliebige Werte annehmen kann.
+                (Also eine Variable). Im Gegensatz zu mit VAR erzeugten
+								Metha-Variablen kann sie aber nicht als Ersatz f"ur ganze Terme
+                benutzt werden.
+
+\item[VAR name [,name ..\symbol{93} : sortname]
+								Erzeugung einer Metha-Variablen. Man kann diese Variable
+                als Platzhalter in Spezifikationen f"ur Algebren (Regellisten)
+								verwenden.
+
+                Bsp.:
+											VAR A : real  SPEC xyz A+0=A
+
+\item[NUM name [,name ..\symbol{93} : sortname]  
+								Erzeugung einer Metha-Variablen. Man kann diese Variable
+                als Platzhalter nur f"ur Numerische Werte in Spezifikationen 
+                f"ur Algebren (Regellisten) verwenden.
+
+                Bsp.: NUM N : real 
+
+											SPEC xyz N+0=N
+
+\item[FUNC name : sortlist \frq \frq\ sortname [LA1..5|RU\symbol{93} [ATT name\symbol{93}]
+                Erzeugung einer Funktion. Die erste `sortlist' gibt die
+                Anzahl und Typen der Argumente an. Es mu"s mindestens
+								eines sein. Sie werden jeweils durch Kommata voneinander getrennt.
+								Ein ++ hinter dem letzten Argument steht f"ur variabel viele Argumente des 
+								letzen Types. Der andere `sortname' gibt den
+                Resulttattyp der Funktion an. LA1 bis LA5 legt das Ein- bzw.
+                Ausgabeformat der zu definierenden Funktion fest. Es bedeuten: \\
+                   {\bf LA1 bis LA5}   : Links-assoziativer Operator (2 Argumente)
+                                   LA5 klammert vor LA4 usw. \\
+                   {\bf RU}            : Rechts-un"arer Operotor. (z.B. Fakult"at) \\
+									 {\bf RA}            : Rechts-assoziativer Operator (z.B. a\^b)\\
+
+                Ist kein spezielles Ein/Ausgabeformat angegeben, so wird die
+                Funktion in der Form : `sin x' , `sin(x)' bzw. `f(x,y)'
+                eingelesen.
+
+                {\bf ATT name} legt den Namen der Funktion in der Liste 
+                `userfunction' im Modul userfkt.c fest, die aufgerufen wird, 
+                wenn alle Argumente der Funktion einen numerischen Wert besitzen.
+								`name' ist nicht in `''' zu setzen. 
+								Name darf frei gew"ahlt werden (auch gleichlautend mit
+								einem Funktionsnamen).
+
+                z.B.: FUNC + : real,real \frq \frq\ real LA1 ATT 2
+
+								auch m"oglich ist: \\
+							  {\bf ATT ( Argdefs ) Block}
+								H"angt eine selbstdefinierte Funktion an. ( Argdefs ) sind 
+								vollst"andige Definitionen f"ur die Argumente ( Konstanten,Terme
+								oder Funktionen ).
+							  Der entsprechende Funktionsk"orper wird ausgef"uhrt, wenn eine
+								Zuweisung eines Terms an eine Konstante erfolgt, oder ein Term
+								ausgegeben werden soll.
+
+							  z.B. FUNC test : real,real,real \frq \frq\ real ATT $\backslash$ \\
+							       (CONST a,b : real; TERM c : real) \{ RETURN c+a*b \}
+
+\item[RETURN Term]
+								Setzt den Resultatwert (einen Term) der Funktion. Die Ausf"uhrung
+                der Funktion wird NICHT!! beendet. Enth"alt dieser Term lokale
+								Variablen, so gibt es eine Fehlermeldung, und die Funktion gild
+								als nicht ausgef"uhrt.
+
+\item[OTHER name : sortlist \frq \frq\ sortname [ATT name\symbol{93}]
+                Definiert zu einem existierenden Funktionsnamen eine weitere
+                Abbildung mit anderen Argument- und Resultattypen. 
+								Funktionen k"onnen anhand ihrer Argumenttypen unterschieden werden.
+
+                z.B.: OTHER + : vector,vector \frq \frq\ vector
+
+\item[BRA  auf zu : sortlist \frq \frq\ sortname [ATT name\symbol{93}]
+                Definiert eine Funktion, die in Klammerschreibweise benutzt
+                werden kann. `auf' bezeichnet das Symbol f"ur Klammer auf,
+                und `zu' das Symbol f"ur Klammer zu.
+								Es ist folgende zusaetzliche Notation bei der Benutzung erlaubt:
+
+								a[b,c] statt [a,b,c]           ([ = auf, ] = zu)
+								damit lassen sich z.B. Vectoren mit a[5] indizieren.
+
+                z.B: BRA \flq \frq : vector,vector \frq \frq\ real \# Skalarprodukt \flq a ,b \frq \\
+                Kennzeichnend f"ur OTHER ist die erste Klammer.\\
+                z.B.: OTHER \flq : compl,compl \frq \frq\ real\\
+
+\item[ALG algname] Definiert eine neue Algebra (Regelliste) , die Spezifikationen enthalten kann
+
+\item[SPEC algname : [Fkt ...\symbol{93} was = zuwas [DO Block\symbol{93}]
+               Alte Spezifikationen werden gel"oscht, diese neue Regel wird eingetragen.
+
+\item[SPEC algname : algnamelist]
+               Alte Spezifikationen werden gel"oscht, `algname' kann anstelle der
+               gesamten algnamelist verwendet werden. In der
+							 `algnamelist' stehen `algnames', die durch Kommata voneinander
+							 getrennt sind. Hintereinander Umschreiben
+               in mehreren Algebren kann so elegant geschrieben werden. 
+               Prinzipiell d"urfen Listen von Algebren immer mit `(' `)' Klammern
+               umgeben werden, was bedeutet, da"s beim Umschreiben die Algebren
+               innerhalb der Klammern solange ausgef"uhrt werden, bis kein weiteres
+               Umschreiben mehr m"oglich ist.
+
+\item[ADDSPEC algname : [IF ( Fkt )\symbol{93} was = zuwas [DO Block\symbol{93}]
+               Hinzuf"ugen einer Ersetzungsregel (Spezifikation) zur Algebra
+                `algname'. Es d"urfen Metha-Variablen auf beiden Seiten
+               verwendet werden. Mit NUM definierte Metha-Variablen werden
+               nur bei Zahlen ersetzt.
+
+							 Fkt ist selbstdefiniert (siehe IF ) oder eine der Funktionen :
+
+                     LB(term,term)            `Lower or between' vergleicht 
+                                              zwei Terme. \\
+                     ISINT(term)              stellt fest ob term ein int-wert
+                                              ist. \\
+                     IN(terma,termb)          stellt fest ob terma in termb
+                                              enthalten ist. \\
+                     NIN(terma,termb)         verneinung von IN. \\
+
+               Abh"angig vom Resultat der Funktionen wird die Regel angewandt
+               oder eben nicht. Das Hintereinanderschreiben mehrerer Funktionen
+               bewirkt eine und-Verkn"upfung der Resultate.
+
+               Bsp.: ADDSPEC real : LB(A,B) A+B=B+A\\
+               Ist DO in Verkn"upfung mit einem Block (oder einem Befehl)
+               angegeben, so wird vor dem Ersetzen der linken durch die rechten
+               Seite der Block ausgef"uhrt. Mehrere Befehle m"ussen in dem Block
+							 von `\{' und `\}' umgeben sein.
+
+               Bsp.: ADDSPEC real : Tay(A,B,D)=q DO \{ q=0 \\
+                                    FOR i=1 TO N STEP 1 DO $\backslash$ \\
+                                    q=q+D\^i/i!*Dp(B,D) \}\\
+
+\item[LIFT (Fktlist(Args)) TO (Fktlist(Args))]
+							 "Ubertragung s"amtlicher auf eine Menge von Funktionen und
+							 Konstanten zutreffender Regeln auf eine andere solche Menge.
+							 Fktlist(Args) ist eine durch Kommas getrennte Liste von Funktionen
+							 mit irgentwelchen Argumenten des gew"unschten Datentyps oder
+							 Konstanten.
+
+               Die jeweiligen Funktionen werden durch den Typ ihrer Argumente
+               eindeutig charakterisiert. Die Argumente spielen sonst im weiteren
+               keine Rolle. Als Konstanten sind auch die reellen Zahlen 1 und 0
+               m"oglich.
+
+							 Alle Regeln, die in der linken Menge gelten werden
+							 nun automatisch auch auf die rechte Menge angewandt.
+
+							 Bsp. :\\
+\begin{verbatim}
+LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
+LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
+\end{verbatim}
+               mit diesem Trick lassen sich die Eigenschaften eines
+               Ringes leicht aufgrund schon spezifizierter Gruppeneigenschaften
+               definieren.
+
+\item[TERM name : sortname]
+               Deklaration einer Term-Variable.
+               Eine Term-Variable kann einen beliebigen Ausdruck des gleichen
+               Typs aufnehmen.Ineianderschachtelung von Term-Variablen bewirkt
+               ein Einsetzen der aktuellen Ausdr"ucke. Die Abh"angigkeit zu der anderen
+               Term-Variablen wird nicht gespeichert.
+
+               Immer vorhanden ist der Term `\%'. Er enth"alt den jeweils
+               zuletzt ausgegebenen Ausdruck. Soll dieser weiterhin gespeichert
+               werden, so mu"s er an eine andere Term-Variable zugewiesen werden.
+
+               Term-Variablen werden eigentlich im Sinne von Funktionen
+               verwendet. So ist die Zuweisung `TERM q  q=x\^y*a' im Sinne von 
+               `q(x,y,a)' zu verstehen. Durch Zuweisungen an die einzelnen
+               Variablen `x=4 y=2 a=3' kann dann einfach der Funktionswert von
+               q(4,2,3) mit `q' ausgerechnet werden.
+               
+
+\item[ATT sortname Name1 , Name2 , Name3 , Name4] 
+               Einem Typ wird Anzeige- ,Vergleichs- , Kopier- und L"oschfunktion
+               f"ur numerische Werte zugewiesen. Dei `Namen' stehen hierbei nicht
+							 in doppelten Anf"uhrunsstrichen.
+
+               `Name1' bezeichnet die Anzeigefunktion in `userfunction' mit der
+               numerische Werte vom Typ sortname angezeigt werden sollen. \\
+               `Name2' bezeichnet die Vergleichsfunktion mit der zwei numerische
+               Werte verglichen werden (1 : Zahl1 \frq\ Zahl2,0: Zahl1 == Zahl2,
+               -1 : Zahl1 \flq Zahl2). \\
+               `Name3' bezeichnet die Kopierfunktion in `userfunction' mit der
+               Numerische Werte kopiert werden. \\
+               `Name4' bezeichnet die L"oschfunktion in `userfunction' mit der
+               Numerische Werte gel"oscht werden.
+
+               Bsp.: ATT complex show\_complex,cmp\_complex,cpy\_complex,del\_complex\\
+               siehe Modul userfkt.c
+
+
+\item[FOR Constname = N1 TO N2 [STEP N3\symbol{93} DO Block]
+							For-Schleife.
+
+							Bsp.: FOR i = 20 TO 10 STEP -1 DO i
+
+\item[IF ( Fkt ) Block [ ELSE Block \symbol{93}] 
+              IF-Bedingung. Fkt ist der Name einer Funktion mit double Resultat, die
+              TRUE/FALSE (1.0/0.0) zur"uckgibt.
+
+              Bsp.: CONST inc\_xxx : real \\
+                    inc\_xxx = 1\\
+                    IF (inc\_xxx \frq 0) INC ''inc/xxx''\\
+
+\item[WHILE ( Fkt ) Block]
+              WHILE-Schleife. F"ur `Fkt' siehe `IF'.
+
+              Bsp.: i = 1\\
+                    WHILE (10\frq i) 2\verb|^|i
+
+\item[Zuweisungen: Termname = term]
+               term wird in Termname gespeichert
+
+               Bsp.: TERM q : real   \\
+							 q=1+1+a
+
+               Der letzte ausgegebene Ausdruck ist unter `\%' als Termname
+               immer verf"ugbar. Er wird also automatisch an `\%' zugewiesen.
+               In selbstdefinierten Funktionen d"urfen lokale Variablen nicht an globalere Terme zugewiesen werden.
+               (daraus resultiert eine Fehlermeldung bei der Ausgabe. (Zuweisung an \%))
+               Werden Term-Variablen an Term-Variablen zugewiesen, so wird der
+               Inhalt kopiert und gegebenenfalls numerisch ausgewertet. Wird also
+               eine Term-Variable ver"andert hat dies keinen einflu"s auf andere
+               Term-Variablen.
+
+
+\item[Constname = value]
+               Die Konstante `Constname' bekommt einen Wert
+
+               z.B.: x=1+1+3    (wenn + mit Funktion verbunden )
+
+               Steht bei `value' kein Wert (z.B. andere Konstante ohne
+               Wert oder Funktion, die nicht rechnet) so wird der Wert der 
+               Konstanten gel"oscht und sie erscheint in der Ausgabe wieder
+							 mit ihrem Namen `Constname'.
+
+               Sowohl eine Const- als auch eine Term-Variable k"onnen durch einfaches
+               hinschreiben des Namens ausgegeben werden.
+							 Ausgegebene Ausdr"ucke werden an `\%' zugewiesen.
+
+							 zur Verdeutlichung ein Beispiel :
+
+
+
+\begin{verbatim}
+1+1 
+2                  # wird ausgegeben 
+TERM q : real 
+q=1+1 
+q 
+2                  # wird ausgegeben (q bleibt aber erhalten) 
+Der letzte Ausgedruckte Wert ist unter dem Term \% wieder zu erreichen.
+Bestehende Abh"angigkeiten zu anderen Termen werden hier ignoriert.
+Bsp.:
+TERM q
+q=b
+a+q
+a+b                # wird ausgegeben
+q=c
+%+2
+a+b+2              # wird ausgegeben
+\end{verbatim}
+\end{description}
+
+\section{Allgemeines}
+Werden von `''' begrenzte Strings hingeschrieben, so wird der Text ausgegeben.
+Sie k"onnen nicht zugewiesen werden. (ein String darf auch `''' enthalten.)
+
+Eine Reihe `benutzerdefinierter' Funktionen sind schon implementiert.
+Dazu geh"oren wichtige Funktionen auf reelen Zahlen (real.c),
+complexen Zahlen (complex.c), reelen Vectoren (rvector.c) und reelen
+Matrizen (rmatrix.c) und Verbindungen der Datentypen. Alle Funktionen
+sind im Modul (userfkt.c) eingetragen.
+
+Neue Funktionen m"ussen immer
+ein array von Zeigern auf Argumente als Argument bekommen und einen Zeiger
+auf das Resultat zur"uckliefern. Beispiele sind in den genannten c-Modulen
+zu finden.
+
+Die grundlegenden mathematischen Datentypen, Funktionen und Regeln sind
+im Modul `alg' im Verzeichni"s `inc' definiert. Dort kann man auch nachlesen
+welche mathematischen Funktionen definiert sind.\\ \\
+{\bf Wichtigste Fehler des Systems:} \\
+Der Speicher wird nur unzureichend freigegeben.\\
+{\bf M"angel des Systems:} \\
+W"unschend w"ahre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie
+differenzieren usw. sind dann deutlich schneller (verschicken von Nachrichten).
+Es existieren keine bisher `Container-Datentypen' wie Arrays, Matritzen, usw. .
+Diese m"ussen durch entsprechende Funktionen nachgebildet werden, was Rechenzeit
+kostet.
+
+\begin{appendix}
+\section{Zusammenfassung der yacc-syntax}
+
+\begin{verbatim}
+
+%token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ
+%token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
+%token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
+%token	<y\_sym>	Id String
+%token	<y\_sym>	Sort Alg Term
+%token	<y\_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
+%token			Terms Form Sorts Functs Forms Algs Cond2 Cond
+%type	<y\_int>	VORRANG
+%type	<y\_nod>	vinstr definition instruction aninstruction instructions prntexpr  tinstructions oinstructions
+%type	<y\_nod> idlist l\_thing l\_list sortlist vsortlist funclist formlist termlist alglist Alg2 prntlist
+%type	<y\_nod>	term func step att namedId d\_list
+%type	<y\_nod> formula cformula condition condfunc
+
+%left	La1 
+%left	La2 
+%left	La3 
+%left	La4 
+%left	La5
+%right	Ra 
+%right	Ru 
+%left	Func 
+%%
+
+
+prog		: line
+				| prog line
+
+line		: instructions '\n' 
+													
+definition	: FUNC namedId ':' vsortlist PFEIL Sort	VORRANG att 
+			| OTHER func ':' vsortlist PFEIL Sort att 
+			| ATT Sort Id ',' Id ',' Id ',' Id 
+			| BRA Id Id	':'  vsortlist PFEIL Sort	att 
+			| VAR idlist ':' Sort			 
+			| NUM Sort	 			  			 
+			| NUM idlist ':' Sort			 
+			| CST idlist ':' Sort			 
+			| SPEC Alg ':' alglist	   
+			| SPEC Alg ':' formlist		 
+			| ADDSPEC Alg ':' formlist 
+			| SORT idlist					     
+
+			| ALG idlist	             
+			| TERM idlist ':' Sort	   
+
+idlist	: namedId						
+			| namedId ',' idlist		
+
+l_thing : Const					
+			| Term						
+
+l_list	: l_thing			     
+			| l_thing ',' l_list 
+
+att 		: /* NULL */		
+			  | ATT namedId		
+				| ATT '(' 
+								 d_list ')' instruction 
+
+namedId : Id           
+        | Const        
+        | Var	         
+        | func         
+        | Sort         
+        | Alg          
+        | Term         
+
+
+VORRANG		: /* nothing */				
+			| LA1						
+			| LA2						
+			| LA3						
+			| LA4						
+			| LA5						
+			| RA						
+			| RU						
+
+condition : condfunc					
+
+condfunc : LB '(' termlist ')'
+			| IN '(' termlist ')' 	
+			| NIN '(' termlist ')'	
+			| '(' term ')'   				
+
+instructions  : instruction	
+							| instruction ';' instructions 
+
+tinstructions : oinstructions	
+							| oinstructions '\n' tinstructions 			
+
+oinstructions : instructions			
+
+trenner : '\n' 
+				| ';'
+
+d_list : definition						 
+			 | definition ';' d_list 
+
+instruction : aninstruction     
+			| definition		    			
+			| '{'
+				tinstructions '}' 			
+			| WHILE condition instruction	
+			| IF condition instruction	
+			| IF condition instruction ELSE instruction	
+			| FOR term EQ term TO term step DO instruction
+
+aninstruction	: /* Nichts */ 	
+			| SYS String					
+			| INC String					
+			| REWR term ':' alglist	
+			| prntlist						
+			| PRTNUM String				
+			| PRT prntlist				
+			| OUT String					
+			| DATA String					
+			| DATA Const					
+			| Term EQ term				
+			| Term EQ REWR term ':' alglist	
+			| Const EQ term			
+			| EXE func Id 			
+			| LIFT '(' termlist ')' TO '(' termlist ')'	
+			| DBG Const 	      	
+			| RETURN term								
+			| QUIT                      
+
+step  : /* NULL */	
+			| STEP term	
+
+prntexpr : term						
+			| String							
+
+prntlist : prntexpr						
+			| prntexpr ',' prntlist	
+
+alglist		: Alg2						
+			| Alg2 ',' alglist		
+
+Alg2 : Alg									
+			| '(' alglist ')'			
+
+sortlist	: Sort							
+			| Sort ',' sortlist			
+
+vsortlist : sortlist					
+			| sortlist VARPAR				
+
+func		: Func				
+			| La1						
+			| La2						
+			| La3						
+			| La4						
+			| La5						
+			| Ra						
+			| Ru						
+			| Bra						
+			| Bra1					
+
+funclist	: func						
+			| func ',' funclist		
+
+term		: Term							
+			| LAST								
+			| Const								
+			| Var				      		
+			| '(' term ')'		    
+			| term Ru				      
+			| Func term				    
+			| La1 term				    
+			| La2 term				    
+			| La3 term				    
+			| La4 term				    
+			| La5 term				    
+			| Bra termlist Bra	  
+			| Bra1 termlist Bra2	
+			| Func '(' termlist ')'		
+			| term La1 term		    
+			| term La2 term				
+			| term La3 term				
+			| term La4 term				
+			| term La5 term				
+			| term Ra  term				
+
+termlist	: term						
+			| term ',' termlist		
+
+formula		: term EQ term		
+
+vinstr : /* */							
+			| DO instruction			
+
+cformula	: formula	vinstr					
+          | IF condition formula	vinstr 
+
+formlist	: cformula					
+			/* | cformula ';' formlist 
+
+%%
+\end{verbatim}
+\end{appendix}
+\end{document}

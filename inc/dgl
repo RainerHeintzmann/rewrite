@@ -1,0 +1,22 @@
+# Loesen von Diff-gleichungen
+# Eingabe : P2 = f(x,P0) = P0'
+# P4 = Anfangswert ( x0) (normal : == 0)
+# P1 = Anfangswert ( == P0(x0)) (y0)
+# P3 = Anfangspolynom (normalerweise == x)
+# Bsp. :
+P2 = 1+P0^2
+P1 = 0
+P4 = 0
+
+P3 = x
+FUNC Picard : real,real >> real   # z.B. Picard(2,x)
+
+P0 = Picard(N- 1,X)
+ALG Pic
+
+SPEC    Pic : Picard(0,X)=P3
+ADDSPEC Pic : IF (N>0) Picard(N,X)= P1+I(P4,x,P2,x)
+ADDSPEC Pic : IF (N>1) (X+Y)^N=(X+Y)*(X+Y)^(N- 1)
+
+ALG Pica
+SPEC Pica : (Pic;Real;Mulord;integr)

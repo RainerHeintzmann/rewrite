@@ -1,0 +1,31 @@
+CONST h,k,l,lambda,Egy,cnt,cmax,thick,mu : real
+CONST Egyf,muf : rvector
+Egyf=nullvec(1000)
+muf=Egyf
+INC "LiNbO3/comp"
+
+# lambda = 1.540598 # Kalpha1 (Cu) [_Ang]
+# Egy = c/(lambda* _Ang)*hq*2*pi/e0   # Energy in eV
+thick=0.79e-3
+cnt=0
+
+# OUT "/dev/null"
+
+FOR Egy = 8000 TO 20000 STEP 6000 DO { # eV
+ lambda = c/(Egy*_Ang)*hq*2*pi/e0
+ lambda
+ INC "LiNbO3/compute"
+ "jhgjhg"
+ Egyf=chvec(Egyf,cnt,Egy)
+ muf=chvec(muf,cnt,mu)
+ cnt=cnt+1
+ }
+
+OUT "stdout"
+"# sample thickness = ",thick*1e3," mm"
+"# Energy/eV , Absorbtionlength(I=I*0.5) , Transmission
+
+FOR cnt = 0 TO cmax-1 DO {
+ elem(Egyf,cnt),ln 0.5/elem(muf,cnt),exp(mu/thick)
+ }
+

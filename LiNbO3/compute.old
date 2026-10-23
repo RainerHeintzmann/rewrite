@@ -1,0 +1,181 @@
+DATA "LiNbO3/struct"
+
+# CONST h,k,l : real
+
+
+CONST Coord,Indices,a1,a2,a3,b1,b2,b3,p1,p2,p3,S,G : rvector
+
+CONST c1,c2,c3,aa,ca,para,d,sin30,cos30,Vuc,Aw,C1,D1,MuDivRho,rho,Zges,MuDivRhoGes : real
+CONST DiffAtoms,ThisAtoms,SFA,SFB,SFC,Za,atom,SumA : real
+CONST ThetaB,sinThetaB,kappa,t05,mu,angx,angy,angz : real
+
+CONST Fg : complex # Structur Factor
+CONST fb : complex # Atomic Form Factor
+CONST Chig : complex # Complex Susceptibility
+
+CONST indj,indk,number,value : real
+CONST d1jk,d2jk,d3jk : rmatrix
+
+
+sin30 = sin (30*pi/180)
+cos30 = cos (30*pi/180)
+
+# h=  3*x    # Indices of reziprocal lattice
+# k=  3*y
+# l=  6*z
+
+Indices= [h,k,l]
+
+
+
+ aa=5.148                 # Length of a1,a2 -axis
+ ca=13.863                # Length of c -axis
+
+ a1= [aa,0,0]             # real space latice vectors [in Angstroem]
+ a2= [ -sin30*aa,cos30*aa,0]
+ a3= [0,0,ca]             # == c-axis
+
+Vuc = a1*(a2 _x_ a3)   # Volume of unit Cell
+
+# Inverse Grating Vectors (without 2*pi)
+
+b1= a2 _x_ a3 / Vuc
+b2= a3 _x_ a1 / Vuc
+b3= a1 _x_ a2 / Vuc
+
+G = h*b1+k*b2+l*b3
+S = G/2
+
+# Calculation of Parameter for Atomic Form Factor : sinTheta/lambda = 1/2d
+
+para = abs(G) / 2
+d = 1/(2*para)                       # distance of Layers
+
+# Calculation of Bragg Angle (lambda given in _Ang)
+
+sinThetaB = para*lambda
+ThetaB = arcsin(sinThetaB)
+
+angx= arccos([1,0,0]*G/abs(G)) / _deg
+angy= arccos([0,1,0]*G/abs(G)) / _deg
+angz= arccos([0,0,1]*G/abs(G)) / _deg
+
+# "Reflex : ",Indices
+# "Parameter sin Theta/Lambda : ",para,"[1/A]"
+
+DATA c1             # Aequivalente Punkte lesen
+DATA c2
+DATA c3
+
+p1= [c1,c2,c3]
+
+DATA c1; DATA c2; DATA c3
+
+p2= [c1,c2,c3]
+
+DATA c1; DATA c2; DATA c3
+
+p3= [c1,c2,c3]
+
+
+Fg = Cpx(0,0) # Initialize Structure Factor
+Zges = 0
+MuDivRhoGes = 0
+SumA = 0
+
+DATA DiffAtoms
+
+FOR atom=1 TO DiffAtoms DO {
+
+DATA Za
+
+DATA Aw  # Atomic weight in Atomic Units
+
+DATA SFA;DATA SFB;DATA SFC
+
+DATA C1;DATA D1
+
+MuDivRho = (C1*lambda^3-D1*lambda^4)*1000/100^2 # Units : lambda = _Ang;-> MuDivRho = cm^2/g (now m^2/kg)
+
+DATA ThisAtoms
+
+Zges = Zges+Za*ThisAtoms*3 # Because of 3 Aequivalent Points
+
+SumA = SumA + Aw*ThisAtoms
+MuDivRhoGes = MuDivRhoGes + MuDivRho*ThisAtoms*Aw # for computing average
+
+fb = Cpx((Za-SFA)*exp(-SFB*para*para)+SFA*exp(-SFC*para),0)
+
+"Atomic Number : ",Za,"  Form Factor : ",fb
+
+FOR a=1 TO ThisAtoms DO {    # read Atoms
+DATA c1
+DATA c2
+DATA c3
+Coord= [ c1,c2,c3 ]
+# Coord
+
+Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p1)))
+Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p2)))
+Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p3)))
+}
+
+} # for atom
+
+DATA rho   # Of the whole Crystal
+
+MuDivRhoGes = MuDivRhoGes/SumA   # Computing average
+mu = rho*MuDivRhoGes
+
+"" # Leerzeile
+
+Chig = -1/pi * bel*Fg*(lambda* _Ang)^2/(Vuc* _Ang^3) # Susceptibility (now in SI System)
+
+kappa = (2*pi/(lambda* _Ang))*sinThetaB/(2*(cos ThetaB)^2)*abs(Chig)
+
+# meine Formel fuer t0.5 :
+
+t05=Vuc*_Ang^3/(2*2^0.5*d*_Ang*bel*abs(Fg))
+
+"Index : ",Indices,"  Structure Factor : ",Fg
+"Angle of G to axis X: ",angx,", Y: ",angy,", Za:",angz
+"lambda [_Ang]: ",lambda,"ThetaB [deg]: ",ThetaB/ _deg
+"1/kappa (Uwe) [m]: ",1/kappa
+"t0.5 (Rainer) [m]: ",t05
+"MuGes/rho (cm^2/g) : ",MuDivRhoGes*100^2/1000
+"Absorbtionlength [m]: ",- sinThetaB*ln 0.5 /mu
+
+""
+
+# Read Piezoelectric Constants
+
+d1jk = nullmat(3,3)
+
+DATA number   # Number of Constants != 0
+FOR b = 1 TO number DO {
+DATA indj;DATA indk; DATA value
+d1jk = chmat(d1jk,indj-1,indk-1,value)
+d1jk = chmat(d1jk,indk-1,indj-1,value)   # Symmetric !
+}
+
+d2jk = nullmat(3,3)
+
+DATA number   # Number of Constants != 0
+FOR b = 1 TO number DO {
+DATA indj;DATA indk; DATA value
+d2jk = chmat(d2jk,indj-1,indk-1,value)
+d2jk = chmat(d2jk,indk-1,indj-1,value)   # Symmetric !
+}
+
+d3jk = nullmat(3,3)
+
+DATA number   # Number of Constants != 0
+FOR b = 1 TO number DO {
+DATA indj;DATA indk; DATA value
+d3jk = chmat(d3jk,indj-1,indk-1,value)
+d3jk = chmat(d3jk,indk-1,indj-1,value)   # Symmetric !
+}
+
+
+INC "LiNbO3/modulation"
+
