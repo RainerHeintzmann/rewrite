@@ -362,7 +362,10 @@ welche mathematischen Funktionen definiert sind.
 
 
 Wichtigste Fehler:
-Der Speicher wird nur unzureichend freigegeben.
+Der Speicher wird nur unzureichend freigegeben. (Seit 2026 laufen wiederholte
+Rechnungen, Umschreibungen und Schleifen ohne Speicherverlust; nur bei
+Syntaxfehlern und beim Ueberdefinieren von Definitionen geht noch etwas
+Speicher verloren.)
 
 Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Anpassung an flex 2.6 (Neustart des Scanners mit yyrestart, yywrap liefert
@@ -380,6 +383,9 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - abs (reelle Zahlen) und eabs (Vektoren) schnitten Nachkommastellen ab
    (C-Funktion abs statt fabs). Behoben.
  - Neues Verzeichnis tests mit Regressionstests (make test, siehe tests/README.md).
+ - Speicherlecks behoben: ausgegebene Terme, Term-Zuweisungen, Ergebnisse und
+   Zwischenschritte von REWR, die Zahlen 0 und 1, DATA, lokale Konstanten in
+   Bloecken und Benutzerfunktionen.
 
 Maengel des Systems:
 Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie

@@ -81,6 +81,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 
 	if ((ers=rewrite(* p_term,Baum)) != (Node *) NULL)
 			{
+			Node * old = * p_term;
 			DEBG((2,"REWR: "));
 			DBFK(2,print(* p_term));
 
@@ -96,6 +97,10 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 				RESTORE;					/* Symboltabelle restaurieren (auch locks beseitigen)*/
 				delete (lt);
 				delete (rt);
+				if (old->type != SYM_TYPE)
+					delnod(old);  /* ersetzter Knoten (Kinder sind schon geloescht) */
+				else
+					delete(old);  /* gibt nur Zahlen frei */
 				DEBG((2," -> "));
 				DBFK(2,print(*p_term));
 				DEBG((2,"\n"));
@@ -330,21 +335,52 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 	return;
 }
 
+/* Liste aus rec_build_list (defs.c) freigeben. Ihre SYM_TYPE-Knoten sind
+ * keine Symbole, sondern Knoten mit (Adresse, Symbol) und duerfen nicht
+ * wie Symbole behandelt werden. */
+static void delete_locals_list (Node * p)
+{
+	if (! p) return;
+	if (p->type == PARAM)
+		{
+		delete_locals_list(p->l);
+		delete_locals_list(p->r);
+		}
+	delnod(p);
+}
+
 void delete _1a ((p), Node * p)
-{	void printterm (Node * np);
-	void termassign (Node * np);
+{
+	void set_locals_seq (Node * np);
+	void declare (Node * np);
 	if (p)
 		{
+		if (((p -> type) == FUNC) && ((p->l) == (Node *) declare) && p->r)
+			{ /* FUNC declare ( lexv ( Idlist, hasv ( rtypes, atypes ) ) )
+			   * Der hasv-Knoten hat als Typ TRUE/FALSE (FALSE == SYM_TYPE !).
+			   * rtypes/atypes gehoeren jetzt den deklarierten Symbolen. */
+			if (p->r->r)
+				delnod(p->r->r);
+			delete(p->r->l);
+			delnod(p->r);
+			delnod(p);
+			return;
+			}
+		if (((p -> type) == FUNC) && ((p->l) == (Node *) set_locals_seq))
+			{ /* FUNC set_locals_seq ( PARAM ( Liste, Anweisung ) ) */
+			delete_locals_list(p->r->l);
+			delete(p->r->r);
+			delnod(p->r);
+			delnod(p);
+			return;
+			}
 		if ( ((p -> type) == Cond)
 		  || ((p -> type) == FUNC))
 			{
-			if ((p->l) != (Node *) printterm)    /* dieser Term darf nicht geloescht werden,da er in % gespeichert ist */
-				{
-				if ((p->l) == (Node *) termassign)  /* Term (p->r->r) darf nicht geloescht werden */
-					delnod(p->r);
-				else
-					delete(p->r); /* nicht die Funktion zestoeren ! */
-				}
+			/* Frueher wurden die Terme von printterm und termassign hier nicht
+			 * geloescht. % und Term-Variablen speichern aber Kopien (tcopy in
+			 * termassign2), daher koennen die Terme geloescht werden. */
+			delete(p->r); /* nicht die Funktion zestoeren ! */
 
 			delnod(p);
 			p = NULL;
@@ -700,7 +736,7 @@ Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 					printfOut("calkulate : Internal ERROR : unexpected term-type : ");
 					print(term);
 					printfOut("  Typenr. : %d\n",term->type);
-					delnum(sp,FALSE);
+					delnum(sp,TRUE); /* Wert gehoert der Zahl */
 					return NULL;
 					}
 				}

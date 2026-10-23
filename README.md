@@ -323,7 +323,9 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
 
 ## Known limitations
 
-- Memory is not always freed. This rarely matters for interactive use.
+- Some memory is still not freed: a few bytes per syntax error, and the
+  definitions themselves (symbols, rules, function bodies) when they are
+  redefined. Repeated calculations, rewriting and loops no longer leak.
 - Not every rule one might expect exists. For example `D(exp(x),x)` is not
   simplified, and constants like `a` are not assumed to be independent of
   `x`, so `D(a,x)` stays in the result.
@@ -338,6 +340,10 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
 - Constants declared in loop bodies now work in every pass of the loop.
 - `INC` inside a block or loop now works. Its declarations are global.
 - `abs` for real numbers and `eabs` for vectors truncated to integers. Fixed.
+- Fixed memory leaks: printed terms, term assignments, `REWR` results and
+  intermediate rewriting steps, the numbers 0 and 1, `DATA` reads, local
+  constants of blocks and user functions. Repeated operations now run in
+  constant memory.
 - [LiNbO3/abso1](LiNbO3/abso1) runs again, and the test suite was added.
 
 ## License

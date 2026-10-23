@@ -4,6 +4,7 @@
  *
  */
 
+#include <stdlib.h> /* free */
 #include "inout.h"
 #include "sym.h"
 #include "node.h"
@@ -97,6 +98,19 @@ static Symbol * save_local(Symbol * sp)
 	return sp;
 }
 
+/* Laufzeit-Kopie eines lokalen Symbols (aus save_local_run) freigeben:
+ * Name (strsave in mksym), Zahlenwert und gespeicherter Term gehoeren ihr. */
+static void free_local_sym(Symbol * sp)
+{
+	if (lexval(sp) == Const && hasval(sp) && value(sp)
+	    && rtypes(sp) && del((Symbol *) rtypes(sp)))
+		DELNUM(sp,value(sp));
+	else if (lexval(sp) == Term)
+		delete(sp->node.l);
+	free(name(sp));
+	delsym(sp);
+}
+
 static void restore_locals_run(void) /* zur Laufzeit andere Reihenfolge ! */
 {
 	Node * vp,* op;
@@ -110,7 +124,7 @@ static void restore_locals_run(void) /* zur Laufzeit andere Reihenfolge ! */
 		sp=(Symbol *) vp->l;
 		sp2=oldvals(sp);
 		oldvals(sp)=oldvals(sp2);
-		delsym(sp2);
+		free_local_sym(sp2);
 		op=vp;
 		vp=vp->r;
 		delnod(op);
@@ -136,7 +150,12 @@ static void restore_locals(void)
 		DEBG((20,"restore_local_1\n"));
 		sp=(Symbol *) vp->l;
 		sp2=oldvals(sp);
+		{
+		char * keep = name(sp); /* sp behaelt seinen eigenen Namen */
 		cpysym(sp2,sp);
+		name(sp) = keep;
+		}
+		free(name(sp2));        /* Kopie des Namens aus clonesym */
 		delsym(sp2);
 		op=vp;
 		vp=vp->r;

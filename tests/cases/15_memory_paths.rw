@@ -1,0 +1,35 @@
+# Exercises the code paths that free memory (fixed leaks in 2026), so that
+# a freed tree that is still in use shows up as a wrong result or a crash.
+INC "inc/all"
+CONST kk : real
+FOR kk = 1 TO 3 DO REWR D(x^kk,x) : All
+TERM t3,t4 : real
+t3 = REWR D(x^3,x) : All
+t3
+t4 = t3*2
+t3 = a
+t4
+a+b
+%+1
+%*2
+{ CONST p1 : real
+  p1 = 3
+  { CONST p2 : real
+    p2 = p1*2
+    PRT p2 } }
+""
+FUNC sq2 : real >> real ATT (TERM tq : real) { RETURN tq*tq }
+sq2(a+b)
+sq2(3)
+FOR kk = 1 TO 3 DO PRT sq2(kk)
+""
+CONST d1 : real
+DATA "tests/data/numbers.txt"
+DATA d1
+DATA d1
+DATA d1
+d1
+CONST r0 : real
+FOR kk = 0 TO 2 DO { r0 = kk
+                     PRT r0 }
+""

@@ -253,6 +253,16 @@ Symbol * mksym (int lexv,const char * name)  /* legt Symbol an */
 	return newsym;
 }
 
+/* gibt einen Zahlenwert mit der Loeschfunktion des Zahlentyps frei */
+static void free_number_value (void * value)
+{
+	Symbol * srt = numbertype ? (Symbol *) numbertype : & stdsort;
+	if (del(srt))
+		((void (*) (void *)) del(srt)) (value);
+}
+
+/* mknum uebernimmt den Wert 'value'. Fuer 0 und 1 wird das gemeinsame
+ * Symbol geliefert und 'value' freigegeben. */
 Symbol * mknum (void * value,Node * rtype)
 {
 Symbol * sp;
@@ -272,6 +282,7 @@ Symbol * sp;
 			if (numbertype) rtypes(& Null_Symbol) = numbertype;
 			else
 				rtypes(& Null_Symbol) = ( Node *) & stdsort;
+			free_number_value(value); /* das gemeinsame Symbol hat einen eigenen Wert */
 			return & Null_Symbol;
 			}
 		if (* (double *) value == 1.0)
@@ -279,6 +290,7 @@ Symbol * sp;
 			if (numbertype) rtypes(& Eins_Symbol) = numbertype;
 			else
 				rtypes(& Eins_Symbol) = ( Node *) & stdsort;
+			free_number_value(value); /* das gemeinsame Symbol hat einen eigenen Wert */
 			return & Eins_Symbol;
 			}
 		}

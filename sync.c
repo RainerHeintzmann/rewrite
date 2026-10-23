@@ -437,6 +437,8 @@ void readdata (Node * np)
   if (! zahlp)
 				fatal("readdata: no room for making real-number !\n");
 	(* zahlp) = readData();
+	if (hasval(np->r) && value(np->r))
+		DELNUM(np->r,value(np->r)); /* alten Wert freigeben */
 	value(np->r)=zahlp;
 	hasval(np->r)=TRUE;
 	return;
@@ -487,7 +489,8 @@ void rewrite_ass_fkt (Node * np)
 {
 Node * to_rewr = tcopy(np->r->r->l); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
 to_rewr = solve(to_rewr,np->r->r->r);
-termassign2(np->r->l,to_rewr);
+termassign2(np->r->l,to_rewr); /* speichert eine Kopie */
+delete(to_rewr);
 }
 
 void rewrite_fkt (Node * np)
@@ -496,7 +499,8 @@ Node * to_rewr = tcopy(np->r->l); /* in Termen (TERM t) darf nicht ersetzt werde
 to_rewr = solve(to_rewr,np->r->r);
 print(to_rewr);
 printfOut("\n");
-history_store(to_rewr);
+history_store(to_rewr); /* speichert eine Kopie in % */
+delete(to_rewr);
 }
 
 void quit_fkt (Node * np)
