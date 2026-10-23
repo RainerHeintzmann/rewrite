@@ -326,9 +326,10 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
 - Some memory is still not freed: a few bytes per syntax error, and the
   definitions themselves (symbols, rules, function bodies) when they are
   redefined. Repeated calculations, rewriting and loops no longer leak.
-- Not every rule one might expect exists. For example `D(exp(x),x)` is not
-  simplified, and constants like `a` are not assumed to be independent of
-  `x`, so `D(a,x)` stays in the result.
+- Not every rule one might expect exists. For example `ln(exp x)` and
+  `sin(x)^2+cos(x)^2` are not simplified.
+- Symbols without a value may depend on any variable, so `D(a,x)` stays in
+  the result. This is intended: differential equations use `D(y,x)`.
 - There are no general container types. Vectors and matrices are
   implemented as C functions.
 
@@ -344,6 +345,9 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
   intermediate rewriting steps, the numbers 0 and 1, `DATA` reads, local
   constants of blocks and user functions. Repeated operations now run in
   constant memory.
+- The derivatives of `arcsin` and `arccos` used `1+x^2` instead of `1-x^2`.
+  Fixed. New derivative rules for `exp`, `sqrt`, `sinh`, `cosh`, `tanh` and
+  `abs`.
 - [LiNbO3/abso1](LiNbO3/abso1) runs again, and the test suite was added.
 
 ## License

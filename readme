@@ -386,6 +386,8 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Speicherlecks behoben: ausgegebene Terme, Term-Zuweisungen, Ergebnisse und
    Zwischenschritte von REWR, die Zahlen 0 und 1, DATA, lokale Konstanten in
    Bloecken und Benutzerfunktionen.
+ - inc/alg: Ableitungen von arcsin und arccos benutzten 1+x^2 statt 1-x^2.
+   Behoben. Neue Ableitungsregeln fuer exp, sqrt, sinh, cosh, tanh und abs.
 
 Maengel des Systems:
 Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie
