@@ -1,0 +1,11 @@
+# INC at top level and inside blocks. Declarations in an included file are
+# global, also when the INC is inside a block or loop (used to break).
+INC "inc/all"
+INC "tests/data/decl.rw"
+s3
+{ INC "tests/data/decl.rw"
+  PRT 7 }
+""
+FOR n = 1 TO 2 DO { INC "tests/data/decl.rw" }
+""
+s3*2

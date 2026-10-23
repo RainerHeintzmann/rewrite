@@ -1,0 +1,14 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+
+>> INC "does/not/exist"
+Error in stdin : Unabel to open includefile "does/not/exist" 
+
+>> 1 +
+Error in stdin : syntax error
+
+>> undefinedfunc(3)
+Error in stdin : syntax error
+
+>> x = qq
+Error in stdin : syntax error
+still running

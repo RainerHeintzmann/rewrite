@@ -576,7 +576,7 @@ vector * rt = mkvec(Dimension(vp));
 double * drt= Vector(rt);
 
 for(i=0;i<Dimension(vp);i++)
-	* (drt ++) = abs(* (dp ++));
+	* (drt ++) = fabs(* (dp ++));
 
 return rt;
 }

@@ -1,0 +1,266 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+1.54967 
+warning : G was previosly defined to be of type real !
+# This file containes data related to LiNbO3-crytals
+# all data is for congruent crystals.
+# equivalent points :
+# Number of different atoms in unit cell
+# Z of this atom (Nb5+)
+# A : atomic weight in atomic units
+# Interpolated atomic form factor for Nb5+ 
+# The formula is empirical and interpolates
+# tabled values given in
+# International Tables for X-Ray Crystallography 
+# Vol. III, Kynoch Press 1968, pp. 201
+#
+#
+# (41-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# These values are taken from
+# International Tables for X-Ray Crystallography 
+# Vol. III, Kynoch Press 1968, pp. 201
+# 
+# C D lambda(Kalpha) (lambda > lambdaKalpa=0.6529 _Ang)
+# number of Nb atoms
+Atomic Number : 36   Form Factor : (31.1529,0) 
+# positions of Nb atoms in relative grating coordinates
+# Z of this atom (Li+)
+# A : atomic weight in atomic units
+# interpolated atomic form factor for Li+ 
+# (2-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# C D lambda(Kalpha) (lambda < lambdaKalpa)
+# number of Li atoms
+Atomic Number : 2   Form Factor : (1.7047,0) 
+# positions of Li atoms in relative grating coordinates
+# Z of this atom (O2-)
+# A : atomic weight in atomic units
+# interpolated atomic form factor for O2- 
+# (10-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# C D lambda(Kalpha) (lambda < lambdaKalpa)
+# number of O atoms
+Atomic Number : 10   Form Factor : (6.75756,0) 
+# positions of O atoms
+#----------------------------------------
+# values for the complete crystal
+#----------------------------------------
+# density rho : [kg/m^3]
+
+index : [0,0,6]   Structure Factor : (94.5235,-74.3594) 
+angle of G to axis X: 90 , Y: 90 , Za:0 
+lambda [_Ang]: 1.54967 ThetaB [deg]: 19.5941 
+t0.5 [m]: 1.43657e-06 
+MuGes/rho (cm^2/g) : 100.947 
+absorbtionlength [m]: 4.97555e-06 
+
+# piezoelectric coefficients (allways symmetric ! dijk == dikj !!)
+# d1jk :
+# number of Coeff 
+# j k value
+# -2*d22 [C/N]
+# d15 [C/N]
+# d2jk :
+# number of Coeff (because of field -> no d211)
+# j k value
+# d22 [C/N]
+# d15 [C/N]
+# d3jk :
+# number of Coeff (because of field -> no d311,d322)
+# j k value
+E : [0,353370,0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
+S : [0,0,0.216403]  _Ang U : [0,0.00590526,0.0191218]  _Ang
+g0 for 0 order : (0.999916,0) 
+Intensity :(0.999831,0) 
+ g1 for 1st order : (-0.0129992,1.59195e-18) 
+ Intensity :(0.00016898,-4.13883e-20) 
+Density Modulation (lattice-response) Sjk*Dholo : [0,7.42077e-06,2.40292e-05] 
+Electr. Density Modulation : 3.25331e-08 
+angle for transmission : 0.00887895  deg
+Transmission normal to surface : 9.36001e-17 
+refractive index change : 1.02491e-10 
+jhgjhg
+0.885526 
+# This file containes data related to LiNbO3-crytals
+# all data is for congruent crystals.
+# equivalent points :
+# Number of different atoms in unit cell
+# Z of this atom (Nb5+)
+# A : atomic weight in atomic units
+# Interpolated atomic form factor for Nb5+ 
+# The formula is empirical and interpolates
+# tabled values given in
+# International Tables for X-Ray Crystallography 
+# Vol. III, Kynoch Press 1968, pp. 201
+#
+#
+# (41-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# These values are taken from
+# International Tables for X-Ray Crystallography 
+# Vol. III, Kynoch Press 1968, pp. 201
+# 
+# C D lambda(Kalpha) (lambda > lambdaKalpa=0.6529 _Ang)
+# number of Nb atoms
+Atomic Number : 36   Form Factor : (31.1529,0) 
+# positions of Nb atoms in relative grating coordinates
+# Z of this atom (Li+)
+# A : atomic weight in atomic units
+# interpolated atomic form factor for Li+ 
+# (2-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# C D lambda(Kalpha) (lambda < lambdaKalpa)
+# number of Li atoms
+Atomic Number : 2   Form Factor : (1.7047,0) 
+# positions of Li atoms in relative grating coordinates
+# Z of this atom (O2-)
+# A : atomic weight in atomic units
+# interpolated atomic form factor for O2- 
+# (10-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# C D lambda(Kalpha) (lambda < lambdaKalpa)
+# number of O atoms
+Atomic Number : 10   Form Factor : (6.75756,0) 
+# positions of O atoms
+#----------------------------------------
+# values for the complete crystal
+#----------------------------------------
+# density rho : [kg/m^3]
+
+index : [0,0,6]   Structure Factor : (94.5235,-74.3594) 
+angle of G to axis X: 90 , Y: 90 , Za:0 
+lambda [_Ang]: 0.885526 ThetaB [deg]: 11.048 
+t0.5 [m]: 1.43657e-06 
+MuGes/rho (cm^2/g) : 20.7784 
+absorbtionlength [m]: 1.38129e-05 
+
+# piezoelectric coefficients (allways symmetric ! dijk == dikj !!)
+# d1jk :
+# number of Coeff 
+# j k value
+# -2*d22 [C/N]
+# d15 [C/N]
+# d2jk :
+# number of Coeff (because of field -> no d211)
+# j k value
+# d22 [C/N]
+# d15 [C/N]
+# d3jk :
+# number of Coeff (because of field -> no d311,d322)
+# j k value
+E : [0,353370,0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
+S : [0,0,0.216403]  _Ang U : [0,0.00590526,0.0191218]  _Ang
+g0 for 0 order : (0.999916,0) 
+Intensity :(0.999831,0) 
+ g1 for 1st order : (-0.0129992,1.59195e-18) 
+ Intensity :(0.00016898,-4.13883e-20) 
+Density Modulation (lattice-response) Sjk*Dholo : [0,7.42077e-06,2.40292e-05] 
+Electr. Density Modulation : 3.25331e-08 
+angle for transmission : 0.00507369  deg
+Transmission normal to surface : 0.000502033 
+refractive index change : 3.34665e-11 
+jhgjhg
+0.619868 
+# This file containes data related to LiNbO3-crytals
+# all data is for congruent crystals.
+# equivalent points :
+# Number of different atoms in unit cell
+# Z of this atom (Nb5+)
+# A : atomic weight in atomic units
+# Interpolated atomic form factor for Nb5+ 
+# The formula is empirical and interpolates
+# tabled values given in
+# International Tables for X-Ray Crystallography 
+# Vol. III, Kynoch Press 1968, pp. 201
+#
+#
+# (41-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# These values are taken from
+# International Tables for X-Ray Crystallography 
+# Vol. III, Kynoch Press 1968, pp. 201
+# 
+# C D lambda(Kalpha) (lambda > lambdaKalpa=0.6529 _Ang)
+# number of Nb atoms
+Atomic Number : 36   Form Factor : (31.1529,0) 
+# positions of Nb atoms in relative grating coordinates
+# Z of this atom (Li+)
+# A : atomic weight in atomic units
+# interpolated atomic form factor for Li+ 
+# (2-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# C D lambda(Kalpha) (lambda < lambdaKalpa)
+# number of Li atoms
+Atomic Number : 2   Form Factor : (1.7047,0) 
+# positions of Li atoms in relative grating coordinates
+# Z of this atom (O2-)
+# A : atomic weight in atomic units
+# interpolated atomic form factor for O2- 
+# (10-a)*exp(-b*x*x)+a*exp(-c*x) ; x == sin Theta/Lambda [1/A]
+# a   b   c
+# for absorbtion calculations: (without Nisha-Klein-correction (compton scattering))
+# mu/rho=C*lambda^3+D*lambda^4*sigKN*N*Z/A
+# C D lambda(Kalpha) (lambda < lambdaKalpa)
+# number of O atoms
+Atomic Number : 10   Form Factor : (6.75756,0) 
+# positions of O atoms
+#----------------------------------------
+# values for the complete crystal
+#----------------------------------------
+# density rho : [kg/m^3]
+
+index : [0,0,6]   Structure Factor : (94.5235,-74.3594) 
+angle of G to axis X: 90 , Y: 90 , Za:0 
+lambda [_Ang]: 0.619868 ThetaB [deg]: 7.70898 
+t0.5 [m]: 1.43657e-06 
+MuGes/rho (cm^2/g) : 7.39356 
+absorbtionlength [m]: 2.71733e-05 
+
+# piezoelectric coefficients (allways symmetric ! dijk == dikj !!)
+# d1jk :
+# number of Coeff 
+# j k value
+# -2*d22 [C/N]
+# d15 [C/N]
+# d2jk :
+# number of Coeff (because of field -> no d211)
+# j k value
+# d22 [C/N]
+# d15 [C/N]
+# d3jk :
+# number of Coeff (because of field -> no d311,d322)
+# j k value
+E : [0,353370,0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
+S : [0,0,0.216403]  _Ang U : [0,0.00590526,0.0191218]  _Ang
+g0 for 0 order : (0.999916,0) 
+Intensity :(0.999831,0) 
+ g1 for 1st order : (-0.0129992,1.59195e-18) 
+ Intensity :(0.00016898,-4.13883e-20) 
+Density Modulation (lattice-response) Sjk*Dholo : [0,7.42077e-06,2.40292e-05] 
+Electr. Density Modulation : 3.25331e-08 
+angle for transmission : 0.00355158  deg
+Transmission normal to surface : 0.0669926 
+refractive index change : 1.63986e-11 
+jhgjhg
+# sample thickness = 0.79  mm
+# Energy/eV , Absorbtionlength(I=I*0.5) [m] , Transmission
+8000 1.48367e-05 9.36001e-17 
+14000 7.20808e-05 0.000502033 
+20000 0.000202572 0.0669926 

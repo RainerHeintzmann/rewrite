@@ -1,0 +1,7 @@
+# Algebraic simplification rules of the standard library.
+INC "inc/all"
+REWR x+0 : All
+REWR 0*x + 1*y : All
+REWR a+a : All
+REWR x*x : All
+REWR (a+b)*z : All

@@ -1,0 +1,19 @@
+# Numerical evaluation with the standard library inc/all.
+INC "inc/all"
+1+2*3
+2^10
+7/2
+-3+1
+sqrt(16), ln(e), sin(pi/2), exp(0), cos(0)
+3!
+int(3.7)
+abs(-2.5)
+|-0.75|
+PRTNUM "%.10g "
+1/3
+pi
+PRTNUM "%g "
+1/3
+2 > 1
+1 > 2
+(1 < 2) && (2 < 3)

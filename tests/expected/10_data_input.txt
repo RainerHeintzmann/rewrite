@@ -1,0 +1,5 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+# numbers used by 10_data_input
+this text is skipped
+1.5 2.5 42 
+46 

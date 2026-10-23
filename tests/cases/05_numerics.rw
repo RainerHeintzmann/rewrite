@@ -1,0 +1,10 @@
+# Numerical algorithms from inc/numerik (rule sets numerik and rechne).
+# Assignments of 0 inside these rules used to crash (freeing static memory).
+INC "inc/all"
+_step=0.01
+REWR I(0,1,x^2,x) : numerik,rechne
+REWR I(0,pi,sin(x),x) : numerik,rechne
+REWR newton(1,x^2-2,D(x^2-2,x),x) : numerik,rechne
+REWR fmin(-1,1,(x-0.3)^2,x) : numerik,rechne
+REWR fmax(-1,1,-(x-0.2)^2,x) : numerik,rechne
+"done"

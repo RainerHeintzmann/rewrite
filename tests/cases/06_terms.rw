@@ -1,0 +1,12 @@
+# TERM variables, the last-result term %, and terms used like functions.
+INC "inc/all"
+TERM tt,qq : real
+tt = a+b
+tt*2
+%+1
+qq = x^y*a
+qq
+x=4
+y=2
+a=3
+qq

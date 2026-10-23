@@ -1,0 +1,3 @@
+# Example script inc/chaos from the original project (regression test).
+INC "inc/all"
+INC "inc/chaos"

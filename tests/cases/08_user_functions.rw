@@ -1,0 +1,6 @@
+# Functions defined in the rewrite language itself (ATT with a block).
+INC "inc/all"
+FUNC fma3 : real,real,real >> real ATT (CONST aa,bb : real; TERM cc : real) { RETURN cc+aa*bb }
+fma3(2,3,4)
+fma3(1,1,1)
+fma3(2,3,y)

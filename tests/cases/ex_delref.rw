@@ -1,0 +1,3 @@
+# Example script delref from the original project (regression test).
+INC "inc/all"
+INC "delref"

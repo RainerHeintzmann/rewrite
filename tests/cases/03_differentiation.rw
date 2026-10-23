@@ -1,0 +1,10 @@
+# Symbolic differentiation by rewriting in the algebra list 'All'.
+INC "inc/all"
+REWR D(sin cos x,x) : All
+REWR D(x^2,x) : All
+REWR D(x^2*sin x,x) : All
+REWR D(ln x,x) : All
+REWR D(sin(x)*cos(x),x) : All
+REWR D(x/y,x) : All
+REWR D(D(x^3,x),x) : All
+REWR D(a*x^3+b*x,x) : All

@@ -377,6 +377,9 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    ausgefuehrt und zerstoert (z.B. LiNbO3/abso1). Behoben.
  - LiNbO3/abso1: fehlendes '"', cmax wird gesetzt, Transmission wird
    fuer jede Energie mit exp(-mu*Dicke) berechnet.
+ - abs (reelle Zahlen) und eabs (Vektoren) schnitten Nachkommastellen ab
+   (C-Funktion abs statt fabs). Behoben.
+ - Neues Verzeichnis tests mit Regressionstests (make test, siehe tests/README.md).
 
 Maengel des Systems:
 Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie

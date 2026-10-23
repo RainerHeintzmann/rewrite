@@ -1,0 +1,18 @@
+# User-defined rule sets with conditions. NUM meta variables only match numbers.
+INC "inc/all"
+NUM NN : real
+FUNC half : real >> real
+ALG hv
+SPEC hv : IF (NN > 0) half(NN) = NN/2
+ADDSPEC hv : IF (is_int(NN)) half(NN) = 0
+REWR half(3) : hv
+REWR half(0.5) : hv
+REWR half(0) : hv
+REWR half(x) : hv
+# IN / NIN conditions
+VAR AA,BB : real
+FUNC dep : real,real >> real
+ALG dv
+SPEC dv : IF NIN(AA,BB) dep(AA,BB) = 0
+REWR dep(x,y+1) : dv
+REWR dep(x,x+1) : dv

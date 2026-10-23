@@ -1,0 +1,7 @@
+# Errors are reported and the interpreter continues with the next line.
+INC "inc/all"
+INC "does/not/exist"
+1 +
+undefinedfunc(3)
+x = qq
+"still running"

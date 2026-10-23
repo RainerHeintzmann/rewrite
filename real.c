@@ -98,7 +98,7 @@ double * fak(double * arg[])			{return mkreal(myfak(* arg[0]));}
 double * asinus   (double * arg[])		{return mkreal(asin((* arg[0])));}
 double * acosinus (double * arg[])		{return mkreal(acos((* arg[0])));}
 double * atangens (double * arg[])		{return mkreal(atan((* arg[0])));}
-double * r_abs      (double * arg[])		{return mkreal(abs((* arg[0])));}
+double * r_abs      (double * arg[])		{return mkreal(fabs((* arg[0])));}
 double * r_sqr      (double * arg[])		{return mkreal((* arg[0])*(* arg[0]));}
 double * r_sqrt     (double * arg[])		{return mkreal(sqrt((* arg[0])));}
 

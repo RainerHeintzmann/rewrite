@@ -1,0 +1,9 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+- cos (cos (x ))* sin (x )
+2 * x 
+2 * x * sin (x )+ x ^ 2 * cos (x )
+1 / x 
+cos (x )^ 2 - sin (x )^ 2 
+1 / y - D (y ,x )* x / y ^ 2 
+6 * x 
+D (b ,x )* x + 3 * x ^ 2 * a + x ^ 3 * D (a ,x )+ b 

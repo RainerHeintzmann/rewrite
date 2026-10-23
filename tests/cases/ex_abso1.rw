@@ -1,0 +1,3 @@
+# Example script LiNbO3/abso1 from the original project (regression test).
+INC "inc/all"
+INC "LiNbO3/abso1"

@@ -34,6 +34,9 @@ syn.c syn.h: syn.y
 
 $(O): syn.h
 
+test: $(T)
+	sh tests/run_tests.sh
+
 clean:
 	$(RM) *.o scan.c syn.c syn.h syn.tab.c syn.tab.h $(T) $(T).exe
 

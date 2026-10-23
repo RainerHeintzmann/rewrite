@@ -1,0 +1,3 @@
+# Example script inc/esrf1 from the original project (regression test).
+INC "inc/all"
+INC "inc/esrf1"

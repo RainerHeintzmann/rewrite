@@ -1,0 +1,29 @@
+# Core language without the library: sorts, numbers, operators,
+# constants, terms, rewrite rules and strings.
+SORT real
+NUM real
+FUNC + : real,real >> real LA2 ATT plus
+FUNC * : real,real >> real LA3 ATT mal
+FUNC ^ : real,real >> real RA ATT hoch
+1+2*3
+(1+2)*3
+2^3^2
+CONST x,y,u : real
+x+y*2
+x=4
+x+y*2
+y=0.5
+x+y*2
+TERM q : real
+q=x*y+1
+q
+VAR A,B : real
+ALG simp
+SPEC simp : A*1=A
+ADDSPEC simp : A+0=A
+REWR (u*1)+0 : simp
+REWR u*1+u*1 : simp
+"Hello world"
+"value of x: ",x
+QUIT
+"this line is never reached"

@@ -1,0 +1,23 @@
+# Complex numbers, real vectors and real matrices (indices start at 0).
+INC "inc/all"
+(1+2*i)*(3-i)
+Cpx(1,2)
+[1,2,3]+[4,5,6]
+[1,2,3]*[4,5,6]
+[1,0,0] _x_ [0,1,0]
+abs([3,4,0])
+eabs([-1.5,2,-3.25])
+nullvec(3)
+chvec(nullvec(3),1,7)
+CONST vv : rvector
+vv = [1,2,3]
+elem(vv,2)
+vv[1]
+CONST mm : rmatrix
+mm = chmat(einsmat(2,2),0,1,5)
+mm
+mm*[1,1]
+trans(mm)
+mm*mm
+2*mm
+elem(mm,0,1)

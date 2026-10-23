@@ -1,0 +1,6 @@
+# Shell scripts and test files must keep LF line ends on every platform.
+*.sh            text eol=lf
+*.bat           text eol=crlf
+tests/cases/**  text eol=lf
+tests/data/**   text eol=lf
+tests/expected/** text eol=lf

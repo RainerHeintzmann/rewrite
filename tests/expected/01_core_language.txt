@@ -1,0 +1,11 @@
+7 
+9 
+512 
+x + y * 2 
+4 + y * 2 
+5 
+3 
+u 
+u + u 
+Hello world
+value of x: 4 

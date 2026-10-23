@@ -1,0 +1,19 @@
+# Regression tests for crashes fixed in 2026.
+INC "inc/all"
+# Assigning 0 or 1 and then assigning again freed static memory.
+CONST r0 : real
+r0 = 0
+r0 = 1
+r0 = 5
+r0
+r0 = 0
+r0 = 0
+r0
+# A vector function with an argument that cannot be calculated
+# freed a NULL vector during cleanup.
+CONST vx : rvector
+vx = [1,2,3]
+CONST novec : rvector
+CONST nb : real
+nb = abs(novec+vx)
+"survived"
