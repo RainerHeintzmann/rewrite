@@ -30,5 +30,7 @@ extern Node * exe_function (Node * np);
 extern Node * in_block_instruct (Node * np);
 extern void is_running(void);
 extern void is_not_running(void);
+extern int  include_begin(void);
+extern void include_end(int oldbase);
 
 #endif

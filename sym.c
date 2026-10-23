@@ -9,6 +9,7 @@
  */
 
 #include "search.h"
+#include <stdlib.h> /* bsearch */
 #include <string.h>
 
 #include "inout.h"
@@ -92,8 +93,6 @@ static int scmp _2a ((va, vb), const void * va, const void * vb)
 
 int lookup _1a ((name), const char * name)
 {	Reserved r, * rp;
-	void * bsearch _5p (const void *, const void *, unsigned, unsigned,
-				int (*) _2p (const void *, const void *));
 
 	Symbol s, ** pp;
 

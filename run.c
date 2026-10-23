@@ -615,7 +615,8 @@ void * realcalk(Node * term,int * perr)
 		{
 		if (((Node *) syms[j])->type != SYM_TYPE)
 			 fatal("run.c : Not a Symbol to delete !! j: %d, type: %d\n",j,((Node *) syms[j])->type);
-		DELNUM(syms[j],feld[j]);
+		if (feld[j])  /* bei Fehler (perr) ist der Wert NULL: nichts freizugeben */
+			DELNUM(syms[j],feld[j]);
 		}		
 	}
 

@@ -178,4 +178,5 @@ u_function * give_ufkt (char * name)
      	 return userfunction[i].function;
   }
 	printfErr(" --ERROR ATT : C-Function %s not Implemented \n",name);
+	return NULL;
 }

@@ -1,6 +1,7 @@
 /* node.c  :   Speicherverwaltung fuer Knoten  ( zur Beschleunigung) */
 
 #include <stdlib.h>
+#include <string.h> /* memset */
 #include "inout.h"
 #include "strsave.h"
 #include "sym.h"
@@ -236,6 +237,7 @@ Symbol * mksym (int lexv,const char * name)  /* legt Symbol an */
 
 	newsym = symbolstack;
 	symbolstack = (Symbol *) newsym->node.l;
+	memset(newsym, 0, sizeof(Symbol)); /* wiederverwendeter Platz: keine alten atypes/value usw. */
 	newsym->node.type = SYM_TYPE;
 	newsym->node.l = NULL;
 	newsym->node.r = NULL;
@@ -349,3 +351,11 @@ Symbol * clonesym(Symbol * s) /* namen doppelt ! */
 	return sp;
 }
 
+
+/* TRUE fuer die gemeinsam benutzten Zahlen 0 und 1 (Null_Symbol, Eins_Symbol).
+ * Ihr Wert liegt im statischen Speicher und darf nie an eine Variable
+ * uebergeben und spaeter mit free() freigegeben werden. */
+BOOLEAN is_shared_num (Symbol * sp)
+{
+	return (sp == & Null_Symbol) || (sp == & Eins_Symbol);
+}

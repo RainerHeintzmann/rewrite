@@ -37,6 +37,8 @@ BOOLEAN symeq (Symbol * a,Symbol * b); /* Vergleicht zwei Symbole auf Gleichheit
 
 Symbol * clonesym(Symbol * s);
 
+BOOLEAN is_shared_num (Symbol * sp); /* 0 und 1: statischer Wert, nicht freigeben */
+
 void cpysym(Symbol * s1,Symbol * s2);
 
 #endif

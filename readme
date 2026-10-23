@@ -12,13 +12,32 @@ Numerisches Auswerten der Terme ist auch moeglich. Benutzer koennen
 eigene Funktionen schreiben und sie in die Liste vorhandener
 Funktionen in dem Modul 'userfkt.c' einfuegen.
 
+UEBERSETZEN (Compilieren) :
+Benoetigt werden gcc, flex, bison und make.
+
+  Windows : MSYS2 installieren (z.B. mit  winget install MSYS2.MSYS2 ) und in
+            der MSYS2-Shell einmalig die Werkzeuge installieren:
+               pacman -S mingw-w64-ucrt-x86_64-gcc flex bison make
+            Danach im Projektverzeichnis  build_windows.bat  aufrufen
+            (oder in der "MSYS2 UCRT64"-Shell einfach  make ).
+            Das erzeugte  rewrite.exe  braucht keine weiteren DLLs und laeuft
+            auch direkt aus cmd oder PowerShell.
+  Linux   : make
+
+  make clean   loescht alle erzeugten Dateien (scan.c, syn.c, syn.h, *.o, rewrite).
+  Das alte 32-Bit-Unix-Makefile liegt noch als makefile.unix32.orig vor.
+
 STARTEN DES PROGRAMMS :
-Starten sie das Programm 'rewrite' von der shell aus.
+Starten sie das Programm 'rewrite' von der shell aus. (Windows: rewrite.exe)
 Geben Sie nun 'INC "inc/all"' ein. Es werden nun eine Reihe von Include-Files
 geladen. Nun koenne Sie Ihre Aufgabe stellen z.B:
 'REWR D(sin cos x,x) : All'
 Das Programm bestimmt nun die Ableitung der Fkt. sin(cos(x)) nach x durch 
 Umschreiben des Terms in der Algebraliste 'All'.
+Numerische Rechnungen gehen z.B. so:
+  REWR I(0,1,x^2,x) : numerik,rechne      # Integral (Simpson) -> 0.333333
+  REWR newton(1,x^2-2,D(x^2-2,x),x) : numerik,rechne   # Nullstelle -> 1.41421
+Die Eingabe kann auch aus einer Datei kommen:  rewrite < meinprogramm
 
 Benutzung von 'Rewrite' :
 
@@ -38,10 +57,17 @@ INC "filename"  Unter 'filename' abgespeicherte Programme werden ausgefuehrt.
                 Der INC-Befehl wird einmalig beim verarbeiten der Eingabe
                 ausgefuehrt. Zeilen, die 'INC' enthalten duerfen nicht mit
                 '\' fortgesetzt werden. (Einzige Ausnahme !)
+                INC darf auch innerhalb eines Blocks (z.B. in einer FOR-Schleife)
+                stehen. Das eingelesene File wird dann wie eine Eingabe auf
+                oberster Ebene behandelt: seine Definitionen (CONST, FUNC ..)
+                sind global und gelten auch nach dem Block weiter.
+                Bsp.: siehe LiNbO3/abso1
 
-REWR term : algname [;algname ..]
+REWR term : algname [,algname ..]
                 Der Term 'term' wird in den Algebren (Regellisten) algname
-                nacheinander umgeschrieben.
+                nacheinander umgeschrieben. Die Algebren werden durch Kommas
+                getrennt (nicht durch ';' wie in aelteren Versionen).
+                Bsp.: REWR I(0,1,x^2,x) : numerik,rechne
 
 PRTNUM "String" Das Standartformat fuer die Ausgabe von reelen Zahlen wird in
                 "String" geaendert. Z.B. : PRTNUM "%2.15g "
@@ -249,6 +275,11 @@ ATT sortname Name1 , Name2 , Name3 , Name4
 FOR Constname = N1 TO N2 [STEP N3] DO Block
 							For-Schleife.
 							Bsp.: FOR i = 20 TO 10 STEP -1 DO i
+              Im Block definierte Konstanten (CONST ..) sind lokal und werden
+              bei jedem Schleifendurchlauf neu angelegt.
+              Bsp.: FOR n = 1 TO 3 DO { CONST s : real
+                      s = n*10
+                      PRT s }
 
 IF ( Fkt ) Block [ ELSE Block ]
               IF-Bedingung. Fkt ist Funktion mit double Resultat, die
@@ -332,6 +363,20 @@ welche mathematischen Funktionen definiert sind.
 
 Wichtigste Fehler:
 Der Speicher wird nur unzureichend freigegeben.
+
+Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
+ - Anpassung an flex 2.6 (Neustart des Scanners mit yyrestart, yywrap liefert
+   int) und bison 3.
+ - Makefile ohne -m32; Build unter Windows mit MSYS2 (build_windows.bat).
+ - Zuweisung von 0 oder 1 an eine Konstante fuehrte spaeter zum free() von
+   statischem Speicher (Absturz z.B. bei fmin, newton).
+ - Absturz beim Aufraeumen nach nicht berechenbaren Funktionsargumenten behoben.
+ - Definitionen in Bloecken (z.B. CONST in einer FOR-Schleife) funktionieren
+   jetzt auch beim zweiten Durchlauf.
+ - INC innerhalb eines Blocks: Definitionen im eingelesenen File wurden doppelt
+   ausgefuehrt und zerstoert (z.B. LiNbO3/abso1). Behoben.
+ - LiNbO3/abso1: fehlendes '"', cmax wird gesetzt, Transmission wird
+   fuer jede Energie mit exp(-mu*Dicke) berechnet.
 
 Maengel des Systems:
 Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie

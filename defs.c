@@ -38,6 +38,7 @@ NULL,
 static Symbol * returnterm =  & ReturnTerm; /* speichert letzten term zwischen */
 static int blockstufe=0;	/* wird von sync.c bei Fehlern auf Null gesetzt */
 static int running   =0;	/* Wird gerade ein statement ausgefuert ? */
+static int blockbase =0;	/* Blockstufe, auf der ein per INC gelesenes File "Top-Level" ist */
 
 #define MAXBLOCKS 250
 
@@ -82,7 +83,7 @@ static Symbol * save_local(Symbol * sp)
 
 	DEBG((15,"save_local\n"));
 
-	if (! blockstufe) return sp;
+	if (blockstufe <= blockbase) return sp; /* Top-Level (auch in INC-Files): global definieren */
 	if (running) return save_local_run(sp); /* Zur Laufzeit anderes Verfahren ! */
 
 	for (vp=local[blockstufe];vp != NULL;vp=vp->r)
@@ -270,7 +271,10 @@ void declare (Node * np) /* Idlist,lexv,rtps,atps,hasv */
 	sp = (Symbol *) mynp;
 	sp = declaresym(sp,rtps,atps,lexv,hasv);
 
-	if ((! dont_protect[blockstufe]) && (! never_protect))
+	/* Nur auf Top-Level neutralisieren: dort wird die Zeile nach dem Ausfuehren geloescht.
+	 * In Bloecken (Schleifen, Funktionen, INC in Bloecken) muss die Definition
+	 * bei jedem Durchlauf erneut ausgefuehrt werden koennen. */
+	if (blockstufe <= blockbase)
 		{
 		np->r->type=PARAM;    /* vorher lexval */
 		np->r->r->type=PARAM; /* vorher hasval */
@@ -395,7 +399,7 @@ void spec_form (Node * np)
 
 void clearBlockstufe (void)
 {
-for(;blockstufe;blockstufe--) restore_locals();
+for(;blockstufe>blockbase;blockstufe--) restore_locals();
 }
 
 void block_begin(void)
@@ -413,7 +417,7 @@ void block_end(void)
 
 void end_all_blocks(void)
 {
-	while (blockstufe>0)
+	while (blockstufe>blockbase)
 		{
 		protect();
 		block_end();
@@ -433,7 +437,7 @@ void do_block_end(Node * np)
 
 Node * in_block_def(Node * np)
 {
-if (blockstufe)
+if (blockstufe > blockbase)
 	{
 	((void (*) (Node *)) (np->l)) (np); /* zeitweise definieren, werden durch block-end geloescht */
 	return np;
@@ -599,3 +603,23 @@ void is_running(void)
 	running = TRUE;
 }
 
+
+/* INC innerhalb eines laufenden Blocks: das eingelesene File wird wie eine
+ * Eingabe auf Top-Level behandelt (Definitionen sofort und global, nicht
+ * doppelt zur Parse- und Laufzeit). Die aeusseren Bloecke bleiben erhalten. */
+int include_begin(void)
+{
+	int old = blockbase;
+	blockbase = blockstufe;
+	return old;
+}
+
+void include_end(int oldbase)
+{
+	while (blockstufe > blockbase) /* nicht geschlossene Bloecke im File */
+		{
+		protect();
+		block_end();
+		}
+	blockbase = oldbase;
+}

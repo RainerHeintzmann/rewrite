@@ -307,7 +307,10 @@ if (hasval(toass)) DELNUM(toass,value(toass));
 
 if (erg)
 	{
-	value(toass)  = value(erg);
+	if (is_shared_num((Symbol *) erg))  /* 0,1: statischen Wert kopieren, sonst spaeter free() auf statischen Speicher */
+		value(toass) = CPYNUM(erg,value(erg));
+	else
+		value(toass)  = value(erg);
 	hasval(toass) = TRUE;
 	delnum((Symbol *) erg,FALSE); /* Do not delete value */
 	}
@@ -779,9 +782,12 @@ void include _1a ((cp), const char * cp)
 		{
 		old=IncFileName;
 		IncFileName=cp;
+		int oldbase;
 		is_not_running();
 		inc_level++;
+		oldbase = include_begin(); /* File wie Top-Level-Eingabe behandeln */
 		read_input(fp);
+		include_end(oldbase);
 		inc_level--;
 		fclose (fp);
 		is_running();
@@ -801,8 +807,8 @@ void yyerror (const char * s)
 	ErrorMsg(s);
 	printfErr("\n");
 }
-void yywrap(void * x)
+int yywrap(void) /* von flex aufgerufen: 1 = Eingabe zu Ende */
 {
-return;
+return 1;
 }
 

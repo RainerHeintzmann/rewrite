@@ -8,7 +8,7 @@
 #define index(s, c)    strchr((s), (c))
 #define rindex(s, c)   strrchr((s), (c))
 
-extern char* mktemp(char* temp);
-extern void* alloca(size_t size);
+#include <stdlib.h>  /* mktemp, alloca: use the system declarations */
+#include <string.h>
 
 #endif /* UNIX_H */

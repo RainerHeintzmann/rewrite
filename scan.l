@@ -92,7 +92,7 @@ void lexi_buf _1a ((cp), const char * cp)
 	buf = bp = cp;
 #ifdef	FLEX_SCANNER
 	avail = strlen(buf);
-	yy_init = 1;		/* (re-) initialisiert scanner */
+	yyrestart(yyin);	/* (re-) initialisiert scanner (modern flex: yy_init=1 heisst "schon initialisiert") */
 #endif
 }
 

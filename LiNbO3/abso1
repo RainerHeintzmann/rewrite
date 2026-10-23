@@ -23,9 +23,10 @@ FOR Egy = 8000 TO 20000 STEP 6000 DO { # eV
 
 OUT "stdout"
 "# sample thickness = ",thick*1e3," mm"
-"# Energy/eV , Absorbtionlength(I=I*0.5) , Transmission
+"# Energy/eV , Absorbtionlength(I=I*0.5) [m] , Transmission"
 
+cmax=cnt   # number of computed energies
 FOR cnt = 0 TO cmax-1 DO {
- elem(Egyf,cnt),ln 0.5/elem(muf,cnt),exp(mu/thick)
+ elem(Egyf,cnt),- ln 0.5/elem(muf,cnt),exp(- elem(muf,cnt)*thick)
  }
 

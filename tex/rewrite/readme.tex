@@ -52,9 +52,10 @@ n"achsten `$\backslash$' gefolgt von einem Zeilentrenner.
                 ausgef"uhrt. Zeilen, die `INC' enthalten d"urfen nicht mit
                 `$\backslash$' fortgesetzt werden. (Einzige Ausnahme !)
 
-\item[REWR term : algname [;algname ..\symbol{93}]
+\item[REWR term : algname [,algname ..\symbol{93}]
                 Der Term `term' wird in den Algebren (Regellisten) `algname'
-                nacheinander umgeschrieben.
+                nacheinander umgeschrieben. Die Algebren werden durch Kommas getrennt
+                (nicht durch `;' wie in "alteren Versionen), z.B. \texttt{REWR I(0,1,x\^{}2,x) : numerik,rechne}.
 
 \item[PRTNUM ''String'']
 								Das Standartformat f"ur die Ausgabe von reelen Zahlen wird in
