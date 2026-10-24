@@ -392,6 +392,11 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    ln(X*Y)=ln X + ln Y und (X^Y)^Z=X^(Y*Z).
  - Neues Verzeichnis inc/integration: regelbasierte Integration, eine
    Auswahl der Rubi-Regeln (A. D. Rich, MIT-Lizenz), siehe README.md dort.
+ - Neue Muster-Eigenschaften: optionale Teile (OPT, DEFAULT), kommutative
+   Operatoren (COMM) und mehrere Bedingungen (IF c1, c2). Eine Regel wird
+   dabei in alle ihre Varianten erweitert (expand.c). Nicht berechenbare
+   Bedingungen fuehren nicht mehr zum Absturz.
+ - Interne Aufraeumarbeit: benannte Zugriffe auf die Knotenstrukturen (nodes.h).
 
 Maengel des Systems:
 Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie

@@ -5,42 +5,26 @@
 #   4 Trig functions / 4.1 Sine / 4.1.10 (c+d x)^m (a+b sin)^n (Regel 1)
 # Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
 # siehe inc/integration/LICENSE.Rubi. Uebersetzung 2026.
-#
+# Schreibweise der Muster: siehe inc/integration/base.
 # Rubi schreibt cos(z) als sin(z+Pi/2). Die cos-Regeln hier sind die
 # entsprechenden sin-Regeln mit dieser Verschiebung, ausgeschrieben.
 
 # Int[sin[c_. + d_.*x_], x_Symbol] := -Cos[c + d*x]/d /; FreeQ[{c, d}, x]
-ADDSPEC IntRubi : IntL(sin(lin(Kc,Kd,Xv)),Xv) = -cos(lin(Kc,Kd,Xv))*mi(Kd)
+ADDSPEC IntRubi : IF NIN(Xv,Qc,Qd) Int(sin(Qc+Qd*Xv),Xv) = -cos(Qc+Qd*Xv)/Qd
 # Int[sin[c_. + Pi/2 + d_.*x_], x_Symbol] := Sin[c + d*x]/d /; FreeQ[{c, d}, x]
-ADDSPEC IntRubi : IntL(cos(lin(Kc,Kd,Xv)),Xv) = sin(lin(Kc,Kd,Xv))*mi(Kd)
+ADDSPEC IntRubi : IF NIN(Xv,Qc,Qd) Int(cos(Qc+Qd*Xv),Xv) = sin(Qc+Qd*Xv)/Qd
 
 # Int[(c_. + d_.*x_)^m_.*sin[e_. + f_.*x_], x_Symbol] :=
 #    -(c + d*x)^m*Cos[e + f*x]/f + d*m/f*Int[(c + d*x)^(m - 1)*Cos[e + f*x], x]
 #    /; FreeQ[{c, d, e, f}, x] && GtQ[m, 0]
-ADDSPEC IntRubi : IF (Km > 0) IntL(lin(Kc,Kd,Xv)^Km*sin(lin(Ke,Kf,Xv)),Xv) = \
-                  -lin(Kc,Kd,Xv)^Km*cos(lin(Ke,Kf,Xv))*mi(Kf) \
-                  + Kd*Km*mi(Kf)*IntL(lin(Kc,Kd,Xv)^(Km-1)*cos(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IF (Km > 0) IntL(sin(lin(Ke,Kf,Xv))*lin(Kc,Kd,Xv)^Km,Xv) = \
-                  -lin(Kc,Kd,Xv)^Km*cos(lin(Ke,Kf,Xv))*mi(Kf) \
-                  + Kd*Km*mi(Kf)*IntL(lin(Kc,Kd,Xv)^(Km-1)*cos(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IntL(lin(Kc,Kd,Xv)*sin(lin(Ke,Kf,Xv)),Xv) = \
-                  -lin(Kc,Kd,Xv)*cos(lin(Ke,Kf,Xv))*mi(Kf) \
-                  + Kd*mi(Kf)*IntL(cos(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IntL(sin(lin(Ke,Kf,Xv))*lin(Kc,Kd,Xv),Xv) = \
-                  -lin(Kc,Kd,Xv)*cos(lin(Ke,Kf,Xv))*mi(Kf) \
-                  + Kd*mi(Kf)*IntL(cos(lin(Ke,Kf,Xv)),Xv)
+ADDSPEC IntRubi : IF NIN(Xv,Qc,Qd,Qe,Qf), (Qm > 0) \
+                  Int((Qc+Qd*Xv)^Qm*sin(Qe+Qf*Xv),Xv) = \
+                  -(Qc+Qd*Xv)^Qm*cos(Qe+Qf*Xv)/Qf \
+                  + Qd*Qm/Qf*Int((Qc+Qd*Xv)^(Qm-1)*cos(Qe+Qf*Xv),Xv)
 
 # dieselbe Regel mit e -> e+Pi/2 (cos):
 #    (c + d*x)^m*Sin[e + f*x]/f - d*m/f*Int[(c + d*x)^(m - 1)*Sin[e + f*x], x]
-ADDSPEC IntRubi : IF (Km > 0) IntL(lin(Kc,Kd,Xv)^Km*cos(lin(Ke,Kf,Xv)),Xv) = \
-                  lin(Kc,Kd,Xv)^Km*sin(lin(Ke,Kf,Xv))*mi(Kf) \
-                  - Kd*Km*mi(Kf)*IntL(lin(Kc,Kd,Xv)^(Km-1)*sin(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IF (Km > 0) IntL(cos(lin(Ke,Kf,Xv))*lin(Kc,Kd,Xv)^Km,Xv) = \
-                  lin(Kc,Kd,Xv)^Km*sin(lin(Ke,Kf,Xv))*mi(Kf) \
-                  - Kd*Km*mi(Kf)*IntL(lin(Kc,Kd,Xv)^(Km-1)*sin(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IntL(lin(Kc,Kd,Xv)*cos(lin(Ke,Kf,Xv)),Xv) = \
-                  lin(Kc,Kd,Xv)*sin(lin(Ke,Kf,Xv))*mi(Kf) \
-                  - Kd*mi(Kf)*IntL(sin(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IntL(cos(lin(Ke,Kf,Xv))*lin(Kc,Kd,Xv),Xv) = \
-                  lin(Kc,Kd,Xv)*sin(lin(Ke,Kf,Xv))*mi(Kf) \
-                  - Kd*mi(Kf)*IntL(sin(lin(Ke,Kf,Xv)),Xv)
+ADDSPEC IntRubi : IF NIN(Xv,Qc,Qd,Qe,Qf), (Qm > 0) \
+                  Int((Qc+Qd*Xv)^Qm*cos(Qe+Qf*Xv),Xv) = \
+                  (Qc+Qd*Xv)^Qm*sin(Qe+Qf*Xv)/Qf \
+                  - Qd*Qm/Qf*Int((Qc+Qd*Xv)^(Qm-1)*sin(Qe+Qf*Xv),Xv)

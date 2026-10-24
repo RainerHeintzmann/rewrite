@@ -1,12 +1,11 @@
  Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
-0.5 * x ^ 2 * a 
 0.333333 * x ^ 3 
 true 
 ln (x )
 true 
 0.5 * ln (3 + 2 * x )
 true 
--5 * (1 + x )^ -1 
+- 5 / (1 + x )
 true 
 0.666667 * x ^ 1.5 
 true 
@@ -14,7 +13,7 @@ x ^ 2 + x ^ 3 + x
 true 
 0.333333 * x ^ 3 + 0.5 * x ^ 2 
 true 
-0.1 * (-3 + 5 * x )^ 2 + 0.666667 * x ^ 3 
+3 * x ^ 2 + 0.666667 * x ^ 3 - (0.5 * x ^ 2 + 3 * x )
 true 
 0.5 * exp (1 + 2 * x )
 true 
@@ -24,7 +23,7 @@ true
 true 
 0.5 * exp (2 * x )* x - 0.25 * exp (2 * x )
 true 
--6 * exp (- x )* x + -1 * x ^ 3 * exp (- x )- (6 * exp (- x )+ 3 * x ^ 2 * exp (- x ))
+- (6 * exp (- x )+ 3 * x ^ 2 * exp (- x )+ 6 * exp (- x )* x + x ^ 3 * exp (- x ))
 true 
 0.296296 * exp (3 * x )+ 0.333333 * (1 + 2 * x )^ 2 * exp (3 * x )- (0.444444 * exp (3 * x )+ 0.888889 * exp (3 * x )* x )
 true 
@@ -36,12 +35,24 @@ sin (x )- cos (x )* x
 true 
 2 * cos (x )* x + x ^ 2 * sin (x )- 2 * sin (x )
 true 
-0.75 * cos (2 * x )* x + 0.75 * x ^ 2 * sin (2 * x )- (0.375 * sin (2 * x )+ 0.5 * x ^ 3 * cos (2 * x ))
+0.75 * cos (2 * x )* x + 0.75 * x ^ 2 * sin (2 * x )- (0.5 * x ^ 3 * cos (2 * x )+ 0.375 * sin (2 * x ))
 true 
 sin (x )* x + cos (x )+ sin (x )
 true 
 0.5 * x ^ 2 + sin (x )- cos (x )
 true 
-0.5 * Int (x ^ -0.5 * cos (x ),x )- x ^ 0.5 * cos (x )
+0.5 * x ^ 2 * a 
+true 
+- cos (a * x + b )/ a 
+true 
+exp (a * x )* x / a - exp (a * x )/ a ^ 2 
+true 
+ln (b * x + a )/ b 
+true 
+0.25 * (b * x + a )^ 4 / b 
+true 
+2 * cos (a * x )* x / a ^ 2 + x ^ 2 * sin (a * x )/ a - 2 * sin (a * x )/ a ^ 3 
+true 
+0.5 * Int (cos (x )/ x ^ 0.5 ,x )- x ^ 0.5 * cos (x )
 Int (sin (x )^ 2 ,x )
 Int (1 / (1 + x ^ 2 ),x )

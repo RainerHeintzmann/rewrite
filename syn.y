@@ -17,6 +17,8 @@
 #include "sync.h"
 #include "defs.h"
 #include "userfkt.h"
+#include "nodes.h"
+#include "expand.h"
 
 #ifdef BISON
 #include "unix.h"
@@ -55,6 +57,7 @@ mknod(FUNC,(Node *) declare, \
 %token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
+%token			OPT COMM DEFAULT RIGHT
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -155,7 +158,8 @@ VORRANG		: /* nothing */				{$$ = Func;}
 			| RA						{$$ = Ra;  	/* Rechtsassoziativ */}
 			| RU						{$$ = Ru;	  /* Rechts Unaer */};
 
-condition : condfunc					{$$ = $1;};
+condition : condfunc					{$$ = $1;}
+			| condfunc ',' condition	{$$ = mknod(Cond,(Node *) and_cond,mknod(PARAM,$1,$3));}; /* alle muessen gelten */
 
 condfunc : LB '(' termlist ')'{$$ = mknod(Cond,(Node *) lower_between,$3);}
 			| IN '(' termlist ')' 	{$$ = mknod(Cond,(Node *) in_tree,$3);}
@@ -185,12 +189,12 @@ instruction : aninstruction     {$$ = in_block_instruct($1); /* Locale Variablen
 																mknod(PARAM,mknod(FUNC,(Node *) sequence,$3),
 																mknod(PARAM,mknod(FUNC,(Node *) do_block_end,NULL),NULL))));}
 			| WHILE condition instruction	{Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,$2,NULL /* wird dann $3 */)));
-																		merk->r->r = $3;$$=rtw;}
+																		WHILE_BODY(merk) = $3;$$=rtw;}
 
 			| IF condition instruction	{Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,$2,mknod(PARAM,NULL,NULL))));
-																		merk->r->r->l = $3;$$=rtw;}
+																		IF_THEN(merk) = $3;$$=rtw;}
 			| IF condition instruction ELSE instruction	{Node * merk,* rtw = in_block_instruct(merk=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,$2,mknod(PARAM,NULL /* $3 */,NULL /* $5 */ ))));
-																		merk->r->r->l = $3;merk->r->r->r = $5;$$=rtw;}
+																		IF_THEN(merk) = $3;IF_ELSE(merk) = $5;$$=rtw;}
 			| FOR term EQ term TO term step DO instruction
 														{Node * merk,* rtw = in_block_instruct(merk=mknod(FUNC,(Node *) forschleife,
 																mknod(PARAM,
@@ -198,7 +202,7 @@ instruction : aninstruction     {$$ = in_block_instruct($1); /* Locale Variablen
 																	mknod(PARAM,
 																		mknod(PARAM,$7,(Node *) ($2)),
 																		NULL /* $9 */) )));	
-														merk->r->r->r = $9;$$=rtw;};
+														FOR_BODY(merk) = $9;$$=rtw;};
 
 
 aninstruction	: /* Nichts */ 	{$$=NULL;}
@@ -229,7 +233,16 @@ aninstruction	: /* Nichts */ 	{$$=NULL;}
 			| LIFT '(' termlist ')' TO '(' termlist ')'	{$$=mknod(FUNC,(Node *) termlist_is_termlist,mknod(PARAM,(Node *) $7,(Node *) $3));}
 			| DBG Const 	      	{$$=mknod(FUNC,(Node *) setdebug,(Node *) ($2));}
 			| RETURN term								{$$=mknod(FUNC,(Node *) return_fkt,$2);}
-			| QUIT                      {$$=mknod(FUNC,(Node *) quit_fkt,NULL);};
+			| QUIT                      {$$=mknod(FUNC,(Node *) quit_fkt,NULL);}
+			| OPT idlist                {$$=mknod(FUNC,(Node *) opt_fkt,$2);}
+			| OPT                       {$$=mknod(FUNC,(Node *) opt_fkt,NULL);   /* loeschen */}
+			| COMM funclist             {$$=mknod(FUNC,(Node *) comm_fkt,$2);}
+			| COMM                      {$$=mknod(FUNC,(Node *) comm_fkt,NULL);  /* loeschen */}
+			| DEFAULT                   {$$=mknod(FUNC,(Node *) default_fkt,NULL); /* loeschen */}
+			| DEFAULT func EQ term      {$$=mknod(FUNC,(Node *) default_fkt,
+			                                  mknod(PARAM,mknod(PARAM,$2,NULL),$4));}
+			| DEFAULT RIGHT func EQ term {$$=mknod(FUNC,(Node *) default_fkt,
+			                                  mknod(PARAM,mknod(PARAM,$3,mknod(PARAM,NULL,NULL)),$5));};
 
 step  : /* NULL */	{$$=(Node *) NULL;}
 			| STEP term	{$$=$2;};

@@ -10,5 +10,10 @@ INC "inc/integration/1.1.1.1_linear_power"
 INC "inc/integration/2_exponentials"
 INC "inc/integration/4.1_sine"
 
+# Einstellungen aus base gelten nur fuer diese Regeln: wieder loeschen
+OPT
+DEFAULT
+COMM
+
 ALG Integrate
-SPEC Integrate : (IntCanon,IntRubi),IntUnlin,All
+SPEC Integrate : (IntNorm,IntRubi),IntOut,All

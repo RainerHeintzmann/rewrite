@@ -15,6 +15,7 @@
 #include "sync.h"
 #include "inout.h"
 #include "defs.h"
+#include "nodes.h"
 
 #define BLOCKAUF '{'
 #define BLOCKZU  '}'
@@ -173,7 +174,7 @@ else
 
 void termassign (Node * np)
 {
-termassign2(np->r->l,np->r->r);
+termassign2(ASSIGN_TARGET(np),ASSIGN_TERM(np));
 }
 
 void termlist_is_termlist(Node * np)   /* LIFT Befehl */
@@ -182,32 +183,32 @@ Node * jog1, * jog2;
 Symbol * oldsym=(Symbol *) 0;
 
 /* Pruefen, ob Symbole schon belegt sind  */
-for (jog1= np->r->l;jog1->type==Terms; jog1=jog1->r)
-	if (IS_kette(jog1->l->l) != (Symbol *) NULL)
+for (jog1= LIFT_TO(np);jog1->type==Terms; jog1=jog1->r)
+	if (IS_kette(TERM_HEAD(jog1->l)) != (Symbol *) NULL)
 		{
 		ErrorMsg("");
 		printfErr("Symbol '");
-		print(jog1->l->l);
+		print((Node *) TERM_HEAD(jog1->l));
 		printfErr("' is already lifted \n");
 		return;
 		}
-if (IS_kette(jog1->l) != (Symbol *) NULL)
+if (IS_kette(TERM_HEAD(jog1)) != (Symbol *) NULL)
 	{
 	ErrorMsg("");
 	printfErr("Symbol '");
-	print(jog1->l);
+	print((Node *) TERM_HEAD(jog1));
 	printfErr("' is already lifted \n");
 	return;
 	}
 
 
-for (jog1= np->r->l,jog2= np->r->r;jog1->type==Terms; jog1=jog1->r,jog2=jog2->r)
+for (jog1= LIFT_TO(np),jog2= LIFT_FROM(np);jog1->type==Terms; jog1=jog1->r,jog2=jog2->r)
 	{
 		if (jog2->type != Terms)
 			break;
-		IS_kette(jog1->l->l) = oldsym;
-		oldsym = ((Symbol *) jog1->l->l);
-		IS_Verbindung(oldsym) = ((Symbol *) jog2->l->l);
+		IS_kette(TERM_HEAD(jog1->l)) = oldsym;
+		oldsym = TERM_HEAD(jog1->l);
+		IS_Verbindung(oldsym) = TERM_HEAD(jog2->l);
           /* Symbol2 ^^                                 Symbol1 ^^ */
 	}
 
@@ -215,29 +216,29 @@ if (jog2->type == Terms) /* jog1 ist kuerzer */
 	{
 	ErrorMsg("");
 	printfErr("Assigned list is too long\n");
-	IS_kette(jog1->l) = oldsym;
-	oldsym = ((Symbol *) jog1->l);
-	IS_Verbindung(oldsym) = ((Symbol *) jog2->l->l);
+	IS_kette(TERM_HEAD(jog1)) = oldsym;
+	oldsym = TERM_HEAD(jog1);
+	IS_Verbindung(oldsym) = TERM_HEAD(jog2->l);
 	}
 if (jog1->type == Terms) /* jog1 ist laenger */
 	{
 	ErrorMsg("");
 	printfErr("Assigned list is too short\n");
-	IS_kette(jog1->l->l) = oldsym;
-	oldsym = ((Symbol *) jog1->l->l);
-	IS_Verbindung(oldsym) = ((Symbol *) jog2->l);
+	IS_kette(TERM_HEAD(jog1->l)) = oldsym;
+	oldsym = TERM_HEAD(jog1->l);
+	IS_Verbindung(oldsym) = TERM_HEAD(jog2);
 	}
 if (jog1->type != Terms && jog2->type != Terms) /* jog1,jog2 sind gleichlang */
 	{
-	IS_kette(jog1->l) = oldsym;
-	oldsym = ((Symbol *) jog1->l);
-	IS_Verbindung(oldsym) = ((Symbol *) jog2->l);
+	IS_kette(TERM_HEAD(jog1)) = oldsym;
+	oldsym = TERM_HEAD(jog1);
+	IS_Verbindung(oldsym) = TERM_HEAD(jog2);
 	}
 
-if (np->r->l->type != Terms)                          /* Im Kreis verketten */
-	IS_kette(np->r->l->l) = oldsym;
+if (LIFT_TO(np)->type != Terms)                          /* Im Kreis verketten */
+	IS_kette(TERM_HEAD(LIFT_TO(np))) = oldsym;
 else
-	IS_kette(np->r->l->l->l) = oldsym;
+	IS_kette(TERM_HEAD(LIFT_TO(np)->l)) = oldsym;
 
 return;
 }
@@ -277,7 +278,7 @@ printfOut("%s",cp);
 
 void printnl (Node * np)
 {
-((void (*) (Node *)) (np->r->l)) (np->r);
+CALLFUNCT(PRINTNL_SEQ(np));
 printfOut("\n");
 }
 
@@ -320,31 +321,31 @@ else
 
 void numassign (Node * np)   /* Setzt bzw Loescht Nummer */
 {
-numassign2(np->r->r,(Symbol *) np->r->l);
+numassign2(ASSIGN_TERM(np),(Symbol *) ASSIGN_TARGET(np));
 }
 
 void while_fkt (Node * np)
 {
-	while (((BOOLEAN (*) (Node *)) np->r->l->l)(np->r->l->r))
-		CALLFUNCT(np->r->r);
+	while (COND_CALL(WHILE_COND(np)))
+		CALLFUNCT(WHILE_BODY(np));
 }
 
 void if_fkt (Node * np)
 {
 	DEBG((5,"-- If_fkt ( "));
-	DBFK(5, print(np->r->l->r));
+	DBFK(5, print(COND_ARG(IF_COND(np))));
 	DEBG((5,") \n"));
-	if (((BOOLEAN (*) (Node *)) np->r->l->l)(np->r->l->r))
-		CALLFUNCT(np->r->r->l);
+	if (COND_CALL(IF_COND(np)))
+		CALLFUNCT(IF_THEN(np));
 	else
-		if (np->r->r->r) CALLFUNCT(np->r->r->r);
+		if (IF_ELSE(np)) CALLFUNCT(IF_ELSE(np));
 }
 
 void forschleife (Node * np)
 {
 Node * p_anf,
 		 * p_ende,
-		 * p_step = np->r->r->l->l,
+		 * p_step = FOR_STEP(np),
 		 * p_symbol;
 
 double anf,ende,step;
@@ -353,9 +354,9 @@ double counter;    /* lokal */
 double * merkval;
 int merkhasval;
 
-if (	!( p_anf = calkulate(np->r->l->l))
-	||	!(p_ende = calkulate(np->r->l->r))
-	||	((p_step) && !(p_step = calkulate(np->r->r->l->l))))
+if (	!( p_anf = calkulate(FOR_FROM(np)))
+	||	!(p_ende = calkulate(FOR_TO(np)))
+	||	((p_step) && !(p_step = calkulate(FOR_STEP(np)))))
 	{
 	ErrorMsg("Wrong FOR-loop: all values must be calculable !\n");
 	if (p_anf)  delnum((Symbol *) p_anf,TRUE); /* auch value */
@@ -387,7 +388,7 @@ if  (schritte < 0)
 	return;
 	}
 
-if (np ->r->r->l->r -> type != Const)
+if (FOR_VAR(np) -> type != Const)
 	{ErrorMsg("Assigned Term should be a CONST - Value \n");
 	delnum((Symbol *) p_anf,TRUE); /* auch value */
 	delnum((Symbol *) p_ende,TRUE); /* auch value */
@@ -395,7 +396,7 @@ if (np ->r->r->l->r -> type != Const)
 	return;
 	}
 
-p_symbol = np ->r->r->l->r->l;
+p_symbol = (Node *) TERM_HEAD(FOR_VAR(np));
 
 DEBG((5, "-- Symbol to count : "));
 DBFK(5, print(p_symbol));
@@ -411,8 +412,8 @@ value(p_symbol)= & counter;
 for (i=0;i<schritte;i++)
 	{
 	counter = ((double) i)*step+anf;
-	if (np->r->r->r)				/* Sonst sozusagen NOP (instruction ist NULL) */
-		((void (*) (Node *)) (np->r->r->r->l)) (np->r->r->r);
+	if (FOR_BODY(np))				/* Sonst sozusagen NOP (instruction ist NULL) */
+		CALLFUNCT(FOR_BODY(np));
 	}
 
 hasval(p_symbol) = merkhasval;
@@ -487,16 +488,16 @@ else
 
 void rewrite_ass_fkt (Node * np)
 {
-Node * to_rewr = tcopy(np->r->r->l); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
-to_rewr = solve(to_rewr,np->r->r->r);
-termassign2(np->r->l,to_rewr); /* speichert eine Kopie */
+Node * to_rewr = tcopy(REWRASS_TERM(np)); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
+to_rewr = solve(to_rewr,REWRASS_ALGS(np));
+termassign2(REWRASS_TARGET(np),to_rewr); /* speichert eine Kopie */
 delete(to_rewr);
 }
 
 void rewrite_fkt (Node * np)
 {
-Node * to_rewr = tcopy(np->r->l); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
-to_rewr = solve(to_rewr,np->r->r);
+Node * to_rewr = tcopy(REWR_TERM(np)); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
+to_rewr = solve(to_rewr,REWR_ALGS(np));
 print(to_rewr);
 printfOut("\n");
 history_store(to_rewr); /* speichert eine Kopie in % */

@@ -1,0 +1,53 @@
+# Optional pattern parts (OPT, DEFAULT), commutative operators (COMM) and
+# condition lists. One rule covers all forms of (a+b*x)^m.
+INC "inc/all"
+VAR Xx : real
+NUM Pa,Pb,Pm : real
+OPT Pa,Pb,Pm
+DEFAULT + = 0
+DEFAULT * = 1
+DEFAULT RIGHT ^ = 1
+COMM +,*
+FUNC lf : real,real >> real
+FUNC Res3 : real,real,real >> real
+ALG tl
+SPEC tl : lf((Pa+Pb*Xx)^Pm,Xx) = Res3(Pa,Pb,Pm)
+REWR lf((3+2*x)^5,x) : tl
+REWR lf((2*x+3)^5,x) : tl
+REWR lf((3+x*2)^5,x) : tl
+REWR lf((2*x)^5,x) : tl
+REWR lf((3+x)^5,x) : tl
+REWR lf(x^5,x) : tl
+REWR lf(3+2*x,x) : tl
+REWR lf(x,x) : tl
+REWR lf(x+3,x) : tl
+REWR lf(y,x) : tl
+# clear the settings: later rules are not expanded any more
+OPT
+DEFAULT
+COMM
+ALG tl2
+SPEC tl2 : lf(Pa+Xx,Xx) = Res3(Pa,1,1)
+REWR lf(3+x,x) : tl2
+REWR lf(x+3,x) : tl2
+REWR lf(x,x) : tl2
+# condition lists: all conditions must hold
+NUM Pc : real
+VAR Pv : real
+FUNC tst : real >> real
+ALG tc
+SPEC    tc : IF (Pc > 0), (Pc < 10) tst(Pc) = 1
+ADDSPEC tc : IF NIN(x,Pc), (Pc >= 10) tst(Pc) = 2
+REWR tst(5) : tc
+REWR tst(50) : tc
+REWR tst(0) : tc
+# NIN with several terms (Rubi's FreeQ[{a,b},x])
+ALG tf
+SPEC tf : IF NIN(x,Pv,Xx) lf(Pv,Xx) = 0
+REWR lf(a,b) : tf
+REWR lf(a,x) : tf
+# a condition on a symbolic value does not hold (used to crash)
+ALG ts
+SPEC ts : IF (Pv > 0) tst(Pv) = 1
+REWR tst(a) : ts
+REWR tst(3) : ts

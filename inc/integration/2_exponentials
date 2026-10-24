@@ -5,30 +5,19 @@
 #   2 Exponentials / 2.1 (c+d x)^m (a+b (F^(g (e+f x)))^n)^p   (Regel 1)
 # Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
 # siehe inc/integration/LICENSE.Rubi. Uebersetzung 2026.
-#
-# F^(c*(a+b*x)) wird als exp(lin(a,b,x)) (F = e) oder als Kf^lin(a,b,x)
-# (Zahl als Basis) geschrieben. c und n aus Rubi sind in lin enthalten
-# bzw. hier 1.
+# Schreibweise der Muster: siehe inc/integration/base.
+# F^(g*(e+f*x)) wird fuer F = E als exp(e+f*x) geschrieben (g, n, b = 1),
+# fuer eine Zahl F als Kf^(e+f*x).
 
 # Int[(F_^(c_.*(a_. + b_.*x_)))^n_., x_Symbol] := (F^(c*(a + b*x)))^n/(b*c*n*Log[F]) /; FreeQ[{F, a, b, c, n}, x]
-ADDSPEC IntRubi : IntL(exp(lin(Ka,Kb,Xv)),Xv) = exp(lin(Ka,Kb,Xv))*mi(Kb)
-ADDSPEC IntRubi : IntL(Kf^lin(Ka,Kb,Xv),Xv)   = Kf^lin(Ka,Kb,Xv)*mi(Kb*ln(Kf))
+ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb) Int(exp(Qa+Qb*Xv),Xv) = exp(Qa+Qb*Xv)/Qb
+ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb) Int(Kf^(Qa+Qb*Xv),Xv) = Kf^(Qa+Qb*Xv)/(Qb*ln(Kf))
 
 # Int[(c_. + d_.*x_)^m_.*(b_.*F_^(g_.*(e_. + f_.*x_)))^n_., x_Symbol] :=
 #    (c + d*x)^m*(b*F^(g*(e + f*x)))^n/(f*g*n*Log[F])
 #    - d*m/(f*g*n*Log[F])*Int[(c + d*x)^(m - 1)*(b*F^(g*(e + f*x)))^n, x]
 #    /; FreeQ[{F, b, c, d, e, f, g, n}, x] && GtQ[m, 0] && IntegerQ[2*m]
-# Hier F = e, b = g = n = 1. Varianten fuer beide Reihenfolgen der Faktoren
-# und fuer m = 1 (ohne Potenz).
-ADDSPEC IntRubi : IF ((Km > 0) && is_int(2*Km)) IntL(lin(Kc,Kd,Xv)^Km*exp(lin(Ke,Kf,Xv)),Xv) = \
-                  lin(Kc,Kd,Xv)^Km*exp(lin(Ke,Kf,Xv))*mi(Kf) \
-                  - Kd*Km*mi(Kf)*IntL(lin(Kc,Kd,Xv)^(Km-1)*exp(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IF ((Km > 0) && is_int(2*Km)) IntL(exp(lin(Ke,Kf,Xv))*lin(Kc,Kd,Xv)^Km,Xv) = \
-                  lin(Kc,Kd,Xv)^Km*exp(lin(Ke,Kf,Xv))*mi(Kf) \
-                  - Kd*Km*mi(Kf)*IntL(lin(Kc,Kd,Xv)^(Km-1)*exp(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IntL(lin(Kc,Kd,Xv)*exp(lin(Ke,Kf,Xv)),Xv) = \
-                  lin(Kc,Kd,Xv)*exp(lin(Ke,Kf,Xv))*mi(Kf) \
-                  - Kd*mi(Kf)*IntL(exp(lin(Ke,Kf,Xv)),Xv)
-ADDSPEC IntRubi : IntL(exp(lin(Ke,Kf,Xv))*lin(Kc,Kd,Xv),Xv) = \
-                  lin(Kc,Kd,Xv)*exp(lin(Ke,Kf,Xv))*mi(Kf) \
-                  - Kd*mi(Kf)*IntL(exp(lin(Ke,Kf,Xv)),Xv)
+ADDSPEC IntRubi : IF NIN(Xv,Qc,Qd,Qe,Qf), (Qm > 0), (is_int(2*Qm)) \
+                  Int((Qc+Qd*Xv)^Qm*exp(Qe+Qf*Xv),Xv) = \
+                  (Qc+Qd*Xv)^Qm*exp(Qe+Qf*Xv)/Qf \
+                  - Qd*Qm/Qf*Int((Qc+Qd*Xv)^(Qm-1)*exp(Qe+Qf*Xv),Xv)

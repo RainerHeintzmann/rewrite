@@ -8,6 +8,7 @@
 #include "forms.h"
 #include "node.h" /* auch symeq */
 #include "sync.h"  /* Fuer IS_follows, lock_rtypes */
+#include "nodes.h"
 
 extern Node * chain_pos;
 extern Node var_chain;
@@ -321,7 +322,7 @@ BOOLEAN match2 (Node * term,Node * Baum)
 			DEBG((6,"\n"));
 
 			/* passende Formel gefunden , nun Condition pruefen */
-			if (((BOOLEAN (*) (Node *)) Baum->r->l->l->l) (Baum->r->l->l->r))	/* Condition fuer Gleichung */
+			if (COND_CALL(RES_COND(Baum->r)))	/* Condition fuer Gleichung */
 				{
 				ersetz = Baum->r; /* Condition passt auch ! */
 				return TRUE;

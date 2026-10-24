@@ -13,6 +13,8 @@
 #include "syn.h"
 #include "run.h"
 #include "sync.h"
+#include "nodes.h"
+#include "expand.h"
 
 
 static Symbol ReturnTerm =
@@ -235,15 +237,14 @@ Symbol * declaresym(Symbol * sp,Node * rtps,Node * atps,int lexv,int hasv)
 		DEBG((15,"declare_sym : "));
 		DBFK(15, print(np));
 		DEBG((15,"\n"));
-		if (np->type == Terms)
-			np=np->l;
+		np=ARGS_ITEM(np);  /* aktuelles Argument */
 		switch (lexv)
 			{
 				case Const : numassign2(np,sp);
-										globalArglist=globalArglist->r;
+										globalArglist=ARGS_NEXT(globalArglist);
 										break;
 				case Term : termassign2((Node *) sp,np);
-										globalArglist=globalArglist->r;
+										globalArglist=ARGS_NEXT(globalArglist);
 										break;
 				case Func : /* Funktionen zu weisen */
 				case Bra  :
@@ -257,11 +258,11 @@ Symbol * declaresym(Symbol * sp,Node * rtps,Node * atps,int lexv,int hasv)
 				case La5  : if (np->type != Func) printfErr("error : %s could not be assigned (no function) !\n",name(sp));
 										else
 											{
-											Symbol * sp2=(Symbol *) np->l;
+											Symbol * sp2=TERM_HEAD(np);
 											hasval(sp)=hasval(sp2);
 											value(sp)=value(sp2);
 											exe_always(sp)=exe_always(sp2);
-											globalArglist=globalArglist->r;
+											globalArglist=ARGS_NEXT(globalArglist);
 											}
 										break;
 				default : printfErr("error : %s has no assignable type !\n",name(sp));
@@ -273,13 +274,13 @@ Symbol * declaresym(Symbol * sp,Node * rtps,Node * atps,int lexv,int hasv)
 
 void declare (Node * np) /* Idlist,lexv,rtps,atps,hasv */
 {
-	Node * Idlist= np->r->l,
-       * rtps  = np->r->r->l,
-       * atps  = np->r->r->r,
+	Node * Idlist= DECL_IDLIST(np),
+       * rtps  = DECL_RTYPES(np),
+       * atps  = DECL_ATYPES(np),
        * mynp;
 	Symbol * sp;
-  int  lexv  = np->r->type,
-       hasv  = np->r->r->type;
+  int  lexv  = DECL_LEXV(np),
+       hasv  = DECL_HASV(np);
 
 	DEBG((4,"def.c : declare \n"));
 
@@ -295,10 +296,10 @@ void declare (Node * np) /* Idlist,lexv,rtps,atps,hasv */
 	 * bei jedem Durchlauf erneut ausgefuehrt werden koennen. */
 	if (blockstufe <= blockbase)
 		{
-		np->r->type=PARAM;    /* vorher lexval */
-		np->r->r->type=PARAM; /* vorher hasval */
-		np->r->r->r= NULL;    /* atypes nicht loeschen ! */
-		np->r->r->l= NULL;
+		DECL_LEXV(np)=PARAM;   /* vorher lexval */
+		DECL_HASV(np)=PARAM;   /* vorher hasval */
+		DECL_ATYPES(np)= NULL; /* atypes nicht loeschen ! */
+		DECL_RTYPES(np)= NULL;
 		}
 
 	if (lexv != Sort)
@@ -309,16 +310,16 @@ void declare (Node * np) /* Idlist,lexv,rtps,atps,hasv */
 
 void set_brackets (Node * np)
 {
-klammer((Symbol *) np->r->l) = ((Symbol *) np->r->r);
-klammer((Symbol *) np->r->r) = NULL;
+klammer((Symbol *) BRK_OPEN(np)) = ((Symbol *) BRK_CLOSE(np));
+klammer((Symbol *) BRK_CLOSE(np)) = NULL;
 }
 
 void other_fkt (Node * np)
 {
-	Symbol * sp   = (Symbol *) np->r->l,* newsym, * hilf;
-  Node * vsortl = np->r->r->l,
-       * sort   = np->r->r->r->l,
-       * att    = np->r->r->r->r;
+	Symbol * sp   = (Symbol *) OTHER_SYM(np),* newsym, * hilf;
+  Node * vsortl = OTHER_SORTS(np),
+       * sort   = OTHER_RTYPE(np),
+       * att    = OTHER_ATT(np);
 
   newsym=mksym(lexval(sp),name(sp));
 	atypes(newsym)=vsortl;
@@ -332,7 +333,7 @@ void other_fkt (Node * np)
 		if (att->type==ATT)
 			{
 			hasval(newsym) = TRUE;
-			value(newsym)  = att->l;
+			value(newsym)  = ATT_CFUNC(att);
 			}
 		else /* PARAM */
 			{
@@ -340,38 +341,38 @@ void other_fkt (Node * np)
 			exe_always(newsym) =TRUE;
 			hasval(newsym) = TRUE;
 			}
-	np->r->r->r->r = NULL;
-	np->r->r->r->l = NULL; /* atypes nicht loeschen */
-	np->r->r->l    = NULL; 
+	OTHER_ATT(np)   = NULL;
+	OTHER_RTYPE(np) = NULL; /* atypes nicht loeschen */
+	OTHER_SORTS(np) = NULL;
 }
 
 
 void att_fkt (Node * np)
 {
-	Symbol * sp  = (Symbol *) np->r->l;
-  Node   * ufk = np->r->r;
-	
+	Symbol * sp  = (Symbol *) ATTF_SYM(np);
+  Node   * ufk = ATTF_ATT(np);
+
 	kette(sp) = NULL;
 	urs_fkt(sp)= sp;
 	if (ufk)
 		if (ufk->type == ATT) /* USERfkt. */
-			{value(sp)  = ufk->l;
+			{value(sp)  = ATT_CFUNC(ufk);
 			hasval(sp) = TRUE;}
 		else /* PARAM */
 			{
 			value(sp) =ufk;
 			exe_always(sp) =TRUE;
 			hasval(sp) = TRUE;}
-	np->r->r = NULL;
+	ATTF_ATT(np) = NULL;
 }
 
 void att_sort (Node * np)
 {
-	Symbol * sp  = (Symbol *) np->r->l;
-  Node * ufk1  = np->r->r->l,
-       * ufk2  = np->r->r->r->l,
-       * ufk3  = np->r->r->r->r->l,
-       * ufk4  = np->r->r->r->r->r;
+	Symbol * sp  = (Symbol *) ATTS_SORT(np);
+  Node * ufk1  = ATTS_SHOW(np),
+       * ufk2  = ATTS_CMP(np),
+       * ufk3  = ATTS_CPY(np),
+       * ufk4  = ATTS_DEL(np);
 DEBG((4,"def.c : att_sort \n"));
 hasval(sp) = TRUE;
 show(sp) = (void *) ufk1 ; /* show-Fkt. */
@@ -379,40 +380,40 @@ cmp(sp)  = (Node *) ufk2;
 cpy(sp)  = (Node *) ufk3;
 del(sp)  = (Symbol *) ufk4;
 
-np->r->r->l = NULL;
-np->r->r->r->l = NULL;
-np->r->r->r->r->l = NULL;
-np->r->r->r->r->r = NULL;
+ATTS_SHOW(np) = NULL;
+ATTS_CMP(np)  = NULL;
+ATTS_CPY(np)  = NULL;
+ATTS_DEL(np)  = NULL;
 DEBG((4,"def.c : att_sort ende\n"));
 }
 
 void spec (Node * np)
 {
-Symbol * sp = (Symbol *) np->r->l;
-Node * alist = np->r->r;
+Symbol * sp = (Symbol *) SPEC_ALG(np);
+Node * alist = SPEC_LIST(np);
 	delete(atypes(sp));
 	atypes(sp) = alist;
-np->r->r = NULL;
+SPEC_LIST(np) = NULL;
 }
 
 void a_spec_form (Node * np)
 {
-Symbol * sp = (Symbol *) np->r->l;
-Node * flist = np->r->r;
+Symbol * sp = (Symbol *) SPEC_ALG(np);
+Node * flist = SPEC_LIST(np);
 Node * ap,* form,* toform;
 	for (ap=(flist);ap != NULL;ap=ap->r)
 		{
-		form=ap->l->l;
-		toform=ap->l->r;
-		atypes(sp)=merge(form,toform,atypes(sp)); /* In Formelbaum einfuegen */
+		form=FORM_LHS(ap->l);
+		toform=FORM_RES(ap->l);
+		atypes(sp)=add_rule_variants(form,toform,atypes(sp)); /* In Formelbaum einfuegen (mit Varianten, expand.c) */
 		}
-np->r->r = NULL;
+SPEC_LIST(np) = NULL;
 }
 
 void spec_form (Node * np)
 {
-	delete(atypes((Symbol *) np->r->l));
-	atypes((Symbol *) np->r->l)=NULL;
+	delete(atypes((Symbol *) SPEC_ALG(np)));
+	atypes((Symbol *) SPEC_ALG(np))=NULL;
 	a_spec_form(np);
 }
 
@@ -475,7 +476,7 @@ Node * mksortlist(Node * np) /* Convert definitions into Sortlist */
 Node * exe_function (Node * np)
 {
 	Node * jog;
-	Symbol * sp = (Symbol *) np->l;
+	Symbol * sp = TERM_HEAD(np);
 	DEBG((7,"exe_function\n"));
 
 	returnterm= &ReturnTerm;
@@ -485,10 +486,10 @@ Node * exe_function (Node * np)
 	block_begin();
 	no_protect();
 	
-	globalArglist=np->r;
+	globalArglist=TERM_ARGS(np);
 	in_definition=TRUE;
 
-	for(jog=((Node *) value(sp))->l;jog;jog=jog->r) /* Argument-definitionen */
+	for(jog=UFUNC_ARGDEFS((Node *) value(sp));jog;jog=jog->r) /* Argument-definitionen */
 		CALLFUNCT(jog->l);
 
 	in_definition=FALSE;
@@ -499,7 +500,7 @@ Node * exe_function (Node * np)
 	globalRtw=NULL;
 
 	no_protectAtall();
-	CALLFUNCT(((Node *) value(sp))->r);
+	CALLFUNCT(UFUNC_BODY((Node *) value(sp)));
 	protectAtall();
 				
 	protect();
@@ -580,15 +581,16 @@ Symbol * give_old (Symbol * sp) /* altes Symbol raussuchen (run-time) */
 
 void set_locals_seq (Node * np)
 {
-np = np->r;
-set_locals(np->l,give_actual);
+Node * list  = LOCALS_LIST(np),
+     * instr = LOCALS_INSTR(np);
+set_locals(list,give_actual);
 DEBG((4,"set_locals_seq will call\n"));
-if (np->r->type != FUNC) fatal("fatal locals_seq ERROR: No Funct in instruction !");
+if (instr->type != FUNC) fatal("fatal locals_seq ERROR: No Funct in instruction !");
 DEBG((4,"args: "));
-DBFK(4, print(np->r->r));
+DBFK(4, print(INSTR_PAR(instr)));
 DEBG((4,"\n"));
-CALLFUNCT(np->r);
-set_locals(np->l,give_old); /* Wieder fuer naechsten Aufruf zuruecksetzen */
+CALLFUNCT(instr);
+set_locals(list,give_old); /* Wieder fuer naechsten Aufruf zuruecksetzen */
 return;
 }
 

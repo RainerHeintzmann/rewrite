@@ -5,18 +5,16 @@
 #   1.1.1.1 (a+b x)^m
 # Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
 # siehe inc/integration/LICENSE.Rubi. Uebersetzung 2026.
-#
-# Die Muster x_, a_.+b_.*x_ werden durch lin(a,b,x) ersetzt, siehe base.
-# a, b und m muessen Zahlen sein (NUM-Variablen).
+# Schreibweise der Muster: siehe inc/integration/base.
 
 # Int[1/x_, x_Symbol] := Log[x]
-# Int[1/(a_ + b_.*x_), x_Symbol] := Log[RemoveContent[a + b*x, x]]/b /; FreeQ[{a, b}, x]
-#   (beide Faelle: lin(a,b,x)^-1)
-ADDSPEC IntRubi : IF (Km == -1) IntL(lin(Ka,Kb,Xv)^Km,Xv) = ln(lin(Ka,Kb,Xv))*mi(Kb)
+ADDSPEC IntRubi : IF (Pm == -1) Int(Xv^Pm,Xv) = ln(Xv)
 
 # Int[x_^m_., x_Symbol] := x^(m + 1)/(m + 1) /; FreeQ[m, x] && NeQ[m, -1]
-# Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /; FreeQ[{a, b, m}, x] && NeQ[m, -1]
-ADDSPEC IntRubi : IF (Km != -1) IntL(lin(Ka,Kb,Xv)^Km,Xv) = lin(Ka,Kb,Xv)^(Km+1)*mi(Kb*(Km+1))
+ADDSPEC IntRubi : IF NIN(Xv,Qm), (Qm != -1) Int(Xv^Qm,Xv) = Xv^(Qm+1)/(Qm+1)
 
-# m = 1 (das Muster x_^m_. erlaubt m = 1; hier ohne Potenz geschrieben)
-ADDSPEC IntRubi : IntL(lin(Ka,Kb,Xv),Xv) = lin(Ka,Kb,Xv)^2*mi(2*Kb)
+# Int[1/(a_ + b_.*x_), x_Symbol] := Log[RemoveContent[a + b*x, x]]/b /; FreeQ[{a, b}, x]
+ADDSPEC IntRubi : IF NIN(Xv,Pa,Qb), (Pm == -1) Int((Pa+Qb*Xv)^Pm,Xv) = ln(Pa+Qb*Xv)/Qb
+
+# Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /; FreeQ[{a, b, m}, x] && NeQ[m, -1]
+ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb,Pm), (Pm != -1) Int((Qa+Qb*Xv)^Pm,Xv) = (Qa+Qb*Xv)^(Pm+1)/(Qb*(Pm+1))

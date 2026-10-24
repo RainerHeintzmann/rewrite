@@ -29,9 +29,11 @@ static const Reserved words [] = {	/* sortiert */
 	{ "ALG",    ALG },
 	{ "ATT",    ATT },
 	{ "BRA",    BRA },
+	{ "COMM",   COMM },     /* kommutative Funktionen (2026) */
 	{ "CONST",  CST },
 	{ "DATA",   DATA },  /* Einlesen von Daten-files */
 	{ "DEBUG",  DBG },
+	{ "DEFAULT",DEFAULT },  /* Wert fehlender Operanden (2026) */
 	{ "DO",     DO },
 	{ "ELSE",   ELSE },
 	{ "EXE",    EXE },
@@ -53,6 +55,7 @@ static const Reserved words [] = {	/* sortiert */
 	{ "LOCAL",  LOCAL },
 	{ "NIN",    NIN },
 	{ "NUM",    NUM },
+	{ "OPT",    OPT },      /* optionale Metavariablen (2026) */
 	{ "OTHER",  OTHER },
 	{ "OUT",    OUT },
 	{ "PRT",    PRT },
@@ -61,6 +64,7 @@ static const Reserved words [] = {	/* sortiert */
 	{ "RA",		  RA  },  			/* Rechtsassoziativ */
 	{ "RETURN", RETURN },
 	{ "REWR",   REWR },
+	{ "RIGHT",  RIGHT },    /* DEFAULT RIGHT (2026) */
 	{ "RU",     RU  },			/* Rechtsunaer */
 	{ "SORT",   SORT },
 	{ "SPEC",   SPEC },

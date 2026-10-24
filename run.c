@@ -18,6 +18,7 @@
 #include "sync.h" /* fuer IS_follows,IS_search  */
 #include "node.h"
 #include "defs.h"
+#include "nodes.h"
 
 #define EQUAL  0	/* wichtig wegen strcmp */
 
@@ -87,12 +88,12 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 
 				lt = (* p_term) -> l;
 				rt = (* p_term) -> r;
-				if (ers->r) {CALLFUNCT(ers->r);} /* Ausfueher von DO-Block */
+				if (RES_DO(ers)) {CALLFUNCT(RES_DO(ers));} /* Ausfueher von DO-Block */
 				if (lt && lt->type == SYM_TYPE)
 					maintype=rtypes((Symbol *) lt);
 				else
 					maintype=NULL;
-				* p_term = tcopy(ers->l->r); /* Formel einsetzen (Es wird auch 'geliftet' !) */
+				* p_term = tcopy(RES_RHS(ers)); /* Formel einsetzen (Es wird auch 'geliftet' !) */
 				* p_term = tcalc(* p_term);  /* Formel numerisch auswerten */
 				RESTORE;					/* Symboltabelle restaurieren (auch locks beseitigen)*/
 				delete (lt);
@@ -183,9 +184,9 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 	{
 	case Cond2 :
 		printfOut("Cond2 ");
-		if (np->l->r != (Node *) NULL)
+		if (COND_ARG(COND2_COND(np)) != (Node *) NULL)
 			{printfOut("( ");
-			tprint(np ->l->r,0);
+			tprint(COND_ARG(COND2_COND(np)),0);
   		printfOut(") ");
 			}
 		printfOut(", ");
@@ -279,24 +280,24 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 			printfOut("(");
 
 			/* Bei einem Argument : Linksunaer sonst wie Linksassoziativ */
-			if (np->r->type != Terms) /* -> Ein Argument -> Links-unaer */
+			if (term_nargs(np) == 1) /* -> Ein Argument -> Links-unaer */
 				{
-				tprint(np -> l,0);		/* Name der Funktion ausgeben */
-				tprint(np -> r,this_type+1); /* Bei gleichem Vorrang Argument-Term klammern z.B. -(1-2) */
+				tprint((Node *) TERM_HEAD(np),0);		/* Name der Funktion ausgeben */
+				tprint(term_arg(np,0),this_type+1); /* Bei gleichem Vorrang Argument-Term klammern z.B. -(1-2) */
 				}
 			else /* links Op. rechts */
 				{
-				if (lexval((Symbol *) (np -> l)) == Ra) /* Rechts-assoziativ */
+				if (lexval(TERM_HEAD(np)) == Ra) /* Rechts-assoziativ */
 					{
-					tprint(np -> r -> l,this_type+1);  	/* Linker Teilbaum muss bei gleichem Vorrang geklammert werden : a-(b+c) */
-					tprint(np -> l,0);									/* Name der Funktion ausgeben */
-					tprint(np -> r -> r,this_type);
+					tprint(term_arg(np,0),this_type+1);  	/* Linker Teilbaum muss bei gleichem Vorrang geklammert werden : a-(b+c) */
+					tprint((Node *) TERM_HEAD(np),0);			/* Name der Funktion ausgeben */
+					tprint(term_arg(np,1),this_type);
 					}
 				else 																	/* Links-assoziativ */
 					{
-					tprint(np -> r -> l,this_type);
-					tprint(np -> l,0);									/* Name der Funktion ausgeben */
-					tprint(np -> r -> r,this_type + 1); /* Rechter Teilbaum muss bei gleichem Vorrang geklammert werden : a-(b+c) */
+					tprint(term_arg(np,0),this_type);
+					tprint((Node *) TERM_HEAD(np),0);			/* Name der Funktion ausgeben */
+					tprint(term_arg(np,1),this_type + 1); /* Rechter Teilbaum muss bei gleichem Vorrang geklammert werden : a-(b+c) */
 					}
 				}
 
@@ -359,17 +360,17 @@ void delete _1a ((p), Node * p)
 			{ /* FUNC declare ( lexv ( Idlist, hasv ( rtypes, atypes ) ) )
 			   * Der hasv-Knoten hat als Typ TRUE/FALSE (FALSE == SYM_TYPE !).
 			   * rtypes/atypes gehoeren jetzt den deklarierten Symbolen. */
-			if (p->r->r)
-				delnod(p->r->r);
-			delete(p->r->l);
-			delnod(p->r);
+			if (DECL_HASVNODE(p))
+				delnod(DECL_HASVNODE(p));
+			delete(DECL_IDLIST(p));
+			delnod(DECL_LEXNODE(p));
 			delnod(p);
 			return;
 			}
 		if (((p -> type) == FUNC) && ((p->l) == (Node *) set_locals_seq))
 			{ /* FUNC set_locals_seq ( PARAM ( Liste, Anweisung ) ) */
-			delete_locals_list(p->r->l);
-			delete(p->r->r);
+			delete_locals_list(LOCALS_LIST(p));
+			delete(LOCALS_INSTR(p));
 			delnod(p->r);
 			delnod(p);
 			return;
@@ -454,6 +455,8 @@ BOOLEAN isnt_zero (Node * np)
 	double val;
   BOOLEAN iszero=FALSE;
 	erg1=calkulate (np);
+	if (! erg1)
+		return FALSE;	/* nicht berechenbar (z.B. symbolisch): Bedingung gilt nicht */
 	/* if (rtypes((Symbol *) erg1) != numbertype)
 		fprintf(stderr,"ERROR -- Condition with non calculatable type !\n");
 	else */
@@ -616,35 +619,26 @@ void * realcalk(Node * term,int * perr)
 	if (* perr) 
 		return (void *) NULL;
 
-	lterm=term->r;	
+	lterm=TERM_ARGS(term);
 
 	{
 	void * feld[MAXARGS];
 	Symbol * syms[MAXARGS];
 	int i=0,j;
 
-	while ((lterm-> type) == Terms)
+	for ( ; lterm; lterm = ARGS_NEXT(lterm))
 		{
-		feld[i]=realcalk(lterm->l,perr);/* Const oder Funct */
+		feld[i]=realcalk(ARGS_ITEM(lterm),perr);/* Const oder Funct */
 		syms[i++]=lastsym;
 		if (i > MAXARGS-2) fatal("Fatal Error run.c : Too max Arguments for Function !");
-		if (* perr) 
+		if (* perr)
 			break;
-		lterm=lterm->r;	
 		}
 	if (!(* perr))
 		{
-		feld[i]=realcalk(lterm,perr); /* letzte Const oder Funct */
-		syms[i++]=lastsym;
-
-		if (i > MAXARGS-2) fatal("Fatal Error run.c : Too max Arguments for Function !");
-
 		feld[i] = NULL; /* Ende (bei variabel Argumenten) kennzeichnen */
-		if (!(* perr)) 
-			{
-			lastsym = (Symbol *) term->l;
-			erg= ((void * (*) (void * [])) value(term->l))(feld); /* Aufruf der Benutzerfunktion */
-			}
+		lastsym = TERM_HEAD(term);
+		erg= ((void * (*) (void * [])) value(TERM_HEAD(term)))(feld); /* Aufruf der Benutzerfunktion */
 		}
 
 	for (j=0;j<i;j++)
@@ -677,11 +671,11 @@ else
 			{ /* In dem aktuellem Baum Ergebnis eintragen */
 			delete(np->r);
 			delete(np->l);
-			if (lterm->l->type == SYM_TYPE) fatal ("run.h fatal internal TYPE ERROR ! ");
+			if (TERM_CONTENT(lterm)->type == SYM_TYPE) fatal ("run.h fatal internal TYPE ERROR ! ");
 
-			np->type=lterm->l->type;  /* Ueberschreiben des Func-Knoten -> Transparent nach aussen */
-			np->r = tcopy(lterm->l->r);
-			np->l = tcopy(lterm->l->l);
+			np->type=TERM_CONTENT(lterm)->type;  /* Ueberschreiben des Func-Knoten -> Transparent nach aussen */
+			np->r = tcopy(TERM_CONTENT(lterm)->r);
+			np->l = tcopy(TERM_CONTENT(lterm)->l);
 
 			functions_execute(np); /* Im Return-Wert suchen */
 			return;
@@ -774,6 +768,38 @@ if  ((term -> type) == Func) /* Rest wird darauf abgebildet */
 		}
 	}
 return term;
+}
+
+/* ---- Argumente von Func-Knoten (siehe nodes.h) ---- */
+
+int term_nargs (Node * t)
+{
+	int n = 0;
+	Node * a;
+	if (! t) return 0;
+	for (a = TERM_ARGS(t); a; a = ARGS_NEXT(a))
+		n++;
+	return n;
+}
+
+Node ** term_argp (Node * t, int i)
+{
+	Node ** pp;
+	if (! t || ! TERM_ARGS(t) || i < 0) return NULL;
+	pp = & TERM_ARGS(t);
+	while ((* pp)->type == Terms)
+		{
+		if (i == 0) return & (* pp)->l;
+		i--;
+		pp = & (* pp)->r;
+		}
+	return (i == 0) ? pp : NULL;  /* letztes Argument steht direkt im r */
+}
+
+Node * term_arg (Node * t, int i)
+{
+	Node ** pp = term_argp(t, i);
+	return pp ? * pp : NULL;
 }
 
 Node * tcopy _1a ((term), Node * term)

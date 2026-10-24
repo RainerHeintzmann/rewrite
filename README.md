@@ -187,11 +187,14 @@ with `NUM` only match numbers. A rule can have conditions:
 - `LB(term,term)`: "lower or between", an ordering of terms, used for
   example to sort sums.
 - `IN(a,b)`: term `a` occurs in term `b`. `NIN(a,b)` is the negation.
+  `NIN(x,a,b,c)` tests that `x` occurs in none of `a`, `b`, `c`.
 - `(term)`: any expression with a boolean result, for example
-  `(is_int(N))` or `(N > 0)`.
+  `(is_int(N))` or `(N > 0)`. If the expression cannot be calculated, for
+  example because `N` is symbolic, the condition does not hold.
 
-Several conditions are combined with a logical and. With `DO block`, the
-block is executed before the left side is replaced by the right side.
+Several conditions are separated by commas, and all of them must hold:
+`IF NIN(x,A), (N > 0) ...`. With `DO block`, the block is executed before
+the left side is replaced by the right side.
 
 ```text
 VAR A : real
@@ -201,6 +204,39 @@ ADDSPEC simp : A+0=A
 CONST u : real
 REWR (u*1)+0 : simp         # prints u
 ```
+
+**Optional parts and commutative operators.** Three statements make one
+rule cover many forms of a term. They act on the rules defined after them:
+
+| Command | Meaning |
+| --- | --- |
+| `OPT A,B` | The meta variables `A`, `B` may be missing in a pattern. |
+| `DEFAULT + = 0` | A missing operand of `+` has the value 0. |
+| `DEFAULT RIGHT ^ = 1` | Only the right operand of `^` may be missing, with value 1. |
+| `COMM +,*` | Patterns with `+` and `*` also match with swapped operands. |
+| `OPT`, `DEFAULT`, `COMM` | Without arguments: clear the list again. |
+
+```text
+VAR Xw : real
+NUM Ca,Cb,Cm : real
+OPT Ca,Cb,Cm
+DEFAULT + = 0
+DEFAULT * = 1
+DEFAULT RIGHT ^ = 1
+COMM +,*
+FUNC fq : real,real >> real
+FUNC gq : real,real,real >> real
+ALG tq
+SPEC tq : fq((Ca+Cb*Xw)^Cm,Xw) = gq(Ca,Cb,Cm)
+REWR fq((x*2+3)^5,x) : tq     # prints gq (3 ,2 ,5 )
+REWR fq(x+3,x) : tq           # prints gq (3 ,1 ,1 )
+REWR fq(x,x) : tq             # prints gq (0 ,1 ,1 )
+```
+
+The rule is expanded into all its variants when it is defined, so the
+matcher itself is unchanged. The number of variants grows quickly with the
+number of optional variables and commutative operators: the example above
+has 18 variants.
 
 The trick behind `LIFT`: once the group rules for `+` and `-` are written,
 the ring rules for `*` and `/` can be derived from them:
@@ -294,12 +330,14 @@ REWR fmin(-1,1,(x-0.3)^2,x) : numerik,rechne          # prints 0.3
 [inc/integration](inc/integration) adds indefinite integration with a
 translation of a subset of the [Rubi](https://github.com/RuleBasedIntegration/Rubi)
 rules (MIT license). It covers powers of linear expressions, exponentials,
-sine and cosine, and polynomials times them:
+sine and cosine, and polynomials times them, also with symbolic
+coefficients:
 
 ```text
 INC "inc/integration/all"
 REWR Int(x^2*cos(x),x) : Integrate      # prints 2 * cos (x )* x + x ^ 2 * sin (x )- 2 * sin (x )
 REWR Int(1/(2*x+3),x) : Integrate      # prints 0.5 * ln (3 + 2 * x )
+REWR Int(sin(a*x+b),x) : Integrate     # prints - cos (a * x + b )/ a
 ```
 
 See [inc/integration/README.md](inc/integration/README.md) for what is
@@ -333,6 +371,8 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
 | [sync.c](sync.c) | Main program, input handling and runtime commands. |
 | [defs.c](defs.c) | Declarations, blocks and local symbols. |
 | [run.c](run.c), [forms.c](forms.c) | Rewriting engine and numerical evaluation. |
+| [expand.c](expand.c) | Optional pattern parts, commutative operators and condition lists. |
+| [nodes.h](nodes.h) | Named access to the node structures built by the parser. |
 | [sym.c](sym.c), [node.c](node.c), [stack.c](stack.c) | Symbol table and memory for nodes and symbols. |
 | [userfkt.c](userfkt.c), [real.c](real.c), [bool.c](bool.c), [complex.c](complex.c), [vector.c](vector.c), [matrix.c](matrix.c) | Built-in numerical functions. |
 | [inout.c](inout.c) | Output, output redirection and data input. |
@@ -348,6 +388,12 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
   the result. This is intended: differential equations use `D(y,x)`.
 - There are no general container types. Vectors and matrices are
   implemented as C functions.
+- Optional parts and commutative operators are implemented by expanding
+  each rule into all its variants. A rule with five optional variables and
+  three commutative products already has hundreds of variants. This is
+  fine for small rule sets, but not for thousands of rules.
+- `COMM` works by function name, so `COMM *` also applies to rules for
+  matrix products. Switch it off with `COMM` after the rules that need it.
 
 ## Changes in 2026
 
@@ -369,6 +415,11 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
   (now `(a^b)^c = a^(b*c)`).
 - New folder [inc/integration](inc/integration) with rule-based integration
   translated from Rubi.
+- New pattern features: optional parts (`OPT`, `DEFAULT`), commutative
+  operators (`COMM`) and lists of conditions (`IF c1, c2`). A condition
+  that cannot be calculated no longer crashes the interpreter.
+- Internal cleanup: named accessors for the node structures
+  ([nodes.h](nodes.h)) instead of chains like `np->r->r->l`.
 - [LiNbO3/abso1](LiNbO3/abso1) runs again, and the test suite was added.
 
 ## License

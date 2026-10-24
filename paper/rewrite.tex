@@ -59,9 +59,11 @@ arguments of a function are numbers, an attached C function computes the
 value. We describe the design of the language, its revival on current
 64-bit compilers including a regression test suite, and a case study in
 which part of the rule-based integrator Rubi was translated into
-\texttt{rewrite}. The case study shows how the mechanisms of the language
-replace features such as optional pattern arguments, and where its limits
-are.
+\texttt{rewrite}. For this translation the language was extended by
+optional pattern parts with default values, commutative operators and
+lists of conditions. They are implemented by expanding each rule into its
+variants, which keeps the matcher unchanged but limits the approach to
+moderately sized rule sets.
 \end{abstract}
 
 \section{Introduction}
@@ -239,9 +241,8 @@ translated a closed subset of them to test how far the mechanisms of
 
 \subsection{Translation scheme}
 
-Rubi's patterns rely on two features of the Mathematica pattern matcher
-that \texttt{rewrite} does not have: optional arguments with default values
-and matching modulo commutativity. A typical rule is
+Rubi's patterns rely on features of the Mathematica pattern matcher that
+the original \texttt{rewrite} did not have. A typical rule is
 
 \begin{lstlisting}
 Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /;
@@ -249,60 +250,63 @@ Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /;
 \end{lstlisting}
 
 where \texttt{a\_.} matches a missing summand with default 0 and
-\texttt{b\_.} a missing factor with default 1. We replaced these features
-by four measures.
+\texttt{b\_.} a missing factor with default 1. The pattern also matches
+$x\,b + a$, because Mathematica matches sums and products in any order, and
+the condition combines several tests. We added three corresponding
+features to the language.
 
-\paragraph{Canonical linear form.} A preparatory rule set rewrites every
-linear expression in the integration variable into a canonical term
-$\mathrm{lin}(a,b,x)$ that stands for $a+bx$. Its rules propagate through
-the integrand and combine linear terms with numbers:
+\paragraph{Optional parts.} \texttt{OPT a,b} declares meta variables that
+may be missing. \texttt{DEFAULT + = 0} and \texttt{DEFAULT * = 1} give the
+value of a missing operand, and \texttt{DEFAULT RIGHT \^{} = 1} allows only
+the exponent of a power to be missing.
 
-\begin{lstlisting}
-ADDSPEC IntCanon : canon(Xv,Xv) = lin(0,1,Xv)
-ADDSPEC IntCanon : IF NIN(Xv,Uv) canon(Uv,Xv) = Uv
-ADDSPEC IntCanon : canon(Uv*Vv,Xv) = canon(Uv,Xv)*canon(Vv,Xv)
-ADDSPEC IntCanon : Kc*lin(Ka,Kb,Xv) = lin(Kc*Ka,Kc*Kb,Xv)
-ADDSPEC IntCanon : lin(Ka,Kb,Xv)+lin(Kc,Kd,Xv) = lin(Ka+Kc,Kb+Kd,Xv)
-\end{lstlisting}
+\paragraph{Commutative operators.} \texttt{COMM +,*} declares that patterns
+with these operators also match with swapped operands.
 
-One translated rule then covers $x$, $2x$, $x+1$ and $3+2x$. After
-integration, $\mathrm{lin}(a,b,x)$ is turned back into $a+bx$ and the
-standard algebra simplifies the result.
+\paragraph{Condition lists.} A rule can have several conditions separated
+by commas, all of which must hold. \texttt{NIN(x,a,b,m)} tests that $x$
+occurs in none of $a$, $b$, $m$, which is Rubi's \texttt{FreeQ}.
 
-\paragraph{Numeric parameters.} The parameters $a$, $b$, $m$ of the Rubi
-rules are \texttt{NUM} variables. They only match numbers, which makes
-Rubi's \texttt{FreeQ} tests unnecessary. The price is that the subset is
-restricted to numeric coefficients. Symbolic constant factors are still
-handled by the linearity rules, which do use \texttt{NIN}.
-
-\paragraph{Combined conditions.} A rule in \texttt{rewrite} has a single
-condition, but the condition can be any boolean expression. Rubi's
-conditions become, for example, \texttt{IF ((Km > 0) \&\& is\_int(2*Km))}.
-
-\paragraph{Factor order.} Rules with two factors are written for both
-orders. Rubi expresses $\cos z$ as $\sin(z+\pi/2)$; the cosine rules were
-obtained by working out this shift.
-
-The translated version of the rule above reads
+All three are implemented when a rule is defined: the rule is expanded into
+all its variants, with the default values of missing variables substituted
+into the right-hand side, the condition and the \texttt{DO} block. The
+matcher itself is unchanged. With these features the rule above translates
+almost one to one:
 
 \begin{lstlisting}
-ADDSPEC IntRubi : IF (Km != -1) IntL(lin(Ka,Kb,Xv)^Km,Xv) =
-                  lin(Ka,Kb,Xv)^(Km+1)*mi(Kb*(Km+1))
+ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb,Pm), (Pm != -1) Int((Qa+Qb*Xv)^Pm,Xv) =
+                  (Qa+Qb*Xv)^(Pm+1)/(Qb*(Pm+1))
 \end{lstlisting}
 
-and the complete integration is the rule list
-\texttt{(IntCanon,IntRubi),IntUnlin,All}. The original Mathematica form of
-each rule is kept as a comment in the rule files.
+Here \texttt{Pm} is a required and \texttt{Qa}, \texttt{Qb} are optional
+meta variables. One rule now covers $(a+bx)^m$, $(bx+a)^m$, $(a+x)^m$,
+$(bx)^m$ and $x^m$, with numeric or symbolic coefficients.
+
+Rubi also relies on Mathematica's normal form of expressions. A small rule
+set produces a similar form before the Rubi rules are applied: $x-y$
+becomes $x+(-1)\,y$, $x/y$ becomes $x\,y^{-1}$, $\sqrt{x}$ becomes
+$x^{0.5}$, numeric factors move to the front and products with sums are
+multiplied out. Rubi expresses $\cos z$ as $\sin(z+\pi/2)$; the cosine
+rules were obtained by working out this shift. The complete integration is
+the rule list \texttt{(IntNorm,IntRubi),IntOut,All}, and the original
+Mathematica form of each rule is kept as a comment in the rule files.
 
 \subsection{Results}
 
-The subset consists of 13 Rubi rules from sections 9.1 (integrand
+The subset consists of 12 Rubi rules from sections 9.1 (integrand
 simplification), 1.1.1.1 ($(a+bx)^m$), 2.1 and 2.3 (exponentials), and
-4.1.1.1 and 4.1.10 (sine), which became 24 \texttt{rewrite} rules. It
+4.1.1.1 and 4.1.10 (sine), which became 14 \texttt{rewrite} rules. It
 integrates sums of powers of linear expressions, possibly multiplied by one
-exponential, sine or cosine of a linear argument. Table~\ref{tab:int} shows
-examples. The test suite checks every result by differentiating it again
-and comparing the derivative numerically with the integrand.
+exponential, sine or cosine of a linear argument, with numeric or symbolic
+coefficients. Table~\ref{tab:int} shows examples. The test suite checks
+27 integrals by differentiating each result again and comparing the
+derivative numerically with the integrand.
+
+When they are defined, the 14 rules expand into 1029 variants. Most rules
+have between 2 and 9 variants, but the three rules for a power of a linear
+expression times an exponential, sine or cosine have five optional
+parameters and two commutative products, and expand into 324 variants each.
+Loading the integration rules takes well below 0.1\,s.
 
 \begin{table}[ht]
 \centering
@@ -312,12 +316,14 @@ and comparing the derivative numerically with the integrand.
 Integrand & Result of \texttt{REWR Int(f,x) : Integrate} \\
 \midrule
 \texttt{1/(2*x+3)}   & \texttt{0.5 * ln (3 + 2 * x )} \\
-\texttt{5/(x+1)\^{}2} & \texttt{-5 * (1 + x )\^{} -1} \\
+\texttt{5/(x+1)\^{}2} & \texttt{- 5 / (1 + x )} \\
 \texttt{sqrt(x)}     & \texttt{0.666667 * x \^{} 1.5} \\
 \texttt{x*exp(2*x)}  & \texttt{0.5 * exp (2 * x )* x - 0.25 * exp (2 * x )} \\
 \texttt{x\^{}2*cos(x)} & \texttt{2 * cos (x )* x + x \^{} 2 * sin (x )- 2 * sin (x )} \\
-\texttt{(x+1)*cos(x)} & \texttt{sin (x )* x + cos (x )+ sin (x )} \\
-\texttt{sqrt(x)*sin(x)} & \texttt{0.5 * Int (x \^{} -0.5 * cos (x ),x )- x \^{} 0.5 * cos (x )} \\
+\texttt{sin(a*x+b)}  & \texttt{- cos (a * x + b )/ a} \\
+\texttt{x*exp(a*x)}  & \texttt{exp (a * x )* x / a - exp (a * x )/ a \^{} 2} \\
+\texttt{1/(a+b*x)}   & \texttt{ln (b * x + a )/ b} \\
+\texttt{sqrt(x)*sin(x)} & \texttt{0.5 * Int (cos (x )/ x \^{} 0.5 ,x )- x \^{} 0.5 * cos (x )} \\
 \bottomrule
 \end{tabular}
 \caption{Indefinite integrals computed with the translated Rubi subset. In
@@ -334,8 +340,8 @@ have been corrected.
 
 \section{Implementation and revival}
 
-The interpreter consists of about 6500 lines of C and a grammar of about
-450 lines for the scanner and parser generators flex and bison. Terms are
+The interpreter consists of about 7200 lines of C and a grammar of about
+470 lines for the scanner and parser generators flex and bison. Terms are
 binary trees of nodes taken from memory pools; symbols carry their sort,
 value and the links used by \texttt{LIFT}. The rules of an algebra are
 merged into a single tree, in which rules with a common left-hand-side
@@ -347,11 +353,15 @@ with current tools. The port to 64-bit Linux and Windows (MSYS2) required
 only small changes to the C code itself. The main problems were changed
 semantics in the scanner generator, the release of static memory that old
 C libraries tolerated, and errors in the handling of declarations inside
-loops and included files. A regression test suite with 23 test programs
-now covers the core language, the library, the integration rules and the
-original example programs. Memory leaks were removed with an instrumented
-build that counts allocations per source line, so that repeated
-calculations run in constant memory.
+loops and included files. A regression test suite with 24 test programs
+now covers the core language, the library, the new pattern features, the
+integration rules and the original example programs. Memory leaks were
+removed with an instrumented build that counts allocations per source
+line, so that repeated calculations run in constant memory. All parser
+structures are now accessed through named macros instead of chains like
+\texttt{np->r->r->l}; for most source files the compiled code stayed
+byte-identical, which confirmed that this cleanup did not change the
+behaviour.
 
 Performance is adequate for interactive use. Loading the complete standard
 library and computing a derivative or an integral takes well below
@@ -373,13 +383,17 @@ evaluation makes it natural to derive formulas symbolically and evaluate
 them numerically in the same program, for example derivatives for Newton's
 method.
 
-\paragraph{Limitations.} The matcher does not support associative or
-commutative matching; sums are kept in a canonical order by rules, and
-products sometimes have to be matched in both orders. Nothing checks that
-a rule set terminates or is confluent~\cite{baader1998term}, and the order
-of rules matters. Optional pattern arguments are missing, which the
-integration case study had to replace by a canonical form. Error messages
-are minimal.
+\paragraph{Limitations.} Optional parts and commutative operators are
+implemented by expanding rules into variants, not inside the matcher. The
+number of variants grows exponentially with the number of optional
+parameters and commutative products, so the approach suits rule sets of
+moderate size but not all of Rubi's rules. Associativity is only handled
+by normalization rules. Nothing checks that a rule set terminates or is
+confluent~\cite{baader1998term}, and the order of rules matters: during the
+translation, two normalization rules defined in the wrong order made the
+interpreter alternate forever between $5(-a)$ and $-1\cdot(5a)$. Numeric
+conditions such as $m\ne-1$ do not hold for symbolic $m$, which is more
+conservative than Rubi. Error messages are minimal.
 
 \paragraph{Related work.} Rule-based simplification is at the core of
 Mathematica~\cite{mathematica} and of Rubi~\cite{rich2018rubi}. General
@@ -391,10 +405,12 @@ organize mathematical knowledge in algebraic hierarchies and simplification
 rule sets~\cite{mathlib2020}. \texttt{rewrite} anticipated several of these
 ideas in a small and self-contained system.
 
-\paragraph{Outlook.} Natural next steps are commutative matching and
-optional arguments in the matcher, which would allow a more direct
-translation of the Rubi rules, and code generation that turns symbolically
-derived expressions into compiled numerical code.
+\paragraph{Outlook.} Natural next steps are moving optional arguments and
+commutative matching into the matcher, which would avoid the expansion
+into variants, an automatic translator from Rubi's Mathematica syntax for
+the rules that need no further helper functions (about 44\% of them), and
+code generation that turns symbolically derived expressions into compiled
+numerical code.
 
 \section{Conclusion}
 
