@@ -169,7 +169,7 @@ t_funct (userfunction [])  = {
 	FKT(r_csc), FKT(r_sec), FKT(r_cot), FKT(r_arccot),
 	FKT(r_coth), FKT(r_sech), FKT(r_csch),
 	FKT(r_arcsinh), FKT(r_arccosh), FKT(r_arctanh), FKT(r_arccoth),
-	FKT(r_polylog), FKT(r_productlog)
+	FKT(r_polylog), FKT(r_productlog), FKT(r_arctan2)
 	} ;
 
 int LASTFUNC = sizeof(userfunction)/sizeof(userfunction[0]);

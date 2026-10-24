@@ -1,11 +1,20 @@
 # Rule-based integration
 
-This folder contains indefinite integration rules for rewrite. They are a
-translation of a small, closed subset of [Rubi](https://github.com/RuleBasedIntegration/Rubi),
-the rule-based integrator by Albert D. Rich, version 4.17.3 (commit 61e9c18).
-Rubi is published under the MIT license, see [LICENSE.Rubi](LICENSE.Rubi).
-The original Mathematica form of every translated rule is kept as a comment
-above its translation.
+This folder contains indefinite integration rules for rewrite, translated
+from [Rubi](https://github.com/RuleBasedIntegration/Rubi), the rule-based
+integrator by Albert D. Rich, version 4.17.3 (commit 61e9c18). Rubi is
+published under the MIT license, see [LICENSE.Rubi](LICENSE.Rubi).
+
+There are two rule sets:
+
+- **`Integrate`** uses a small subset of 15 rules translated by hand
+  (files in this folder). It loads in a fraction of a second and covers
+  powers of linear expressions, exponentials, sine and cosine, and
+  polynomials times them.
+- **`RubiIntegrate`** uses the rules in [rubi](rubi), which the script
+  [tools/rubi2rewrite.py](../../tools/rubi2rewrite.py) translates
+  automatically from Rubi's rule files. About three quarters of Rubi's
+  rules are translated. Loading takes about half a second.
 
 ## Usage
 
@@ -14,19 +23,121 @@ INC "inc/all"
 INC "inc/integration/all"
 REWR Int(x^2*cos(x),x) : Integrate
 2 * cos (x )* x + x ^ 2 * sin (x )- 2 * sin (x )
-REWR Int(sin(a*x+b),x) : Integrate
-- cos (a * x + b )/ a
+
+INC "inc/integration/rubi/all"
+REWR Int(1/(1+x^3),x) : RubiIntegrate
+0.333333 * ln (1 + x )+ 0.57735 * arctan (-0.57735 + 1.1547 * x )- 0.166667 * ln (1 + x ^ 2 - x )
+REWR Int(sqrt(1-x^2),x) : RubiIntegrate
+0.5 * arcsin (x )+ 0.5 * (1 - x ^ 2 )^ 0.5 * x
+REWR Int(x/(1+x^4),x) : RubiIntegrate
+0.5 * arctan (x ^ 2 )
 ```
 
 `Int(f,x)` is the indefinite integral without integration constant. If no
-rule applies, the remaining integral is returned unchanged, for example
-`Int (sin (x )^ 2 ,x )`.
+rule applies, the remaining integral is returned unchanged.
 
-## What is covered
+Numbers are real numbers. Rubi works with exact fractions and complex
+numbers, so a few things differ:
 
-The subset handles sums of the following integrands. Here `L` stands for a
-linear expression `a+b*x`, where `a` and `b` may be numbers or symbols that
-do not contain `x`.
+- Rules whose result needs `I` (the imaginary unit) are not translated.
+- A rule whose result contains a NaN, for example the square root of a
+  negative number, counts as not applicable; the next rule is tried.
+- Logarithms keep Rubi's arguments, e.g. `ln(-2 + x)`, which is NaN for
+  `x < 2` in real arithmetic. Its derivative is still correct.
+
+## The translated Rubi rules
+
+[tools/rubi2rewrite.py](../../tools/rubi2rewrite.py) reads Rubi's rule files
+and writes one rewrite file per Rubi file into [rubi](rubi), with the
+Mathematica original of every rule as a comment, plus
+[rubi/STATISTICS.txt](rubi/STATISTICS.txt) with the reasons for the rules it
+could not translate. Generated files should not be edited by hand; changes
+belong in the script.
+
+```text
+python3 tools/rubi2rewrite.py RUBI/Rubi/IntegrationRules inc/integration/rubi \
+        --order RUBI/Rubi/Rubi.m [--stats]
+```
+
+`--order` loads the files in the order of Rubi's loader, which matters
+because the first applicable rule wins.
+
+A Rubi rule translates almost one to one:
+
+```text
+Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /;
+    FreeQ[{a, b, m}, x] && NeQ[m, -1]
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m), (neq(P_m,(-1)))
+    Int(((O_a)+((O_b)*(Xv)))^(P_m),Xv) = ...
+```
+
+| Rubi | rewrite |
+| --- | --- |
+| `x_Symbol` | `Xv` |
+| `a_` | `P_a`, a `VAR` |
+| `a_.` | `O_a`, a `VAR` declared with `OPT` |
+| default of `a_.` in `+`, `*`, exponent | `DEFAULT + = 0`, `DEFAULT * = 1`, `DEFAULT RIGHT ^ = 1` |
+| order of factors and summands | `COMM +,*` |
+| negative number in a pattern, e.g. `-1` | a `NUM` variable `K_1` with the condition `(K_1 == (-1))` |
+| `FreeQ[{a,b},x]` | `NIN(Xv,O_a,O_b)` |
+| `c1 && c2` | `IF c1, c2` |
+| `With[{q = ...}, ...]`, `Module` with values only | `q` replaced by its value |
+| helpers defined in the rule files (`IntBinomialQ`, ...) | inlined |
+| `ExpandIntegrand`, `PolyQ`, `Subst`, `Rt`, `D`, ... | the C helpers of [inc/helpers](../helpers) |
+| Rubi's inert trig functions `sin`, `cos`, ... | the normal functions |
+
+The rules are stored in Rubi's order in a rule list (see "Rule lists" in
+the main README). The matcher handles optional parts and commutative
+operators by backtracking, and the conditions are part of the match.
+
+### Differences to Mathematica that the rule list handles
+
+Rubi relies on Mathematica's automatic simplification. Rewrite does not
+have it, so a few steps are added:
+
+- `RubiNorm` brings the integrand into a similar normal form first:
+  `x-y` becomes `x+(-1)*y`, `x/y` becomes `x*y^(-1)`, `sqrt(x)` becomes
+  `x^0.5`, numeric factors move to the front. Unlike `IntNorm` of the
+  hand-translated subset, it does not multiply out products with sums,
+  because Mathematica does not do that either.
+- `exp(u)` is written as `e^u` with the number `e`, as Mathematica writes
+  `E^u`, so that rules for `F^u` apply to it. `IntOut` turns it back into
+  `exp(u)`.
+- The first rules of `RubiRules` write polynomials in the integrand as
+  `c0 + c1*x + c2*x^2 + ...` with collected coefficients (`normpoly`), and
+  split integrals of sums and constant factors.
+- Every rule result is simplified trivially: `u^0`, `u^1`, `1*u`, `0*u`,
+  `0+u`.
+- A rule whose result equals the term (no progress), contains a NaN, or
+  equals one of the last terms that rules replaced (a cycle like
+  expanding and factoring again), is skipped and the next rule is tried.
+- An optional variable that occurs twice, like `e.` in
+  `(c+d*tan(e.+f.*x))/(a+b*tan(e.+f.*x))`, may be missing in both places.
+- `RubiCollect` combines like summands of the result (`collect`).
+
+The algebra list is
+
+```text
+SPEC RubiIntegrate : (RubiNorm,IntRubi,RubiRules),RubiCollect,IntOut,All
+```
+
+## Measuring with Rubi's test suite
+
+[tools/rubitest.py](../../tools/rubitest.py) runs problems of Rubi's test
+suite ([MathematicaSyntaxTestSuite](https://github.com/RuleBasedIntegration/MathematicaSyntaxTestSuite),
+MIT license) through `RubiIntegrate` and checks each result numerically:
+the derivative of the result must equal the integrand at several points.
+
+```text
+python3 tools/rubitest.py SUITE --files Apostol --report report.txt
+```
+
+RESULTS_PLACEHOLDER
+
+## The hand-translated subset
+
+The files in this folder translate 13 Rubi rules into 15 rewrite rules:
 
 | Integrand | Rubi section |
 | --- | --- |
@@ -38,97 +149,23 @@ do not contain `x`.
 | `sin(L)`, `cos(L)` | 4.1.1.1 (a+b sin)^n |
 | `L^m*sin(L)`, `L^m*cos(L)` for `m > 0` | 4.1.10 (c+d x)^m (a+b sin)^n |
 
-Products with sums, like `x*(x+1)`, are multiplied out first. Exponents
-must be numbers: a condition like `m != -1` does not hold for a symbolic
-`m`, so `Int(x^n,x)` stays unevaluated. The test
+Here `L` stands for a linear expression `a+b*x`, where `a` and `b` may be
+numbers or symbols. The test
 [tests/cases/16_integration.rw](../../tests/cases/16_integration.rw)
-checks every result by differentiating it again.
-
-## How the translation works
-
-The rules use the pattern features `OPT`, `DEFAULT`, `COMM` and condition
-lists (see the main README). With them, a Rubi rule translates almost one
-to one:
-
-```text
-Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /;
-    FreeQ[{a, b, m}, x] && NeQ[m, -1]
-
-ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb,Pm), (Pm != -1) Int((Qa+Qb*Xv)^Pm,Xv) =
-                  (Qa+Qb*Xv)^(Pm+1)/(Qb*(Pm+1))
-```
-
-| Rubi | rewrite |
-| --- | --- |
-| `x_` | `Xv` |
-| `a_` (parameter) | `Pa`, a `VAR` |
-| `a_.` (optional parameter) | `Qa`, a `VAR` declared with `OPT` |
-| default of `a_.` in `+`, `*`, exponent | `DEFAULT + = 0`, `DEFAULT * = 1`, `DEFAULT RIGHT ^ = 1` |
-| order of factors and summands | `COMM +,*` |
-| `FreeQ[{a,b},x]` | `NIN(Xv,Qa,Qb)` |
-| `c1 && c2` | `IF c1, c2` |
-| `cos(z)` written as `sin(z+Pi/2)` | separate cos rules with the shift worked out |
-
-Rubi relies on Mathematica's normal form of expressions. The rule set
-`IntNorm` produces a similar form before the Rubi rules are applied:
-`x-y` becomes `x+(-1)*y`, `x/y` becomes `x*y^(-1)`, `sqrt(x)` becomes
-`x^0.5`, `e^x` becomes `exp(x)`, numeric factors move to the front, and
-products with sums are multiplied out.
-
-The integration runs as the algebra list `Integrate`:
-
-```text
-SPEC Integrate : (IntNorm,IntRubi),IntOut,All
-```
-
-`IntNorm` and `IntRubi` are applied repeatedly until nothing changes. Then
-`IntOut` turns negative numbers and exponents back into minus signs and
-fractions, and the standard algebra `All` simplifies the result.
-
-The settings `OPT`, `DEFAULT` and `COMM` are switched on in [base](base) and
-switched off again at the end of [all](all), so they do not affect rules
-defined later.
+checks every result by differentiating it again, and
+[tests/cases/19_rubi.rw](../../tests/cases/19_rubi.rw) does the same for
+`RubiIntegrate`.
 
 ## Files
 
 | File | Contents |
 | --- | --- |
-| [all](all) | Loads all files and defines `Integrate`. |
-| [base](base) | Declarations, normal form, settings and linearity rules. |
+| [all](all) | Loads the hand-translated subset and defines `Integrate`. |
+| [base](base) | Declarations, normal forms `IntNorm` and `RubiNorm`, output form `IntOut`, settings and linearity rules. |
 | [1.1.1.1_linear_power](1.1.1.1_linear_power) | Powers of linear expressions. |
 | [1.1.1.2_linear_products](1.1.1.2_linear_products) | Products of powers of linear expressions. |
 | [2_exponentials](2_exponentials) | Exponentials, and polynomials times exponentials. |
 | [4.1_sine](4.1_sine) | Sine and cosine, and polynomials times them. |
+| [rubi/all](rubi/all) | Loads the automatically translated rules and defines `RubiIntegrate`. |
+| [rubi/](rubi) | One file per Rubi rule file, `declarations`, `STATISTICS.txt`. |
 | [LICENSE.Rubi](LICENSE.Rubi) | License of the original rules. |
-
-## Adding rules
-
-1. Pick a Rubi rule file and a rule whose helper functions exist here.
-2. Copy the Mathematica rule as a comment.
-3. Translate the pattern with the table above and add it with
-   `ADDSPEC IntRubi` to a file that is loaded between `base` and the end
-   of `all`.
-4. Add a line to the test and check it with the derivative test.
-
-The helper functions of Rubi that appear in the conditions and right-hand
-sides, such as `ExpandIntegrand`, `PolyQ`, `IntegerQ` or `Subst`, are
-available in lower case from [inc/helpers](../helpers) (see the main
-README). For example, the rule in
-[1.1.1.2_linear_products](1.1.1.2_linear_products) translates
-
-```text
-Int[(a_. + b_.*x_)^m_.*(c_. + d_.*x_)^n_., x_Symbol] := Int[ExpandIntegrand[(a + b*x)^m*(c + d*x)^n, x], x] /;
-    FreeQ[{a, b, c, d, n}, x] && NeQ[b*c - a*d, 0] && IGtQ[m, 0] && (Not[IntegerQ[n]] || ...)
-```
-
-into a rule with `neq(Qb*Qc-Qa*Qd,0)`, `igtq(Qm,0)` and
-`expandintegrand(...)`.
-
-This folder translates 13 Rubi rules into 15 rewrite rules. When they are
-defined, the optional parts and commutative operators expand them into
-about 1700 variants. Rubi's rule files contain about 8500 rule definitions.
-About 72% of them use only functions that rewrite now has; with a
-translator that resolves Mathematica's local definitions (`With`, `Module`)
-it would be about 77%. Translating all of them will need optional parts and
-commutative matching inside the matcher, instead of the expansion into
-variants.

@@ -1,0 +1,89 @@
+# r4_7_1
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   4.7.1 Sine normalization rules
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*tan[a_. + b_.*x_])^m_.*(d_.*sin[a_. + b_.*x_])^n_., x_Symbol] := (c*Tan[a + b*x])^m*(d*Cos[a + b*x])^m/(d*Sin[a + b*x])^m* Int[ActivateTrig[u]*(d*Sin[a + b*x])^(m + n)/(d*Cos[a + b*x])^m, x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSineIntegrandQ[u, x] && Not[IntegerQ[m]]
+
+# Regel 2 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*tan[a_. + b_.*x_])^m_.*(d_.*cos[a_. + b_.*x_])^n_., x_Symbol] := (c*Tan[a + b*x])^m*(d*Cos[a + b*x])^m/(d*Sin[a + b*x])^m* Int[ActivateTrig[u]*(d*Sin[a + b*x])^m/(d*Cos[a + b*x])^(m - n), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSineIntegrandQ[u, x] && Not[IntegerQ[m]]
+
+# Regel 3 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*cot[a_. + b_.*x_])^m_.*(d_.*sin[a_. + b_.*x_])^n_., x_Symbol] := (c*Cot[a + b*x])^m*(d*Sin[a + b*x])^m/(d*Cos[a + b*x])^m* Int[ActivateTrig[u]*(d*Cos[a + b*x])^m/(d*Sin[a + b*x])^(m - n), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSineIntegrandQ[u, x] && Not[IntegerQ[m]]
+
+# Regel 4 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*cot[a_. + b_.*x_])^m_.*(d_.*cos[a_. + b_.*x_])^n_., x_Symbol] := (c*Cot[a + b*x])^m*(d*Sin[a + b*x])^m/(d*Cos[a + b*x])^m* Int[ActivateTrig[u]*(d*Cos[a + b*x])^(m + n)/(d*Sin[a + b*x])^m, x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSineIntegrandQ[u, x] && Not[IntegerQ[m]]
+
+# Regel 5 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*sec[a_. + b_.*x_])^m_.*(d_.*cos[a_. + b_.*x_])^n_., x_Symbol] := (c*Sec[a + b*x])^m*(d*Cos[a + b*x])^m* Int[ActivateTrig[u]*(d*Cos[a + b*x])^(n - m), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 6 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*sec[a_. + b_.*x_])^m_.*(d_.*cos[a_. + b_.*x_])^n_., x_Symbol] := (c*Csc[a + b*x])^m*(d*Sin[a + b*x])^m* Int[ActivateTrig[u]*(d*Sin[a + b*x])^(n - m), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 7 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*tan[a_. + b_.*x_])^m_., x_Symbol] := (c*Tan[a + b*x])^m*(c*Cos[a + b*x])^m/(c*Sin[a + b*x])^m* Int[ActivateTrig[u]*(c*Sin[a + b*x])^m/(c*Cos[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownSineIntegrandQ[u, x]
+
+# Regel 8 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*cot[a_. + b_.*x_])^m_., x_Symbol] := (c*Cot[a + b*x])^m*(c*Sin[a + b*x])^m/(c*Cos[a + b*x])^m* Int[ActivateTrig[u]*(c*Cos[a + b*x])^m/(c*Sin[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownSineIntegrandQ[u, x]
+
+# Regel 9 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*sec[a_. + b_.*x_])^m_., x_Symbol] := (c*Sec[a + b*x])^m*(c*Cos[a + b*x])^m* Int[ActivateTrig[u]/(c*Cos[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownSineIntegrandQ[u, x]
+
+# Regel 10 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*csc[a_. + b_.*x_])^m_., x_Symbol] := (c*Csc[a + b*x])^m*(c*Sin[a + b*x])^m* Int[ActivateTrig[u]/(c*Sin[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownSineIntegrandQ[u, x]
+
+# Regel 11 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*sin[a_. + b_.*x_])^n_.*(A_ + B_.*csc[a_. + b_.*x_]), x_Symbol] := c*Int[ ActivateTrig[u]*(c*Sin[a + b*x])^(n - 1)*(B + A*Sin[a + b*x]), x] /; FreeQ[{a, b, c, A, B, n}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 12 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(c_.*cos[a_. + b_.*x_])^n_.*(A_ + B_.*sec[a_. + b_.*x_]), x_Symbol] := c*Int[ ActivateTrig[u]*(c*Cos[a + b*x])^(n - 1)*(B + A*Cos[a + b*x]), x] /; FreeQ[{a, b, c, A, B, n}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 13 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(A_ + B_.*csc[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(B + A*Sin[a + b*x])/Sin[a + b*x], x] /; FreeQ[{a, b, A, B}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 14 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(A_ + B_.*sec[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(B + A*Cos[a + b*x])/Cos[a + b*x], x] /; FreeQ[{a, b, A, B}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 15 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_.*(c_.*sin[a_. + b_.*x_])^ n_.*(A_. + B_.*csc[a_. + b_.*x_] + C_.*csc[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[ u]*(c*Sin[a + b*x])^(n - 2)*(C + B*Sin[a + b*x] + A*Sin[a + b*x]^2), x] /; FreeQ[{a, b, c, A, B, C, n}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 16 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_.*(c_.*cos[a_. + b_.*x_])^ n_.*(A_. + B_.*sec[a_. + b_.*x_] + C_.*sec[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[ u]*(c*Cos[a + b*x])^(n - 2)*(C + B*Cos[a + b*x] + A*Cos[a + b*x]^2), x] /; FreeQ[{a, b, c, A, B, C, n}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 17 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_.*(c_.*sin[a_. + b_.*x_])^n_.*(A_ + C_.*csc[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[u]*(c*Sin[a + b*x])^(n - 2)*(C + A*Sin[a + b*x]^2), x] /; FreeQ[{a, b, c, A, C, n}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 18 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_.*(c_.*cos[a_. + b_.*x_])^n_.*(A_ + C_.*sec[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[u]*(c*Cos[a + b*x])^(n - 2)*(C + A*Cos[a + b*x]^2), x] /; FreeQ[{a, b, c, A, C, n}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 19 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(A_. + B_.*csc[a_. + b_.*x_] + C_.*csc[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + B*Sin[a + b*x] + A*Sin[a + b*x]^2)/ Sin[a + b*x]^2, x] /; FreeQ[{a, b, A, B, C}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 20 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(A_. + B_.*sec[a_. + b_.*x_] + C_.*sec[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + B*Cos[a + b*x] + A*Cos[a + b*x]^2)/ Cos[a + b*x]^2, x] /; FreeQ[{a, b, A, B, C}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 21 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(A_ + C_.*csc[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + A*Sin[a + b*x]^2)/Sin[a + b*x]^2, x] /; FreeQ[{a, b, A, C}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 22 nicht uebersetzt: predicate KnownSineIntegrandQ
+#   Int[u_*(A_ + C_.*sec[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + A*Cos[a + b*x]^2)/Cos[a + b*x]^2, x] /; FreeQ[{a, b, A, C}, x] && KnownSineIntegrandQ[u, x]
+
+# Regel 23 (8748 Varianten):
+#   Int[u_*(A_. + B_.*sin[a_. + b_.*x_] + C_.*csc[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(C + A*Sin[a + b*x] + B*Sin[a + b*x]^2)/ Sin[a + b*x], x] /; FreeQ[{a, b, A, B, C}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C) Int((P_u)*((O_A)+((O_B)*(sin((O_a)+((O_b)*(Xv)))))+((O_C)*(csc((O_a)+((O_b)*(Xv)))))),Xv) = Int(((P_u)*(((O_C)+(((O_A)*(sin(((O_a)+(((O_b)*(Xv))))))))+(((O_B)*(((sin(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((sin(((O_a)+(((O_b)*(Xv))))))^((-1))))),Xv)
+
+# Regel 24 (8748 Varianten):
+#   Int[u_*(A_. + B_.*cos[a_. + b_.*x_] + C_.*sec[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(C + A*Cos[a + b*x] + B*Cos[a + b*x]^2)/ Cos[a + b*x], x] /; FreeQ[{a, b, A, B, C}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C) Int((P_u)*((O_A)+((O_B)*(cos((O_a)+((O_b)*(Xv)))))+((O_C)*(sec((O_a)+((O_b)*(Xv)))))),Xv) = Int(((P_u)*(((O_C)+(((O_A)*(cos(((O_a)+(((O_b)*(Xv))))))))+(((O_B)*(((cos(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((cos(((O_a)+(((O_b)*(Xv))))))^((-1))))),Xv)
+
+# Regel 25 (314928 Varianten):
+#   Int[u_*(A_.*sin[a_. + b_.*x_]^n_. + B_.*sin[a_. + b_.*x_]^n1_ + C_.*sin[a_. + b_.*x_]^n2_), x_Symbol] := Int[ActivateTrig[u]* Sin[a + b*x]^n*(A + B*Sin[a + b*x] + C*Sin[a + b*x]^2), x] /; FreeQ[{a, b, A, B, C, n}, x] && EqQ[n1, n + 1] && EqQ[n2, n + 2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C,O_n), (eqq(P_n1,((O_n)+(1)))), (eqq(P_n2,((O_n)+(2)))) Int((P_u)*(((O_A)*((sin((O_a)+((O_b)*(Xv))))^(O_n)))+((O_B)*((sin((O_a)+((O_b)*(Xv))))^(P_n1)))+((O_C)*((sin((O_a)+((O_b)*(Xv))))^(P_n2)))),Xv) = Int(((P_u)*(((sin(((O_a)+(((O_b)*(Xv))))))^(O_n)))*(((O_A)+(((O_B)*(sin(((O_a)+(((O_b)*(Xv))))))))+(((O_C)*(((sin(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)
+
+# Regel 26 (314928 Varianten):
+#   Int[u_*(A_.*cos[a_. + b_.*x_]^n_. + B_.*cos[a_. + b_.*x_]^n1_ + C_.*cos[a_. + b_.*x_]^n2_), x_Symbol] := Int[ActivateTrig[u]* Cos[a + b*x]^n*(A + B*Cos[a + b*x] + C*Cos[a + b*x]^2), x] /; FreeQ[{a, b, A, B, C, n}, x] && EqQ[n1, n + 1] && EqQ[n2, n + 2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C,O_n), (eqq(P_n1,((O_n)+(1)))), (eqq(P_n2,((O_n)+(2)))) Int((P_u)*(((O_A)*((cos((O_a)+((O_b)*(Xv))))^(O_n)))+((O_B)*((cos((O_a)+((O_b)*(Xv))))^(P_n1)))+((O_C)*((cos((O_a)+((O_b)*(Xv))))^(P_n2)))),Xv) = Int(((P_u)*(((cos(((O_a)+(((O_b)*(Xv))))))^(O_n)))*(((O_A)+(((O_B)*(cos(((O_a)+(((O_b)*(Xv))))))))+(((O_C)*(((cos(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)

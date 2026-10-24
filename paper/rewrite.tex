@@ -58,12 +58,14 @@ Numerical evaluation is interleaved with rewriting: as soon as all
 arguments of a function are numbers, an attached C function computes the
 value. We describe the design of the language, its revival on current
 64-bit compilers including a regression test suite, and a case study in
-which part of the rule-based integrator Rubi was translated into
+which the rule-based integrator Rubi was translated into
 \texttt{rewrite}. For this translation the language was extended by
-optional pattern parts with default values, commutative operators and
-lists of conditions. They are implemented by expanding each rule into its
-variants, which keeps the matcher unchanged but limits the approach to
-moderately sized rule sets.
+ordered rule lists with a backtracking matcher that supports optional
+pattern parts with default values, commutative operators and lists of
+conditions, and by symbolic helper functions written in C. A translator
+converts about three quarters of Rubi's 7466 rules automatically, and the
+results on Rubi's own test problems are verified by numerical
+differentiation.
 \end{abstract}
 
 \section{Introduction}
@@ -236,7 +238,8 @@ pattern based. Rubi~\cite{rich2018rubi,rubirepo} showed that an extensive
 system of carefully ordered rules with conditions can integrate a very
 large class of functions. Its rule files contain about 8500 rule
 definitions in Mathematica syntax, published under the MIT license. We
-translated a closed subset of them to test how far the mechanisms of
+first translated a closed subset of them by hand, and then wrote a
+translator for all of them, to test how far the mechanisms of
 \texttt{rewrite} carry.
 
 \subsection{Translation scheme}
@@ -267,11 +270,20 @@ with these operators also match with swapped operands.
 by commas, all of which must hold. \texttt{NIN(x,a,b,m)} tests that $x$
 occurs in none of $a$, $b$, $m$, which is Rubi's \texttt{FreeQ}.
 
-All three are implemented when a rule is defined: the rule is expanded into
-all its variants, with the default values of missing variables substituted
-into the right-hand side, the condition and the \texttt{DO} block. The
-matcher itself is unchanged. With these features the rule above translates
-almost one to one:
+A first implementation expanded every rule into all its variants when it
+was defined, with the default values of missing variables substituted, so
+that the matcher stayed unchanged. The number of variants grows
+exponentially with the number of optional parameters and commutative
+products, however: the median Rubi rule would have about 1900 variants.
+Rules defined while one of these features is active are therefore kept in
+an ordered \emph{rule list}, as in Mathematica, and matched by a separate
+backtracking matcher. Bindings of meta variables are recorded on a trail,
+so a failed alternative undoes exactly its own bindings. Swapped operands
+and missing optional operands are tried in turn, and the conditions are
+checked as part of the match, so a failing condition makes the matcher try
+the next alternative and then the next rule. A precomputed set of possible
+head symbols per rule skips most rules of a large list without running the
+matcher. With these features the rule above translates almost one to one:
 
 \begin{lstlisting}
 ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb,Pm), (Pm != -1) Int((Qa+Qb*Xv)^Pm,Xv) =
@@ -378,7 +390,7 @@ with current tools. The port to 64-bit Linux and Windows (MSYS2) required
 only small changes to the C code itself. The main problems were changed
 semantics in the scanner generator, the release of static memory that old
 C libraries tolerated, and errors in the handling of declarations inside
-loops and included files. A regression test suite with 25 test programs
+loops and included files. A regression test suite with 26 test programs
 now covers the core language, the library, the new pattern features and helper functions, the
 integration rules and the original example programs. Memory leaks were
 removed with an instrumented build that counts allocations per source
@@ -408,12 +420,13 @@ evaluation makes it natural to derive formulas symbolically and evaluate
 them numerically in the same program, for example derivatives for Newton's
 method.
 
-\paragraph{Limitations.} Optional parts and commutative operators are
-implemented by expanding rules into variants, not inside the matcher. The
-number of variants grows exponentially with the number of optional
-parameters and commutative products, so the approach suits rule sets of
-moderate size but not all of Rubi's rules. Associativity is only handled
-by normalization rules. Nothing checks that a rule set terminates or is
+\paragraph{Limitations.} Commutative matching only swaps the two operands
+of one binary operator. Associativity is handled by normalization, so the
+integrand must be brought into a fixed form before the rules are tried.
+Numbers are floating-point reals, so Rubi's exact fractions and complex
+intermediate results are not available. Rules that need the imaginary
+unit are not translated, and logarithms of negative arguments evaluate to
+NaN although their derivatives are correct. Nothing checks that a rule set terminates or is
 confluent~\cite{baader1998term}, and the order of rules matters: during the
 translation, two normalization rules defined in the wrong order made the
 interpreter alternate forever between $5(-a)$ and $-1\cdot(5a)$. Numeric
@@ -430,12 +443,11 @@ organize mathematical knowledge in algebraic hierarchies and simplification
 rule sets~\cite{mathlib2020}. \texttt{rewrite} anticipated several of these
 ideas in a small and self-contained system.
 
-\paragraph{Outlook.} Natural next steps are moving optional arguments and
-commutative matching into the matcher, which would avoid the expansion
-into variants; an automatic translator from Rubi's Mathematica syntax for
-the rules whose helper functions are now available (about 72\% of them);
-the remaining helper functions such as partial fractions; and code
-generation that turns symbolically derived expressions into compiled
+\paragraph{Outlook.} Natural next steps are the remaining helper functions
+(partial fractions, \texttt{SimplerQ}, and special functions such as
+elliptic integrals and $\mathrm{erf}$), exact rational numbers, an
+associative-commutative matcher for sums and products of any length, and
+code generation that turns symbolically derived expressions into compiled
 numerical code.
 
 \section{Conclusion}
@@ -443,9 +455,10 @@ numerical code.
 \texttt{rewrite} shows that a small interpreter can host a complete
 computer algebra library when the mathematics is expressed as rewrite rules
 and rule sets can be combined and lifted between algebraic structures. The
-translation of part of Rubi demonstrates that established rule-based
-algorithms can be imported, and it clarifies which matching features such
-an import requires.
+automatic translation of most of Rubi demonstrates that established
+rule-based algorithms can be imported, and it clarifies which matching
+features and which implicit simplifications of the host system such an
+import requires.
 
 \section*{Availability}
 

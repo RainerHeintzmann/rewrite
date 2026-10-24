@@ -44,6 +44,9 @@ Node * calkulate _1p(Node *);
 void print	_1p(Node *);
 Node * solve	_2p(Node * ,Node *);
 Node * rewrite _2p(Node * ,Node *);
+void rewrite_begin (void);   /* 2026: Schrittbegrenzung fuer REWR */
+void rewrite_end (void);
+extern long max_rewrite_steps;
 
 /* Condition-Funktionen */
 

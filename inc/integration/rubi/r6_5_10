@@ -1,0 +1,13 @@
+# r6_5_10
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   6.5.10 (c+d x)^m (a+b sech)^n
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 nicht uebersetzt: function List
+#   Int[u_^m_.*Sech[v_]^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*Sech[ExpandToSum[v, x]]^n, x] /; FreeQ[{m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
+
+# Regel 2 nicht uebersetzt: function List
+#   Int[u_^m_.*Csch[v_]^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*Csch[ExpandToSum[v, x]]^n, x] /; FreeQ[{m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]

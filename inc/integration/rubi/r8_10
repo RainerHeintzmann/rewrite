@@ -1,0 +1,16 @@
+# r8_10
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   8.10 Bessel functions
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 nicht uebersetzt: function BesselJ in pattern
+#   Int[BesselJ[1, a_. + b_.*x_], x_Symbol] := -BesselJ[0, a + b*x]/b /; FreeQ[{a, b}, x]
+
+# Regel 2 nicht uebersetzt: function BesselJ in pattern
+#   Int[BesselJ[n_, a_. + b_.*x_], x_Symbol] := -2*BesselJ[n - 1, a + b*x]/b + Int[BesselJ[n - 2, a + b*x], x] /; FreeQ[{a, b}, x] && IGtQ[(n - 1)/2, 0]
+
+# Regel 3 nicht uebersetzt: function BesselJ in pattern
+#   Int[BesselJ[n_, a_. + b_.*x_], x_Symbol] := (a + b*x)^(n + 1)* HypergeometricPFQ[{(n + 1)/2}, {(n + 3)/2, n + 1}, -1/4*(a + b*x)^2]/(2^n*b*Gamma[n + 2]) /; FreeQ[{a, b, n}, x]

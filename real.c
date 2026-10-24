@@ -188,3 +188,6 @@ double * r_productlog (double * arg[])
 		}
 	return mkreal(w);
 }
+
+/* ArcTan[x,y] in Mathematica: Winkel von (x,y) */
+double * r_arctan2 (double * arg[])	{return mkreal(atan2(* arg[1], * arg[0]));}

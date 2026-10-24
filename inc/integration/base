@@ -15,7 +15,7 @@
 
 FUNC Int : real,real >> real
 FUNC inthide      : real,real >> real ATT inthide       # Rubi IntHide = Int
-FUNC unintegrable : real,real >> real ATT unintegrable  # Rubi Unintegrable: Int bleibt stehen
+FUNC unintegrable : real,real >> real                   # Rubi Unintegrable: bleibt stehen, IntOut macht Int daraus
 
 VAR Uv,Vv,Wv,Xv : real                    # beliebige Terme
 VAR Pa,Pb,Pc,Pd,Pe,Pf,Pm,Pn : real        # Rubi a_ , b_ , ...
@@ -56,10 +56,43 @@ ADDSPEC IntNorm : (Vv+Wv)*Uv = Vv*Uv+Wv*Uv
 # ---------------- Rueckwandlung fuer die Ausgabe ----------------
 # negative Zahlen als Minuszeichen und Kehrwerte als Bruch, damit All die
 # gewohnte Form ausgibt
+# Normalform fuer die automatisch uebersetzten Rubi-Regeln (rubi/all):
+# wie IntNorm, aber ohne Ausmultiplizieren (Mathematica multipliziert
+# Produkte mit Summen nicht von selbst aus).
+ALG RubiNorm
+SPEC    RubiNorm : Uv-Vv   = Uv+(-1)*Vv
+ADDSPEC RubiNorm : -Uv     = (-1)*Uv
+ADDSPEC RubiNorm : Uv/Vv   = Uv*Vv^(-1)
+ADDSPEC RubiNorm : mi Uv   = Uv^(-1)
+ADDSPEC RubiNorm : sqrt Uv = Uv^0.5
+ADDSPEC RubiNorm : exp(Uv) = e^Uv   # wie Mathematica: E^u, damit F^u-Muster passen
+ADDSPEC RubiNorm : IF (Kc == 0) Uv^Kc = 1
+ADDSPEC RubiNorm : IF (Kc == 1) Uv^Kc = Uv
+ADDSPEC RubiNorm : IF (Kc == 1) Kc*Uv = Uv
+ADDSPEC RubiNorm : IF (Kc == 0) Kc*Uv = 0
+ADDSPEC RubiNorm : IF (Kc == 0) Kc+Uv = Uv
+ADDSPEC RubiNorm : IF (Kc == 0) Uv+Kc = Uv
+ADDSPEC RubiNorm : (Uv^Vv)^Kc = Uv^(Vv*Kc)
+ADDSPEC RubiNorm : Uv*Uv = Uv^2
+ADDSPEC RubiNorm : Uv^Vv*Uv = Uv^(Vv+1)
+ADDSPEC RubiNorm : Uv*Uv^Vv = Uv^(Vv+1)
+ADDSPEC RubiNorm : Uv^Vv*Uv^Wv = Uv^(Vv+Wv)
+# (Reihenfolge wichtig: zwei Zahlen zuerst zusammenfassen, sonst
+#  wechseln 5*(-1*a) und -1*(5*a) endlos)
+ADDSPEC RubiNorm : Kc*(Kd*Uv) = (Kc*Kd)*Uv
+ADDSPEC RubiNorm : Uv*Kc = Kc*Uv
+ADDSPEC RubiNorm : (Kc*Uv)*Vv = Kc*(Uv*Vv)
+ADDSPEC RubiNorm : Uv*(Kc*Vv) = Kc*(Uv*Vv)
+# ---------------- Rueckwandlung fuer die Ausgabe ----------------
+# negative Zahlen als Minuszeichen und Kehrwerte als Bruch, damit All die
+# gewohnte Form ausgibt
+
 ALG IntOut
 SPEC    IntOut : IF (Kc < 0) Uv^Kc = mi(Uv^(-Kc))
 ADDSPEC IntOut : IF (Kc == -1) Kc*Uv = -Uv
 ADDSPEC IntOut : IF (Kc < 0), (Kc != -1) Kc*Uv = -((-Kc)*Uv)
+ADDSPEC IntOut : unintegrable(Uv,Vv) = Int(Uv,Vv)
+ADDSPEC IntOut : IF (abs(Kf - e) < 1e-9) Kf^Uv = exp(Uv)
 
 # ---------------- Einstellungen fuer die Rubi-Regeln ----------------
 # (werden am Ende von inc/integration/all wieder geloescht)

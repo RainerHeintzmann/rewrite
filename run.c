@@ -20,6 +20,7 @@
 #include "defs.h"
 #include "nodes.h"
 #include "symfkt.h"
+#include "listmatch.h"
 
 #define EQUAL  0	/* wichtig wegen strcmp */
 
@@ -58,8 +59,64 @@ Node * rewrite _2a ((term,Baum) , Node * term ,Node * Baum)
 	DBFK(5,print(Baum));
 	DEBG((5,"\n"));
 
+	if (Baum && Baum->type == RULELIST)	/* Regelliste (listmatch.c) */
+		return match_list(term,Baum);
 	return match(term,Baum);
 
+}
+
+/* 2026: Schrittbegrenzung, damit eine Regelschleife REWR nicht endlos laufen laesst */
+long max_rewrite_steps = 100000;
+static long rewrite_steps = 0;
+static int  rewrite_depth = 0;
+static BOOLEAN step_limit_hit = FALSE;
+
+/* 2026: die zuletzt von Regellisten ersetzten Terme. Ein Ergebnis, das einem
+   davon gleicht, schliesst einen Zyklus (A -> B -> A) und gilt als kein Fortschritt. */
+#define NHIST 8
+static Node * hist[NHIST];
+static int hist_pos = 0;
+
+static void hist_clear (void)
+{
+	int i;
+	for (i = 0; i < NHIST; i++)
+		{
+		delete(hist[i]);
+		hist[i] = NULL;
+		}
+	hist_pos = 0;
+}
+
+static void hist_add (Node * t)
+{
+	delete(hist[hist_pos]);
+	hist[hist_pos] = term_copy(t);
+	hist_pos = (hist_pos + 1) % NHIST;
+}
+
+static BOOLEAN hist_has (Node * t)
+{
+	int i;
+	for (i = 0; i < NHIST; i++)
+		if (hist[i] && term_equal(hist[i], t)) return TRUE;
+	return FALSE;
+}
+
+void rewrite_begin (void)	/* vor REWR (verschachtelt: nur aussen zuruecksetzen) */
+{
+	if (rewrite_depth++ == 0)
+		{
+		rewrite_steps = 0;
+		step_limit_hit = FALSE;
+		hist_clear();
+		}
+}
+
+void rewrite_end (void)
+{
+	if (rewrite_depth > 0) rewrite_depth--;
+	if (rewrite_depth == 0) hist_clear();
 }
 
 BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
@@ -67,7 +124,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 	Node * lt, * rt,* ers ,* maintype;
 	BOOLEAN rewritten;
 
-	if (* p_term == NULL)
+	if (* p_term == NULL || step_limit_hit)
 		return FALSE;
 
 	DEBG((4,"\nsuche_Stelle : term : "));
@@ -81,11 +138,11 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 	do rewritten=(suche_Stelle (&((* p_term) -> r),Baum));
 	while (rewritten);
 
-	if ((ers=rewrite(* p_term,Baum)) != (Node *) NULL)
+	lm_start = 0;
+	while ((ers=rewrite(* p_term,Baum)) != (Node *) NULL)
 			{
-			Node * old = * p_term;
-			DEBG((2,"REWR: "));
-			DBFK(2,print(* p_term));
+			Node * old = * p_term, * neu;
+			int found = lm_last;
 
 				lt = (* p_term) -> l;
 				rt = (* p_term) -> r;
@@ -94,9 +151,26 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 					maintype=rtypes((Symbol *) lt);
 				else
 					maintype=NULL;
-				* p_term = tcopy(RES_RHS(ers)); /* Formel einsetzen (Es wird auch 'geliftet' !) */
-				* p_term = tcalc(* p_term);  /* Formel numerisch auswerten */
+				neu = tcopy(RES_RHS(ers)); /* Formel einsetzen (Es wird auch 'geliftet' !) */
+				neu = tcalc(neu);  /* Formel numerisch auswerten */
+				if (Baum && Baum->type == RULELIST)
+					term_simplify_trivial(& neu);	/* x^0, 1*u, ... wie Mathematica */
 				RESTORE;					/* Symboltabelle restaurieren (auch locks beseitigen)*/
+				/* 2026: in einer Regelliste wird eine Regel ohne Fortschritt
+				   (Ergebnis gleich dem Term) uebersprungen; die naechste wird versucht */
+				if (Baum && Baum->type == RULELIST
+				    && (term_equal(neu, old) || term_has_nan(neu) || hist_has(neu)))
+					{
+					DEBG((2,"REWR: rule %d makes no progress or gives NaN, skipped\n", found));
+					delete(neu);
+					lm_start = found + 1;
+					continue;
+					}
+				if (Baum && Baum->type == RULELIST)
+					hist_add(old);
+				DEBG((2,"REWR: "));
+				DBFK(2,print(old));
+				* p_term = neu;
 				delete (lt);
 				delete (rt);
 				if (old->type != SYM_TYPE)
@@ -107,10 +181,16 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 				DBFK(2,print(*p_term));
 				DEBG((2,"\n"));
 				didrewrite = TRUE; /* wurde umgeschrieben */
+				if (++rewrite_steps > max_rewrite_steps && ! step_limit_hit)
+					{
+					step_limit_hit = TRUE;
+					printfErr("REWR : step limit (%ld rewrites) reached, the result is not complete\n",
+					          max_rewrite_steps);
+					}
 				return TRUE;
 			}
-		else
-			RESTORE;					/* Symboltabelle restaurieren */
+	RESTORE;					/* Symboltabelle restaurieren */
+	lm_start = 0;
 
 	return FALSE;
 

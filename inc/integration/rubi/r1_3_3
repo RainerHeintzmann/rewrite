@@ -1,0 +1,70 @@
+# r1_3_3
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   1.3.3 P(x)^p
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 nicht uebersetzt: predicate BinomialQ
+#   Int[(c_.*x_)^m_.*Pq_*u_^p_.,x_Symbol] := Int[(c*x)^m*Pq*ExpandToSum[u,x]^p,x] /; FreeQ[{c,m,p},x] && PolyQ[Pq,x] && BinomialQ[u,x] && Not[BinomialMatchQ[u,x]]
+
+# Regel 2 nicht uebersetzt: predicate QuadraticQ
+#   Int[Pq_*u_^p_.,x_Symbol] := Int[Pq*ExpandToSum[u,x]^p,x] /; FreeQ[p,x] && PolyQ[Pq,x] && QuadraticQ[u,x] && Not[QuadraticMatchQ[u,x]]
+
+# Regel 3 nicht uebersetzt: predicate QuadraticQ
+#   Int[u_^m_.*Pq_*v_^p_.,x_Symbol] := Int[ExpandToSum[u,x]^m*Pq*ExpandToSum[v,x]^p,x] /; FreeQ[{m,p},x] && PolyQ[Pq,x] && LinearQ[u,x] && QuadraticQ[v,x] && Not[LinearMatchQ[u,x] && QuadraticMatchQ[v,x]]
+
+# Regel 4 nicht uebersetzt: predicate TrinomialQ
+#   Int[Pq_*u_^p_.,x_Symbol] := Int[Pq*ExpandToSum[u,x]^p,x] /; FreeQ[p,x] && PolyQ[Pq,x] && TrinomialQ[u,x] && Not[TrinomialMatchQ[u,x]]
+
+# Regel 5 nicht uebersetzt: predicate TrinomialQ
+#   Int[(d_.*x_)^m_.*Pq_*u_^p_.,x_Symbol] := Int[(d*x)^m*Pq*ExpandToSum[u,x]^p,x] /; FreeQ[{d,m,p},x] && PolyQ[Pq,x] && TrinomialQ[u,x] && Not[TrinomialMatchQ[u,x]]
+
+# Regel 6 nicht uebersetzt: function PolyGCD
+#   Int[u_.*Px_^p_*Qx_^q_,x_Symbol] := Module[{Rx=PolyGCD[Px,Qx,x]}, Int[u*Rx^(p+q)*PolynomialQuotient[Px,Rx,x]^p*PolynomialQuotient[Qx,Rx,x]^q,x] /; NeQ[Rx,1]] /; IGtQ[p,0] && ILtQ[q,0] && PolyQ[Px,x] && PolyQ[Qx,x]
+
+# Regel 7 nicht uebersetzt: function PolyGCD
+#   Int[u_.*Px_*Qx_^q_,x_Symbol] := Module[{Rx=PolyGCD[Px,Qx,x]}, Int[u*Rx^(q+1)*PolynomialQuotient[Px,Rx,x]*PolynomialQuotient[Qx,Rx,x]^q,x] /; NeQ[Rx,1]] /; ILtQ[q,0] && PolyQ[Px,x] && PolyQ[Qx,x]
+
+# Regel 8 nicht uebersetzt: function ReplaceAll
+#   Int[Pn_^p_.,x_Symbol] := With[{S=Coeff[Pn,x,Expon[Pn,x]-1]/(Expon[Pn,x]*Coeff[Pn,x,Expon[Pn,x]])}, Subst[Int[ExpandToSum[ReplaceAll[Pn,x->x-S],x]^p,x],x,x+S] /; BinomialQ[ReplaceAll[Pn,x->x-S],x] || IntegerQ[Expon[Pn,x]/2] && TrinomialQ[ReplaceAll[Pn,x->x-S],x]] /; FreeQ[p,x] && PolyQ[Pn,x] && GtQ[Expon[Pn,x],2] && NeQ[Coeff[Pn,x,Expon[Pn,x]-1],0]
+
+# Regel 9 nicht uebersetzt: function ReplaceAll
+#   Int[Pn_^p_.*Qx_,x_Symbol] := With[{S=Coeff[Pn,x,Expon[Pn,x]-1]/(Expon[Pn,x]*Coeff[Pn,x,Expon[Pn,x]])}, Subst[Int[ExpandToSum[ReplaceAll[Pn,x->x-S],x]^p*ExpandToSum[ReplaceAll[Qx,x->x-S],x],x],x,x+S] /; BinomialQ[ReplaceAll[Pn,x->x-S],x] || IntegerQ[Expon[Pn,x]/2] && TrinomialQ[ReplaceAll[Pn,x->x-S],x]] /; FreeQ[p,x] && PolyQ[Pn,x] && GtQ[Expon[Pn,x],2] && NeQ[Coeff[Pn,x,Expon[Pn,x]-1],0] && PolyQ[Qx,x] && Not[MonomialQ[Qx,x] && IGtQ[p,0]]
+
+# Regel 10 nicht uebersetzt: function ReplaceAll
+#   Int[u_.*Px_^p_,x_Symbol] := With[{Qx=Factor[ReplaceAll[Px,x->Sqrt[x]]]}, Int[ExpandIntegrand[u*ReplaceAll[Qx,x->x^2]^p,x],x] /; Not[SumQ[NonfreeFactors[Qx,x]]]] /; PolyQ[Px,x^2] && GtQ[Expon[Px,x],2] && Not[BinomialQ[Px,x]] && Not[TrinomialQ[Px,x]] && ILtQ[p,0] && RationalFunctionQ[u,x]
+
+# Regel 11 nicht uebersetzt: function ReplaceAll
+#   Int[u_.*Px_^p_,x_Symbol] := With[{Qx=Factor[ReplaceAll[Px,x->Sqrt[x]]]}, Int[ExpandIntegrand[u,ReplaceAll[Qx,x->x^2]^p,x],x] /; Not[SumQ[NonfreeFactors[Qx,x]]]] /; PolyQ[Px,x^2] && GtQ[Expon[Px,x],2] && Not[BinomialQ[Px,x]] && Not[TrinomialQ[Px,x]] && ILtQ[p,0]
+
+# Regel 12 nicht uebersetzt: function Factor
+#   Int[u_.*Px_^p_,x_Symbol] := With[{Qx=Factor[Px]}, Int[ExpandIntegrand[u*Qx^p,x],x] /; Not[SumQ[NonfreeFactors[Qx,x]]]] /; PolyQ[Px,x] && GtQ[Expon[Px,x],2] && Not[BinomialQ[Px,x]] && Not[TrinomialQ[Px,x]] && ILtQ[p,0] && RationalFunctionQ[u,x]
+
+# Regel 13 nicht uebersetzt: function Factor
+#   Int[u_.*Px_^p_,x_Symbol] := With[{Qx=Factor[Px]}, Int[ExpandIntegrand[u,Qx^p,x],x] /; Not[SumQ[NonfreeFactors[Qx,x]]]] /; PolyQ[Px,x] && GtQ[Expon[Px,x],2] && Not[BinomialQ[Px,x]] && Not[TrinomialQ[Px,x]] && ILtQ[p,0]
+
+# Regel 14 nicht uebersetzt: function Factor
+#   Int[u_.*Px_^p_,x_Symbol] := With[{Qx=Factor[Px]}, Int[u*Qx^p,x] /; Not[SumQ[NonfreeFactors[Qx,x]]]] /; PolyQ[Px,x] && GtQ[Expon[Px,x],2] && Not[BinomialQ[Px,x]] && Not[TrinomialQ[Px,x]] && IGtQ[p,1]
+
+# Regel 15 nicht uebersetzt: predicate BinomialQ
+#   Int[u_.*Px_^p_,x_Symbol] := Int[ExpandToSum[u,Px^p,x],x] /; PolyQ[Px,x] && GtQ[Expon[Px,x],2] && Not[BinomialQ[Px,x]] && Not[TrinomialQ[Px,x]] && IGtQ[p,0]
+
+# Regel 16 nicht uebersetzt: predicate RationalFunctionQ
+#   Int[u_.*Q6_^p_,x_Symbol] := With[{a=Coeff[Q6,x,0],b=Coeff[Q6,x,2],c=Coeff[Q6,x,3],d=Coeff[Q6,x,4],e=Coeff[Q6,x,6]}, 1/(3^(3*p)*a^(2*p)) \[Star] Int[ExpandIntegrand[u* (3*a+3*Rt[a,3]^2*Rt[c,3]*x+b*x^2)^p* (3*a-3*(-1)^(1/3)*Rt[a,3]^2*Rt[c,3]*x+b*x^2)^p* (3*a+3*(-1)^(2/3)*Rt[a,3]^2*Rt[c,3]*x+b*x^2)^p,x],x] /; EqQ[b^2-3*a*d,0] && EqQ[b^3-27*a^2*e,0]] /; ILtQ[p,0] && PolyQ[Q6,x,6] && EqQ[Coeff[Q6,x,1],0] && EqQ[Coeff[Q6,x,5],0] && RationalFunctionQ[u,x]
+
+# Regel 17 nicht uebersetzt: symbol Min
+#   Int[Px_^p_*Fx_.,x_Symbol] := With[{r=Expon[Px,x,Min]}, Px^FracPart[p]/(x^(r*FracPart[p])*ExpandToSum[Px/x^r,x]^FracPart[p]) \[Star] Int[x^(p*r)*ExpandToSum[Px/x^r,x]^p*Fx,x] /; IGtQ[r,0]] /; FreeQ[p,x] && PolyQ[Px,x] && Not[IntegerQ[p]] && Not[MonomialQ[Px,x]] && Not[PolyQ[Fx,x]]
+
+# Regel 18 (216 Varianten):
+#   Int[(a_.*x_^r_.+b_.*x_^s_.)^p_*Fx_.,x_Symbol] := (a*x^r+b*x^s)^p/(x^(p*r)*(a+b*x^(s-r))^p) \[Star] Int[x^(p*r)*(a+b*x^(s-r))^p*Fx,x] /; FreeQ[{a,b,p,r,s},x] && Not[IntegerQ[p]] && PosQ[s-r] && Not[EqQ[p,1] && EqQ[Fx,1]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_p,O_r,O_s), (not(integerq(P_p))), (posq(((O_s)+((((-1))*(O_r)))))), (not(((eqq(P_p,1)) && (eqq(O_Fx,1))))) Int(((((O_a)*((Xv)^(O_r)))+((O_b)*((Xv)^(O_s))))^(P_p))*(O_Fx),Xv) = ((((((((O_a)*(((Xv)^(O_r)))))+(((O_b)*(((Xv)^(O_s)))))))^(P_p)))*(((((((Xv)^(((P_p)*(O_r)))))*(((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))))^(P_p)))))^((-1))))*(Int(((((Xv)^(((P_p)*(O_r)))))*(((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))))^(P_p)))*(O_Fx)),Xv)))
+
+# Regel 19 (2592 Varianten):
+#   Int[(a_.*x_^r_.+b_.*x_^s_.+c_.*x_^t_.)^p_*Fx_.,x_Symbol] := (a*x^r+b*x^s+c*x^t)^p/(x^(p*r)*(a+b*x^(s-r)+c*x^(t-r))^p) \[Star] Int[x^(p*r)*(a+b*x^(s-r)+c*x^(t-r))^p*Fx,x] /; FreeQ[{a,b,c,p,r,s,t},x] && Not[IntegerQ[p]] && PosQ[s-r] && PosQ[t-r] && Not[EqQ[p,1] && EqQ[Fx,1]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_p,O_r,O_s,O_t), (not(integerq(P_p))), (posq(((O_s)+((((-1))*(O_r)))))), (posq(((O_t)+((((-1))*(O_r)))))), (not(((eqq(P_p,1)) && (eqq(O_Fx,1))))) Int(((((O_a)*((Xv)^(O_r)))+((O_b)*((Xv)^(O_s)))+((O_c)*((Xv)^(O_t))))^(P_p))*(O_Fx),Xv) = ((((((((O_a)*(((Xv)^(O_r)))))+(((O_b)*(((Xv)^(O_s)))))+(((O_c)*(((Xv)^(O_t)))))))^(P_p)))*(((((((Xv)^(((P_p)*(O_r)))))*(((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))+(((O_c)*(((Xv)^(((O_t)+((((-1))*(O_r)))))))))))^(P_p)))))^((-1))))*(Int(((((Xv)^(((P_p)*(O_r)))))*(((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))+(((O_c)*(((Xv)^(((O_t)+((((-1))*(O_r)))))))))))^(P_p)))*(O_Fx)),Xv)))
+
+# Regel 20 (31104 Varianten):
+#   Int[(a_.*x_^r_.+b_.*x_^s_.+c_.*x_^t_.+d_.*x_^q_.)^p_*Fx_.,x_Symbol] := (a*x^r+b*x^s+c*x^t+d*x^q)^p/(x^(p*r)*(a+b*x^(s-r)+c*x^(t-r)+d*x^(q-r))^p) \[Star] Int[x^(p*r)*(a+b*x^(s-r)+c*x^(t-r)+d*x^(q-r))^p*Fx,x] /; FreeQ[{a,b,c,d,p,r,s,t,q},x] && Not[IntegerQ[p]] && PosQ[s-r] && PosQ[t-r] && PosQ[q-r] && Not[EqQ[p,1] && EqQ[Fx,1]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_p,O_r,O_s,O_t,O_q), (not(integerq(P_p))), (posq(((O_s)+((((-1))*(O_r)))))), (posq(((O_t)+((((-1))*(O_r)))))), (posq(((O_q)+((((-1))*(O_r)))))), (not(((eqq(P_p,1)) && (eqq(O_Fx,1))))) Int(((((O_a)*((Xv)^(O_r)))+((O_b)*((Xv)^(O_s)))+((O_c)*((Xv)^(O_t)))+((O_d)*((Xv)^(O_q))))^(P_p))*(O_Fx),Xv) = ((((((((O_a)*(((Xv)^(O_r)))))+(((O_b)*(((Xv)^(O_s)))))+(((O_c)*(((Xv)^(O_t)))))+(((O_d)*(((Xv)^(O_q)))))))^(P_p)))*(((((((Xv)^(((P_p)*(O_r)))))*(((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))+(((O_c)*(((Xv)^(((O_t)+((((-1))*(O_r)))))))))+(((O_d)*(((Xv)^(((O_q)+((((-1))*(O_r)))))))))))^(P_p)))))^((-1))))*(Int(((((Xv)^(((P_p)*(O_r)))))*(((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))+(((O_c)*(((Xv)^(((O_t)+((((-1))*(O_r)))))))))+(((O_d)*(((Xv)^(((O_q)+((((-1))*(O_r)))))))))))^(P_p)))*(O_Fx)),Xv)))

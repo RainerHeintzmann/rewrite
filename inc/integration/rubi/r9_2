@@ -1,0 +1,64 @@
+# r9_2
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   9.2 Piecewise linear functions
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^m_.,x_Symbol] := With[{c=Simplify[D[u,x]]}, 1/c \[Star] Subst[Int[x^m,x],x,u]] /; FreeQ[m,x] && PiecewiseLinearQ[u,x]
+
+# Regel 2 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[v_/u_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, b*x/a - (b*u-a*v)/a \[Star] Int[1/u,x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x]
+
+# Regel 3 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[v_^n_/u_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, v^n/(a*n) - (b*u-a*v)/a \[Star] Int[v^(n-1)/u,x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x] && GtQ[n,0] && NeQ[n,1]
+
+# Regel 4 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[1/(u_*v_),x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, b/(b*u-a*v) \[Star] Int[1/v,x] - a/(b*u-a*v) \[Star] Int[1/u,x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x]
+
+# Regel 5 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[1/(u_*Sqrt[v_]),x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, 2*ArcTan[Sqrt[v]/Rt[(b*u-a*v)/a,2]]/(a*Rt[(b*u-a*v)/a,2]) /; NeQ[b*u-a*v,0] && PosQ[(b*u-a*v)/a]] /; PiecewiseLinearQ[u,v,x]
+
+# Regel 6 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[1/(u_*Sqrt[v_]),x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, -2*ArcTanh[Sqrt[v]/Rt[-(b*u-a*v)/a,2]]/(a*Rt[-(b*u-a*v)/a,2]) /; NeQ[b*u-a*v,0] && NegQ[(b*u-a*v)/a]] /; PiecewiseLinearQ[u,v,x]
+
+# Regel 7 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[v_^n_/u_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, v^(n+1)/((n+1)*(b*u-a*v)) - a*(n+1)/((n+1)*(b*u-a*v)) \[Star] Int[v^(n+1)/u,x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x] && LtQ[n,-1]
+
+# Regel 8 nicht uebersetzt: function Hypergeometric2F1
+#   Int[v_^n_/u_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, v^(n+1)/((n+1)*(b*u-a*v))*Hypergeometric2F1[1,n+1,n+2,-a*v/(b*u-a*v)] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x] && Not[IntegerQ[n]]
+
+# Regel 9 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[1/(Sqrt[u_]*Sqrt[v_]),x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, 2/Rt[a*b,2]*ArcTanh[Rt[a*b,2]*Sqrt[u]/(a*Sqrt[v])] /; NeQ[b*u-a*v,0] && PosQ[a*b]] /; PiecewiseLinearQ[u,v,x]
+
+# Regel 10 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[1/(Sqrt[u_]*Sqrt[v_]),x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, 2/Rt[-a*b,2]*ArcTan[Rt[-a*b,2]*Sqrt[u]/(a*Sqrt[v])] /; NeQ[b*u-a*v,0] && NegQ[a*b]] /; PiecewiseLinearQ[u,v,x]
+
+# Regel 11 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^m_*v_^n_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, -u^(m+1)*v^(n+1)/((m+1)*(b*u-a*v)) /; NeQ[b*u-a*v,0]] /; FreeQ[{m,n},x] && PiecewiseLinearQ[u,v,x] && EqQ[m+n+2,0] && NeQ[m,-1]
+
+# Regel 12 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^m_*v_^n_.,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, u^(m+1)*v^n/(a*(m+1)) - b*n/(a*(m+1)) \[Star] Int[u^(m+1)*v^(n-1),x] /; NeQ[b*u-a*v,0]] /; FreeQ[{m,n},x] && PiecewiseLinearQ[u,v,x]   && NeQ[m,-1] && ( LtQ[m,-1] && GtQ[n,0] && Not[ILtQ[m+n,-2] && (FractionQ[m] || GeQ[2*n+m+1,0])] || IGtQ[n,0] && IGtQ[m,0] && LeQ[n,m] ||  IGtQ[n,0] && Not[IntegerQ[m]] || ILtQ[m,0] && Not[IntegerQ[n]])
+
+# Regel 13 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^m_*v_^n_.,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, u^(m+1)*v^n/(a*(m+n+1)) - n*(b*u-a*v)/(a*(m+n+1)) \[Star] Int[u^m*v^(n-1),x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x] && NeQ[m+n+2,0] && GtQ[n,0] && NeQ[m+n+1,0] && Not[IGtQ[m,0] && (Not[IntegerQ[n]] || LtQ[0,m,n])] && Not[ILtQ[m+n,-2]]
+
+# Regel 14 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^m_*v_^n_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, u^(m+1)*v^n/(a*(m+n+1)) - n*(b*u-a*v)/(a*(m+n+1)) \[Star] Int[u^m*v^Simplify[n-1],x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x] && NeQ[m+n+1,0] && Not[RationalQ[n]] && SumSimplerQ[n,-1]
+
+# Regel 15 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^m_*v_^n_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, -u^(m+1)*v^(n+1)/((m+1)*(b*u-a*v)) + b*(m+n+2)/((m+1)*(b*u-a*v)) \[Star] Int[u^(m+1)*v^n,x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x] && NeQ[m+n+2,0] && LtQ[m,-1]
+
+# Regel 16 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^m_*v_^n_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, -u^(m+1)*v^(n+1)/((m+1)*(b*u-a*v)) + b*(m+n+2)/((m+1)*(b*u-a*v)) \[Star] Int[u^Simplify[m+1]*v^n,x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x] && Not[RationalQ[m]] && SumSimplerQ[m,1]
+
+# Regel 17 nicht uebersetzt: function Hypergeometric2F1
+#   Int[u_^m_*v_^n_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, u^m*v^(n+1)/(b*(n+1)*(b*u/(b*u-a*v))^m)*Hypergeometric2F1[-m,n+1,n+2,-a*v/(b*u-a*v)] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x] && Not[IntegerQ[m]] && Not[IntegerQ[n]]
+
+# Regel 18 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^n_.*Log[a_.+b_.*x_],x_Symbol] := With[{c=Simplify[D[u,x]]}, u^n*(a+b*x)*Log[a+b*x]/b - Int[u^n,x] - c*n/b \[Star] Int[u^(n-1)*(a+b*x)*Log[a+b*x],x]] /; FreeQ[{a,b},x] && PiecewiseLinearQ[u,x] && Not[LinearQ[u,x]] && GtQ[n,0]
+
+# Regel 19 nicht uebersetzt: predicate PiecewiseLinearQ
+#   Int[u_^n_.*(a_.+b_.*x_)^m_.*Log[a_.+b_.*x_],x_Symbol] := With[{c=Simplify[D[u,x]]}, u^n*(a+b*x)^(m+1)*Log[a+b*x]/(b*(m+1)) - 1/(m+1) \[Star] Int[u^n*(a+b*x)^m,x] - c*n/(b*(m+1)) \[Star] Int[u^(n-1)*(a+b*x)^(m+1)*Log[a+b*x],x]] /; FreeQ[{a,b,m},x] && PiecewiseLinearQ[u,x] && Not[LinearQ[u,x]] && GtQ[n,0] && NeQ[m,-1]

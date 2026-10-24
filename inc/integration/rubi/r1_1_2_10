@@ -1,0 +1,30 @@
+# r1_1_2_10
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   1.1.2.10 P(x) (a+b x^2)^p
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 (24 Varianten):
+#   Int[Pq_*(a_+b_.*x_^2)^p_.,x_Symbol] := Int[ExpandIntegrand[Pq*(a+b*x^2)^p,x],x] /; FreeQ[{a,b},x] && PolyQ[Pq,x] && IGtQ[p,-2]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (polyq(P_Pq,Xv)), (igtq(O_p,(-2))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(2))))^(O_p)),Xv) = Int(expandintegrand(((P_Pq)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(O_p)))),Xv),Xv)
+
+# Regel 2 nicht uebersetzt: predicate MatchQ
+#   Int[Pq_*(a_+b_.*x_^2)^p_,x_Symbol] := Int[x*PolynomialQuotient[Pq,x,x]*(a+b*x^2)^p,x] /; FreeQ[{a,b,p},x] && PolyQ[Pq,x] && EqQ[Coeff[Pq,x,0],0] && Not[MatchQ[Pq,x^m_.*u_. /; IntegerQ[m]]]
+
+# Regel 3 (24 Varianten):
+#   Int[Px_*(a_+b_.*x_^2)^p_.,x_Symbol] := Int[PolynomialQuotient[Px,a+b*x^2,x]*(a+b*x^2)^(p+1),x] /; FreeQ[{a,b,p},x] && PolyQ[Px,x] && EqQ[PolynomialRemainder[Px,a+b*x^2,x],0]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_p), (polyq(P_Px,Xv)), (eqq(polyremainder(P_Px,((P_a)+(((O_b)*(((Xv)^(2)))))),Xv),0)) Int((P_Px)*(((P_a)+((O_b)*((Xv)^(2))))^(O_p)),Xv) = Int(((polyquotient(P_Px,((P_a)+(((O_b)*(((Xv)^(2)))))),Xv))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((O_p)+(1)))))),Xv)
+
+# Regel 4 (12 Varianten):
+#   Int[Pq_*(a_+b_.*x_^2)^p_,x_Symbol] := With[{A=Coeff[Pq,x,0],Q=PolynomialQuotient[Pq-Coeff[Pq,x,0],x^2,x]}, A*x*(a+b*x^2)^(p+1)/a + 1/a \[Star] Int[x^2*(a+b*x^2)^p*(a*Q-A*b*(2*p+3)),x]] /; FreeQ[{a,b},x] && PolyQ[Pq,x^2] && ILtQ[p+1/2,0] && LtQ[Expon[Pq,x]+2*p+1,0]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (polyq(P_Pq,((Xv)^(2)))), (iltq(((P_p)+((1/2))),0)), (((((expon(P_Pq,Xv))+(((2)*(P_p)))+(1)) < 0))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = ((((coeff(P_Pq,Xv,0))*(Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((P_a)^((-1))))))+(((((P_a)^((-1))))*(Int(((((Xv)^(2)))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)))*(((((P_a)*(polyquotient(((P_Pq)+((((-1))*(coeff(P_Pq,Xv,0))))),((Xv)^(2)),Xv))))+((((-1))*(coeff(P_Pq,Xv,0))*(O_b)*(((((2)*(P_p)))+(3)))))))),Xv)))))
+
+# Regel 5 (12 Varianten):
+#   Int[Pq_*(a_+b_.*x_^2)^p_,x_Symbol] := With[{Q=PolynomialQuotient[Pq,a+b*x^2,x], f=Coeff[PolynomialRemainder[Pq,a+b*x^2,x],x,0], g=Coeff[PolynomialRemainder[Pq,a+b*x^2,x],x,1]}, (a*g-b*f*x)*(a+b*x^2)^(p+1)/(2*a*b*(p+1)) + 1/(2*a*(p+1)) \[Star] Int[(a+b*x^2)^(p+1)*ExpandToSum[2*a*(p+1)*Q+f*(2*p+3),x],x]] /; FreeQ[{a,b},x] && PolyQ[Pq,x] && LtQ[p,-1]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (polyq(P_Pq,Xv)), (((P_p < (-1)))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = ((((((((P_a)*(coeff(polyremainder(P_Pq,((P_a)+(((O_b)*(((Xv)^(2)))))),Xv),Xv,1))))+((((-1))*(O_b)*(coeff(polyremainder(P_Pq,((P_a)+(((O_b)*(((Xv)^(2)))))),Xv),Xv,0))*(Xv)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((((2)*(P_a)*(O_b)*(((P_p)+(1)))))^((-1))))))+(((((((2)*(P_a)*(((P_p)+(1)))))^((-1))))*(Int(((((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(expandtosum(((((2)*(P_a)*(((P_p)+(1)))*(polyquotient(P_Pq,((P_a)+(((O_b)*(((Xv)^(2)))))),Xv))))+(((coeff(polyremainder(P_Pq,((P_a)+(((O_b)*(((Xv)^(2)))))),Xv),Xv,0))*(((((2)*(P_p)))+(3)))))),Xv))),Xv)))))
+
+# Regel 6 (12 Varianten):
+#   Int[Pq_*(a_+b_.*x_^2)^p_,x_Symbol] := With[{q=Expon[Pq,x],e=Coeff[Pq,x,Expon[Pq,x]]}, e*x^(q-1)*(a+b*x^2)^(p+1)/(b*(q+2*p+1)) + 1/(b*(q+2*p+1)) \[Star] Int[(a+b*x^2)^p*ExpandToSum[b*(q+2*p+1)*Pq-a*e*(q-1)*x^(q-2)-b*e*(q+2*p+1)*x^q,x],x]] /; FreeQ[{a,b,p},x] && PolyQ[Pq,x] && Not[LeQ[p,-1]]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (polyq(P_Pq,Xv)), (not(((P_p <= (-1))))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = ((((coeff(P_Pq,Xv,expon(P_Pq,Xv)))*(((Xv)^(((expon(P_Pq,Xv))+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((((O_b)*(((expon(P_Pq,Xv))+(((2)*(P_p)))+(1)))))^((-1))))))+(((((((O_b)*(((expon(P_Pq,Xv))+(((2)*(P_p)))+(1)))))^((-1))))*(Int(((((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)))*(expandtosum(((((O_b)*(((expon(P_Pq,Xv))+(((2)*(P_p)))+(1)))*(P_Pq)))+((((-1))*(P_a)*(coeff(P_Pq,Xv,expon(P_Pq,Xv)))*(((expon(P_Pq,Xv))+((-1))))*(((Xv)^(((expon(P_Pq,Xv))+((-2))))))))+((((-1))*(O_b)*(coeff(P_Pq,Xv,expon(P_Pq,Xv)))*(((expon(P_Pq,Xv))+(((2)*(P_p)))+(1)))*(((Xv)^(expon(P_Pq,Xv))))))),Xv))),Xv)))))

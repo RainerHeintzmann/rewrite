@@ -233,10 +233,27 @@ REWR fq(x+3,x) : tq           # prints gq (3 ,1 ,1 )
 REWR fq(x,x) : tq             # prints gq (0 ,1 ,1 )
 ```
 
-The rule is expanded into all its variants when it is defined, so the
-matcher itself is unchanged. The number of variants grows quickly with the
-number of optional variables and commutative operators: the example above
-has 18 variants.
+**Rule lists.** Rules defined while `OPT`, `DEFAULT` or `COMM` is active
+are not merged into the rule tree. They are kept in a list in the order of
+their definition, like in Mathematica or Rubi, and the first rule that
+matches wins. The matcher ([listmatch.c](listmatch.c)) tries the swapped
+operands of commutative operators and the missing optional operands by
+backtracking, and the conditions are part of the match: if a condition
+fails, the next possibility is tried. Two more rules apply to rule lists
+only:
+
+- If the result of a rule equals the term (no progress), contains a NaN,
+  or equals one of the last eight terms that rules of a list replaced (a
+  cycle), the rule is skipped and the next rule of the list is tried.
+- The result is simplified trivially (`u^0`, `u^1`, `1*u`, `0*u`, `0+u`),
+  as Mathematica does automatically.
+
+A rule list of several thousand rules is fast, because a quick test of the
+function names skips most rules without running the matcher.
+
+**Step limit.** One `REWR` stops after 100000 rewriting steps with the
+message `REWR : step limit (100000 rewrites) reached`. Rules that loop
+therefore do not hang the interpreter.
 
 The trick behind `LIFT`: once the group rules for `+` and `-` are written,
 the ring rules for `*` and `/` can be derived from them:
@@ -340,6 +357,16 @@ REWR Int(1/(2*x+3),x) : Integrate      # prints 0.5 * ln (3 + 2 * x )
 REWR Int(sin(a*x+b),x) : Integrate     # prints - cos (a * x + b )/ a
 ```
 
+With [inc/integration/rubi](inc/integration/rubi), about three quarters of
+all Rubi rules are available. They are translated automatically by
+[tools/rubi2rewrite.py](tools/rubi2rewrite.py):
+
+```text
+INC "inc/integration/rubi/all"
+REWR Int(x/(1+x^4),x) : RubiIntegrate        # prints 0.5 * arctan (x ^ 2 )
+REWR Int(sqrt(x)/(1+x),x) : RubiIntegrate    # prints 2 * x ^ 0.5 - 2 * arctan (x ^ 0.5 )
+```
+
 See [inc/integration/README.md](inc/integration/README.md) for what is
 covered and how the rules are translated.
 
@@ -365,6 +392,14 @@ loaded by the integration rules and can also be used on their own:
 | `subst(u,x,v)` | `u` with `x` replaced by `v` (waits while `u` contains `Int`) |
 | `simp(u,x)`, `simplify(u)`, `dist(u,v,x)`, `rt(u,n)` | `u`, `u`, `u*v`, `n`-th root |
 | `intpart(u)`, `fracpart(u)` | integer and non-integer parts of numbers |
+| `fractionq(u,..)`, `halfintegerq(u,..)`, `nicesqrtq(u)` | non-integer numbers, halves of odd integers, a number > 0 |
+| `gcd(m,n,..)`, `numerator(u)`, `denominator(u)` | for numbers (as fractions) and for products (negative powers) |
+| `freefactors(u,x)`, `nonfreefactors(u,x)` | product of the factors of `u` that do not or do contain `x` |
+| `expandtosum(u,x)`, `expandtosum(u,v,x)` | polynomial `u` as `c0+c1*x+...`; `u` times that of `v` |
+| `polyquotient(p,q,x)`, `polyremainder(p,q,x)` | polynomial division |
+| `normpoly(u,x)` | every polynomial sum in `u` as `c0+c1*x+...` with collected coefficients |
+| `deriv(u,x)` | derivative of elementary functions (stays unevaluated otherwise) |
+| `collect(u)` | like summands combined, e.g. `2*a+b-a` gives `a+b` |
 
 The predicates return true or false and can be used in conditions, also
 combined with `&&` and `||`:
@@ -379,9 +414,10 @@ REWR expand((x+1)^3) : t2            # prints x ^ 3 + 3 * x ^ 2 + 3 * x + 1
 ```
 
 The term functions are applied during rewriting, so they are used with
-`REWR`. Some are simpler than their Rubi counterparts: `expand` does no
-partial fractions, `eqq` compares terms without simplifying them, and
-`simp` returns its argument unchanged.
+`REWR`. Some are simpler than their Rubi counterparts: `expandintegrand`
+does no partial fractions (it multiplies out, and writes a polynomial times
+`(c+d*x)^n` as a sum of powers of `c+d*x`), `eqq` compares terms after
+multiplying out, and `simp` returns its argument unchanged.
 
 Larger example programs are [LiNbO3/abso1](LiNbO3/abso1) and
 [LiNbO3/compute](LiNbO3/compute) (X-ray absorption and structure factors
@@ -416,8 +452,11 @@ in the same way.
 | [sync.c](sync.c) | Main program, input handling and runtime commands. |
 | [defs.c](defs.c) | Declarations, blocks and local symbols. |
 | [run.c](run.c), [forms.c](forms.c) | Rewriting engine and numerical evaluation. |
-| [expand.c](expand.c) | Optional pattern parts, commutative operators and condition lists. |
+| [expand.c](expand.c) | Settings `OPT`, `DEFAULT`, `COMM` and condition lists. |
+| [listmatch.c](listmatch.c) | Rule lists with a backtracking matcher. |
 | [symfkt.c](symfkt.c) | Symbolic helper functions (`expand`, `coeff`, `polyq`, ...). |
+| [tools/rubi2rewrite.py](tools/rubi2rewrite.py) | Translator of Rubi's integration rules. |
+| [tools/rubitest.py](tools/rubitest.py) | Runs Rubi's test suite and checks the results numerically. |
 | [nodes.h](nodes.h) | Named access to the node structures built by the parser. |
 | [sym.c](sym.c), [node.c](node.c), [stack.c](stack.c) | Symbol table and memory for nodes and symbols. |
 | [userfkt.c](userfkt.c), [real.c](real.c), [bool.c](bool.c), [complex.c](complex.c), [vector.c](vector.c), [matrix.c](matrix.c) | Built-in numerical functions. |
@@ -434,10 +473,12 @@ in the same way.
   the result. This is intended: differential equations use `D(y,x)`.
 - There are no general container types. Vectors and matrices are
   implemented as C functions.
-- Optional parts and commutative operators are implemented by expanding
-  each rule into all its variants. A rule with five optional variables and
-  three commutative products already has hundreds of variants. This is
-  fine for small rule sets, but not for thousands of rules.
+- Commutative matching only swaps the two operands of one operator; sums
+  and products are binary trees, and their terms are not reordered across
+  levels. The integration rules therefore bring polynomials into a fixed
+  normal form first.
+- Numbers are real numbers. Exact fractions and the complex results that
+  Rubi or Mathematica would give are not available to the rule sets.
 - `COMM` works by function name, so `COMM *` also applies to rules for
   matrix products. Switch it off with `COMM` after the rules that need it.
 
@@ -467,6 +508,13 @@ in the same way.
 - Symbolic helper functions in C ([symfkt.c](symfkt.c), [inc/helpers](inc/helpers))
   and further elementary functions (`csc`, `sec`, `cot`, `arccot`, the
   hyperbolic and inverse hyperbolic functions, `polylog`, `productlog`).
+- Rule lists with a backtracking matcher for rules with `OPT`, `DEFAULT`
+  and `COMM`, instead of expanding each rule into its variants. Rules that
+  make no progress or give NaN are skipped, and `REWR` has a step limit.
+- [tools/rubi2rewrite.py](tools/rubi2rewrite.py) translates about three
+  quarters of Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
+  `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
+  with Rubi's test suite.
 - Internal cleanup: named accessors for the node structures
   ([nodes.h](nodes.h)) instead of chains like `np->r->r->l`.
 - [LiNbO3/abso1](LiNbO3/abso1) runs again, and the test suite was added.

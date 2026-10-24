@@ -42,6 +42,7 @@ struct Symbol{            /* ACHTUNG: Instanzen in node.c und sync.c */
 #define OR_TYPE	((int) 556)       /* forms.c */
 #define ERSETZ_TYPE	((int) 557)   /* forms.c */
 #define CHAIN	555               /* Fuer run.c,forms.c */
+#define RULELIST	((int) 558)  /* 2026: Regelliste mit Backtracking (listmatch.c) */
 
 #define lexval(p_sym)	((p_sym) -> yylex)
 #define type(p_sym)	( (((p_sym) -> yylex) == Var) ? "Var" : \

@@ -1,6 +1,6 @@
 # mathnum        Numerische Werte fuer Mathematik
 
-e  = 2.718281828459	
+e  = 2.718281828459045
 pi = 3.141592653589793
 
 CONST _deg, _sec, _min, _rad : real

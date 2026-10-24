@@ -1,0 +1,30 @@
+# r3_1_1
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   3.1.1 (a+b log(c x^n))^p
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 (6 Varianten):
+#   Int[Log[c_.*x_^n_.], x_Symbol] := x*Log[c*x^n] - n*x /; FreeQ[{c, n}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_n) Int(ln((O_c)*((Xv)^(O_n))),Xv) = ((((Xv)*(ln(((O_c)*(((Xv)^(O_n))))))))+((((-1))*(O_n)*(Xv))))
+
+# Regel 2 (108 Varianten):
+#   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := x*(a + b*Log[c*x^n])^p - b*n*p*Int[(a + b*Log[c*x^n])^(p - 1), x] /; FreeQ[{a, b, c, n}, x] && GtQ[p, 0] && IntegerQ[2*p]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (((O_p > 0))), (integerq(((2)*(O_p)))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p),Xv) = ((((Xv)*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))))+((((-1))*(O_b)*(O_n)*(O_p)*(Int(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((O_p)+((-1))))),Xv)))))
+
+# Regel 3 (54 Varianten):
+#   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := x*(a + b*Log[c*x^n])^(p + 1)/(b*n*(p + 1)) - 1/(b*n*(p + 1))*Int[(a + b*Log[c*x^n])^(p + 1), x] /; FreeQ[{a, b, c, n}, x] && LtQ[p, -1] && IntegerQ[2*p]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (((P_p < (-1)))), (integerq(((2)*(P_p)))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p),Xv) = ((((Xv)*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))))*(((((O_b)*(O_n)*(((P_p)+(1)))))^((-1))))))+((((-1))*(((((O_b)*(O_n)*(((P_p)+(1)))))^((-1))))*(Int(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))),Xv)))))
+
+# Regel 4 nicht uebersetzt: function LogIntegral
+#   Int[1/Log[c_.*x_], x_Symbol] := LogIntegral[c*x]/c /; FreeQ[c, x]
+
+# Regel 5 (54 Varianten):
+#   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := 1/(n*c^(1/n))*Subst[Int[E^(x/n)*(a + b*x)^p, x], x, Log[c*x^n]] /; FreeQ[{a, b, c, p}, x] && IntegerQ[1/n]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_p), (integerq(((O_n)^((-1))))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p),Xv) = ((((((O_n)*(((O_c)^(((O_n)^((-1))))))))^((-1))))*(subst(Int(((exp(((Xv)*(((O_n)^((-1)))))))*(((((O_a)+(((O_b)*(Xv)))))^(P_p)))),Xv),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
+
+# Regel 6 (54 Varianten):
+#   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := x/(n*(c*x^n)^(1/n))* Subst[Int[E^(x/n)*(a + b*x)^p, x], x, Log[c*x^n]] /; FreeQ[{a, b, c, n, p}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n,P_p) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p),Xv) = ((Xv)*(((((O_n)*(((((O_c)*(((Xv)^(O_n)))))^(((O_n)^((-1))))))))^((-1))))*(subst(Int(((exp(((Xv)*(((O_n)^((-1)))))))*(((((O_a)+(((O_b)*(Xv)))))^(P_p)))),Xv),Xv,ln(((O_c)*(((Xv)^(O_n))))))))

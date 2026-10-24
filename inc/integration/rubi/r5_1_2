@@ -1,0 +1,61 @@
+# r5_1_2
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   5.1.2 (d x)^m (a+b arcsin(c x))^n
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 (108 Varianten):
+#   Int[(a_. + b_.*ArcSin[c_.*x_])^n_./x_, x_Symbol] := Subst[Int[(a + b*x)^n*Cot[x], x], x, ArcSin[c*x]] /; FreeQ[{a, b, c}, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c), (igtq(O_n,0)) Int((((O_a)+((O_b)*(arcsin((O_c)*(Xv)))))^(O_n))*((Xv)^(K_1)),Xv) = subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(cot(Xv))),Xv),Xv,arcsin(((O_c)*(Xv))))
+
+# Regel 2 (108 Varianten):
+#   Int[(a_. + b_.*ArcCos[c_.*x_])^n_./x_, x_Symbol] := -Subst[Int[(a + b*x)^n*Tan[x], x], x, ArcCos[c*x]] /; FreeQ[{a, b, c}, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c), (igtq(O_n,0)) Int((((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(O_n))*((Xv)^(K_1)),Xv) = (((-1))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(tan(Xv))),Xv),Xv,arccos(((O_c)*(Xv))))))
+
+# Regel 3 (648 Varianten):
+#   Int[(d_.*x_)^m_.*(a_. + b_.*ArcSin[c_.*x_])^n_., x_Symbol] := (d*x)^(m + 1)*(a + b*ArcSin[c*x])^n/(d*(m + 1)) - b*c*n/(d*(m + 1))* Int[(d*x)^(m + 1)*(a + b*ArcSin[c*x])^(n - 1)/Sqrt[1 - c^2*x^2], x] /; FreeQ[{a, b, c, d, m}, x] && IGtQ[n, 0] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (igtq(O_n,0)), (neq(O_m,(-1))) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(arcsin((O_c)*(Xv)))))^(O_n)),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))^(O_n)))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_c)*(O_n)*(((((O_d)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))^(((O_n)+((-1))))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv)))))
+
+# Regel 4 (648 Varianten):
+#   Int[(d_.*x_)^m_.*(a_. + b_.*ArcCos[c_.*x_])^n_., x_Symbol] := (d*x)^(m + 1)*(a + b*ArcCos[c*x])^n/(d*(m + 1)) + b*c*n/(d*(m + 1))* Int[(d*x)^(m + 1)*(a + b*ArcCos[c*x])^(n - 1)/Sqrt[1 - c^2*x^2], x] /; FreeQ[{a, b, c, d, m}, x] && IGtQ[n, 0] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (igtq(O_n,0)), (neq(O_m,(-1))) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(O_n)),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))^(O_n)))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+(((O_b)*(O_c)*(O_n)*(((((O_d)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))^(((O_n)+((-1))))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv)))))
+
+# Regel 5 (108 Varianten):
+#   Int[x_^m_.*(a_. + b_.*ArcSin[c_.*x_])^n_, x_Symbol] := x^(m + 1)*(a + b*ArcSin[c*x])^n/(m + 1) - b*c*n/(m + 1)* Int[x^(m + 1)*(a + b*ArcSin[c*x])^(n - 1)/Sqrt[1 - c^2*x^2], x] /; FreeQ[{a, b, c}, x] && IGtQ[m, 0] && GtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (igtq(O_m,0)), (((P_n > 0))) Int(((Xv)^(O_m))*(((O_a)+((O_b)*(arcsin((O_c)*(Xv)))))^(P_n)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))^(P_n)))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(O_c)*(P_n)*(((((O_m)+(1)))^((-1))))*(Int(((((Xv)^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))^(((P_n)+((-1))))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv)))))
+
+# Regel 6 (108 Varianten):
+#   Int[x_^m_.*(a_. + b_.*ArcCos[c_.*x_])^n_, x_Symbol] := x^(m + 1)*(a + b*ArcCos[c*x])^n/(m + 1) + b*c*n/(m + 1)* Int[x^(m + 1)*(a + b*ArcCos[c*x])^(n - 1)/Sqrt[1 - c^2*x^2], x] /; FreeQ[{a, b, c}, x] && IGtQ[m, 0] && GtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (igtq(O_m,0)), (((P_n > 0))) Int(((Xv)^(O_m))*(((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(P_n)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))^(P_n)))*(((((O_m)+(1)))^((-1))))))+(((O_b)*(O_c)*(P_n)*(((((O_m)+(1)))^((-1))))*(Int(((((Xv)^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))^(((P_n)+((-1))))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv)))))
+
+# Regel 7 nicht uebersetzt: function ExpandTrigReduce
+#   Int[x_^m_.*(a_. + b_.*ArcSin[c_.*x_])^n_, x_Symbol] := x^m*Sqrt[1 - c^2*x^2]*(a + b*ArcSin[c*x])^(n + 1)/(b*c*(n + 1)) - 1/(b^2*c^(m + 1)*(n + 1))* Subst[Int[ ExpandTrigReduce[x^(n + 1), Sin[-a/b + x/b]^(m - 1)*(m - (m + 1)*Sin[-a/b + x/b]^2), x], x], x, a + b*ArcSin[c*x]] /; FreeQ[{a, b, c}, x] && IGtQ[m, 0] && GeQ[n, -2] && LtQ[n, -1]
+
+# Regel 8 nicht uebersetzt: function ExpandTrigReduce
+#   Int[x_^m_.*(a_. + b_.*ArcCos[c_.*x_])^n_, x_Symbol] := -x^m*Sqrt[ 1 - c^2*x^2]*(a + b*ArcCos[c*x])^(n + 1)/(b*c*(n + 1)) - 1/(b^2*c^(m + 1)*(n + 1))* Subst[Int[ ExpandTrigReduce[x^(n + 1), Cos[-a/b + x/b]^(m - 1)*(m - (m + 1)*Cos[-a/b + x/b]^2), x], x], x, a + b*ArcCos[c*x]] /; FreeQ[{a, b, c}, x] && IGtQ[m, 0] && GeQ[n, -2] && LtQ[n, -1]
+
+# Regel 9 (108 Varianten):
+#   Int[x_^m_.*(a_. + b_.*ArcSin[c_.*x_])^n_, x_Symbol] := x^m*Sqrt[1 - c^2*x^2]*(a + b*ArcSin[c*x])^(n + 1)/(b*c*(n + 1)) - m/(b*c*(n + 1))* Int[x^(m - 1)*(a + b*ArcSin[c*x])^(n + 1)/Sqrt[1 - c^2*x^2], x] + c*(m + 1)/(b*(n + 1))* Int[x^(m + 1)*(a + b*ArcSin[c*x])^(n + 1)/Sqrt[1 - c^2*x^2], x] /; FreeQ[{a, b, c}, x] && IGtQ[m, 0] && LtQ[n, -2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (igtq(O_m,0)), (((P_n < (-2)))) Int(((Xv)^(O_m))*(((O_a)+((O_b)*(arcsin((O_c)*(Xv)))))^(P_n)),Xv) = ((((((Xv)^(O_m)))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((1/2))))*(((((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))^(((P_n)+(1)))))*(((((O_b)*(O_c)*(((P_n)+(1)))))^((-1))))))+((((-1))*(O_m)*(((((O_b)*(O_c)*(((P_n)+(1)))))^((-1))))*(Int(((((Xv)^(((O_m)+((-1))))))*(((((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))^(((P_n)+(1)))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv))))+(((O_c)*(((O_m)+(1)))*(((((O_b)*(((P_n)+(1)))))^((-1))))*(Int(((((Xv)^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))^(((P_n)+(1)))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv)))))
+
+# Regel 10 (108 Varianten):
+#   Int[x_^m_.*(a_. + b_.*ArcCos[c_.*x_])^n_, x_Symbol] := -x^m*Sqrt[ 1 - c^2*x^2]*(a + b*ArcCos[c*x])^(n + 1)/(b*c*(n + 1)) + m/(b*c*(n + 1))* Int[x^(m - 1)*(a + b*ArcCos[c*x])^(n + 1)/Sqrt[1 - c^2*x^2], x] - c*(m + 1)/(b*(n + 1))* Int[x^(m + 1)*(a + b*ArcCos[c*x])^(n + 1)/Sqrt[1 - c^2*x^2], x] /; FreeQ[{a, b, c}, x] && IGtQ[m, 0] && LtQ[n, -2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (igtq(O_m,0)), (((P_n < (-2)))) Int(((Xv)^(O_m))*(((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(P_n)),Xv) = (((((-1))*(((Xv)^(O_m)))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((1/2))))*(((((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))^(((P_n)+(1)))))*(((((O_b)*(O_c)*(((P_n)+(1)))))^((-1))))))+(((O_m)*(((((O_b)*(O_c)*(((P_n)+(1)))))^((-1))))*(Int(((((Xv)^(((O_m)+((-1))))))*(((((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))^(((P_n)+(1)))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv))))+((((-1))*(O_c)*(((O_m)+(1)))*(((((O_b)*(((P_n)+(1)))))^((-1))))*(Int(((((Xv)^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))^(((P_n)+(1)))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv)))))
+
+# Regel 11 (108 Varianten):
+#   Int[x_^m_.*(a_. + b_.*ArcSin[c_.*x_])^n_, x_Symbol] := 1/(b*c^(m + 1))* Subst[Int[x^n*Sin[-a/b + x/b]^m*Cos[-a/b + x/b], x], x, a + b*ArcSin[c*x]] /; FreeQ[{a, b, c, n}, x] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_n), (igtq(O_m,0)) Int(((Xv)^(O_m))*(((O_a)+((O_b)*(arcsin((O_c)*(Xv)))))^(P_n)),Xv) = ((((((O_b)*(((O_c)^(((O_m)+(1)))))))^((-1))))*(subst(Int(((((Xv)^(P_n)))*(((sin((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))^(O_m)))*(cos((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))),Xv),Xv,((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))))
+
+# Regel 12 (108 Varianten):
+#   Int[x_^m_.*(a_. + b_.*ArcCos[c_.*x_])^n_, x_Symbol] := -1/(b*c^(m + 1))* Subst[Int[x^n*Cos[-a/b + x/b]^m*Sin[-a/b + x/b], x], x, a + b*ArcCos[c*x]] /; FreeQ[{a, b, c, n}, x] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_n), (igtq(O_m,0)) Int(((Xv)^(O_m))*(((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(P_n)),Xv) = (((-1))*(((((O_b)*(((O_c)^(((O_m)+(1)))))))^((-1))))*(subst(Int(((((Xv)^(P_n)))*(((cos((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))^(O_m)))*(sin((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))),Xv),Xv,((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))))
+
+# Regel 13 (648 Varianten):
+#   Int[(d_.*x_)^m_.*(a_. + b_.*ArcSin[c_.*x_])^n_., x_Symbol] := Unintegrable[(d*x)^m*(a + b*ArcSin[c*x])^n, x] /; FreeQ[{a, b, c, d, m, n}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(arcsin((O_c)*(Xv)))))^(O_n)),Xv) = unintegrable(((((((O_d)*(Xv)))^(O_m)))*(((((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))^(O_n)))),Xv)
+
+# Regel 14 (648 Varianten):
+#   Int[(d_.*x_)^m_.*(a_. + b_.*ArcCos[c_.*x_])^n_., x_Symbol] := Unintegrable[(d*x)^m*(a + b*ArcCos[c*x])^n, x] /; FreeQ[{a, b, c, d, m, n}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(O_n)),Xv) = unintegrable(((((((O_d)*(Xv)))^(O_m)))*(((((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))^(O_n)))),Xv)

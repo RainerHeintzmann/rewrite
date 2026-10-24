@@ -1,0 +1,39 @@
+# r1_1_1_5
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   1.1.1.5 P(x) (a+b x)^m (c+d x)^n
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 (1296 Varianten):
+#   Int[Px_*(a_. + b_.*x_)^m_.*(c_. + d_.*x_)^n_., x_Symbol] := Int[Px*(a*c + b*d*x^2)^m, x] /; FreeQ[{a, b, c, d, m, n}, x] && PolyQ[Px, x] && EqQ[b*c + a*d, 0] && EqQ[m, n] && (IntegerQ[m] || GtQ[a, 0] && GtQ[c, 0])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (polyq(P_Px,Xv)), (eqq(((((O_b)*(O_c)))+(((O_a)*(O_d)))),0)), (eqq(O_m,O_n)), (((integerq(O_m)) || (((((O_a > 0))) && (((O_c > 0))))))) Int((P_Px)*(((O_a)+((O_b)*(Xv)))^(O_m))*(((O_c)+((O_d)*(Xv)))^(O_n)),Xv) = Int(((P_Px)*(((((((O_a)*(O_c)))+(((O_b)*(O_d)*(((Xv)^(2)))))))^(O_m)))),Xv)
+
+# Regel 2 (324 Varianten):
+#   Int[Px_*(a_. + b_.*x_)^m_*(c_. + d_.*x_)^n_, x_Symbol] := (a + b*x)^ FracPart[m]*(c + d*x)^FracPart[m]/(a*c + b*d*x^2)^FracPart[m]* Int[Px*(a*c + b*d*x^2)^m, x] /; FreeQ[{a, b, c, d, m, n}, x] && PolyQ[Px, x] && EqQ[b*c + a*d, 0] && EqQ[m, n] && Not[IntegerQ[m]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_m,P_n), (polyq(P_Px,Xv)), (eqq(((((O_b)*(O_c)))+(((O_a)*(O_d)))),0)), (eqq(P_m,P_n)), (not(integerq(P_m))) Int((P_Px)*(((O_a)+((O_b)*(Xv)))^(P_m))*(((O_c)+((O_d)*(Xv)))^(P_n)),Xv) = ((((((O_a)+(((O_b)*(Xv)))))^(fracpart(P_m))))*(((((O_c)+(((O_d)*(Xv)))))^(fracpart(P_m))))*(((((((((O_a)*(O_c)))+(((O_b)*(O_d)*(((Xv)^(2)))))))^(fracpart(P_m))))^((-1))))*(Int(((P_Px)*(((((((O_a)*(O_c)))+(((O_b)*(O_d)*(((Xv)^(2)))))))^(P_m)))),Xv)))
+
+# Regel 3 (1296 Varianten):
+#   Int[Px_*(a_. + b_.*x_)^m_.*(c_. + d_.*x_)^n_., x_Symbol] := Int[PolynomialQuotient[Px, a + b*x, x]*(a + b*x)^(m + 1)*(c + d*x)^ n, x] /; FreeQ[{a, b, c, d, m, n}, x] && PolyQ[Px, x] && EqQ[PolynomialRemainder[Px, a + b*x, x], 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (polyq(P_Px,Xv)), (eqq(polyremainder(P_Px,((O_a)+(((O_b)*(Xv)))),Xv),0)) Int((P_Px)*(((O_a)+((O_b)*(Xv)))^(O_m))*(((O_c)+((O_d)*(Xv)))^(O_n)),Xv) = Int(((polyquotient(P_Px,((O_a)+(((O_b)*(Xv)))),Xv))*(((((O_a)+(((O_b)*(Xv)))))^(((O_m)+(1)))))*(((((O_c)+(((O_d)*(Xv)))))^(O_n)))),Xv)
+
+# Regel 4 (648 Varianten):
+#   Int[Px_*(c_. + d_.*x_)^n_./(a_. + b_.*x_), x_Symbol] := Int[ExpandIntegrand[1/Sqrt[c + d*x], Px*(c + d*x)^(n + 1/2)/(a + b*x), x], x] /; FreeQ[{a, b, c, d, n}, x] && PolyQ[Px, x] && ILtQ[n + 1/2, 0] && GtQ[Expon[Px, x], 2]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_n), (polyq(P_Px,Xv)), (iltq(((O_n)+((1/2))),0)), (((expon(P_Px,Xv) > 2))) Int((P_Px)*(((O_c)+((O_d)*(Xv)))^(O_n))*(((O_a)+((O_b)*(Xv)))^(K_1)),Xv) = Int(expandintegrand(((((O_c)+(((O_d)*(Xv)))))^((-(1/2)))),((P_Px)*(((((O_c)+(((O_d)*(Xv)))))^(((O_n)+((1/2))))))*(((((O_a)+(((O_b)*(Xv)))))^((-1))))),Xv),Xv)
+
+# Regel 5 (1296 Varianten):
+#   Int[Px_*(a_. + b_.*x_)^m_.*(c_. + d_.*x_)^n_., x_Symbol] := Int[ExpandIntegrand[Px*(a + b*x)^m*(c + d*x)^n, x], x] /; FreeQ[{a, b, c, d, m, n}, x] && PolyQ[Px, x] && (IntegersQ[m, n] || IGtQ[m, -2]) && GtQ[Expon[Px, x], 2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (polyq(P_Px,Xv)), (((integersq(O_m,O_n)) || (igtq(O_m,(-2))))), (((expon(P_Px,Xv) > 2))) Int((P_Px)*(((O_a)+((O_b)*(Xv)))^(O_m))*(((O_c)+((O_d)*(Xv)))^(O_n)),Xv) = Int(expandintegrand(((P_Px)*(((((O_a)+(((O_b)*(Xv)))))^(O_m)))*(((((O_c)+(((O_d)*(Xv)))))^(O_n)))),Xv),Xv)
+
+# Regel 6 (648 Varianten):
+#   Int[Px_*(a_. + b_.*x_)^m_*(c_. + d_.*x_)^n_., x_Symbol] := With[{Qx = PolynomialQuotient[Px, a + b*x, x], R = PolynomialRemainder[Px, a + b*x, x]}, R*(a + b*x)^(m + 1)*(c + d*x)^(n + 1)/((m + 1)*(b*c - a*d)) + 1/((m + 1)*(b*c - a*d))* Int[(a + b*x)^(m + 1)*(c + d*x)^n* ExpandToSum[(m + 1)*(b*c - a*d)*Qx - d*R*(m + n + 2), x], x]] /; FreeQ[{a, b, c, d, n}, x] && PolyQ[Px, x] && ILtQ[m, -1] && GtQ[Expon[Px, x], 2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n), (polyq(P_Px,Xv)), (iltq(P_m,(-1))), (((expon(P_Px,Xv) > 2))) Int((P_Px)*(((O_a)+((O_b)*(Xv)))^(P_m))*(((O_c)+((O_d)*(Xv)))^(O_n)),Xv) = ((((polyremainder(P_Px,((O_a)+(((O_b)*(Xv)))),Xv))*(((((O_a)+(((O_b)*(Xv)))))^(((P_m)+(1)))))*(((((O_c)+(((O_d)*(Xv)))))^(((O_n)+(1)))))*(((((((P_m)+(1)))*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))))^((-1))))))+(((((((((P_m)+(1)))*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))))^((-1))))*(Int(((((((O_a)+(((O_b)*(Xv)))))^(((P_m)+(1)))))*(((((O_c)+(((O_d)*(Xv)))))^(O_n)))*(expandtosum(((((((P_m)+(1)))*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(polyquotient(P_Px,((O_a)+(((O_b)*(Xv)))),Xv))))+((((-1))*(O_d)*(polyremainder(P_Px,((O_a)+(((O_b)*(Xv)))),Xv))*(((P_m)+(O_n)+(2)))))),Xv))),Xv)))))
+
+# Regel 7 (648 Varianten):
+#   Int[Px_*(a_. + b_.*x_)^m_*(c_. + d_.*x_)^n_., x_Symbol] := With[{Qx = PolynomialQuotient[Px, a + b*x, x], R = PolynomialRemainder[Px, a + b*x, x]}, R*(a + b*x)^(m + 1)*(c + d*x)^(n + 1)/((m + 1)*(b*c - a*d)) + 1/((m + 1)*(b*c - a*d))* Int[(a + b*x)^(m + 1)*(c + d*x)^n* ExpandToSum[(m + 1)*(b*c - a*d)*Qx - d*R*(m + n + 2), x], x]] /; FreeQ[{a, b, c, d, n}, x] && PolyQ[Px, x] && LtQ[m, -1] && GtQ[Expon[Px, x], 2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n), (polyq(P_Px,Xv)), (((P_m < (-1)))), (((expon(P_Px,Xv) > 2))) Int((P_Px)*(((O_a)+((O_b)*(Xv)))^(P_m))*(((O_c)+((O_d)*(Xv)))^(O_n)),Xv) = ((((polyremainder(P_Px,((O_a)+(((O_b)*(Xv)))),Xv))*(((((O_a)+(((O_b)*(Xv)))))^(((P_m)+(1)))))*(((((O_c)+(((O_d)*(Xv)))))^(((O_n)+(1)))))*(((((((P_m)+(1)))*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))))^((-1))))))+(((((((((P_m)+(1)))*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))))^((-1))))*(Int(((((((O_a)+(((O_b)*(Xv)))))^(((P_m)+(1)))))*(((((O_c)+(((O_d)*(Xv)))))^(O_n)))*(expandtosum(((((((P_m)+(1)))*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(polyquotient(P_Px,((O_a)+(((O_b)*(Xv)))),Xv))))+((((-1))*(O_d)*(polyremainder(P_Px,((O_a)+(((O_b)*(Xv)))),Xv))*(((P_m)+(O_n)+(2)))))),Xv))),Xv)))))
+
+# Regel 8 (1296 Varianten):
+#   Int[Px_*(a_. + b_.*x_)^m_.*(c_. + d_.*x_)^n_., x_Symbol] := With[{q = Expon[Px, x], k = Coeff[Px, x, Expon[Px, x]]}, k*(a + b*x)^(m + q)*(c + d*x)^(n + 1)/(d*b^q*(m + n + q + 1)) + 1/(d*b^q*(m + n + q + 1))*Int[(a + b*x)^m*(c + d*x)^n* ExpandToSum[ d*b^q*(m + n + q + 1)*Px - d*k*(m + n + q + 1)*(a + b*x)^q - k*(b*c - a*d)*(m + q)*(a + b*x)^(q - 1), x], x] /; NeQ[m + n + q + 1, 0]] /; FreeQ[{a, b, c, d, m, n}, x] && PolyQ[Px, x] && GtQ[Expon[Px, x], 2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (polyq(P_Px,Xv)), (((expon(P_Px,Xv) > 2))), (neq(((O_m)+(O_n)+(expon(P_Px,Xv))+(1)),0)) Int((P_Px)*(((O_a)+((O_b)*(Xv)))^(O_m))*(((O_c)+((O_d)*(Xv)))^(O_n)),Xv) = ((((coeff(P_Px,Xv,expon(P_Px,Xv)))*(((((O_a)+(((O_b)*(Xv)))))^(((O_m)+(expon(P_Px,Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^(((O_n)+(1)))))*(((((O_d)*(((O_b)^(expon(P_Px,Xv))))*(((O_m)+(O_n)+(expon(P_Px,Xv))+(1)))))^((-1))))))+(((((((O_d)*(((O_b)^(expon(P_Px,Xv))))*(((O_m)+(O_n)+(expon(P_Px,Xv))+(1)))))^((-1))))*(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_m)))*(((((O_c)+(((O_d)*(Xv)))))^(O_n)))*(expandtosum(((((O_d)*(((O_b)^(expon(P_Px,Xv))))*(((O_m)+(O_n)+(expon(P_Px,Xv))+(1)))*(P_Px)))+((((-1))*(O_d)*(coeff(P_Px,Xv,expon(P_Px,Xv)))*(((O_m)+(O_n)+(expon(P_Px,Xv))+(1)))*(((((O_a)+(((O_b)*(Xv)))))^(expon(P_Px,Xv))))))+((((-1))*(coeff(P_Px,Xv,expon(P_Px,Xv)))*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(((O_m)+(expon(P_Px,Xv))))*(((((O_a)+(((O_b)*(Xv)))))^(((expon(P_Px,Xv))+((-1))))))))),Xv))),Xv)))))

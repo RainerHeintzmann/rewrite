@@ -1,0 +1,115 @@
+# r7_5_2
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   7.5.2 Miscellaneous inverse hyperbolic secant
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 nicht uebersetzt: function ArcSech in pattern
+#   Int[ArcSech[c_ + d_.*x_], x_Symbol] := (c + d*x)*ArcSech[c + d*x]/d + Int[Sqrt[(1 - c - d*x)/(1 + c + d*x)]/(1 - c - d*x), x] /; FreeQ[{c, d}, x]
+
+# Regel 2 nicht uebersetzt: function ArcCsch in pattern
+#   Int[ArcCsch[c_ + d_.*x_], x_Symbol] := (c + d*x)*ArcCsch[c + d*x]/d + Int[1/((c + d*x)*Sqrt[1 + 1/(c + d*x)^2]), x] /; FreeQ[{c, d}, x]
+
+# Regel 3 nicht uebersetzt: function ArcSech in pattern
+#   Int[(a_. + b_.*ArcSech[c_ + d_.*x_])^p_., x_Symbol] := 1/d*Subst[Int[(a + b*ArcSech[x])^p, x], x, c + d*x] /; FreeQ[{a, b, c, d}, x] && IGtQ[p, 0]
+
+# Regel 4 nicht uebersetzt: function ArcCsch in pattern
+#   Int[(a_. + b_.*ArcCsch[c_ + d_.*x_])^p_., x_Symbol] := 1/d*Subst[Int[(a + b*ArcCsch[x])^p, x], x, c + d*x] /; FreeQ[{a, b, c, d}, x] && IGtQ[p, 0]
+
+# Regel 5 nicht uebersetzt: function ArcSech in pattern
+#   Int[(a_. + b_.*ArcSech[c_ + d_.*x_])^p_, x_Symbol] := Unintegrable[(a + b*ArcSech[c + d*x])^p, x] /; FreeQ[{a, b, c, d, p}, x] && Not[IGtQ[p, 0]]
+
+# Regel 6 nicht uebersetzt: function ArcCsch in pattern
+#   Int[(a_. + b_.*ArcCsch[c_ + d_.*x_])^p_, x_Symbol] := Unintegrable[(a + b*ArcCsch[c + d*x])^p, x] /; FreeQ[{a, b, c, d, p}, x] && Not[IGtQ[p, 0]]
+
+# Regel 7 nicht uebersetzt: function ArcSech in pattern
+#   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcSech[c_ + d_.*x_])^p_., x_Symbol] := 1/d*Subst[Int[(f*x/d)^m*(a + b*ArcSech[x])^p, x], x, c + d*x] /; FreeQ[{a, b, c, d, e, f, m}, x] && EqQ[d*e - c*f, 0] && IGtQ[p, 0]
+
+# Regel 8 nicht uebersetzt: function ArcCsch in pattern
+#   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcCsch[c_ + d_.*x_])^p_., x_Symbol] := 1/d*Subst[Int[(f*x/d)^m*(a + b*ArcCsch[x])^p, x], x, c + d*x] /; FreeQ[{a, b, c, d, e, f, m}, x] && EqQ[d*e - c*f, 0] && IGtQ[p, 0]
+
+# Regel 9 nicht uebersetzt: function ArcSech in pattern
+#   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcSech[c_ + d_.*x_])^p_., x_Symbol] := -1/d^(m + 1)* Subst[Int[(a + b*x)^p*Sech[x]*Tanh[x]*(d*e - c*f + f*Sech[x])^m, x], x, ArcSech[c + d*x]] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[p, 0] && IntegerQ[m]
+
+# Regel 10 nicht uebersetzt: function ArcCsch in pattern
+#   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcCsch[c_ + d_.*x_])^p_., x_Symbol] := -1/d^(m + 1)* Subst[Int[(a + b*x)^p*Csch[x]*Coth[x]*(d*e - c*f + f*Csch[x])^m, x], x, ArcCsch[c + d*x]] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[p, 0] && IntegerQ[m]
+
+# Regel 11 nicht uebersetzt: function ArcSech in pattern
+#   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcSech[c_ + d_.*x_])^p_., x_Symbol] := 1/d*Subst[Int[((d*e - c*f)/d + f*x/d)^m*(a + b*ArcSech[x])^p, x], x, c + d*x] /; FreeQ[{a, b, c, d, e, f, m}, x] && IGtQ[p, 0]
+
+# Regel 12 nicht uebersetzt: function ArcCsch in pattern
+#   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcCsch[c_ + d_.*x_])^p_., x_Symbol] := 1/d*Subst[Int[((d*e - c*f)/d + f*x/d)^m*(a + b*ArcCsch[x])^p, x], x, c + d*x] /; FreeQ[{a, b, c, d, e, f, m}, x] && IGtQ[p, 0]
+
+# Regel 13 nicht uebersetzt: function ArcSech in pattern
+#   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcSech[c_ + d_.*x_])^p_, x_Symbol] := Unintegrable[(e + f*x)^m*(a + b*ArcSech[c + d*x])^p, x] /; FreeQ[{a, b, c, d, e, f, m, p}, x] && Not[IGtQ[p, 0]]
+
+# Regel 14 nicht uebersetzt: function ArcCsch in pattern
+#   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcCsch[c_ + d_.*x_])^p_, x_Symbol] := Unintegrable[(e + f*x)^m*(a + b*ArcCsch[c + d*x])^p, x] /; FreeQ[{a, b, c, d, e, f, m, p}, x] && Not[IGtQ[p, 0]]
+
+# Regel 15 nicht uebersetzt: function ArcSech in pattern
+#   Int[u_.*ArcSech[c_./(a_. + b_.*x_^n_.)]^m_., x_Symbol] := Int[u*ArcCosh[a/c + b*x^n/c]^m, x] /; FreeQ[{a, b, c, n, m}, x]
+
+# Regel 16 nicht uebersetzt: function ArcCsch in pattern
+#   Int[u_.*ArcCsch[c_./(a_. + b_.*x_^n_.)]^m_., x_Symbol] := Int[u*ArcSinh[a/c + b*x^n/c]^m, x] /; FreeQ[{a, b, c, n, m}, x]
+
+# Regel 17 nicht uebersetzt: function ArcSech in pattern
+#   Int[E^ArcSech[a_.*x_], x_Symbol] := x*E^ArcSech[a*x] + Log[x]/a + 1/a*Int[1/(x*(1 - a*x))*Sqrt[(1 - a*x)/(1 + a*x)], x] /; FreeQ[a, x]
+
+# Regel 18 nicht uebersetzt: function ArcSech in pattern
+#   Int[E^ArcSech[a_.*x_^p_], x_Symbol] := x*E^ArcSech[a*x^p] + p/a*Int[1/x^p, x] + p*Sqrt[1 + a*x^p]/a*Sqrt[1/(1 + a*x^p)]* Int[1/(x^p*Sqrt[1 + a*x^p]*Sqrt[1 - a*x^p]), x] /; FreeQ[{a, p}, x]
+
+# Regel 19 nicht uebersetzt: function ArcCsch in pattern
+#   Int[E^ArcCsch[a_.*x_^p_.], x_Symbol] := 1/a*Int[1/x^p, x] + Int[Sqrt[1 + 1/(a^2*x^(2*p))], x] /; FreeQ[{a, p}, x]
+
+# Regel 20 nicht uebersetzt: function ArcSech in pattern
+#   Int[E^(n_.*ArcSech[u_]), x_Symbol] := Int[(1/u + Sqrt[(1 - u)/(1 + u)] + 1/u*Sqrt[(1 - u)/(1 + u)])^n, x] /; IntegerQ[n]
+
+# Regel 21 nicht uebersetzt: function ArcCsch in pattern
+#   Int[E^(n_.*ArcCsch[u_]), x_Symbol] := Int[(1/u + Sqrt[1 + 1/u^2])^n, x] /; IntegerQ[n]
+
+# Regel 22 nicht uebersetzt: function ArcSech in pattern
+#   Int[E^ArcSech[a_.*x_^p_.]/x_, x_Symbol] := -1/(a*p*x^p) + Sqrt[1 + a*x^p]/a*Sqrt[1/(1 + a*x^p)]* Int[Sqrt[1 + a*x^p]*Sqrt[1 - a*x^p]/x^(p + 1), x] /; FreeQ[{a, p}, x]
+
+# Regel 23 nicht uebersetzt: function ArcSech in pattern
+#   Int[x_^m_.*E^ArcSech[a_.*x_^p_.], x_Symbol] := x^(m + 1)*E^ArcSech[a*x^p]/(m + 1) + p/(a*(m + 1))*Int[x^(m - p), x] + p*Sqrt[1 + a*x^p]/(a*(m + 1))*Sqrt[1/(1 + a*x^p)]* Int[x^(m - p)/(Sqrt[1 + a*x^p]*Sqrt[1 - a*x^p]), x] /; FreeQ[{a, m, p}, x] && NeQ[m, -1]
+
+# Regel 24 nicht uebersetzt: function ArcCsch in pattern
+#   Int[x_^m_.*E^ArcCsch[a_.*x_^p_.], x_Symbol] := 1/a*Int[x^(m - p), x] + Int[x^m*Sqrt[1 + 1/(a^2*x^(2*p))], x] /; FreeQ[{a, m, p}, x]
+
+# Regel 25 nicht uebersetzt: function ArcSech in pattern
+#   Int[x_^m_.*E^(n_.*ArcSech[u_]), x_Symbol] := Int[x^m*(1/u + Sqrt[(1 - u)/(1 + u)] + 1/u*Sqrt[(1 - u)/(1 + u)])^ n, x] /; FreeQ[m, x] && IntegerQ[n]
+
+# Regel 26 nicht uebersetzt: function ArcCsch in pattern
+#   Int[x_^m_.*E^(n_.*ArcCsch[u_]), x_Symbol] := Int[x^m*(1/u + Sqrt[1 + 1/u^2])^n, x] /; FreeQ[m, x] && IntegerQ[n]
+
+# Regel 27 nicht uebersetzt: function ArcSech in pattern
+#   Int[E^(ArcSech[c_.*x_])/(a_ + b_.*x_^2), x_Symbol] := 1/(a*c)*Int[Sqrt[1/(1 + c*x)]/(x*Sqrt[1 - c*x]), x] + 1/c*Int[1/(x*(a + b*x^2)), x] /; FreeQ[{a, b, c}, x] && EqQ[b + a*c^2, 0]
+
+# Regel 28 nicht uebersetzt: function ArcCsch in pattern
+#   Int[E^(ArcCsch[c_.*x_])/(a_ + b_.*x_^2), x_Symbol] := 1/(a*c^2)*Int[1/(x^2*Sqrt[1 + 1/(c^2*x^2)]), x] + 1/c*Int[1/(x*(a + b*x^2)), x] /; FreeQ[{a, b, c}, x] && EqQ[b - a*c^2, 0]
+
+# Regel 29 nicht uebersetzt: function ArcSech in pattern
+#   Int[(d_.*x_)^m_.*E^(ArcSech[c_.*x_])/(a_ + b_.*x_^2), x_Symbol] := d/(a*c)*Int[(d*x)^(m - 1)*Sqrt[1/(1 + c*x)]/Sqrt[1 - c*x], x] + d/c*Int[(d*x)^(m - 1)/(a + b*x^2), x] /; FreeQ[{a, b, c, d, m}, x] && EqQ[b + a*c^2, 0]
+
+# Regel 30 nicht uebersetzt: function ArcCsch in pattern
+#   Int[(d_.*x_)^m_.*E^(ArcCsch[c_.*x_])/(a_ + b_.*x_^2), x_Symbol] := d^2/(a*c^2)*Int[(d*x)^(m - 2)/Sqrt[1 + 1/(c^2*x^2)], x] + d/c*Int[(d*x)^(m - 1)/(a + b*x^2), x] /; FreeQ[{a, b, c, d, m}, x] && EqQ[b - a*c^2, 0]
+
+# Regel 31 nicht uebersetzt: function ArcSech in pattern
+#   Int[ArcSech[u_], x_Symbol] := x*ArcSech[u] + Sqrt[1 - u^2]/(u*Sqrt[-1 + 1/u]*Sqrt[1 + 1/u])* Int[SimplifyIntegrand[x*D[u, x]/(u*Sqrt[1 - u^2]), x], x] /; InverseFunctionFreeQ[u, x] && Not[FunctionOfExponentialQ[u, x]]
+
+# Regel 32 nicht uebersetzt: function ArcCsch in pattern
+#   Int[ArcCsch[u_], x_Symbol] := x*ArcCsch[u] - u/Sqrt[-u^2]* Int[SimplifyIntegrand[x*D[u, x]/(u*Sqrt[-1 - u^2]), x], x] /; InverseFunctionFreeQ[u, x] && Not[FunctionOfExponentialQ[u, x]]
+
+# Regel 33 nicht uebersetzt: function ArcSech in pattern
+#   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcSech[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcSech[u])/(d*(m + 1)) + b*Sqrt[1 - u^2]/(d*(m + 1)*u*Sqrt[-1 + 1/u]*Sqrt[1 + 1/u])* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(u*Sqrt[1 - u^2]), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && Not[FunctionOfExponentialQ[u, x]]
+
+# Regel 34 nicht uebersetzt: function ArcCsch in pattern
+#   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcCsch[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcCsch[u])/(d*(m + 1)) - b*u/(d*(m + 1)*Sqrt[-u^2])* Int[SimplifyIntegrand[(c + d*x)^(m + 1)* D[u, x]/(u*Sqrt[-1 - u^2]), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && Not[FunctionOfExponentialQ[u, x]]
+
+# Regel 35 nicht uebersetzt: function ArcSech in pattern
+#   Int[v_*(a_. + b_.*ArcSech[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcSech[u]), w, x] + b*Sqrt[1 - u^2]/(u*Sqrt[-1 + 1/u]*Sqrt[1 + 1/u])* Int[SimplifyIntegrand[w*D[u, x]/(u*Sqrt[1 - u^2]), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]]
+
+# Regel 36 nicht uebersetzt: function ArcCsch in pattern
+#   Int[v_*(a_. + b_.*ArcCsch[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcCsch[u]), w, x] - b*u/Sqrt[-u^2]* Int[SimplifyIntegrand[w*D[u, x]/(u*Sqrt[-1 - u^2]), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]]

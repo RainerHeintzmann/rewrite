@@ -1,0 +1,214 @@
+# r8_1
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   8.1 Error functions
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 nicht uebersetzt: function Erf in pattern
+#   Int[Erf[a_. + b_.*x_], x_Symbol] := (a + b*x)*Erf[a + b*x]/b + 1/(b*Sqrt[Pi]*E^(a + b*x)^2) /; FreeQ[{a, b}, x]
+
+# Regel 2 nicht uebersetzt: function Erfc in pattern
+#   Int[Erfc[a_. + b_.*x_], x_Symbol] := (a + b*x)*Erfc[a + b*x]/b - 1/(b*Sqrt[Pi]*E^(a + b*x)^2) /; FreeQ[{a, b}, x]
+
+# Regel 3 nicht uebersetzt: function Erfi in pattern
+#   Int[Erfi[a_. + b_.*x_], x_Symbol] := (a + b*x)*Erfi[a + b*x]/b - E^(a + b*x)^2/(b*Sqrt[Pi]) /; FreeQ[{a, b}, x]
+
+# Regel 4 nicht uebersetzt: function Erf in pattern
+#   Int[Erf[a_. + b_.*x_]^2, x_Symbol] := (a + b*x)*Erf[a + b*x]^2/b - 4/Sqrt[Pi]*Int[(a + b*x)*Erf[a + b*x]/E^(a + b*x)^2, x] /; FreeQ[{a, b}, x]
+
+# Regel 5 nicht uebersetzt: function Erfc in pattern
+#   Int[Erfc[a_. + b_.*x_]^2, x_Symbol] := (a + b*x)*Erfc[a + b*x]^2/b + 4/Sqrt[Pi]*Int[(a + b*x)*Erfc[a + b*x]/E^(a + b*x)^2, x] /; FreeQ[{a, b}, x]
+
+# Regel 6 nicht uebersetzt: function Erfi in pattern
+#   Int[Erfi[a_. + b_.*x_]^2, x_Symbol] := (a + b*x)*Erfi[a + b*x]^2/b - 4/Sqrt[Pi]*Int[(a + b*x)*E^(a + b*x)^2*Erfi[a + b*x], x] /; FreeQ[{a, b}, x]
+
+# Regel 7 nicht uebersetzt: function Erf in pattern
+#   Int[Erf[a_. + b_.*x_]^n_, x_Symbol] := Unintegrable[Erf[a + b*x]^n, x] /; FreeQ[{a, b, n}, x] && NeQ[n, 1] && NeQ[n, 2]
+
+# Regel 8 nicht uebersetzt: function Erfc in pattern
+#   Int[Erfc[a_. + b_.*x_]^n_, x_Symbol] := Unintegrable[Erfc[a + b*x]^n, x] /; FreeQ[{a, b, n}, x] && NeQ[n, 1] && NeQ[n, 2]
+
+# Regel 9 nicht uebersetzt: function Erfi in pattern
+#   Int[Erfi[a_. + b_.*x_]^n_, x_Symbol] := Unintegrable[Erfi[a + b*x]^n, x] /; FreeQ[{a, b, n}, x] && NeQ[n, 1] && NeQ[n, 2]
+
+# Regel 10 nicht uebersetzt: function Erf in pattern
+#   Int[Erf[b_.*x_]/x_, x_Symbol] := 2*b*x/Sqrt[Pi]* HypergeometricPFQ[{1/2, 1/2}, {3/2, 3/2}, -b^2*x^2] /; FreeQ[b, x]
+
+# Regel 11 nicht uebersetzt: function Erfc in pattern
+#   Int[Erfc[b_.*x_]/x_, x_Symbol] := Log[x] - Int[Erf[b*x]/x, x] /; FreeQ[b, x]
+
+# Regel 12 nicht uebersetzt: function Erfi in pattern
+#   Int[Erfi[b_.*x_]/x_, x_Symbol] := 2*b*x/Sqrt[Pi]*HypergeometricPFQ[{1/2, 1/2}, {3/2, 3/2}, b^2*x^2] /; FreeQ[b, x]
+
+# Regel 13 nicht uebersetzt: function Erf in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erf[a_. + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*Erf[a + b*x]/(d*(m + 1)) - 2*b/(Sqrt[Pi]*d*(m + 1))* Int[(c + d*x)^(m + 1)/E^(a + b*x)^2, x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1]
+
+# Regel 14 nicht uebersetzt: function Erfc in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erfc[a_. + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*Erfc[a + b*x]/(d*(m + 1)) + 2*b/(Sqrt[Pi]*d*(m + 1))* Int[(c + d*x)^(m + 1)/E^(a + b*x)^2, x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1]
+
+# Regel 15 nicht uebersetzt: function Erfi in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erfi[a_. + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*Erfi[a + b*x]/(d*(m + 1)) - 2*b/(Sqrt[Pi]*d*(m + 1))* Int[(c + d*x)^(m + 1)*E^(a + b*x)^2, x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1]
+
+# Regel 16 nicht uebersetzt: function Erf in pattern
+#   Int[x_^m_.*Erf[b_.*x_]^2, x_Symbol] := x^(m + 1)*Erf[b*x]^2/(m + 1) - 4*b/(Sqrt[Pi]*(m + 1))*Int[x^(m + 1)*E^(-b^2*x^2)*Erf[b*x], x] /; FreeQ[b, x] && (IGtQ[m, 0] || ILtQ[(m + 1)/2, 0])
+
+# Regel 17 nicht uebersetzt: function Erfc in pattern
+#   Int[x_^m_.*Erfc[b_.*x_]^2, x_Symbol] := x^(m + 1)*Erfc[b*x]^2/(m + 1) + 4*b/(Sqrt[Pi]*(m + 1))*Int[x^(m + 1)*E^(-b^2*x^2)*Erfc[b*x], x] /; FreeQ[b, x] && (IGtQ[m, 0] || ILtQ[(m + 1)/2, 0])
+
+# Regel 18 nicht uebersetzt: function Erfi in pattern
+#   Int[x_^m_.*Erfi[b_.*x_]^2, x_Symbol] := x^(m + 1)*Erfi[b*x]^2/(m + 1) - 4*b/(Sqrt[Pi]*(m + 1))*Int[x^(m + 1)*E^(b^2*x^2)*Erfi[b*x], x] /; FreeQ[b, x] && (IGtQ[m, 0] || ILtQ[(m + 1)/2, 0])
+
+# Regel 19 nicht uebersetzt: function Erf in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erf[a_ + b_.*x_]^2, x_Symbol] := 1/b^(m + 1)* Subst[Int[ExpandIntegrand[Erf[x]^2, (b*c - a*d + d*x)^m, x], x], x, a + b*x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0]
+
+# Regel 20 nicht uebersetzt: function Erfc in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erfc[a_ + b_.*x_]^2, x_Symbol] := 1/b^(m + 1)* Subst[Int[ExpandIntegrand[Erfc[x]^2, (b*c - a*d + d*x)^m, x], x], x, a + b*x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0]
+
+# Regel 21 nicht uebersetzt: function Erfi in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erfi[a_ + b_.*x_]^2, x_Symbol] := 1/b^(m + 1)* Subst[Int[ExpandIntegrand[Erfi[x]^2, (b*c - a*d + d*x)^m, x], x], x, a + b*x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0]
+
+# Regel 22 nicht uebersetzt: function Erf in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erf[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[(c + d*x)^m*Erf[a + b*x]^n, x] /; FreeQ[{a, b, c, d, m, n}, x]
+
+# Regel 23 nicht uebersetzt: function Erfc in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erfc[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[(c + d*x)^m*Erfc[a + b*x]^n, x] /; FreeQ[{a, b, c, d, m, n}, x]
+
+# Regel 24 nicht uebersetzt: function Erfi in pattern
+#   Int[(c_. + d_.*x_)^m_.*Erfi[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[(c + d*x)^m*Erfi[a + b*x]^n, x] /; FreeQ[{a, b, c, d, m, n}, x]
+
+# Regel 25 nicht uebersetzt: function Erf in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erf[b_.*x_]^n_., x_Symbol] := E^c*Sqrt[Pi]/(2*b)*Subst[Int[x^n, x], x, Erf[b*x]] /; FreeQ[{b, c, d, n}, x] && EqQ[d, -b^2]
+
+# Regel 26 nicht uebersetzt: function Erfc in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erfc[b_.*x_]^n_., x_Symbol] := -E^c*Sqrt[Pi]/(2*b)*Subst[Int[x^n, x], x, Erfc[b*x]] /; FreeQ[{b, c, d, n}, x] && EqQ[d, -b^2]
+
+# Regel 27 nicht uebersetzt: function Erfi in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erfi[b_.*x_]^n_., x_Symbol] := E^c*Sqrt[Pi]/(2*b)*Subst[Int[x^n, x], x, Erfi[b*x]] /; FreeQ[{b, c, d, n}, x] && EqQ[d, b^2]
+
+# Regel 28 nicht uebersetzt: function Erf in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erf[b_.*x_], x_Symbol] := b*E^c*x^2/Sqrt[Pi]*HypergeometricPFQ[{1, 1}, {3/2, 2}, b^2*x^2] /; FreeQ[{b, c, d}, x] && EqQ[d, b^2]
+
+# Regel 29 nicht uebersetzt: function Erfc in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erfc[b_.*x_], x_Symbol] := Int[E^(c + d*x^2), x] - Int[E^(c + d*x^2)*Erf[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d, b^2]
+
+# Regel 30 nicht uebersetzt: function Erfi in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erfi[b_.*x_], x_Symbol] := b*E^c*x^2/Sqrt[Pi]*HypergeometricPFQ[{1, 1}, {3/2, 2}, -b^2*x^2] /; FreeQ[{b, c, d}, x] && EqQ[d, -b^2]
+
+# Regel 31 nicht uebersetzt: function Erf in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erf[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[E^(c + d*x^2)*Erf[a + b*x]^n, x] /; FreeQ[{a, b, c, d, n}, x]
+
+# Regel 32 nicht uebersetzt: function Erfc in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erfc[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[E^(c + d*x^2)*Erfc[a + b*x]^n, x] /; FreeQ[{a, b, c, d, n}, x]
+
+# Regel 33 nicht uebersetzt: function Erfi in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erfi[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[E^(c + d*x^2)*Erfi[a + b*x]^n, x] /; FreeQ[{a, b, c, d, n}, x]
+
+# Regel 34 nicht uebersetzt: function Erf in pattern
+#   Int[x_*E^(c_. + d_.*x_^2)*Erf[a_. + b_.*x_], x_Symbol] := E^(c + d*x^2)*Erf[a + b*x]/(2*d) - b/(d*Sqrt[Pi])*Int[E^(-a^2 + c - 2*a*b*x - (b^2 - d)*x^2), x] /; FreeQ[{a, b, c, d}, x]
+
+# Regel 35 nicht uebersetzt: function Erfc in pattern
+#   Int[x_*E^(c_. + d_.*x_^2)*Erfc[a_. + b_.*x_], x_Symbol] := E^(c + d*x^2)*Erfc[a + b*x]/(2*d) + b/(d*Sqrt[Pi])*Int[E^(-a^2 + c - 2*a*b*x - (b^2 - d)*x^2), x] /; FreeQ[{a, b, c, d}, x]
+
+# Regel 36 nicht uebersetzt: function Erfi in pattern
+#   Int[x_*E^(c_. + d_.*x_^2)*Erfi[a_. + b_.*x_], x_Symbol] := E^(c + d*x^2)*Erfi[a + b*x]/(2*d) - b/(d*Sqrt[Pi])*Int[E^(a^2 + c + 2*a*b*x + (b^2 + d)*x^2), x] /; FreeQ[{a, b, c, d}, x]
+
+# Regel 37 nicht uebersetzt: function Erf in pattern
+#   Int[x_^m_*E^(c_. + d_.*x_^2)*Erf[a_. + b_.*x_], x_Symbol] := x^(m - 1)*E^(c + d*x^2)*Erf[a + b*x]/(2*d) - b/(d*Sqrt[Pi])* Int[x^(m - 1)*E^(-a^2 + c - 2*a*b*x - (b^2 - d)*x^2), x] - (m - 1)/(2*d)*Int[x^(m - 2)*E^(c + d*x^2)*Erf[a + b*x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 1]
+
+# Regel 38 nicht uebersetzt: function Erfc in pattern
+#   Int[x_^m_*E^(c_. + d_.*x_^2)*Erfc[a_. + b_.*x_], x_Symbol] := x^(m - 1)*E^(c + d*x^2)*Erfc[a + b*x]/(2*d) + b/(d*Sqrt[Pi])* Int[x^(m - 1)*E^(-a^2 + c - 2*a*b*x - (b^2 - d)*x^2), x] - (m - 1)/(2*d)*Int[x^(m - 2)*E^(c + d*x^2)*Erfc[a + b*x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 1]
+
+# Regel 39 nicht uebersetzt: function Erfi in pattern
+#   Int[x_^m_*E^(c_. + d_.*x_^2)*Erfi[a_. + b_.*x_], x_Symbol] := x^(m - 1)*E^(c + d*x^2)*Erfi[a + b*x]/(2*d) - b/(d*Sqrt[Pi])* Int[x^(m - 1)*E^(a^2 + c + 2*a*b*x + (b^2 + d)*x^2), x] - (m - 1)/(2*d)*Int[x^(m - 2)*E^(c + d*x^2)*Erfi[a + b*x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 1]
+
+# Regel 40 nicht uebersetzt: function Erf in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erf[b_.*x_]/x_, x_Symbol] := 2*b*E^c*x/Sqrt[Pi]* HypergeometricPFQ[{1/2, 1}, {3/2, 3/2}, b^2*x^2] /; FreeQ[{b, c, d}, x] && EqQ[d, b^2]
+
+# Regel 41 nicht uebersetzt: function Erfc in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erfc[b_.*x_]/x_, x_Symbol] := Int[E^(c + d*x^2)/x, x] - Int[E^(c + d*x^2)*Erf[b*x]/x, x] /; FreeQ[{b, c, d}, x] && EqQ[d, b^2]
+
+# Regel 42 nicht uebersetzt: function Erfi in pattern
+#   Int[E^(c_. + d_.*x_^2)*Erfi[b_.*x_]/x_, x_Symbol] := 2*b*E^c*x/Sqrt[Pi]* HypergeometricPFQ[{1/2, 1}, {3/2, 3/2}, -b^2*x^2] /; FreeQ[{b, c, d}, x] && EqQ[d, -b^2]
+
+# Regel 43 nicht uebersetzt: function Erf in pattern
+#   Int[x_^m_*E^(c_. + d_.*x_^2)*Erf[a_. + b_.*x_], x_Symbol] := x^(m + 1)*E^(c + d*x^2)*Erf[a + b*x]/(m + 1) - 2*b/((m + 1)*Sqrt[Pi])* Int[x^(m + 1)*E^(-a^2 + c - 2*a*b*x - (b^2 - d)*x^2), x] - 2*d/(m + 1)*Int[x^(m + 2)*E^(c + d*x^2)*Erf[a + b*x], x] /; FreeQ[{a, b, c, d}, x] && ILtQ[m, -1]
+
+# Regel 44 nicht uebersetzt: function Erfc in pattern
+#   Int[x_^m_*E^(c_. + d_.*x_^2)*Erfc[a_. + b_.*x_], x_Symbol] := x^(m + 1)*E^(c + d*x^2)*Erfc[a + b*x]/(m + 1) + 2*b/((m + 1)*Sqrt[Pi])* Int[x^(m + 1)*E^(-a^2 + c - 2*a*b*x - (b^2 - d)*x^2), x] - 2*d/(m + 1)*Int[x^(m + 2)*E^(c + d*x^2)*Erfc[a + b*x], x] /; FreeQ[{a, b, c, d}, x] && ILtQ[m, -1]
+
+# Regel 45 nicht uebersetzt: function Erfi in pattern
+#   Int[x_^m_*E^(c_. + d_.*x_^2)*Erfi[a_. + b_.*x_], x_Symbol] := x^(m + 1)*E^(c + d*x^2)*Erfi[a + b*x]/(m + 1) - 2*b/((m + 1)*Sqrt[Pi])* Int[x^(m + 1)*E^(a^2 + c + 2*a*b*x + (b^2 + d)*x^2), x] - 2*d/(m + 1)*Int[x^(m + 2)*E^(c + d*x^2)*Erfi[a + b*x], x] /; FreeQ[{a, b, c, d}, x] && ILtQ[m, -1]
+
+# Regel 46 nicht uebersetzt: function Erf in pattern
+#   Int[(e_.*x_)^m_.*E^(c_. + d_.*x_^2)*Erf[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[(e*x)^m*E^(c + d*x^2)*Erf[a + b*x]^n, x] /; FreeQ[{a, b, c, d, e, m, n}, x]
+
+# Regel 47 nicht uebersetzt: function Erfc in pattern
+#   Int[(e_.*x_)^m_.*E^(c_. + d_.*x_^2)*Erfc[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[(e*x)^m*E^(c + d*x^2)*Erfc[a + b*x]^n, x] /; FreeQ[{a, b, c, d, e, m, n}, x]
+
+# Regel 48 nicht uebersetzt: function Erfi in pattern
+#   Int[(e_.*x_)^m_.*E^(c_. + d_.*x_^2)*Erfi[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[(e*x)^m*E^(c + d*x^2)*Erfi[a + b*x]^n, x] /; FreeQ[{a, b, c, d, e, m, n}, x]
+
+# Regel 49 nicht uebersetzt: function Erf in pattern
+#   Int[Erf[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := x*Erf[d*(a + b*Log[c*x^n])] - 2*b*d*n/(Sqrt[Pi])*Int[1/E^(d*(a + b*Log[c*x^n]))^2, x] /; FreeQ[{a, b, c, d, n}, x]
+
+# Regel 50 nicht uebersetzt: function Erfc in pattern
+#   Int[Erfc[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := x*Erfc[d*(a + b*Log[c*x^n])] + 2*b*d*n/(Sqrt[Pi])*Int[1/E^(d*(a + b*Log[c*x^n]))^2, x] /; FreeQ[{a, b, c, d, n}, x]
+
+# Regel 51 nicht uebersetzt: function Erfi in pattern
+#   Int[Erfi[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := x*Erfi[d*(a + b*Log[c*x^n])] - 2*b*d*n/(Sqrt[Pi])*Int[E^(d*(a + b*Log[c*x^n]))^2, x] /; FreeQ[{a, b, c, d, n}, x]
+
+# Regel 52 nicht uebersetzt: call of a non-symbol
+#   Int[F_[d_.*(a_. + b_.*Log[c_.*x_^n_.])]/x_, x_Symbol] := 1/n*Subst[F[d*(a + b*x)], x, Log[c*x^n]] /; FreeQ[{a, b, c, d, n}, x] && MemberQ[{Erf, Erfc, Erfi}, F]
+
+# Regel 53 nicht uebersetzt: function Erf in pattern
+#   Int[(e_.*x_)^m_.*Erf[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := (e*x)^(m + 1)*Erf[d*(a + b*Log[c*x^n])]/(e*(m + 1)) - 2*b*d*n/(Sqrt[Pi]*(m + 1))* Int[(e*x)^m/E^(d*(a + b*Log[c*x^n]))^2, x] /; FreeQ[{a, b, c, d, e, m, n}, x] && NeQ[m, -1]
+
+# Regel 54 nicht uebersetzt: function Erfc in pattern
+#   Int[(e_.*x_)^m_.*Erfc[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := (e*x)^(m + 1)*Erfc[d*(a + b*Log[c*x^n])]/(e*(m + 1)) + 2*b*d*n/(Sqrt[Pi]*(m + 1))* Int[(e*x)^m/E^(d*(a + b*Log[c*x^n]))^2, x] /; FreeQ[{a, b, c, d, e, m, n}, x] && NeQ[m, -1]
+
+# Regel 55 nicht uebersetzt: function Erfi in pattern
+#   Int[(e_.*x_)^m_.*Erfi[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := (e*x)^(m + 1)*Erfi[d*(a + b*Log[c*x^n])]/(e*(m + 1)) - 2*b*d*n/(Sqrt[Pi]*(m + 1))* Int[(e*x)^m*E^(d*(a + b*Log[c*x^n]))^2, x] /; FreeQ[{a, b, c, d, e, m, n}, x] && NeQ[m, -1]
+
+# Regel 56 nicht uebersetzt: function Erf in pattern
+#   Int[Sin[c_. + d_.*x_^2]*Erf[b_.*x_], x_Symbol] := I/2*Int[E^(-I*c - I*d*x^2)*Erf[b*x], x] - I/2*Int[E^(I*c + I*d*x^2)*Erf[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+
+# Regel 57 nicht uebersetzt: function Erfc in pattern
+#   Int[Sin[c_. + d_.*x_^2]*Erfc[b_.*x_], x_Symbol] := I/2*Int[E^(-I*c - I*d*x^2)*Erfc[b*x], x] - I/2*Int[E^(I*c + I*d*x^2)*Erfc[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+
+# Regel 58 nicht uebersetzt: function Erfi in pattern
+#   Int[Sin[c_. + d_.*x_^2]*Erfi[b_.*x_], x_Symbol] := I/2*Int[E^(-I*c - I*d*x^2)*Erfi[b*x], x] - I/2*Int[E^(I*c + I*d*x^2)*Erfi[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+
+# Regel 59 nicht uebersetzt: function Erf in pattern
+#   Int[Cos[c_. + d_.*x_^2]*Erf[b_.*x_], x_Symbol] := 1/2*Int[E^(-I*c - I*d*x^2)*Erf[b*x], x] + 1/2*Int[E^(I*c + I*d*x^2)*Erf[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+
+# Regel 60 nicht uebersetzt: function Erfc in pattern
+#   Int[Cos[c_. + d_.*x_^2]*Erfc[b_.*x_], x_Symbol] := 1/2*Int[E^(-I*c - I*d*x^2)*Erfc[b*x], x] + 1/2*Int[E^(I*c + I*d*x^2)*Erfc[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+
+# Regel 61 nicht uebersetzt: function Erfi in pattern
+#   Int[Cos[c_. + d_.*x_^2]*Erfi[b_.*x_], x_Symbol] := 1/2*Int[E^(-I*c - I*d*x^2)*Erfi[b*x], x] + 1/2*Int[E^(I*c + I*d*x^2)*Erfi[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+
+# Regel 62 nicht uebersetzt: function Erf in pattern
+#   Int[Sinh[c_. + d_.*x_^2]*Erf[b_.*x_], x_Symbol] := 1/2*Int[E^(c + d*x^2)*Erf[b*x], x] - 1/2*Int[E^(-c - d*x^2)*Erf[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, b^4]
+
+# Regel 63 nicht uebersetzt: function Erfc in pattern
+#   Int[Sinh[c_. + d_.*x_^2]*Erfc[b_.*x_], x_Symbol] := 1/2*Int[E^(c + d*x^2)*Erfc[b*x], x] - 1/2*Int[E^(-c - d*x^2)*Erfc[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, b^4]
+
+# Regel 64 nicht uebersetzt: function Erfi in pattern
+#   Int[Sinh[c_. + d_.*x_^2]*Erfi[b_.*x_], x_Symbol] := 1/2*Int[E^(c + d*x^2)*Erfi[b*x], x] - 1/2*Int[E^(-c - d*x^2)*Erfi[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, b^4]
+
+# Regel 65 nicht uebersetzt: function Erf in pattern
+#   Int[Cosh[c_. + d_.*x_^2]*Erf[b_.*x_], x_Symbol] := 1/2*Int[E^(c + d*x^2)*Erf[b*x], x] + 1/2*Int[E^(-c - d*x^2)*Erf[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, b^4]
+
+# Regel 66 nicht uebersetzt: function Erfc in pattern
+#   Int[Cosh[c_. + d_.*x_^2]*Erfc[b_.*x_], x_Symbol] := 1/2*Int[E^(c + d*x^2)*Erfc[b*x], x] + 1/2*Int[E^(-c - d*x^2)*Erfc[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, b^4]
+
+# Regel 67 nicht uebersetzt: function Erfi in pattern
+#   Int[Cosh[c_. + d_.*x_^2]*Erfi[b_.*x_], x_Symbol] := 1/2*Int[E^(c + d*x^2)*Erfi[b*x], x] + 1/2*Int[E^(-c - d*x^2)*Erfi[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, b^4]
+
+# Regel 68 nicht uebersetzt: call of a non-symbol
+#   Int[F_[f_.*(a_. + b_.*Log[c_.*(d_ + e_.*x_)^n_.])], x_Symbol] := 1/e*Subst[Int[F[f*(a + b*Log[c*x^n])], x], x, d + e*x] /; FreeQ[{a, b, c, d, e, f, n}, x] && MemberQ[{Erf, Erfc, Erfi, FresnelS, FresnelC, ExpIntegralEi, SinIntegral, CosIntegral, SinhIntegral, CoshIntegral}, F]
+
+# Regel 69 nicht uebersetzt: call of a non-symbol
+#   Int[(g_ + h_. x_)^m_.*F_[f_.*(a_. + b_.*Log[c_.*(d_ + e_.*x_)^n_.])], x_Symbol] := 1/e*Subst[Int[(g*x/d)^m*F[f*(a + b*Log[c*x^n])], x], x, d + e*x] /; FreeQ[{a, b, c, d, e, f, g, m, n}, x] && EqQ[e*f - d*g, 0] && MemberQ[{Erf, Erfc, Erfi, FresnelS, FresnelC, ExpIntegralEi, SinIntegral, CosIntegral, SinhIntegral, CoshIntegral}, F]

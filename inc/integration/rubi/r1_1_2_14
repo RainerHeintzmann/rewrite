@@ -1,0 +1,19 @@
+# r1_1_2_14
+# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# mit tools/rubi2rewrite.py, Abschnitt
+#   1.1.2.14 P(x) (c+d x)^m (e+f x)^n (a+b x^2)^p
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi.
+# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+
+# Regel 1 (20736 Varianten):
+#   Int[Px_*(c_+d_.*x_)^m_.*(e_+f_.*x_)^n_.*(a_.+b_.*x_^2)^p_.,x_Symbol] := Int[PolynomialQuotient[Px,c+d*x,x]*(c+d*x)^(m+1)*(e+f*x)^n*(a+b*x^2)^p,x] /; FreeQ[{a,b,c,d,e,f,m,n,p},x] && PolynomialQ[Px,x] && EqQ[PolynomialRemainder[Px,c+d*x,x],0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,P_e,O_f,O_m,O_n,O_p), (polyq(P_Px,Xv)), (eqq(polyremainder(P_Px,((P_c)+(((O_d)*(Xv)))),Xv),0)) Int((P_Px)*(((P_c)+((O_d)*(Xv)))^(O_m))*(((P_e)+((O_f)*(Xv)))^(O_n))*(((O_a)+((O_b)*((Xv)^(2))))^(O_p)),Xv) = Int(((polyquotient(P_Px,((P_c)+(((O_d)*(Xv)))),Xv))*(((((P_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(((((P_e)+(((O_f)*(Xv)))))^(O_n)))*(((((O_a)+(((O_b)*(((Xv)^(2)))))))^(O_p)))),Xv)
+
+# Regel 2 (20736 Varianten):
+#   Int[Px_*(c_+d_.*x_)^m_.*(e_+f_.*x_)^n_.*(a_.+b_.*x_^2)^p_.,x_Symbol] := Int[ExpandIntegrand[Px*(c+d*x)^m*(e+f*x)^n*(a+b*x^2)^p,x],x] /; FreeQ[{a,b,c,d,e,f,m,n,p},x] && PolyQ[Px,x] && (IntegerQ[p] || IntegerQ[2*p] && IntegerQ[m] && ILtQ[n,0]) && Not[IGtQ[m,0] && IGtQ[n,0]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,P_e,O_f,O_m,O_n,O_p), (polyq(P_Px,Xv)), (((integerq(O_p)) || (((integerq(((2)*(O_p)))) && (integerq(O_m)) && (iltq(O_n,0)))))), (not(((igtq(O_m,0)) && (igtq(O_n,0))))) Int((P_Px)*(((P_c)+((O_d)*(Xv)))^(O_m))*(((P_e)+((O_f)*(Xv)))^(O_n))*(((O_a)+((O_b)*((Xv)^(2))))^(O_p)),Xv) = Int(expandintegrand(((P_Px)*(((((P_c)+(((O_d)*(Xv)))))^(O_m)))*(((((P_e)+(((O_f)*(Xv)))))^(O_n)))*(((((O_a)+(((O_b)*(((Xv)^(2)))))))^(O_p)))),Xv),Xv)
+
+# Regel 3 (20736 Varianten):
+#   Int[Px_*(c_+d_.*x_)^m_.*(e_+f_.*x_)^n_.*(a_.+b_.*x_^2)^p_.,x_Symbol] := Int[PolynomialQuotient[Px,c+d*x,x]*(c+d*x)^(m+1)*(e+f*x)^n*(a+b*x^2)^p,x] + PolynomialRemainder[Px,c+d*x,x] \[Star] Int[(c+d*x)^m*(e+f*x)^n*(a+b*x^2)^p,x]/; FreeQ[{a,b,c,d,e,f,n,p},x] && PolynomialQ[Px,x] && LtQ[m,0] && Not[IntegerQ[n]] && IntegersQ[2*m,2*n,2*p]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,P_e,O_f,O_n,O_p), (polyq(P_Px,Xv)), (((O_m < 0))), (not(integerq(O_n))), (integersq(((2)*(O_m)),((2)*(O_n)),((2)*(O_p)))) Int((P_Px)*(((P_c)+((O_d)*(Xv)))^(O_m))*(((P_e)+((O_f)*(Xv)))^(O_n))*(((O_a)+((O_b)*((Xv)^(2))))^(O_p)),Xv) = ((Int(((polyquotient(P_Px,((P_c)+(((O_d)*(Xv)))),Xv))*(((((P_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(((((P_e)+(((O_f)*(Xv)))))^(O_n)))*(((((O_a)+(((O_b)*(((Xv)^(2)))))))^(O_p)))),Xv))+(((polyremainder(P_Px,((P_c)+(((O_d)*(Xv)))),Xv))*(Int(((((((P_c)+(((O_d)*(Xv)))))^(O_m)))*(((((P_e)+(((O_f)*(Xv)))))^(O_n)))*(((((O_a)+(((O_b)*(((Xv)^(2)))))))^(O_p)))),Xv)))))

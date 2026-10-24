@@ -393,13 +393,17 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Neues Verzeichnis inc/integration: regelbasierte Integration, eine
    Auswahl der Rubi-Regeln (A. D. Rich, MIT-Lizenz), siehe README.md dort.
  - Neue Muster-Eigenschaften: optionale Teile (OPT, DEFAULT), kommutative
-   Operatoren (COMM) und mehrere Bedingungen (IF c1, c2). Eine Regel wird
-   dabei in alle ihre Varianten erweitert (expand.c). Nicht berechenbare
-   Bedingungen fuehren nicht mehr zum Absturz.
+   Operatoren (COMM) und mehrere Bedingungen (IF c1, c2). Solche Regeln
+   stehen in einer geordneten Regelliste mit einem Matcher mit Backtracking
+   (listmatch.c). Nicht berechenbare Bedingungen fuehren nicht mehr zum
+   Absturz. REWR bricht nach 100000 Schritten ab.
  - Interne Aufraeumarbeit: benannte Zugriffe auf die Knotenstrukturen (nodes.h).
  - Symbolische Hilfsfunktionen in C (symfkt.c, inc/helpers) wie expand, coeff,
    polyq, freeq, subst, und weitere elementare Funktionen (csc, sec, cot,
    arccot, hyperbolische und Area-Funktionen, polylog, productlog).
+ - tools/rubi2rewrite.py uebersetzt etwa drei Viertel der Rubi-Regeln
+   automatisch nach inc/integration/rubi (RubiIntegrate); tools/rubitest.py
+   prueft sie mit Rubis Testsammlung.
 
 Maengel des Systems:
 Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie

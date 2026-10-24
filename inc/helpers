@@ -22,9 +22,13 @@ FUNC linearq   : real,real >> bool        ATT linearq    # Polynom vom Grad 1
 FUNC sumq      : real >> bool             ATT sumq
 FUNC productq  : real >> bool             ATT productq
 FUNC powerq    : real >> bool             ATT powerq
+FUNC fractionq : real++ >> bool           ATT fractionq     # keine ganzen Zahlen
+FUNC halfintegerq : real++ >> bool        ATT halfintegerq  # halbzahlig
+FUNC nicesqrtq : real >> bool             ATT nicesqrtq     # Zahl > 0
 
 # ---- Termfunktionen ----
 FUNC expand    : real >> real             ATT expand     # ausmultiplizieren
+OTHER expand   : real,real >> real        ATT expand     # Expand[u,x]
 FUNC expandintegrand : real,real >> real  ATT expandintegrand
 OTHER expandintegrand : real,real,real >> real ATT expandintegrand
 FUNC coeff     : real,real,real >> real   ATT coeff      # Koeffizient von x^n
@@ -32,9 +36,22 @@ OTHER coeff    : real,real >> real        ATT coeff      # Koeffizient von x
 FUNC expon     : real,real >> real        ATT expon      # Grad in x
 FUNC subst     : real,real,real >> real   ATT subst      # x in u durch v ersetzen
 FUNC simp      : real,real >> real        ATT simp       # u (Vereinfachen macht All)
+OTHER simp     : real >> real             ATT simp
 FUNC simplify  : real >> real             ATT simplify
 FUNC dist      : real,real,real >> real   ATT dist       # u*v
 OTHER dist     : real,real >> real        ATT dist
 FUNC rt        : real,real >> real        ATT rt         # n-te Wurzel
 FUNC intpart   : real >> real             ATT intpart
 FUNC fracpart  : real >> real             ATT fracpart
+FUNC gcd       : real,real >> real        ATT gcd        # ggT von Bruechen
+FUNC numerator : real >> real             ATT numerator  # Zaehler
+FUNC denominator : real >> real           ATT denominator # Nenner
+FUNC freefactors : real,real >> real      ATT freefactors     # Faktoren ohne x
+FUNC nonfreefactors : real,real >> real   ATT nonfreefactors  # Faktoren mit x
+FUNC expandtosum : real,real >> real      ATT expandtosum     # Summe c_k*x^k
+OTHER expandtosum : real,real,real >> real ATT expandtosum
+FUNC polyquotient  : real,real,real >> real ATT polyquotient  # Polynomdivision
+FUNC polyremainder : real,real,real >> real ATT polyremainder # Rest
+FUNC normpoly  : real,real >> real        ATT normpoly   # Polynome: c0+c1*x+...
+FUNC deriv     : real,real >> real        ATT deriv      # Ableitung (in C)
+FUNC collect   : real >> real             ATT collect    # gleiche Summanden zusammenfassen

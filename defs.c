@@ -407,7 +407,7 @@ Node * ap,* form,* toform;
 		{
 		form=FORM_LHS(ap->l);
 		toform=FORM_RES(ap->l);
-		atypes(sp)=add_rule_variants(form,toform,atypes(sp)); /* In Formelbaum einfuegen (mit Varianten, expand.c) */
+		atypes(sp)=add_rule(form,toform,atypes(sp)); /* in Formelbaum oder Regelliste (expand.c) */
 		}
 SPEC_LIST(np) = NULL;
 }

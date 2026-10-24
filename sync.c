@@ -20,7 +20,7 @@
 #define BLOCKAUF '{'
 #define BLOCKZU  '}'
 
-#define BUFFSIZE 4096	/* Programm-Stack muss gross genug sein ! */
+#define BUFFSIZE 65536	/* Programm-Stack muss gross genug sein ! (2026: lange Regeln aus Rubi) */
 
 #ifdef NO_MAIN
 #define main(argc,argv) start_input(argc,argv)
@@ -489,7 +489,9 @@ else
 void rewrite_ass_fkt (Node * np)
 {
 Node * to_rewr = tcopy(REWRASS_TERM(np)); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
+rewrite_begin();
 to_rewr = solve(to_rewr,REWRASS_ALGS(np));
+rewrite_end();
 termassign2(REWRASS_TARGET(np),to_rewr); /* speichert eine Kopie */
 delete(to_rewr);
 }
@@ -497,7 +499,9 @@ delete(to_rewr);
 void rewrite_fkt (Node * np)
 {
 Node * to_rewr = tcopy(REWR_TERM(np)); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
+rewrite_begin();
 to_rewr = solve(to_rewr,REWR_ALGS(np));
+rewrite_end();
 print(to_rewr);
 printfOut("\n");
 history_store(to_rewr); /* speichert eine Kopie in % */

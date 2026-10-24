@@ -25,7 +25,17 @@
  *	  dist(u,v,x)          u*v
  *	  rt(u,n)              n-th root of u
  *	  intpart(u), fracpart(u)  integer / non-integer part of numbers
- *	  inthide(u,x), unintegrable(u,x)   Int(u,x)
+ *	  inthide(u,x)                      Int(u,x)
+ *	  fractionq(u,..), halfintegerq(u,..), nicesqrtq(u)   number tests
+ *	  gcd(m,n,..)          greatest common divisor of fractions
+ *	  numerator(u), denominator(u)  of a number or a product
+ *	  freefactors(u,x), nonfreefactors(u,x)  factors free / not free of x
+ *	  expandtosum(u,x)     polynomial u as a sum c_k*x^k
+ *	  expandtosum(u,v,x)   u*expandtosum(v,x), distributed
+ *	  polyquotient(p,q,x), polyremainder(p,q,x)  polynomial division
+ *	  normpoly(u,x)        polynomial sums in u as c0 + c1*x + c2*x^2 + ...
+ *	  deriv(u,x)           derivative (elementary functions; else unevaluated)
+ *	  collect(u)           like summands combined, e.g. 2*a+b-a -> a+b
  */
 
 #include <stdlib.h>
@@ -109,12 +119,27 @@ static Symbol * atom_sym (Node * t)	/* symbol of an atom (constant, variable) */
 	return NULL;
 }
 
+static Node * untrivial (Node * t)	/* 1*u, u*1, 0+u, u+0, u^1 -> u */
+{
+	double v;
+	for (;;)
+		{
+		t = deref(t);
+		if (is_head(t, "*", 2) && is_num(arg(t, 0), & v) && v == 1) t = arg(t, 1);
+		else if (is_head(t, "*", 2) && is_num(arg(t, 1), & v) && v == 1) t = arg(t, 0);
+		else if (is_head(t, "+", 2) && is_num(arg(t, 0), & v) && v == 0) t = arg(t, 1);
+		else if (is_head(t, "+", 2) && is_num(arg(t, 1), & v) && v == 0) t = arg(t, 0);
+		else if (is_head(t, "^", 2) && is_num(arg(t, 1), & v) && v == 1) t = arg(t, 0);
+		else return t;
+		}
+}
+
 static int tequal (Node * a, Node * b)
 {
 	double va, vb;
 	Symbol * sa, * sb;
 	int i, n;
-	a = deref(a); b = deref(b);
+	a = untrivial(a); b = untrivial(b);
 	if (a == b) return 1;
 	if (! a || ! b) return 0;
 	if (is_num(a, & va) && is_num(b, & vb))
@@ -128,6 +153,25 @@ static int tequal (Node * a, Node * b)
 	for (i = 0; i < n; i++)
 		if (! tequal(arg(a, i), arg(b, i))) return 0;
 	return 1;
+}
+
+int term_equal (Node * a, Node * b)	/* structural equality (exported) */
+{
+	return tequal(a, b);
+}
+
+int term_has_nan (Node * t)	/* contains a number that is NaN or infinite */
+{
+	double v;
+	int i, n;
+	t = deref(t);
+	if (! t) return 0;
+	if (is_num(t, & v)) return ! isfinite(v);
+	if (t->type != Func) return 0;
+	n = term_nargs(t);
+	for (i = 0; i < n; i++)
+		if (term_has_nan(arg(t, i))) return 1;
+	return 0;
 }
 
 static int contains (Node * t, Node * x)
@@ -172,6 +216,11 @@ static Node * tcpy (Node * t)
 	if (t->type == Const) return mknod(Const, t->l, NULL);
 	if (t->type == Func) return mknod(Func, t->l, tcpy(t->r));
 	return mknod(t->type, tcpy(t->l), tcpy(t->r));
+}
+
+Node * term_copy (Node * t)	/* exported tcpy */
+{
+	return tcpy(t);
 }
 
 static Symbol * fsym (const char * f)
@@ -284,11 +333,11 @@ static void expand_to (Node * t, TList * out)
 		for (i = 0; i < a.n; i++)
 			tl_add(out, mk_mul(tcpy(a.t[i]), mk_pow(tcpy(arg(t, 1)), mk_num(-1))));
 		}
-	else if (is_head(t, "^", 2) && is_num(arg(t, 1), & e) && e == 1)
+	else if (is_head(t, "^", 2) && num_value(arg(t, 1), & e) && e == 1)
 		expand_to(arg(t, 0), out);			/* u^1 = u */
-	else if (is_head(t, "^", 2) && is_num(arg(t, 1), & e) && e == 0)
+	else if (is_head(t, "^", 2) && num_value(arg(t, 1), & e) && e == 0)
 		tl_add(out, mk_num(1));				/* u^0 = 1 */
-	else if (is_head(t, "^", 2) && is_num(arg(t, 1), & e)
+	else if (is_head(t, "^", 2) && num_value(arg(t, 1), & e)
 	         && e == floor(e) && e >= 2 && e <= MAXEXPPOWER)
 		{
 		expand_to(arg(t, 0), & a);
@@ -342,10 +391,10 @@ static void mono_flatten (Node * t, Mono * m)	/* t is a product */
 {
 	double v, e;
 	t = deref(t);
-	if (is_num(t, & v)) m->c *= v;
+	if (num_value(t, & v)) m->c *= v;
 	else if (is_head(t, "*", 2)) { mono_flatten(arg(t, 0), m); mono_flatten(arg(t, 1), m); }
 	else if (is_head(t, "-", 1)) { m->c = -m->c; mono_flatten(arg(t, 0), m); }
-	else if (is_head(t, "^", 2) && is_num(arg(t, 1), & e)) mono_addfac(m, arg(t, 0), e);
+	else if (is_head(t, "^", 2) && num_value(arg(t, 1), & e)) mono_addfac(m, arg(t, 0), e);
 	else mono_addfac(m, t, 1);
 }
 
@@ -386,9 +435,10 @@ static Node * mono_build (Mono * m)
 static Node * tl_collect (TList * l)
 {
 	Mono * ms = (Mono *) calloc(l->n ? l->n : 1, sizeof(Mono));
+	double * mag = (double *) calloc(l->n ? l->n : 1, sizeof(double));
 	int i, j, nm = 0;
 	Node * s = NULL;
-	if (! ms) fatal("symfkt : no room");
+	if (! ms || ! mag) fatal("symfkt : no room");
 	for (i = 0; i < l->n; i++)
 		{
 		Mono m = { 1.0, NULL, 0, 0 };
@@ -398,13 +448,16 @@ static Node * tl_collect (TList * l)
 			if (mono_like(& ms[j], & m)) break;
 		if (j < nm) { ms[j].c += m.c; free(m.f); }
 		else ms[nm++] = m;
+		if (fabs(m.c) > mag[j]) mag[j] = fabs(m.c);
 		}
 	for (j = 0; j < nm; j++)
 		{
-		if (ms[j].c != 0) s = mk_add(s, mono_build(& ms[j]));
+		/* cancelled up to rounding errors: 0.375 a - 0.375 a */
+		if (fabs(ms[j].c) > 1e-12 * mag[j]) s = mk_add(s, mono_build(& ms[j]));
 		free(ms[j].f);
 		}
 	free(ms);
+	free(mag);
 	tl_free(l);	/* the monomials referred to these terms */
 	return s ? s : mk_num(0);
 }
@@ -418,7 +471,7 @@ static int monomial (Node * t, Node * x, Node ** c, double * k)
 	t = deref(t);
 	if (! contains(t, x)) { * c = tcpy(t); * k = 0; return 1; }
 	if (tequal(t, x)) { * c = mk_num(1); * k = 1; return 1; }
-	if (is_head(t, "^", 2) && tequal(arg(t, 0), x) && is_num(arg(t, 1), & e))
+	if (is_head(t, "^", 2) && tequal(arg(t, 0), x) && num_value(arg(t, 1), & e))
 		{ * c = mk_num(1); * k = e; return 1; }
 	if (is_head(t, "*", 2))
 		{
@@ -532,12 +585,24 @@ static Node * s_negq (Node * a[], int n, Symbol * f)
 	return mk_bool(! is_zero(a[0]) && ! posaux(a[0]), f);
 }
 
+/* u = v: numerically, as the same term, or if u-v expands to 0
+ * (like Rubi's EqQ, which tests PossibleZeroQ[u-v]) */
 static int eq_terms (Node * u, Node * v)
 {
 	double x, y;
+	TList l = {0};
+	Node * d;
+	int zero;
 	if (num_value(u, & x) && num_value(v, & y))
 		return fabs(x - y) <= 1e-12 * (1.0 + fabs(x));
-	return tequal(u, v);
+	if (tequal(u, v)) return 1;
+	d = mk_add(tcpy(u), mk_mul(mk_num(-1), tcpy(v)));
+	expand_to(d, & l);
+	delete(d);
+	d = tl_collect(& l);
+	zero = is_num(d, & x) && fabs(x) <= 1e-12;
+	delete(d);
+	return zero;
 }
 
 static Node * s_eqq (Node * a[], int n, Symbol * f)
@@ -610,15 +675,19 @@ static Node * s_powerq (Node * a[], int n, Symbol * f)
 static Node * s_expand (Node * a[], int n, Symbol * f)
 {
 	TList l = {0};
-	if (n != 1) return NULL;
+	if (n < 1 || n > 2) return NULL;	/* expand(u), expand(u,x) */
 	expand_to(a[0], & l);
 	return tl_collect(& l);
 }
+
+static Node * expand_linear_product (Node * u, Node * x);
 
 static Node * s_expandintegrand (Node * a[], int n, Symbol * f)
 {
 	TList l = {0};
 	Node * in, * r;
+	if (n == 2 && (r = expand_linear_product(a[0], a[1])))
+		return r;
 	if (n == 2)
 		in = tcpy(a[0]);
 	else if (n == 3)
@@ -682,6 +751,7 @@ static int contains_head (Node * t, const char * h)	/* is h(...) somewhere in t?
 static Node * s_subst (Node * a[], int n, Symbol * f)
 {
 	if (n != 3) return NULL;
+	if (tequal(a[1], a[2])) return tcpy(a[0]);	/* x -> x (also x^1, 1*x) */
 	/* Rubi: Subst[Int[...],x,u] integrates first. Wait until no Int is left. */
 	if (contains_head(a[0], "Int")) return NULL;
 	return replace(a[0], a[1], a[2]);
@@ -736,10 +806,521 @@ static Node * s_fracpart (Node * a[], int n, Symbol * f)
 	return part(a[0], 1);
 }
 
-static Node * s_inthide (Node * a[], int n, Symbol * f)	/* inthide, unintegrable */
+static Node * s_inthide (Node * a[], int n, Symbol * f)	/* inthide */
 {
 	if (n != 2 || ! find_symbol("Int")) return NULL;
 	return mk_f2("Int", tcpy(a[0]), tcpy(a[1]));
+}
+
+/* ================= numbers as fractions ================= */
+
+/* v = p/q (continued fractions, q <= 1e6); 0 if no such fraction is close */
+static int rat_approx (double v, double * p, double * q)
+{
+	double x = fabs(v), h0 = 0, h1 = 1, k0 = 1, k1 = 0, a, h, k;
+	int i;
+	if (! isfinite(v)) return 0;
+	for (i = 0; i < 40; i++)
+		{
+		a = floor(x);
+		h = a * h1 + h0; k = a * k1 + k0;
+		h0 = h1; h1 = h; k0 = k1; k1 = k;
+		if (k1 > 1e6) return 0;
+		if (fabs(fabs(v) - h1 / k1) <= 1e-12 * (1.0 + fabs(v))) break;
+		if (x - a < 1e-15) break;
+		x = 1.0 / (x - a);
+		}
+	* p = v < 0 ? -h1 : h1;
+	* q = k1;
+	return 1;
+}
+
+static double gcd2 (double a, double b)		/* integers */
+{
+	a = fabs(a); b = fabs(b);
+	while (b > 0.5) { double r = fmod(a, b); a = b; b = r; }
+	return a;
+}
+
+static Node * s_fractionq (Node * a[], int n, Symbol * f)	/* all non-integer numbers */
+{
+	int i; double v;
+	for (i = 0; i < n; i++)
+		if (! num_value(a[i], & v) || v == floor(v)) return mk_bool(0, f);
+	return mk_bool(n > 0, f);
+}
+
+static Node * s_halfintegerq (Node * a[], int n, Symbol * f)
+{
+	int i; double v;
+	for (i = 0; i < n; i++)
+		if (! num_value(a[i], & v) || v == floor(v) || 2 * v != floor(2 * v))
+			return mk_bool(0, f);
+	return mk_bool(n > 0, f);
+}
+
+static Node * s_nicesqrtq (Node * a[], int n, Symbol * f)	/* Rubi: rational and > 0 */
+{
+	double v;
+	if (n != 1) return NULL;
+	return mk_bool(num_value(a[0], & v) && v > 0, f);
+}
+
+static Node * s_gcd (Node * a[], int n, Symbol * f)	/* gcd of fractions */
+{
+	double p, q, gp = 0, gq = 1, v;
+	int i;
+	if (n < 1) return NULL;
+	for (i = 0; i < n; i++)
+		{
+		if (! num_value(a[i], & v) || ! rat_approx(v, & p, & q)) return NULL;
+		/* gcd(gp/gq, p/q) = gcd(gp*q, p*gq) / (gq*q) */
+		gp = gcd2(gp * q, p * gq);
+		gq = gq * q;
+		v = gcd2(gp, gq);
+		if (v > 0) { gp /= v; gq /= v; }
+		}
+	return mk_num(gp / gq);
+}
+
+/* factors of a product (binary *) */
+static void factors_to (Node * t, TList * out)
+{
+	t = deref(t);
+	if (is_head(t, "*", 2))
+		{
+		factors_to(arg(t, 0), out);
+		factors_to(arg(t, 1), out);
+		}
+	else
+		tl_add(out, t);
+}
+
+/* numerator (den = 0) or denominator (den = 1) of u */
+static Node * numden (Node * u, int den)
+{
+	TList l = {0};
+	Node * r = NULL;
+	double v, p, q, e;
+	int i;
+	if (num_value(u, & v))
+		{
+		if (! rat_approx(v, & p, & q)) return den ? mk_num(1) : mk_num(v);
+		return mk_num(den ? q : p);
+		}
+	factors_to(u, & l);
+	for (i = 0; i < l.n; i++)
+		{
+		Node * t = l.t[i], * part = NULL;
+		if (is_head(t, "^", 2) && num_value(arg(t, 1), & e) && e < 0)
+			{
+			if (den) part = mk_pow(tcpy(arg(t, 0)), mk_num(-e));
+			}
+		else if (is_head(t, "/", 2))
+			part = tcpy(arg(t, den ? 1 : 0));
+		else if (num_value(t, & v) && rat_approx(v, & p, & q))
+			part = mk_num(den ? q : p);
+		else if (! den)
+			part = tcpy(t);
+		if (part) r = r ? mk_mul(r, part) : part;
+		}
+	l.n = 0;	/* the factors belong to u */
+	tl_free(& l);
+	return r ? r : mk_num(1);
+}
+
+static Node * s_numerator (Node * a[], int n, Symbol * f)
+{
+	if (n != 1) return NULL;
+	return numden(a[0], 0);
+}
+
+static Node * s_denominator (Node * a[], int n, Symbol * f)
+{
+	if (n != 1) return NULL;
+	return numden(a[0], 1);
+}
+
+/* product of the factors of u that are free (free = 1) or not free of x */
+static Node * s_freefactors_aux (Node * u, Node * x, int free)
+{
+	TList l = {0};
+	Node * r = NULL;
+	int i;
+	factors_to(u, & l);
+	for (i = 0; i < l.n; i++)
+		if ((! contains(l.t[i], x)) == free)
+			r = r ? mk_mul(r, tcpy(l.t[i])) : tcpy(l.t[i]);
+	l.n = 0;
+	tl_free(& l);
+	return r ? r : mk_num(1);
+}
+
+static Node * s_freefactors (Node * a[], int n, Symbol * f)
+{
+	if (n != 2) return NULL;
+	return s_freefactors_aux(a[0], a[1], 1);
+}
+
+static Node * s_nonfreefactors (Node * a[], int n, Symbol * f)
+{
+	if (n != 2) return NULL;
+	return s_freefactors_aux(a[0], a[1], 0);
+}
+
+/* coefficients c[0..deg] of the polynomial u in x (new terms), or 0 */
+#define MAXDEG 64
+static int poly_coeffs (Node * u, Node * x, Node * c[], int * deg)
+{
+	double d;
+	int k;
+	if (! poly_info(u, x, & d, -1, NULL) || d > MAXDEG - 1) return 0;
+	* deg = (int) d;
+	for (k = 0; k <= * deg; k++)
+		if (! poly_info(u, x, & d, k, & c[k]))
+			{
+			while (--k >= 0) delete(c[k]);
+			return 0;
+			}
+	return 1;
+}
+
+static Node * poly_build (Node * c[], int deg, Node * x)	/* takes the c[k] */
+{
+	Node * s = NULL;
+	int k;
+	for (k = 0; k <= deg; k++)
+		{
+		if (is_zero(c[k])) { delete(c[k]); continue; }
+		s = mk_add(s, k == 0 ? c[k] : mk_mul(c[k], mk_pow(tcpy(x), mk_num(k))));
+		}
+	return s ? s : mk_num(0);
+}
+
+static Node * expand_to_sum (Node * u, Node * x)
+{
+	Node * c[MAXDEG];
+	int deg;
+	if (! poly_coeffs(u, x, c, & deg)) return tcpy(u);
+	return poly_build(c, deg, x);
+}
+
+static Node * s_expandtosum (Node * a[], int n, Symbol * f)	/* (u,x), (u,v,x) */
+{
+	TList l = {0};
+	Node * w, * r = NULL;
+	int i;
+	if (n == 2) return expand_to_sum(a[0], a[1]);
+	if (n != 3) return NULL;
+	w = expand_to_sum(a[1], a[2]);		/* u * ExpandToSum[v,x], distributed */
+	expand_to(w, & l);
+	for (i = 0; i < l.n; i++)
+		r = mk_add(r, mk_mul(tcpy(a[0]), tcpy(l.t[i])));
+	tl_free(& l);
+	delete(w);
+	return r ? r : mk_num(0);
+}
+
+/* polynomial division p = quot*q + rem in x */
+static Node * polydiv (Node * a[], int n, int want_rem)
+{
+	Node * p[MAXDEG], * q[MAXDEG], * quot[MAXDEG];
+	int dp, dq, k, j;
+	if (n != 3) return NULL;
+	if (! poly_coeffs(a[0], a[2], p, & dp)) return NULL;
+	if (! poly_coeffs(a[1], a[2], q, & dq) || is_zero(q[dq]))
+		{
+		for (k = 0; k <= dp; k++) delete(p[k]);
+		return NULL;
+		}
+	for (k = dp - dq; k >= 0; k--)
+		{
+		/* quot[k] = p[k+dq] / q[dq];  p[k+j] -= quot[k]*q[j] */
+		quot[k] = mk_mul(tcpy(p[k + dq]), mk_pow(tcpy(q[dq]), mk_num(-1)));
+		for (j = 0; j <= dq; j++)
+			p[k + j] = mk_add(p[k + j],
+				mk_mul(mk_num(-1), mk_mul(tcpy(quot[k]), tcpy(q[j]))));
+		}
+	for (j = 0; j <= dq; j++) delete(q[j]);
+	if (want_rem)
+		{
+		for (k = 0; k <= dp - dq; k++) delete(quot[k]);
+		if (dp < dq) return poly_build(p, dp, a[2]);
+		for (k = dq; k <= dp; k++) delete(p[k]);	/* zero now */
+		if (dq == 0) return mk_num(0);
+		return poly_build(p, dq - 1, a[2]);
+		}
+	for (k = 0; k <= dp; k++) delete(p[k]);
+	if (dp < dq) return mk_num(0);
+	return poly_build(quot, dp - dq, a[2]);
+}
+
+/* Rubi's ExpandLinearProduct: P(x) * (c + d x)^n with P a polynomial and n
+ * not a non-negative integer is written as a sum of e_k (c + d x)^(k + n):
+ *   x = (v - c)/d,  e_k = sum_{j>=k} p_j d^-j binomial(j,k) (-c)^(j-k).
+ * Returns NULL if u has not this form. */
+static Node * expand_linear_product (Node * u, Node * x)
+{
+	TList l = {0};
+	Node * lin = NULL, * expo = NULL, * rest = NULL, * p[MAXDEG], * lc[MAXDEG];
+	Node * r = NULL;
+	double n = 0, binom;
+	int i, j, k, deg, dl;
+	factors_to(u, & l);
+	for (i = 0; i < l.n; i++)
+		{
+		Node * t = l.t[i];
+		double e;
+		if (! lin && is_head(t, "^", 2) && contains(arg(t, 0), x)
+		    && ! contains(arg(t, 1), x)
+		    && ! (num_value(arg(t, 1), & e) && e >= 0 && e == floor(e)))
+			{
+			if (! poly_coeffs(arg(t, 0), x, lc, & dl)) continue;
+			if (dl != 1) { delete(lc[0]); delete(lc[1]); continue; }
+			lin = arg(t, 0);
+			expo = arg(t, 1);
+			continue;
+			}
+		rest = rest ? mk_mul(rest, tcpy(t)) : tcpy(t);
+		}
+	l.n = 0;
+	tl_free(& l);
+	if (! lin) { delete(rest); return NULL; }
+	if (! rest) rest = mk_num(1);
+	if (! contains(rest, x) || ! poly_coeffs(rest, x, p, & deg) || deg < 1)
+		{
+		delete(rest); delete(lc[0]); delete(lc[1]);
+		return NULL;
+		}
+	delete(rest);
+	num_value(expo, & n);
+	for (k = 0; k <= deg; k++)
+		{
+		Node * e = NULL, * ex;
+		for (j = k; j <= deg; j++)
+			{
+			Node * term;
+			int m;
+			binom = 1;
+			for (m = 1; m <= k; m++) binom = binom * (j - k + m) / m;
+			term = mk_mul(mk_num(binom), tcpy(p[j]));
+			term = mk_mul(term, mk_pow(tcpy(lc[1]), mk_num(-j)));
+			term = mk_mul(term, mk_pow(mk_mul(mk_num(-1), tcpy(lc[0])), mk_num(j - k)));
+			e = mk_add(e, term);
+			}
+		ex = mk_add(tcpy(expo), mk_num(k));
+		r = mk_add(r, mk_mul(e, mk_pow(tcpy(lin), ex)));
+		}
+	for (j = 0; j <= deg; j++) delete(p[j]);
+	delete(lc[0]); delete(lc[1]);
+	return r;
+}
+
+static Node * s_polyquotient (Node * a[], int n, Symbol * f)
+{
+	return polydiv(a, n, 0);
+}
+
+static Node * s_polyremainder (Node * a[], int n, Symbol * f)
+{
+	return polydiv(a, n, 1);
+}
+
+/* ================= polynomial normal form and derivative ================= */
+
+static Node * mk_f1 (const char * f, Node * a)
+{
+	return mknod(Func, (Node *) getsymbol(fsym(f), a), a);
+}
+
+static Node * mk_neg (Node * a)
+{
+	return mk_mul(mk_num(-1), a);
+}
+
+/* every sum that is a polynomial in x becomes c0 + c1*x + c2*x^2 + ...
+ * with collected coefficients (Mathematica's canonical form) */
+static Node * normpoly (Node * u, Node * x);
+
+static Node * normpoly_args (Node * r, Node * x)
+{
+	if (r && r->type == Terms)
+		return mknod(Terms, normpoly(r->l, x), normpoly_args(r->r, x));
+	return normpoly(r, x);
+}
+
+static Node * normpoly (Node * u, Node * x)
+{
+	Node * c[MAXDEG];
+	int deg;
+	u = deref(u);
+	if (! u) return NULL;
+	if ((is_head(u, "+", 2) || is_head(u, "-", 2)) && contains(u, x)
+	    && poly_coeffs(u, x, c, & deg))
+		{
+		if (deg >= 1) return poly_build(c, deg, x);
+		while (deg >= 0) delete(c[deg--]);
+		}
+	if (u->type == Func && ! num_sym(u))
+		return mknod(Func, u->l, normpoly_args(u->r, x));
+	return tcpy(u);
+}
+
+static Node * s_normpoly (Node * a[], int n, Symbol * f)
+{
+	if (n != 2) return NULL;
+	return normpoly(a[0], a[1]);
+}
+
+/* derivative of u with respect to x, or NULL for unknown functions */
+static Node * deriv (Node * u, Node * x)
+{
+	Node * a, * b, * da, * db;
+	u = deref(u);
+	if (! u) return NULL;
+	if (! contains(u, x)) return mk_num(0);
+	if (tequal(u, x)) return mk_num(1);
+	if (u->type != Func) return NULL;
+	if (term_nargs(u) == 2)
+		{
+		a = arg(u, 0); b = arg(u, 1);
+		if (is_head(u, "^", 2) && ! contains(b, x))		/* b a^(b-1) a' */
+			{
+			if (! (da = deriv(a, x))) return NULL;
+			return mk_mul(mk_mul(tcpy(b), mk_pow(tcpy(a), mk_add(tcpy(b), mk_num(-1)))), da);
+			}
+		if (is_head(u, "^", 2))		/* u (b' ln a + b a'/a) */
+			{
+			if (! (da = deriv(a, x))) return NULL;
+			if (! (db = deriv(b, x))) { delete(da); return NULL; }
+			return mk_mul(tcpy(u), mk_add(mk_mul(db, mk_f1("ln", tcpy(a))),
+				mk_mul(mk_mul(tcpy(b), da), mk_pow(tcpy(a), mk_num(-1)))));
+			}
+		if (! (da = deriv(a, x))) return NULL;
+		if (! (db = deriv(b, x))) { delete(da); return NULL; }
+		if (is_head(u, "+", 2)) return mk_add(da, db);
+		if (is_head(u, "-", 2)) return mk_add(da, mk_neg(db));
+		if (is_head(u, "*", 2)) return mk_add(mk_mul(da, tcpy(b)), mk_mul(tcpy(a), db));
+		if (is_head(u, "/", 2))
+			return mk_mul(mk_add(mk_mul(da, tcpy(b)), mk_neg(mk_mul(tcpy(a), db))),
+			              mk_pow(tcpy(b), mk_num(-2)));
+		delete(da); delete(db);
+		return NULL;
+		}
+	if (term_nargs(u) != 1) return NULL;
+	a = arg(u, 0);
+	if (! (da = deriv(a, x))) return NULL;
+	{
+	const char * h = name(TERM_HEAD(u));
+	Node * g = NULL;		/* outer derivative at a */
+	#define A tcpy(a)
+	#define SQ(t) mk_pow(t, mk_num(2))
+	if (! strcmp(h, "-")) g = mk_num(-1);
+	else if (! strcmp(h, "sin")) g = mk_f1("cos", A);
+	else if (! strcmp(h, "cos")) g = mk_neg(mk_f1("sin", A));
+	else if (! strcmp(h, "tan")) g = mk_pow(mk_f1("cos", A), mk_num(-2));
+	else if (! strcmp(h, "cot")) g = mk_neg(mk_pow(mk_f1("sin", A), mk_num(-2)));
+	else if (! strcmp(h, "sec")) g = mk_mul(mk_f1("sec", A), mk_f1("tan", A));
+	else if (! strcmp(h, "csc")) g = mk_neg(mk_mul(mk_f1("csc", A), mk_f1("cot", A)));
+	else if (! strcmp(h, "exp")) g = mk_f1("exp", A);
+	else if (! strcmp(h, "ln")) g = mk_pow(A, mk_num(-1));
+	else if (! strcmp(h, "sqrt")) g = mk_mul(mk_num(0.5), mk_pow(A, mk_num(-0.5)));
+	else if (! strcmp(h, "mi")) g = mk_neg(mk_pow(A, mk_num(-2)));
+	else if (! strcmp(h, "arcsin")) g = mk_pow(mk_add(mk_num(1), mk_neg(SQ(A))), mk_num(-0.5));
+	else if (! strcmp(h, "arccos")) g = mk_neg(mk_pow(mk_add(mk_num(1), mk_neg(SQ(A))), mk_num(-0.5)));
+	else if (! strcmp(h, "arctan")) g = mk_pow(mk_add(mk_num(1), SQ(A)), mk_num(-1));
+	else if (! strcmp(h, "arccot")) g = mk_neg(mk_pow(mk_add(mk_num(1), SQ(A)), mk_num(-1)));
+	else if (! strcmp(h, "sinh")) g = mk_f1("cosh", A);
+	else if (! strcmp(h, "cosh")) g = mk_f1("sinh", A);
+	else if (! strcmp(h, "tanh")) g = mk_pow(mk_f1("cosh", A), mk_num(-2));
+	else if (! strcmp(h, "coth")) g = mk_neg(mk_pow(mk_f1("sinh", A), mk_num(-2)));
+	else if (! strcmp(h, "sech")) g = mk_neg(mk_mul(mk_f1("sech", A), mk_f1("tanh", A)));
+	else if (! strcmp(h, "csch")) g = mk_neg(mk_mul(mk_f1("csch", A), mk_f1("coth", A)));
+	else if (! strcmp(h, "arcsinh")) g = mk_pow(mk_add(mk_num(1), SQ(A)), mk_num(-0.5));
+	else if (! strcmp(h, "arccosh")) g = mk_pow(mk_add(SQ(A), mk_num(-1)), mk_num(-0.5));
+	else if (! strcmp(h, "arctanh") || ! strcmp(h, "arccoth"))
+		g = mk_pow(mk_add(mk_num(1), mk_neg(SQ(A))), mk_num(-1));
+	#undef A
+	#undef SQ
+	if (! g) { delete(da); return NULL; }
+	return mk_mul(g, da);
+	}
+}
+
+static Node * s_deriv (Node * a[], int n, Symbol * f)
+{
+	if (n != 2) return NULL;
+	return deriv(a[0], a[1]);
+}
+
+/* collect(u): like summands of u combined (no multiplying out) */
+static void summands_to (Node * t, TList * out, int neg)
+{
+	t = deref(t);
+	if (is_head(t, "+", 2))
+		{
+		summands_to(arg(t, 0), out, neg);
+		summands_to(arg(t, 1), out, neg);
+		}
+	else if (is_head(t, "-", 2))
+		{
+		summands_to(arg(t, 0), out, neg);
+		summands_to(arg(t, 1), out, ! neg);
+		}
+	else
+		tl_add(out, neg ? mk_neg(tcpy(t)) : tcpy(t));
+}
+
+static Node * s_collect (Node * a[], int n, Symbol * f)
+{
+	TList l = {0};
+	if (n != 1) return NULL;
+	summands_to(a[0], & l, 0);
+	return tl_collect(& l);
+}
+
+/* ================= trivial simplification of rule results ================= */
+
+static int num_is (Node * t, double v)
+{
+	double w;
+	return is_num(t, & w) && w == v;
+}
+
+/* Mathematica simplifies these automatically, and Rubi's rules rely on it:
+ * u^0 -> 1, u^1 -> u, 1*u -> u, u*1 -> u, 0*u -> 0, 0+u -> u, u+0 -> u.
+ * Works in place on a term built by tcopy (owned nodes). */
+void term_simplify_trivial (Node ** p)
+{
+	Node * t = * p, ** q, * a, * b, * keep;
+	if (! t || t->type != Func) return;
+	for (q = & t->r; * q && (* q)->type == Terms; q = & (* q)->r)
+		term_simplify_trivial(& (* q)->l);
+	if (* q) term_simplify_trivial(q);
+	if (! t->r || t->r->type != Terms || term_nargs(t) != 2) return;
+	a = t->r->l; b = t->r->r;
+	keep = NULL;
+	if (is_head(t, "^", 2))
+		{
+		if (num_is(b, 0)) { delete(t); * p = mk_num(1); return; }
+		if (num_is(b, 1)) keep = a;
+		}
+	else if (is_head(t, "*", 2))
+		{
+		if (num_is(a, 0) || num_is(b, 0)) { delete(t); * p = mk_num(0); return; }
+		if (num_is(a, 1)) keep = b;
+		else if (num_is(b, 1)) keep = a;
+		}
+	else if (is_head(t, "+", 2))
+		{
+		if (num_is(a, 0)) keep = b;
+		else if (num_is(b, 0)) keep = a;
+		}
+	if (! keep) return;
+	delete(keep == a ? b : a);
+	delnod(t->r);
+	delnod(t);
+	* p = keep;
 }
 
 /* ================= table and call ================= */
@@ -772,7 +1353,20 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "intpart",         s_intpart },
 	{ "fracpart",        s_fracpart },
 	{ "inthide",         s_inthide },
-	{ "unintegrable",    s_inthide },
+	{ "fractionq",       s_fractionq },
+	{ "halfintegerq",    s_halfintegerq },
+	{ "nicesqrtq",       s_nicesqrtq },
+	{ "gcd",             s_gcd },
+	{ "numerator",       s_numerator },
+	{ "denominator",     s_denominator },
+	{ "freefactors",     s_freefactors },
+	{ "nonfreefactors",  s_nonfreefactors },
+	{ "expandtosum",     s_expandtosum },
+	{ "polyquotient",    s_polyquotient },
+	{ "polyremainder",   s_polyremainder },
+	{ "normpoly",        s_normpoly },
+	{ "deriv",           s_deriv },
+	{ "collect",         s_collect },
 };
 
 s_function * give_sfkt (const char * name)

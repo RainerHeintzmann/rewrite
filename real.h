@@ -58,5 +58,6 @@ double * r_arctanh (double * arg[]);
 double * r_arccoth (double * arg[]);
 double * r_polylog (double * arg[]);
 double * r_productlog (double * arg[]);
+double * r_arctan2 (double * arg[]);
 
 #endif

@@ -99,6 +99,7 @@ FUNC  cosh  : real >> real        ATT cosinush
 FUNC  tan   : real >> real        ATT tangens
 OTHER tan   : complex >> complex	ATT c_tangens
 FUNC arctan : real >> real        ATT atangens
+OTHER arctan : real,real >> real  ATT r_arctan2     # 2026: arctan(x,y) = Winkel von (x,y)
 FUNC  tanh  : real >> real        ATT tangensh
 FUNC  bessel : real,real >> real  ATT bessel
 
