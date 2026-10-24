@@ -305,12 +305,17 @@ while (((froass)->type != Const) && (froass->type != Func))
 		return;}
 	froass=froass->l;
 	}
-if (rtypes(toass) != rtypes((Symbol *)froass->l)
-    && sort_dist(rtypes((Symbol *)froass->l), rtypes(toass)) < 0)	/* 2026: Untersorte erlaubt */
- 	{ErrorMsg("Wrong const-assignment : different types\n");
- 	return;}
-
 erg = calkulate(froass);
+
+/* 2026: ohne Wert (z.B. a = nothing) wird der Wert geloescht, fuer jede
+   Sorte; sonst muss die Sorte passen (Untersorten erlaubt) */
+if (erg && rtypes(toass) != rtypes((Symbol *) erg)
+    && sort_dist(rtypes((Symbol *) erg), rtypes(toass)) < 0)
+ 	{
+ 	ErrorMsg("Wrong const-assignment : different types\n");
+ 	delete(erg);
+ 	return;
+ 	}
 
 if (hasval(toass)) DELNUM(toass,value(toass));
 

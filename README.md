@@ -24,20 +24,28 @@ $ rewrite
 > INC "inc/all"
 > REWR D(sin cos x,x) : All
 - cos (cos (x ))* sin (x )
-REWR D(x^2*sin x,x) : All
+> REWR D(x^2*sin x,x) : All
 2 * x * sin (x )+ x ^ 2 * cos (x )
-REWR I(0,1,x^2,x) : numerik,rechne
+> REWR I(0,1,x^2,x) : numerik,rechne
 0.333333
-sqrt(16), ln(e), sin(pi/2)
+> sqrt(16), ln(e), sin(pi/2)
 4 1 1
-[1,0,0] _x_ [0,1,0]
+> [1,0,0] _x_ [0,1,0]
 [0,0,1]
-QUIT
+> a = 3
+> a + 1
+4
+> a = nothing
+> a + 1
+a + 1
+> QUIT
 ```
 
 `INC "inc/all"` loads the standard library. `REWR term : All` rewrites the
 term with the rule list `All`, here computing the derivative of
-`sin(cos(x))`.
+`sin(cos(x))`. Constants such as `a` either have a value or stand for
+themselves: `a = nothing` removes the value again, because the library
+constant `nothing` never has one.
 
 There are an interactive and a non-interactive way to run rewrite:
 
@@ -355,6 +363,15 @@ qq                  # prints 48
   one copies its content, so later changes do not propagate.
 - `Constname = value` gives a constant a value. If the value cannot be
   calculated, the constant loses its value and is printed by its name again.
+  The library constant `nothing` never has a value, so `a = nothing` clears
+  `a` (for constants of any sort):
+
+```text
+a = 3
+a + 1               # prints 4
+a = nothing
+a + 1               # prints a + 1
+```
 
 ### Control flow
 

@@ -151,8 +151,8 @@ results are:
 
 | Result | Problems | Share of tested |
 | --- | --- | --- |
-| solved and verified | 847 | 55.0% |
-| no antiderivative found | 673 | 43.7% |
+| solved and verified | 848 | 55.1% |
+| no antiderivative found | 672 | 43.7% |
 | wrong | 3 | 0.2% |
 | crash or time-out | 7 | 0.5% |
 | not verifiable | 9 | 0.6% |

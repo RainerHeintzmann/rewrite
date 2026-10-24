@@ -38,8 +38,8 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{847}
-\newcommand{\psolved}{55.0\%}
+\newcommand{\nsolved}{848}
+\newcommand{\psolved}{55.1\%}
 \newcommand{\nwrong}{3}
 \newcommand{\nfailed}{7}
 
@@ -68,9 +68,10 @@ arguments of a function are numbers, an attached C function computes the
 value. We describe the design of the language, its revival on current
 64-bit compilers, and its extension by static subsorts, which add exact
 integers and fractions as sorts below the real numbers without changing
-any rule of the library. As a case study, the rule-based integrator Rubi
-was translated into \texttt{rewrite}. A translator converts 90\% of Rubi's
-7422 rules automatically; for this, the language gained ordered rule lists
+any rule of the library, and sorts of non-negative and positive numbers
+for which rules like $\sqrt{x^2}=x$ hold. As a case study, the rule-based
+integrator Rubi was translated into \texttt{rewrite}. A translator converts
+91\% of Rubi's 7422 rules automatically; for this, the language gained ordered rule lists
 with a backtracking matcher for optional pattern parts, commutative
 operators and condition lists, symbolic helper functions and special
 functions. On \nproblems{} integration problems from four independent
@@ -227,7 +228,7 @@ OTHER + : rational,rational >> rational ATT rat_plus
 OTHER / : integer,integer >> rational  ATT int_div
 ...
 LIFT (A+A,A-A,A*A,A/A,-A,mi(A),A^A) TO (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,mi(Aq),Aq^Az)
-INTNUM integer ATT read_int              # 12 is an integer, 0.5 stays real
+INTNUM natural ATT read_int              # 12 is a natural number, 0.5 real
 \end{lstlisting}
 
 \texttt{SUBSORT} declares that every value of the first sort is also a value
@@ -243,6 +244,28 @@ is exact, and \texttt{1/3+0.5} uses the real \texttt{+} and prints
 rules of \texttt{real}, and a second one does the same for
 \texttt{integer}; \texttt{x*1+0*x+(1/2)*x} simplifies to \texttt{(3/2) * x}
 with the unchanged rules for real numbers.
+
+\paragraph{Sorts with a known sign.} A sort may have several wider sorts,
+and the conversion follows the shortest path in the resulting graph. The
+library declares
+\[
+\mathit{natural} < \mathit{integer} < \mathit{rational} < \mathit{real},\qquad
+\mathit{natural} < \mathit{nonneg} < \mathit{real},\qquad
+\mathit{positive} < \mathit{nonneg},
+\]
+where \texttt{nonneg} and \texttt{positive} are real numbers known to be
+non-negative or positive. Since the minus sign is an operator, every number
+literal is \texttt{natural}, and \texttt{2-5} is the \texttt{integer} $-3$.
+Operator variants such as \texttt{nonneg*nonneg >> nonneg} and
+\texttt{sqrt : nonneg >> nonneg} propagate the sign through terms. Several
+simplification rules are valid only for non-negative or positive
+arguments: $\sqrt{t^2}=t$, $(t^a)^b=t^{ab}$, $\ln(pq)=\ln p+\ln q$. They
+are now written with meta variables of these sorts. A meta variable whose
+sort is a subsort of another only matches terms of that sort or below it,
+whereas a variable of sort \texttt{real} still matches any term as in the
+original language. Thus \texttt{sqrt(t\^{}2)} simplifies to \texttt{t} for
+\texttt{CONST t : nonneg}, but \texttt{sqrt(x\^{}2)} stays as it is for a
+real \texttt{x}.
 
 One change in the interpreter made this work. When a rule written for
 \texttt{real} rewrites a term with exact numbers, the operators of the new
@@ -360,7 +383,10 @@ definitions (\texttt{With}, and \texttt{Module} with values only) are
 substituted, helper predicates that Rubi defines inside its rule files are
 inlined, and a predicate applied to a list, like \texttt{LinearQ[\{u,v\},x]},
 becomes a conjunction. $e^u$ is matched as a power with base $e$, so that
-the rules for $F^u$ apply to it, as in Mathematica.
+the rules for $F^u$ apply to it, as in Mathematica. Some rules have a
+function variable, \texttt{F\_[c\_.*(a\_.+b\_.*x\_)]} with a condition such
+as \texttt{TrigQ[F]} or \texttt{MemberQ[\{Sinh,Cosh\},F]}; they are expanded
+into one rule per admissible function.
 
 \paragraph{Helper and special functions.} Rubi's conditions and right-hand
 sides use about a hundred helper functions, such as \texttt{ExpandIntegrand},
@@ -396,7 +422,12 @@ division by zero, or equals one of the last terms the list replaced (a
 cycle such as expanding and factoring again), and a rule that keeps
 rewriting the same term. The matcher also had to learn that an optional
 variable already bound to its default value may be missing a second time,
-as in $(c+d\tan(e+fx))/(a+b\tan(e+fx))$ with $e=0$.
+as in $(c+d\tan(e+fx))/(a+b\tan(e+fx))$ with $e=0$. Finally, Rubi's
+substitutions $\int u\,dx$ with $x\to\sqrt{a+bx}$ rely on Mathematica
+treating the new variable as non-negative. \texttt{Subst[Int[u,x],x,v]}
+therefore integrates in a fresh constant of sort \texttt{nonneg} when $v$ is
+a square root or otherwise non-negative, so that $\sqrt{x^2}=x$ holds
+inside; with this, $\int\sin\sqrt{1+x}/\sqrt{1+x}\,dx=-2\cos\sqrt{1+x}$.
 
 The complete integration is the algebra list
 \begin{lstlisting}
@@ -407,12 +438,13 @@ where \texttt{RubiCollect} combines like summands of the result and
 
 \subsection{Results}
 
-The translator converts 6713 of Rubi's 7422 rules (90\%). The largest
-group of the remaining rules needs complex numbers (245 rules); others use
-patterns with function variables (\texttt{F\_[x]}), Rubi's substitution
-machinery (\texttt{SubstFor}, \texttt{FunctionOfQ},
-\texttt{DerivativeDivides}), general pattern tests (\texttt{MatchQ}) or
-the generalized hypergeometric function. Loading all translated rules takes
+The translator converts 6748 of Rubi's 7422 rules (91\%), which become
+7160 \texttt{rewrite} rules after the expansion of function variables. The
+largest group of the remaining rules needs complex numbers (245 rules);
+others use Rubi's substitution machinery (\texttt{SubstFor},
+\texttt{FunctionOfQ}, \texttt{DerivativeDivides}), general pattern tests
+(\texttt{MatchQ}), function variables without a finite set of functions,
+or the generalized hypergeometric function. Loading all translated rules takes
 about half a second, and a typical integral a fraction of a second.
 Table~\ref{tab:int} shows examples.
 
@@ -462,7 +494,7 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 673 & 43.7\% \\
+no antiderivative found   & 672 & 43.7\% \\
 wrong result              & \nwrong  & 0.2\% \\
 crash or time-out         & \nfailed & 0.5\% \\
 not verifiable            & 9 & 0.6\% \\
@@ -489,9 +521,10 @@ $\ln(x+y)$ into $\ln x\cdot\ln y$ and $a^{b^c}$ into $a^{bc}$, two incorrect
 derivatives (of $\arcsin$ and $\arccos$), and three rules that are only
 valid for positive bases: $(ab)^c=a^c b^c$, $(a^b)^c=a^{bc}$, which turned
 $\sqrt{x^2}$ into $x$, and $\ln(ab)=\ln a+\ln b$. They now apply only for
-integer exponents or a positive numerical factor. The numerical check of
-the harness found these errors, because Rubi's results were differentiated
-at negative arguments.
+integer exponents or a positive numerical factor, and for terms of the
+sorts \texttt{nonneg} and \texttt{positive}. The numerical check of the
+harness found these errors, because Rubi's results were differentiated at
+negative arguments.
 
 \section{Implementation and revival}
 
@@ -522,11 +555,13 @@ calculations run in constant memory. All parser structures are now
 accessed through named macros instead of chains like
 \texttt{np->r->r->l}; for most source files the compiled code stayed
 byte-identical, which confirmed that this cleanup did not change the
-behaviour.
+behaviour. \texttt{rewrite} runs interactively with a prompt, runs program
+files given as arguments, or reads a program from a pipe for scripts and
+the tests.
 
 Performance is adequate for interactive use. Loading the standard library
 and computing a derivative takes well below 0.1\,s on a current laptop;
-loading the 6713 integration rules about half a second. A scalar loop
+loading the 7160 integration rules about half a second. A scalar loop
 written in the language itself needs about 0.25\,$\mu$s per iteration
 (measured for $10^7$ iterations of \texttt{s = s + k*k}). We estimate this
 to be about two orders of magnitude slower than an equivalent compiled
@@ -552,9 +587,9 @@ integrand must be brought into a fixed form before the rules are tried.
 Complex numbers exist as a sort of the library, but not yet as part of the
 number tower, so rules that need the imaginary unit are not translated,
 and logarithms of negative arguments evaluate to NaN although their
-derivatives are correct. Each sort can have only one wider sort; a sort of
-non-negative numbers, which would make rules like $\sqrt{x^2}=x$ applicable
-where they are valid, would need several. Nothing checks that a rule set
+derivatives are correct. The sign of a term is only known through the
+sorts of its operator variants, so for example $e^x$ is not known to be
+positive. Nothing checks that a rule set
 terminates or is confluent~\cite{baader1998term}, and the order of rules
 matters; the safeguards against loops in rule lists are heuristics.
 Numeric conditions such as $m\ne-1$ do not hold for symbolic $m$, which is
@@ -572,9 +607,8 @@ rule sets~\cite{mathlib2020}. \texttt{rewrite} anticipated several of these
 ideas in a small and self-contained system.
 
 \paragraph{Outlook.} Natural next steps are complex numbers on top of the
-number tower and subsorts with several supersorts, for example for
-non-negative numbers; the translation of Rubi rules with function
-variables, which can be expanded into one rule per admissible function;
+number tower, which would also open the 245 Rubi rules with the imaginary
+unit but require complex versions of the helper and special functions;
 Rubi's substitution machinery; an associative-commutative matcher for sums
 and products of any length; and code generation that turns symbolically
 derived expressions into compiled numerical code.
@@ -584,7 +618,7 @@ derived expressions into compiled numerical code.
 \texttt{rewrite} shows that a small interpreter can host a complete
 computer algebra library when the mathematics is expressed as rewrite rules
 and rule sets can be combined and lifted between algebraic structures and
-number sorts. The automatic translation of 90\% of Rubi demonstrates that
+number sorts. The automatic translation of 91\% of Rubi demonstrates that
 established rule-based algorithms can be imported, and it clarifies which
 matching features and which implicit simplifications of the host system
 such an import requires.

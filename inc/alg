@@ -57,6 +57,7 @@ CONST maxreal  : real
 CONST minreal  : real
 
 CONST e,pi : real  # e,pi
+CONST nothing : real  # 2026: hat nie einen Wert; a = nothing loescht den Wert von a
 CONST i : complex  # sqrt(-1)
 
 #  e  = 2.718281828459			siehe mathnum
