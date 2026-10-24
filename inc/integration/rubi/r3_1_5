@@ -233,8 +233,22 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n,O_q), (igtq(P_k,0)) In
 #   Int[(d_.*x_)^m_.* PolyLog[k_, e_.*x_^q_.]*(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := Unintegrable[(d*x)^m*PolyLog[k, e*x^q]*(a + b*Log[c*x^n])^p, x] /; FreeQ[{a, b, c, d, e, m, n, p, q}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n,O_p,O_q) Int((((O_d)*(Xv))^(O_m))*(polylog(P_k,(O_e)*((Xv)^(O_q))))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p)),Xv) = unintegrable(((((((O_d)*(Xv)))^(O_m)))*(polylog(P_k,((O_e)*(((Xv)^(O_q))))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))),Xv)
 
-# Regel 58 nicht uebersetzt: call of a non-symbol
+# Regel 58 (17496 Varianten):
 #   Int[Px_.*F_[d_.*(e_. + f_.*x_)]^m_.*(a_. + b_.*Log[c_.*x_^n_.]), x_Symbol] := With[{u = IntHide[Px*F[d*(e + f*x)]^m, x]}, Dist[(a + b*Log[c*x^n]), u, x] - b*n*Int[Dist[1/x, u, x], x]] /; FreeQ[{a, b, c, d, e, f, n}, x] && PolynomialQ[Px, x] && IGtQ[m, 0] && MemberQ[{ArcSin, ArcCos, ArcSinh, ArcCosh}, F]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (polyq(O_Px,Xv)), (igtq(O_m,0)) Int((O_Px)*((arcsin((O_d)*((O_e)+((O_f)*(Xv)))))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((O_Px)*(((arcsin(((O_d)*(((O_e)+(((O_f)*(Xv))))))))^(O_m)))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(dist(((Xv)^((-1))),inthide(((O_Px)*(((arcsin(((O_d)*(((O_e)+(((O_f)*(Xv))))))))^(O_m)))),Xv),Xv),Xv)))))
 
-# Regel 59 nicht uebersetzt: call of a non-symbol
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (polyq(O_Px,Xv)), (igtq(O_m,0)) Int((O_Px)*((arccos((O_d)*((O_e)+((O_f)*(Xv)))))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((O_Px)*(((arccos(((O_d)*(((O_e)+(((O_f)*(Xv))))))))^(O_m)))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(dist(((Xv)^((-1))),inthide(((O_Px)*(((arccos(((O_d)*(((O_e)+(((O_f)*(Xv))))))))^(O_m)))),Xv),Xv),Xv)))))
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (polyq(O_Px,Xv)), (igtq(O_m,0)) Int((O_Px)*((arcsinh((O_d)*((O_e)+((O_f)*(Xv)))))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((O_Px)*(((arcsinh(((O_d)*(((O_e)+(((O_f)*(Xv))))))))^(O_m)))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(dist(((Xv)^((-1))),inthide(((O_Px)*(((arcsinh(((O_d)*(((O_e)+(((O_f)*(Xv))))))))^(O_m)))),Xv),Xv),Xv)))))
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (polyq(O_Px,Xv)), (igtq(O_m,0)) Int((O_Px)*((arccosh((O_d)*((O_e)+((O_f)*(Xv)))))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((O_Px)*(((arccosh(((O_d)*(((O_e)+(((O_f)*(Xv))))))))^(O_m)))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(dist(((Xv)^((-1))),inthide(((O_Px)*(((arccosh(((O_d)*(((O_e)+(((O_f)*(Xv))))))))^(O_m)))),Xv),Xv),Xv)))))
+
+# Regel 59 (8748 Varianten):
 #   Int[Px_.*F_[d_.*(e_. + f_.*x_)]*(a_. + b_.*Log[c_.*x_^n_.]), x_Symbol] := With[{u = IntHide[Px*F[d*(e + f*x)], x]}, Dist[(a + b*Log[c*x^n]), u, x] - b*n*Int[Dist[1/x, u, x], x]] /; FreeQ[{a, b, c, d, e, f, n}, x] && PolynomialQ[Px, x] && MemberQ[{ArcTan, ArcCot, ArcTanh, ArcCoth}, F]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (polyq(O_Px,Xv)) Int((O_Px)*(arctan((O_d)*((O_e)+((O_f)*(Xv)))))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((O_Px)*(arctan(((O_d)*(((O_e)+(((O_f)*(Xv))))))))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(dist(((Xv)^((-1))),inthide(((O_Px)*(arctan(((O_d)*(((O_e)+(((O_f)*(Xv))))))))),Xv),Xv),Xv)))))
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (polyq(O_Px,Xv)) Int((O_Px)*(arccot((O_d)*((O_e)+((O_f)*(Xv)))))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((O_Px)*(arccot(((O_d)*(((O_e)+(((O_f)*(Xv))))))))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(dist(((Xv)^((-1))),inthide(((O_Px)*(arccot(((O_d)*(((O_e)+(((O_f)*(Xv))))))))),Xv),Xv),Xv)))))
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (polyq(O_Px,Xv)) Int((O_Px)*(arctanh((O_d)*((O_e)+((O_f)*(Xv)))))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((O_Px)*(arctanh(((O_d)*(((O_e)+(((O_f)*(Xv))))))))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(dist(((Xv)^((-1))),inthide(((O_Px)*(arctanh(((O_d)*(((O_e)+(((O_f)*(Xv))))))))),Xv),Xv),Xv)))))
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (polyq(O_Px,Xv)) Int((O_Px)*(arccoth((O_d)*((O_e)+((O_f)*(Xv)))))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((O_Px)*(arccoth(((O_d)*(((O_e)+(((O_f)*(Xv))))))))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(dist(((Xv)^((-1))),inthide(((O_Px)*(arccoth(((O_d)*(((O_e)+(((O_f)*(Xv))))))))),Xv),Xv),Xv)))))

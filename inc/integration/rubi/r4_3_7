@@ -10,10 +10,10 @@
 #   Int[u_.*(a_ + b_.*tan[e_. + f_.*x_]^2)^p_, x_Symbol] := Int[ActivateTrig[u*(a*sec[e + f*x]^2)^p], x] /; FreeQ[{a, b, e, f, p}, x] && EqQ[a, b]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_e,O_f,P_p), (eqq(P_a,O_b)) Int((O_u)*(((P_a)+((O_b)*((tan((O_e)+((O_f)*(Xv))))^(2))))^(P_p)),Xv) = Int(((O_u)*(((((P_a)*(((sec(((O_e)+(((O_f)*(Xv))))))^(2)))))^(P_p)))),Xv)
 
-# Regel 2 nicht uebersetzt: call of a non-symbol
+# Regel 2 nicht uebersetzt: predicate MatchQ
 #   Int[u_.*(b_.*tan[e_. + f_.*x_]^n_)^p_, x_Symbol] := With[{ff = FreeFactors[Tan[e + f*x], x]}, (b*ff^n)^ IntPart[p]*(b*Tan[e + f*x]^n)^ FracPart[p]/(Tan[e + f*x]/ff)^(n*FracPart[p])* Int[ActivateTrig[u]*(Tan[e + f*x]/ff)^(n*p), x]] /; FreeQ[{b, e, f, n, p}, x] && Not[IntegerQ[p]] && IntegerQ[n] && (EqQ[u, 1] || MatchQ[u, (d_.*trig_[e + f*x])^m_. /; FreeQ[{d, m}, x] && MemberQ[{sin, cos, tan, cot, sec, csc}, trig]])
 
-# Regel 3 nicht uebersetzt: call of a non-symbol
+# Regel 3 nicht uebersetzt: predicate MatchQ
 #   Int[u_.*(b_.*(c_.*tan[e_. + f_.*x_])^n_)^p_, x_Symbol] := b^IntPart[p]*(b*(c*Tan[e + f*x])^n)^ FracPart[p]/(c*Tan[e + f*x])^(n*FracPart[p])* Int[ActivateTrig[u]*(c*Tan[e + f*x])^(n*p), x] /; FreeQ[{b, c, e, f, n, p}, x] && Not[IntegerQ[p]] && Not[IntegerQ[n]] && (EqQ[u, 1] || MatchQ[u, (d_.*trig_[e + f*x])^m_. /; FreeQ[{d, m}, x] && MemberQ[{sin, cos, tan, cot, sec, csc}, trig]])
 
 # Regel 4 (54 Varianten):

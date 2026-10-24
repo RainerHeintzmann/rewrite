@@ -208,8 +208,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n) Int(fresnels((O_d)*((O_a)+((O
 #   Int[FresnelC[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := x*FresnelC[d*(a + b*Log[c*x^n])] - b*d*n*Int[Cos[Pi/2*(d*(a + b*Log[c*x^n]))^2], x] /; FreeQ[{a, b, c, d, n}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n) Int(fresnelc((O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))),Xv) = ((((Xv)*(fresnelc(((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))))+((((-1))*(O_b)*(O_d)*(O_n)*(Int(cos(((pi)*((1/2))*(((((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))^(2))))),Xv)))))
 
-# Regel 53 nicht uebersetzt: call of a non-symbol
+# Regel 53 (324 Varianten):
 #   Int[F_[d_.*(a_. + b_.*Log[c_.*x_^n_.])]/x_, x_Symbol] := 1/n*Subst[F[d*(a + b*x)], x, Log[c*x^n]] /; FreeQ[{a, b, c, d, n}, x] && MemberQ[{FresnelS, FresnelC}, F]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_n) Int((fresnels((O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))))*((Xv)^(K_1)),Xv) = ((((O_n)^((-1))))*(subst(fresnels(((O_d)*(((O_a)+(((O_b)*(Xv))))))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
+
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_n) Int((fresnelc((O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))))*((Xv)^(K_1)),Xv) = ((((O_n)^((-1))))*(subst(fresnelc(((O_d)*(((O_a)+(((O_b)*(Xv))))))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
 
 # Regel 54 (1944 Varianten):
 #   Int[(e_.*x_)^m_.*FresnelS[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := (e*x)^(m + 1)*FresnelS[d*(a + b*Log[c*x^n])]/(e*(m + 1)) - b*d*n/(m + 1)* Int[(e*x)^m*Sin[Pi/2*(d*(a + b*Log[c*x^n]))^2], x] /; FreeQ[{a, b, c, d, e, m, n}, x] && NeQ[m, -1]

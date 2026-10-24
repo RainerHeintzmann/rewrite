@@ -6,16 +6,16 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: call of a non-symbol
+# Regel 1 nicht uebersetzt: function variable without a finite set of functions
 #   Int[(a_.+b_.*F_[c_.*Sqrt[d_.+e_.*x_]/Sqrt[f_.+g_.*x_]])^n_./(A_.+B_.*x_+C_.*x_^2),x_Symbol] := 2*e*g/(C*(e*f-d*g)) \[Star] Subst[Int[(a+b*F[c*x])^n/x,x],x,Sqrt[d+e*x]/Sqrt[f+g*x]] /; FreeQ[{a,b,c,d,e,f,g,A,B,C,F},x] && EqQ[C*d*f-A*e*g,0] && EqQ[B*e*g-C*(e*f+d*g),0] && IGtQ[n,0]
 
-# Regel 2 nicht uebersetzt: call of a non-symbol
+# Regel 2 nicht uebersetzt: function variable without a finite set of functions
 #   Int[(a_.+b_.*F_[c_.*Sqrt[d_.+e_.*x_]/Sqrt[f_.+g_.*x_]])^n_./(A_.+C_.*x_^2),x_Symbol] := 2*e*g/(C*(e*f-d*g)) \[Star] Subst[Int[(a+b*F[c*x])^n/x,x],x,Sqrt[d+e*x]/Sqrt[f+g*x]] /; FreeQ[{a,b,c,d,e,f,g,A,C,F},x] && EqQ[C*d*f-A*e*g,0] && EqQ[e*f+d*g,0] && IGtQ[n,0]
 
-# Regel 3 nicht uebersetzt: call of a non-symbol
+# Regel 3 nicht uebersetzt: function variable without a finite set of functions
 #   Int[(a_.+b_.*F_[c_.*Sqrt[d_.+e_.*x_]/Sqrt[f_.+g_.*x_]])^n_/(A_.+B_.*x_+C_.*x_^2),x_Symbol] := Unintegrable[(a+b*F[c*Sqrt[d+e*x]/Sqrt[f+g*x]])^n/(A+B*x+C*x^2),x] /; FreeQ[{a,b,c,d,e,f,g,A,B,C,F,n},x] && EqQ[C*d*f-A*e*g,0] && EqQ[B*e*g-C*(e*f+d*g),0] && Not[IGtQ[n,0]]
 
-# Regel 4 nicht uebersetzt: call of a non-symbol
+# Regel 4 nicht uebersetzt: function variable without a finite set of functions
 #   Int[(a_.+b_.*F_[c_.*Sqrt[d_.+e_.*x_]/Sqrt[f_.+g_.*x_]])^n_/(A_+C_.*x_^2),x_Symbol] := Unintegrable[(a+b*F[c*Sqrt[d+e*x]/Sqrt[f+g*x]])^n/(A+C*x^2),x] /; FreeQ[{a,b,c,d,e,f,g,A,C,F,n},x] && EqQ[C*d*f-A*e*g,0] && EqQ[e*f+d*g,0] && Not[IGtQ[n,0]]
 
 # Regel 5 nicht uebersetzt: function DerivativeDivides

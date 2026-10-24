@@ -74,8 +74,79 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (rationalq(O_m)), (integerq(O_n)
 #   Int[(c_. + d_.*x_)^m_.*Csch[a_. + b_.*x_]^n_.*Sech[a_. + b_.*x_]^p_., x_Symbol] := With[{u = IntHide[Csch[a + b*x]^n*Sech[a + b*x]^p, x]}, Dist[(c + d*x)^m, u, x] - d*m*Int[(c + d*x)^(m - 1)*u, x]] /; FreeQ[{a, b, c, d}, x] && IntegersQ[n, p] && GtQ[m, 0] && NeQ[n, p]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (integersq(O_n,O_p)), (((O_m > 0))), (neq(O_n,O_p)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((csch((O_a)+((O_b)*(Xv))))^(O_n))*((sech((O_a)+((O_b)*(Xv))))^(O_p)),Xv) = ((dist(((((O_c)+(((O_d)*(Xv)))))^(O_m)),inthide(((((csch(((O_a)+(((O_b)*(Xv))))))^(O_n)))*(((sech(((O_a)+(((O_b)*(Xv))))))^(O_p)))),Xv),Xv))+((((-1))*(O_d)*(O_m)*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(inthide(((((csch(((O_a)+(((O_b)*(Xv))))))^(O_n)))*(((sech(((O_a)+(((O_b)*(Xv))))))^(O_p)))),Xv))),Xv)))))
 
-# Regel 18 nicht uebersetzt: call of a non-symbol
+# Regel 18 (32 Varianten):
 #   Int[u_^m_.*F_[v_]^n_.*G_[w_]^p_., x_Symbol] := Int[ExpandToSum[u, x]^m*F[ExpandToSum[v, x]]^n* G[ExpandToSum[v, x]]^p, x] /; FreeQ[{m, n, p}, x] && HyperbolicQ[F] && HyperbolicQ[G] && EqQ[v, w] && LinearQ[{u, v, w}, x] && Not[LinearMatchQ[{u, v, w}, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sinh(P_v))^(O_n))*((sinh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sinh(expandtosum(P_v,Xv)))^(O_n)))*(((sinh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sinh(P_v))^(O_n))*((cosh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sinh(expandtosum(P_v,Xv)))^(O_n)))*(((cosh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sinh(P_v))^(O_n))*((tanh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sinh(expandtosum(P_v,Xv)))^(O_n)))*(((tanh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sinh(P_v))^(O_n))*((coth(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sinh(expandtosum(P_v,Xv)))^(O_n)))*(((coth(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sinh(P_v))^(O_n))*((sech(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sinh(expandtosum(P_v,Xv)))^(O_n)))*(((sech(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sinh(P_v))^(O_n))*((csch(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sinh(expandtosum(P_v,Xv)))^(O_n)))*(((csch(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((cosh(P_v))^(O_n))*((sinh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((cosh(expandtosum(P_v,Xv)))^(O_n)))*(((sinh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((cosh(P_v))^(O_n))*((cosh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((cosh(expandtosum(P_v,Xv)))^(O_n)))*(((cosh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((cosh(P_v))^(O_n))*((tanh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((cosh(expandtosum(P_v,Xv)))^(O_n)))*(((tanh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((cosh(P_v))^(O_n))*((coth(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((cosh(expandtosum(P_v,Xv)))^(O_n)))*(((coth(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((cosh(P_v))^(O_n))*((sech(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((cosh(expandtosum(P_v,Xv)))^(O_n)))*(((sech(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((cosh(P_v))^(O_n))*((csch(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((cosh(expandtosum(P_v,Xv)))^(O_n)))*(((csch(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((tanh(P_v))^(O_n))*((sinh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((tanh(expandtosum(P_v,Xv)))^(O_n)))*(((sinh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((tanh(P_v))^(O_n))*((cosh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((tanh(expandtosum(P_v,Xv)))^(O_n)))*(((cosh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((tanh(P_v))^(O_n))*((tanh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((tanh(expandtosum(P_v,Xv)))^(O_n)))*(((tanh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((tanh(P_v))^(O_n))*((coth(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((tanh(expandtosum(P_v,Xv)))^(O_n)))*(((coth(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((tanh(P_v))^(O_n))*((sech(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((tanh(expandtosum(P_v,Xv)))^(O_n)))*(((sech(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((tanh(P_v))^(O_n))*((csch(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((tanh(expandtosum(P_v,Xv)))^(O_n)))*(((csch(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((coth(P_v))^(O_n))*((sinh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((coth(expandtosum(P_v,Xv)))^(O_n)))*(((sinh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((coth(P_v))^(O_n))*((cosh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((coth(expandtosum(P_v,Xv)))^(O_n)))*(((cosh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((coth(P_v))^(O_n))*((tanh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((coth(expandtosum(P_v,Xv)))^(O_n)))*(((tanh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((coth(P_v))^(O_n))*((coth(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((coth(expandtosum(P_v,Xv)))^(O_n)))*(((coth(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((coth(P_v))^(O_n))*((sech(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((coth(expandtosum(P_v,Xv)))^(O_n)))*(((sech(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((coth(P_v))^(O_n))*((csch(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((coth(expandtosum(P_v,Xv)))^(O_n)))*(((csch(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sech(P_v))^(O_n))*((sinh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sech(expandtosum(P_v,Xv)))^(O_n)))*(((sinh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sech(P_v))^(O_n))*((cosh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sech(expandtosum(P_v,Xv)))^(O_n)))*(((cosh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sech(P_v))^(O_n))*((tanh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sech(expandtosum(P_v,Xv)))^(O_n)))*(((tanh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sech(P_v))^(O_n))*((coth(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sech(expandtosum(P_v,Xv)))^(O_n)))*(((coth(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sech(P_v))^(O_n))*((sech(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sech(expandtosum(P_v,Xv)))^(O_n)))*(((sech(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((sech(P_v))^(O_n))*((csch(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sech(expandtosum(P_v,Xv)))^(O_n)))*(((csch(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((csch(P_v))^(O_n))*((sinh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((csch(expandtosum(P_v,Xv)))^(O_n)))*(((sinh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((csch(P_v))^(O_n))*((cosh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((csch(expandtosum(P_v,Xv)))^(O_n)))*(((cosh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((csch(P_v))^(O_n))*((tanh(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((csch(expandtosum(P_v,Xv)))^(O_n)))*(((tanh(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((csch(P_v))^(O_n))*((coth(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((csch(expandtosum(P_v,Xv)))^(O_n)))*(((coth(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((csch(P_v))^(O_n))*((sech(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((csch(expandtosum(P_v,Xv)))^(O_n)))*(((sech(expandtosum(P_v,Xv)))^(O_p)))),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (eqq(P_v,P_w)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((csch(P_v))^(O_n))*((csch(P_w))^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((csch(expandtosum(P_v,Xv)))^(O_n)))*(((csch(expandtosum(P_v,Xv)))^(O_p)))),Xv)
 
 # Regel 19 (69984 Varianten):
 #   Int[(e_. + f_.*x_)^m_.* Cosh[c_. + d_.*x_]*(a_ + b_.*Sinh[c_. + d_.*x_])^n_., x_Symbol] := (e + f*x)^m*(a + b*Sinh[c + d*x])^(n + 1)/(b*d*(n + 1)) - f*m/(b*d*(n + 1))* Int[(e + f*x)^(m - 1)*(a + b*Sinh[c + d*x])^(n + 1), x] /; FreeQ[{a, b, c, d, e, f, n}, x] && IGtQ[m, 0] && NeQ[n, -1]
@@ -113,5 +184,5 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q
 #   Int[(e_. + f_.*x_)^m_.*Sinh[a_. + b_.*x_]^p_.*Cosh[c_. + d_.*x_]^q_., x_Symbol] := Int[ExpandTrigReduce[(e + f*x)^m, Sinh[a + b*x]^p*Cosh[c + d*x]^q, x], x] /; FreeQ[{a, b, c, d, e, f, m}, x] && IGtQ[p, 0] && IGtQ[q, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m), (igtq(O_p,0)), (igtq(O_q,0)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*((sinh((O_a)+((O_b)*(Xv))))^(O_p))*((cosh((O_c)+((O_d)*(Xv))))^(O_q)),Xv) = Int(expandtrigreduce(((((O_e)+(((O_f)*(Xv)))))^(O_m)),((((sinh(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cosh(((O_c)+(((O_d)*(Xv))))))^(O_q)))),Xv),Xv)
 
-# Regel 28 nicht uebersetzt: call of a non-symbol
+# Regel 28 nicht uebersetzt: no instance of the function variable translatable
 #   Int[(e_. + f_.*x_)^m_.*F_[a_. + b_.*x_]^p_.*G_[c_. + d_.*x_]^q_., x_Symbol] := Int[ExpandTrigExpand[(e + f*x)^m*G[c + d*x]^q, F, c + d*x, p, b/d, x], x] /; FreeQ[{a, b, c, d, e, f, m}, x] && MemberQ[{Sinh, Cosh}, F] && MemberQ[{Sech, Csch}, G] && IGtQ[p, 0] && IGtQ[q, 0] && EqQ[b*c - a*d, 0] && IGtQ[b/d, 1]

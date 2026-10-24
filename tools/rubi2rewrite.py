@@ -166,8 +166,12 @@ class Parser:
         if v == '^':
             return call('Power', left, self.parse(29))
         if v == '[':
-            if left[0] != 'sym':
+            if left[0] == 'pat' and left[3] is None:      # F_[u]: function variable
+                head = '?' + left[1]
+            elif left[0] != 'sym':
                 raise Untranslatable("call of a non-symbol")
+            else:
+                head = left[1]
             args = []
             if self.peek()[1] != ']':
                 while True:
@@ -177,7 +181,7 @@ class Parser:
                         continue
                     break
             self.expect(']')
-            return ('call', left[1], args)
+            return ('call', head, args)
         if v in COMPARE:
             return call(COMPARE[v], left, self.parse(7))
         if v == '&&':
@@ -627,8 +631,68 @@ def split_top(s, sep):
     return s, None
 
 
+# function variables F_[...]: the admissible functions, from the condition
+FUNCTION_SETS = {
+    'TrigQ': ['Sin', 'Cos', 'Tan', 'Cot', 'Sec', 'Csc'],
+    'InertTrigQ': ['sin', 'cos', 'tan', 'cot', 'sec', 'csc'],
+    'HyperbolicQ': ['Sinh', 'Cosh', 'Tanh', 'Coth', 'Sech', 'Csch'],
+    'InverseTrigQ': ['ArcSin', 'ArcCos', 'ArcTan', 'ArcCot', 'ArcSec', 'ArcCsc'],
+    'InverseHyperbolicQ': ['ArcSinh', 'ArcCosh', 'ArcTanh', 'ArcCoth', 'ArcSech', 'ArcCsch'],
+}
+
+
+def function_vars(e, out):
+    if e[0] == 'call':
+        if e[1].startswith('?'):
+            out.add(e[1][1:])
+        for a in e[2]:
+            function_vars(a, out)
+    return out
+
+
+def function_sets(conds, fvars):
+    """{F: [admissible heads]} from predicates like TrigQ[F], MemberQ[{..}, F]"""
+    sets = {}
+
+    def scan(e):
+        if e[0] != 'call':
+            return
+        h, args = e[1], e[2]
+        if h in FUNCTION_SETS and len(args) == 1 and args[0][0] == 'sym' and args[0][1] in fvars:
+            sets[args[0][1]] = FUNCTION_SETS[h]
+        elif (h == 'MemberQ' and len(args) == 2 and args[1][0] == 'sym' and args[1][1] in fvars
+              and args[0][0] == 'call' and args[0][1] == 'List'
+              and all(a[0] == 'sym' for a in args[0][2])):
+            sets[args[1][1]] = [a[1] for a in args[0][2]]
+        if h == 'And':
+            for a in args:
+                scan(a)
+    for c in conds:
+        scan(c)
+    return sets
+
+
+def instantiate(e, assign):
+    """F_[u] -> Sin[u] for F = Sin; the predicates on F become True"""
+    if e[0] == 'sym' and e[1] in assign:
+        return ('sym', assign[e[1]])
+    if e[0] != 'call':
+        return e
+    h, args = e[1], e[2]
+    if h.startswith('?') and h[1:] in assign:
+        h = assign[h[1:]]
+    elif h in assign:                       # F[u] on the right-hand side
+        h = assign[h]
+    if ((h in FUNCTION_SETS and len(args) == 1 and args[0][0] == 'sym' and args[0][1] in assign)
+            or (h == 'MemberQ' and len(args) == 2 and args[1][0] == 'sym' and args[1][1] in assign)):
+        return ('sym', 'True')
+    return ('call', h, [instantiate(a, assign) for a in args])
+
+
 def translate_rule(text):
-    """returns (rewrite rule, number of variants) or raises Untranslatable"""
+    """returns a list of (rewrite rule, number of variants, ctx); raises
+    Untranslatable. A rule with function variables F_[...] gives one rule
+    per admissible function."""
     lhs_s, rhs_s = split_top(text, ':=')
     if rhs_s is None:
         raise Untranslatable("not a rule")
@@ -639,6 +703,33 @@ def translate_rule(text):
     rhs = normalize(resolve_with(parse(rhs_s)))
     if lhs[0] != 'call' or lhs[1] != 'Int' or len(lhs[2]) != 2:
         raise Untranslatable("left side is not Int[u, x]")
+    fvars = function_vars(lhs, set())
+    if not fvars:
+        return [translate_parsed(lhs, rhs)]
+    conds = []
+    r = rhs
+    while r[0] == 'call' and r[1] == 'Condition':
+        conds.append(r[2][1])
+        r = r[2][0]
+    sets = function_sets(conds, fvars)
+    if any(f not in sets for f in fvars):
+        raise Untranslatable("function variable without a finite set of functions")
+    combos = [{}]
+    for f in sorted(fvars):
+        combos = [dict(c, **{f: g}) for c in combos for g in sets[f]]
+    out = []
+    for assign in combos:
+        try:
+            out.append(translate_parsed(normalize(instantiate(lhs, assign)),
+                                        normalize(instantiate(rhs, assign))))
+        except Untranslatable:
+            pass                    # e.g. a function rewrite does not have
+    if not out:
+        raise Untranslatable("no instance of the function variable translatable")
+    return out
+
+
+def translate_parsed(lhs, rhs):
 
     conds_ast = []
     while rhs[0] == 'call' and rhs[1] == 'Condition':     # rhs /; cond
@@ -765,7 +856,7 @@ def translate_file(path, out_dir, all_vars, stats):
     ok = 0
     for i, text in enumerate(rules_of(path), 1):
         try:
-            rule, nvar, ctx = translate_rule(text)
+            results = translate_rule(text)
         except Untranslatable as err:
             reason = str(err)
             stats['rejected'][reason] = stats['rejected'].get(reason, 0) + 1
@@ -777,11 +868,15 @@ def translate_file(path, out_dir, all_vars, stats):
             lines.append('# Regel %d nicht uebersetzt: %s\n#   %s\n' % (i, reason, text))
             continue
         ok += 1
-        all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('P_'))
-        all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('O_'))
-        all_vars['K'].update(ctx.kvars)
-        stats['variants'].append((nvar, name, i))
-        lines.append('# Regel %d (%d Varianten):\n#   %s\n%s\n' % (i, nvar, text, rule))
+        for k, (rule, nvar, ctx) in enumerate(results):
+            all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('P_'))
+            all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('O_'))
+            all_vars['K'].update(ctx.kvars)
+            stats['variants'].append((nvar, name, i))
+            if k == 0:
+                lines.append('# Regel %d (%d Varianten):\n#   %s\n%s\n' % (i, nvar, text, rule))
+            else:
+                lines.append(rule + '\n')
     stats['files'].append((name, section, ok, sum(1 for _ in rules_of(path))))
     with open(os.path.join(out_dir, name), 'w', encoding='utf-8', newline='\n') as f:
         f.write('\n'.join(lines))
