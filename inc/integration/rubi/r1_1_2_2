@@ -8,7 +8,7 @@
 
 # Regel 1 (12 Varianten):
 #   Int[x_/(a_+b_.*x_^2),x_Symbol] := Log[RemoveContent[a+b*x^2,x]]/(2*b) /; FreeQ[{a,b},x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int((Xv)*(((P_a)+((O_b)*((Xv)^(2))))^(K_1)),Xv) = ((ln(((P_a)+(((O_b)*(((Xv)^(2))))))))*((1/2))*(((O_b)^((-1)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int((Xv)*(((P_a)+((O_b)*((Xv)^(2))))^(K_1)),Xv) = ((ln(removecontent(((P_a)+(((O_b)*(((Xv)^(2)))))),Xv)))*((1/2))*(((O_b)^((-1)))))
 
 # Regel 2 (12 Varianten):
 #   Int[x_*(a_+b_.*x_^2)^p_,x_Symbol] := (a+b*x^2)^(p+1)/(2*b*(p+1)) /; FreeQ[{a,b,p},x] && NeQ[p,-1]

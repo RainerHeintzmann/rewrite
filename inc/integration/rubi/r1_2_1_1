@@ -38,7 +38,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (neq(((((O_b)^(2)))+((((-4))*(O_a)*(
 
 # Regel 9 (18 Varianten):
 #   Int[1/(b_.*x_ + c_.*x_^2), x_Symbol] := Log[x]/b - Log[RemoveContent[b + c*x, x]]/b /; FreeQ[{b, c}, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_b,O_c) Int((((O_b)*(Xv))+((O_c)*((Xv)^(2))))^(K_1),Xv) = ((((ln(Xv))*(((O_b)^((-1))))))+((((-1))*(ln(((O_b)+(((O_c)*(Xv))))))*(((O_b)^((-1)))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_b,O_c) Int((((O_b)*(Xv))+((O_c)*((Xv)^(2))))^(K_1),Xv) = ((((ln(Xv))*(((O_b)^((-1))))))+((((-1))*(ln(removecontent(((O_b)+(((O_c)*(Xv)))),Xv)))*(((O_b)^((-1)))))))
 
 # Regel 10 nicht uebersetzt: predicate PerfectSquareQ
 #   Int[1/(a_. + b_.*x_ + c_.*x_^2), x_Symbol] := With[{q = Rt[b^2 - 4*a*c, 2]}, c/q*Int[1/Simp[b/2 - q/2 + c*x, x], x] - c/q*Int[1/Simp[b/2 + q/2 + c*x, x], x]] /; FreeQ[{a, b, c}, x] && NeQ[b^2 - 4*a*c, 0] && PosQ[b^2 - 4*a*c] && PerfectSquareQ[b^2 - 4*a*c]

@@ -19,6 +19,8 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_m,O_n) Int((((O_a)*(cos((O_e)+((
 #   UnifyInertTrigFunction[(a_.+b_.*cos[e_.+f_.*x_])^n_.,x_] := (a+b*sin[e+Pi/2+f*x])^n /; FreeQ[{a,b,e,f,n},x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_n) Int(((O_a)+((O_b)*(cos((O_e)+((O_f)*(Xv))))))^(O_n),Xv) = Int(((((O_a)+(((O_b)*(sin(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))))^(O_n)),Xv)
 
+ADDSPEC RubiRules : IF NIN(Xv,O_gg,O_hh,O_kk), NIN(Xv,O_a,O_b,O_e,O_f,O_n) Int((((O_gg)+((O_hh)*(Xv)))^(O_kk))*(((O_a)+((O_b)*(cos((O_e)+((O_f)*(Xv))))))^(O_n)),Xv) = Int(((((((O_gg)+(((O_hh)*(Xv)))))^(O_kk)))*(((((O_a)+(((O_b)*(sin(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))))^(O_n)))),Xv)
+
 # Definition 6:
 #   UnifyInertTrigFunction[(g_.*sin[e_.+f_.*x_])^p_.*(a_+b_.*cos[e_.+f_.*x_])^m_.,x_] := (g*cos[e-Pi/2+f*x])^p*(a-b*sin[e-Pi/2+f*x])^m /; FreeQ[{a,b,e,f,g,m,p},x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_e,O_f,O_g,O_m,O_p) Int((((O_g)*(sin((O_e)+((O_f)*(Xv)))))^(O_p))*(((P_a)+((O_b)*(cos((O_e)+((O_f)*(Xv))))))^(O_m)),Xv) = Int(((((((O_g)*(cos(((O_e)+((((-(1/2)))*(pi)))+(((O_f)*(Xv))))))))^(O_p)))*(((((P_a)+((((-1))*(O_b)*(sin(((O_e)+((((-(1/2)))*(pi)))+(((O_f)*(Xv))))))))))^(O_m)))),Xv)
@@ -87,6 +89,8 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_A,O_C,O_m,O_n) Int((((O_
 #   UnifyInertTrigFunction[(a_.+b_.*(c_.*cos[e_.+f_.*x_])^n_)^p_,x_] := (a+b*(c*sin[e+Pi/2+f*x])^n)^p /; FreeQ[{a,b,e,f,n,p},x] && Not[EqQ[a,0] && IntegerQ[p]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,P_n,P_p), (not(((eqq(O_a,0)) && (integerq(P_p))))) Int(((O_a)+((O_b)*(((O_c)*(cos((O_e)+((O_f)*(Xv)))))^(P_n))))^(P_p),Xv) = Int(((((O_a)+(((O_b)*(((((O_c)*(sin(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(P_n)))))))^(P_p)),Xv)
 
+ADDSPEC RubiRules : IF NIN(Xv,O_gg,O_hh,O_kk), NIN(Xv,O_a,O_b,O_e,O_f,P_n,P_p), (not(((eqq(O_a,0)) && (integerq(P_p))))) Int((((O_gg)+((O_hh)*(Xv)))^(O_kk))*(((O_a)+((O_b)*(((O_c)*(cos((O_e)+((O_f)*(Xv)))))^(P_n))))^(P_p)),Xv) = Int(((((((O_gg)+(((O_hh)*(Xv)))))^(O_kk)))*(((((O_a)+(((O_b)*(((((O_c)*(sin(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(P_n)))))))^(P_p)))),Xv)
+
 # Definition 24:
 #   UnifyInertTrigFunction[(d_.*cos[e_.+f_.*x_])^m_.*(a_.+b_.*(c_.*cos[e_.+f_.*x_])^n_)^p_.,x_] := (d*sin[e+Pi/2+f*x])^m*(a+b*(c*sin[e+Pi/2+f*x])^n)^p /; FreeQ[{a,b,c,d,e,f,m,n,p},x] && Not[EqQ[a,0] && IntegerQ[p]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m,P_n,O_p), (not(((eqq(O_a,0)) && (integerq(O_p))))) Int((((O_d)*(cos((O_e)+((O_f)*(Xv)))))^(O_m))*(((O_a)+((O_b)*(((O_c)*(cos((O_e)+((O_f)*(Xv)))))^(P_n))))^(O_p)),Xv) = Int(((((((O_d)*(sin(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(O_m)))*(((((O_a)+(((O_b)*(((((O_c)*(sin(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(P_n)))))))^(O_p)))),Xv)
@@ -134,6 +138,8 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_m,O_n) Int((((O_a)*(sec((O_e)+((
 # Definition 35:
 #   UnifyInertTrigFunction[(a_.+b_.*cot[e_.+f_.*x_])^n_.,x_] := (a-b*tan[e+Pi/2+f*x])^n /; FreeQ[{a,b,e,f,n},x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_n) Int(((O_a)+((O_b)*(cot((O_e)+((O_f)*(Xv))))))^(O_n),Xv) = Int(((((O_a)+((((-1))*(O_b)*(tan(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))))^(O_n)),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_gg,O_hh,O_kk), NIN(Xv,O_a,O_b,O_e,O_f,O_n) Int((((O_gg)+((O_hh)*(Xv)))^(O_kk))*(((O_a)+((O_b)*(cot((O_e)+((O_f)*(Xv))))))^(O_n)),Xv) = Int(((((((O_gg)+(((O_hh)*(Xv)))))^(O_kk)))*(((((O_a)+((((-1))*(O_b)*(tan(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))))^(O_n)))),Xv)
 
 # Definition 36:
 #   UnifyInertTrigFunction[(d_.*csc[e_.+f_.*x_])^m_.*(a_+b_.*cot[e_.+f_.*x_])^n_.,x_] := (d*sec[e-Pi/2+f*x])^m*(a-b*tan[e-Pi/2+f*x])^n /; FreeQ[{a,b,d,e,f,m,n},x]
@@ -187,6 +193,8 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_A,O_C,O_m,O_n) Int((((O_
 #   UnifyInertTrigFunction[(a_.+b_.*(c_.*cot[e_.+f_.*x_])^n_)^p_,x_] := (a+b*(-c*tan[e+Pi/2+f*x])^n)^p /; FreeQ[{a,b,c,e,f,n,p},x] && Not[EqQ[a,0] && IntegerQ[p]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_e,O_f,P_n,P_p), (not(((eqq(O_a,0)) && (integerq(P_p))))) Int(((O_a)+((O_b)*(((O_c)*(cot((O_e)+((O_f)*(Xv)))))^(P_n))))^(P_p),Xv) = Int(((((O_a)+(((O_b)*((((((-1))*(O_c)*(tan(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(P_n)))))))^(P_p)),Xv)
 
+ADDSPEC RubiRules : IF NIN(Xv,O_gg,O_hh,O_kk), NIN(Xv,O_a,O_b,O_c,O_e,O_f,P_n,P_p), (not(((eqq(O_a,0)) && (integerq(P_p))))) Int((((O_gg)+((O_hh)*(Xv)))^(O_kk))*(((O_a)+((O_b)*(((O_c)*(cot((O_e)+((O_f)*(Xv)))))^(P_n))))^(P_p)),Xv) = Int(((((((O_gg)+(((O_hh)*(Xv)))))^(O_kk)))*(((((O_a)+(((O_b)*((((((-1))*(O_c)*(tan(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(P_n)))))))^(P_p)))),Xv)
+
 # Definition 49:
 #   UnifyInertTrigFunction[(d_.*cos[e_.+f_.*x_])^m_.*(a_.+b_.*(c_.*cot[e_.+f_.*x_])^n_)^p_.,x_] := (d*sin[e+Pi/2+f*x])^m*(a+b*(-c*tan[e+Pi/2+f*x])^n)^p /; FreeQ[{a,b,c,d,e,f,m,n,p},x] && Not[EqQ[a,0] && IntegerQ[p]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m,P_n,O_p), (not(((eqq(O_a,0)) && (integerq(O_p))))) Int((((O_d)*(cos((O_e)+((O_f)*(Xv)))))^(O_m))*(((O_a)+((O_b)*(((O_c)*(cot((O_e)+((O_f)*(Xv)))))^(P_n))))^(O_p)),Xv) = Int(((((((O_d)*(sin(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(O_m)))*(((((O_a)+(((O_b)*((((((-1))*(O_c)*(tan(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(P_n)))))))^(O_p)))),Xv)
@@ -214,6 +222,8 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m,P_n,O_p), (not(((eqq(O
 # Definition 55:
 #   UnifyInertTrigFunction[(a_.+b_.*sec[e_.+f_.*x_])^n_.,x_] := (a+b*csc[e+Pi/2+f*x])^n /; FreeQ[{a,b,e,f,n},x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_n) Int(((O_a)+((O_b)*(sec((O_e)+((O_f)*(Xv))))))^(O_n),Xv) = Int(((((O_a)+(((O_b)*(csc(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))))^(O_n)),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_gg,O_hh,O_kk), NIN(Xv,O_a,O_b,O_e,O_f,O_n) Int((((O_gg)+((O_hh)*(Xv)))^(O_kk))*(((O_a)+((O_b)*(sec((O_e)+((O_f)*(Xv))))))^(O_n)),Xv) = Int(((((((O_gg)+(((O_hh)*(Xv)))))^(O_kk)))*(((((O_a)+(((O_b)*(csc(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))))^(O_n)))),Xv)
 
 # Definition 56:
 #   UnifyInertTrigFunction[(g_.*sec[e_.+f_.*x_])^p_.*(a_+b_.*sec[e_.+f_.*x_])^m_.,x_] := (g*csc[e+Pi/2+f*x])^p*(a+b*csc[e+Pi/2+f*x])^m /; FreeQ[{a,b,e,f,g,m,p},x]
@@ -270,6 +280,8 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_d,O_e,O_f,O_A,O_C,O_m,O_n) Int((((O_a)+(
 # Definition 70:
 #   UnifyInertTrigFunction[(a_.+b_.*(c_.*csc[e_.+f_.*x_])^n_)^p_,x_] := (a+b*(-c*sec[e+Pi/2+f*x])^n)^p /; FreeQ[{a,b,c,e,f,n,p},x] && Not[EqQ[a,0] && IntegerQ[p]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_e,O_f,P_n,P_p), (not(((eqq(O_a,0)) && (integerq(P_p))))) Int(((O_a)+((O_b)*(((O_c)*(csc((O_e)+((O_f)*(Xv)))))^(P_n))))^(P_p),Xv) = Int(((((O_a)+(((O_b)*((((((-1))*(O_c)*(sec(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(P_n)))))))^(P_p)),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_gg,O_hh,O_kk), NIN(Xv,O_a,O_b,O_c,O_e,O_f,P_n,P_p), (not(((eqq(O_a,0)) && (integerq(P_p))))) Int((((O_gg)+((O_hh)*(Xv)))^(O_kk))*(((O_a)+((O_b)*(((O_c)*(csc((O_e)+((O_f)*(Xv)))))^(P_n))))^(P_p)),Xv) = Int(((((((O_gg)+(((O_hh)*(Xv)))))^(O_kk)))*(((((O_a)+(((O_b)*((((((-1))*(O_c)*(sec(((O_e)+(((pi)*((1/2))))+(((O_f)*(Xv))))))))^(P_n)))))))^(P_p)))),Xv)
 
 # Definition 71:
 #   UnifyInertTrigFunction[(d_.*cos[e_.+f_.*x_])^m_.*(a_.+b_.*(c_.*csc[e_.+f_.*x_])^n_)^p_.,x_] := (d*sin[e+Pi/2+f*x])^m*(a+b*(-c*sec[e+Pi/2+f*x])^n)^p /; FreeQ[{a,b,c,d,e,f,m,n,p},x] && Not[EqQ[a,0] && IntegerQ[p]]

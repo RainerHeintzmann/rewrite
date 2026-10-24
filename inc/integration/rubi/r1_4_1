@@ -72,7 +72,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_q), (polyq(P_Px,Xv)), (polyq(P_Qx,Xv)), (eqq(pol
 
 # Regel 18 (2 Varianten):
 #   Int[Pp_/Qq_,x_Symbol] := With[{p=Expon[Pp,x],q=Expon[Qq,x]}, Coeff[Pp,x,p]*Log[RemoveContent[Qq,x]]/(q*Coeff[Qq,x,q])/; EqQ[p,q-1] && EqQ[Pp,Simplify[Coeff[Pp,x,p]/(q*Coeff[Qq,x,q])*D[Qq,x]]]] /; PolyQ[Pp,x] && PolyQ[Qq,x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), (polyq(P_Pp,Xv)), (polyq(P_Qq,Xv)), (eqq(expon(P_Pp,Xv),((expon(P_Qq,Xv))+((-1))))), (eqq(P_Pp,simplify(((coeff(P_Pp,Xv,expon(P_Pp,Xv)))*(((expon(P_Qq,Xv))^((-1))))*(((coeff(P_Qq,Xv,expon(P_Qq,Xv)))^((-1))))*(deriv(P_Qq,Xv)))))) Int((P_Pp)*((P_Qq)^(K_1)),Xv) = ((coeff(P_Pp,Xv,expon(P_Pp,Xv)))*(ln(P_Qq))*(((expon(P_Qq,Xv))^((-1))))*(((coeff(P_Qq,Xv,expon(P_Qq,Xv)))^((-1)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), (polyq(P_Pp,Xv)), (polyq(P_Qq,Xv)), (eqq(expon(P_Pp,Xv),((expon(P_Qq,Xv))+((-1))))), (eqq(P_Pp,simplify(((coeff(P_Pp,Xv,expon(P_Pp,Xv)))*(((expon(P_Qq,Xv))^((-1))))*(((coeff(P_Qq,Xv,expon(P_Qq,Xv)))^((-1))))*(deriv(P_Qq,Xv)))))) Int((P_Pp)*((P_Qq)^(K_1)),Xv) = ((coeff(P_Pp,Xv,expon(P_Pp,Xv)))*(ln(removecontent(P_Qq,Xv)))*(((expon(P_Qq,Xv))^((-1))))*(((coeff(P_Qq,Xv,expon(P_Qq,Xv)))^((-1)))))
 
 # Regel 19 (4 Varianten):
 #   Int[Pp_*Qq_^m_.,x_Symbol] := With[{p=Expon[Pp,x],q=Expon[Qq,x]}, Coeff[Pp,x,p]*x^(p-q+1)*Qq^(m+1)/((p+m*q+1)*Coeff[Qq,x,q]) /; NeQ[p+m*q+1,0] && EqQ[(p+m*q+1)*Coeff[Qq,x,q]*Pp,Coeff[Pp,x,p]*x^(p-q)*((p-q+1)*Qq+(m+1)*x*D[Qq,x])]] /; FreeQ[m,x] && PolyQ[Pp,x] && PolyQ[Qq,x] && NeQ[m,-1]

@@ -487,7 +487,9 @@ def tr_rhs(e, ctx):
     if head == 'ReplaceAll' and len(args) == 2 and args[1][0] == 'call' and args[1][1] == 'Rule':
         return 'replaceall' + paren(','.join(tr_rhs(a, ctx) for a in [args[0]] + args[1][2]))
     if head == 'RemoveContent' and len(args) == 2:
-        return tr_rhs(args[0], ctx)          # only a constant factor differs
+        # without constant factors, also the sign of cos(pi/2+u) = -sin(u):
+        # ln(sin x), not ln(-sin x)
+        return 'removecontent' + paren(','.join(tr_rhs(a, ctx) for a in args))
     if head in RHS_HELPERS:
         return RHS_HELPERS[head] + paren(','.join(tr_rhs(a, ctx) for a in args))
     if head in PREDICATES or head in ORDER or head in ('And', 'Or', 'Not', 'FreeQ'):
@@ -967,6 +969,9 @@ ALG RubiRules
 # zuerst konstante Faktoren herausziehen, wie Mathematica: sonst macht normpoly
 # aus -1*(x*u) den Faktor (-1*x), und Regeln fuer (c*x)^m passen mit c = -1
 ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
+# wie Mathematica 1/sin(u) = csc(u), und Rubis FixInertTrigFunction fuer
+# Produkte zweier Winkelfunktionen: sec(u)*sin(u)^2 = cos(u)^-1*sin(u)^2
+ADDSPEC RubiRules : Int(Uv,Xv) = Int(trignorm(Uv,Xv),Xv)
 # Polynome im Integranden in Mathematicas Normalform c0+c1*x+...
 # (ohne Aenderung wird die Regel uebersprungen)
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)
@@ -1058,8 +1063,21 @@ def translate_unify(util_path, out_dir, all_vars, stats):
         rule = 'Int[%s, x_Symbol] := Int[%s, x]' % (u_s, body)
         if cond is not None:
             rule += ' /; ' + cond
+        # a single trig factor: also with a polynomial factor (g+h*x)^k, as
+        # Rubi's DeactivateTrig[(c+d*x)^m*(a+b*trig)^n] unifies only the trig part
+        depth, single = 0, True
+        for ch in u_s:
+            depth += ch in '[(' and 1 or (ch in '])' and -1 or 0)
+            if ch == '*' and depth == 0:
+                single = False
+        rules = [rule]
+        if single:
+            rules.append('Int[(gg_.+hh_.*x_)^kk_.*%s, x_Symbol] := Int[(gg+hh*x)^kk*(%s), x] /; '
+                         'FreeQ[{gg,hh,kk},x]%s' % (u_s, body, ' && ' + cond if cond else ''))
         try:
-            results = translate_rule(rule)
+            results = []
+            for r_text in rules:
+                results.extend(translate_rule(r_text))
         except (Untranslatable, RecursionError, IndexError) as err:
             lines.append('# Definition %d nicht uebersetzt: %s\n#   %s\n' % (i, err, st))
             continue

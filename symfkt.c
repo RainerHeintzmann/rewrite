@@ -200,7 +200,7 @@ int term_has_nan (Node * t)	/* contains NaN, infinity or a division by zero */
 	 * of no use */
 	if (is_head(t, "polyquotient", 3) || is_head(t, "polyremainder", 3)
 	    || is_head(t, "expandintegrand", -1) || is_head(t, "substexp", -1)
-	    || is_head(t, "substfor", -1)) return 1;
+	    || is_head(t, "substfor", -1) || is_head(t, "trignorm", -1)) return 1;
 	n = term_nargs(t);
 	for (i = 0; i < n; i++)
 		if (term_has_nan(arg(t, i))) return 1;
@@ -1170,6 +1170,231 @@ static Node * s_nonfreefactors (Node * a[], int n, Symbol * f)
 {
 	if (n != 2) return NULL;
 	return s_freefactors_aux(a[0], a[1], 0);
+}
+
+static Node * mk_f1 (const char * f, Node * a);
+static Node * mk_neg (Node * a);
+
+/* trig(u + k pi/2) with odd k as +-cofunction(u), as Mathematica evaluates
+ * Cos[Pi/2 + x] = -Sin[x] automatically; NULL if u has no such form */
+static Node * pi2_shift (Node * t)
+{
+	static const struct { const char * f, * g; int s1, s3; } sh[] = {	/* k = 1 and k = 3 (-1) */
+		{ "sin", "cos", 1, -1 }, { "cos", "sin", -1, 1 }, { "tan", "cot", -1, -1 },
+		{ "cot", "tan", -1, -1 }, { "sec", "csc", -1, 1 }, { "csc", "sec", 1, -1 } };
+	TList l = {0};
+	Node * rest = NULL, * r = NULL;
+	int i, j, k = 0;
+	double v, q;
+	t = deref(t);
+	for (i = 0; i < 6; i++)
+		if (is_head(t, sh[i].f, 1)) break;
+	if (i == 6 || ! is_head(arg(t, 0), "+", 2)) return NULL;
+	summands_to(arg(t, 0), & l, 0);
+	for (j = 0; j < l.n; j++)
+		if (! k && num_value(l.t[j], & v) && (q = v / (M_PI / 2), fabs(q - floor(q + 0.5)) < 1e-9)
+		    && ((long) floor(q + 0.5)) % 2 != 0)
+			k = (int) ((((long) floor(q + 0.5)) % 4 + 4) % 4);	/* 1 or 3 */
+		else
+			rest = rest ? mk_add(rest, tcpy(l.t[j])) : tcpy(l.t[j]);
+	tl_free(& l);
+	if (! k || ! rest) { delete(rest); return NULL; }
+	r = mk_f1(sh[i].g, rest);
+	return (k == 1 ? sh[i].s1 : sh[i].s3) < 0 ? mk_neg(r) : r;
+}
+
+/* ---- trignorm(u, x): Mathematica's 1/sin = csc and Rubi's FixInertTrigFunction ----
+ * Every trig or hyperbolic factor with a negative integer exponent becomes
+ * its reciprocal function (Mathematica writes Sin[x]^-3 as Csc[x]^3). In a
+ * product of exactly two such factors, Rubi then writes the first one (in
+ * Mathematica's alphabetical order) to match the second: sec^m*sin^n =
+ * cos^-m*sin^n, so that the rules for sin^m*cos^n apply. NULL: no change. */
+
+static const char * trig_recip (const char * h)
+{
+	static const char * p[][2] = { {"sin","csc"}, {"cos","sec"}, {"tan","cot"},
+		{"sinh","csch"}, {"cosh","sech"}, {"tanh","coth"} };
+	int i;
+	for (i = 0; i < 6; i++)
+		{
+		if (! strcmp(h, p[i][0])) return p[i][1];
+		if (! strcmp(h, p[i][1])) return p[i][0];
+		}
+	return NULL;
+}
+
+static const char * fix_inert[][3] = {	/* f1^m * f2^n = g1^-m * f2^n (rubi_util.m) */
+	{"csc","sin","sin"}, {"sec","cos","cos"}, {"cot","tan","tan"}, {"tan","cot","cot"},
+	{"cos","sec","sec"}, {"sin","csc","csc"}, {"sec","sin","cos"}, {"csc","cos","sin"},
+	{"cos","tan","sec"}, {"sin","cot","csc"}, {"sin","sec","csc"}, {"cos","csc","sec"},
+	{"cot","sin","tan"}, {"tan","cos","cot"}, {"csc","tan","sin"}, {"sec","cot","cos"},
+	{"cot","sec","tan"}, {"tan","csc","cot"} };
+
+static int is_canon_trig (const char * h)	/* sin, cos, tan, sinh, cosh, tanh */
+{
+	return ! strcmp(h, "sin") || ! strcmp(h, "cos") || ! strcmp(h, "tan")
+	    || ! strcmp(h, "sinh") || ! strcmp(h, "cosh") || ! strcmp(h, "tanh");
+}
+
+/* Rubi's FixInertTrigFunction[u*f^n*w] with PowerOfInertTrigSumQ[w, g]:
+ * f^n = f2^-n (rubi_util.m) */
+static const char * fix_inert_sum[][3] = {
+	{"sec","cos","cos"}, {"csc","sin","sin"}, {"sec","sin","cos"}, {"csc","cos","sin"},
+	{"cot","tan","tan"}, {"cos","tan","sec"}, {"csc","tan","sin"}, {"tan","cot","cot"},
+	{"sin","cot","csc"}, {"sec","cot","cos"}, {"cos","sec","sec"}, {"cot","sec","tan"},
+	{"csc","sec","sin"}, {"sin","csc","csc"}, {"tan","csc","cot"}, {"sec","csc","cos"} };
+
+/* the trig function g if w = (a + b*g(..)^k + ...)^p with a constant summand
+ * (Rubi's PowerOfInertTrigSumQ); else NULL */
+static const char * trig_sum_func (Node * w, Node * x)
+{
+	TList l = {0};
+	const char * g = NULL;
+	int i, ok = 1, nconst = 0;
+	w = deref(w);
+	if (is_head(w, "^", 2)) w = arg(w, 0);
+	if (! is_head(w, "+", 2) && ! is_head(w, "-", 2)) return NULL;
+	summands_to(w, & l, 0);
+	for (i = 0; i < l.n && ok; i++)
+		{
+		TList fl = {0};
+		int j, nt = 0;
+		if (! contains(l.t[i], x)) { nconst++; continue; }
+		factors_to(l.t[i], & fl);
+		for (j = 0; j < fl.n; j++)
+			{
+			Node * t = deref(fl.t[j]);
+			if (! contains(t, x)) continue;
+			if (is_head(t, "^", 2)) t = arg(t, 0);
+			if (t->type != Func || term_nargs(t) != 1 || ! trig_recip(name(TERM_HEAD(t)))
+			    || (g && strcmp(g, name(TERM_HEAD(t))))) { ok = 0; break; }
+			g = name(TERM_HEAD(t));
+			nt++;
+			}
+		if (nt != 1) ok = 0;
+		fl.n = 0;
+		tl_free(& fl);
+		}
+	tl_free(& l);
+	return ok && nconst > 0 ? g : NULL;
+}
+
+static Node * s_trignorm (Node * a[], int n, Symbol * f)
+{
+	TList l = {0};
+	Node * fb[MAXPF], * r = NULL, * x;
+	double fe[MAXPF];
+	int trig[MAXPF];		/* 0: other, 1: trig with integer exponent, 2: other exponent */
+	int i, j, k, nf, nt = 0, ntrig = 0, nother = 0, t1 = -1, t2 = -1;
+	if (n != 2) return NULL;
+	x = a[1];
+	factors_to(a[0], & l);
+	if (l.n > MAXPF) { l.n = 0; tl_free(& l); return NULL; }
+	nf = 0;
+	for (i = 0; i < l.n; i++)		/* factor = base^exponent, trig in sin, cos, tan */
+		{
+		Node * t = deref(l.t[i]), * b0 = t;
+		double e = 1;
+		int ie = 1;
+		if (is_head(t, "^", 2))
+			{
+			b0 = arg(t, 0);
+			ie = num_value(arg(t, 1), & e) && e == floor(e);
+			}
+		if (b0->type == Func && term_nargs(b0) == 1 && contains(b0, x)
+		    && trig_recip(name(TERM_HEAD(b0))))
+			{
+			Node * b;
+			nt++;
+			if (! ie)			/* sin(2x)^(3/2): kept as it is */
+				{
+				fb[nf] = tcpy(t); fe[nf] = 1; trig[nf++] = 2;
+				continue;
+				}
+			if (is_canon_trig(name(TERM_HEAD(b0)))) b = tcpy(b0);
+			else { b = mk_f1(trig_recip(name(TERM_HEAD(b0))), tcpy(arg(b0, 0))); e = -e; }
+			for (j = 0; j < nf; j++)		/* sin^a * csc^b = sin^(a-b) */
+				if (trig[j] == 1 && tequal(fb[j], b)) break;
+			if (j < nf) { fe[j] += e; delete(b); continue; }
+			fb[nf] = b; fe[nf] = e; trig[nf++] = 1;
+			}
+		else
+			{
+			if (contains(t, x)) nother++;
+			fb[nf] = tcpy(t); fe[nf] = 1; trig[nf++] = 0;
+			}
+		}
+	l.n = 0;			/* the factors belong to a[0] */
+	tl_free(& l);
+	for (i = 0; i < nf; i++)		/* negative exponents: csc^3, sec, ... */
+		if (trig[i] && fe[i] != 0)
+			{
+			if (trig[i] == 1 && fe[i] < 0)
+				{
+				Node * g = mk_f1(trig_recip(name(TERM_HEAD(fb[i]))), tcpy(arg(fb[i], 0)));
+				delete(fb[i]);
+				fb[i] = g;
+				fe[i] = -fe[i];
+				}
+			if (ntrig++ == 0) t1 = i; else t2 = i;
+			}
+	if (ntrig == 2 && nother == 0)		/* Rubi's FixInertTrigFunction for f1^m*f2^n */
+		{
+		Node * h1 = trig[t1] == 2 ? arg(fb[t1], 0) : fb[t1], * h2 = trig[t2] == 2 ? arg(fb[t2], 0) : fb[t2];
+		int first = strcmp(name(TERM_HEAD(h1)), name(TERM_HEAD(h2))) <= 0 ? t1 : t2;
+		int second = first == t1 ? t2 : t1;
+		Node * hs = second == t1 ? h1 : h2;
+		if (trig[first] == 1)
+			for (k = 0; k < 18; k++)
+				if (! strcmp(fix_inert[k][0], name(TERM_HEAD(fb[first])))
+				    && ! strcmp(fix_inert[k][1], name(TERM_HEAD(hs))))
+					{
+					Node * g = mk_f1(fix_inert[k][2], tcpy(arg(fb[first], 0)));
+					delete(fb[first]);
+					fb[first] = g;
+					fe[first] = -fe[first];
+					break;
+					}
+		}
+	else				/* f^n next to a power of a sum of g: Rubi's table */
+		for (j = 0; j < nf; j++)
+			{
+			const char * g;
+			if (trig[j] || ! (g = trig_sum_func(fb[j], x))) continue;
+			for (i = 0; i < nf; i++)
+				if (trig[i] == 1 && fe[i] != 0)
+					for (k = 0; k < 16; k++)
+						if (! strcmp(fix_inert_sum[k][0], name(TERM_HEAD(fb[i])))
+						    && ! strcmp(fix_inert_sum[k][1], g))
+							{
+							Node * h = mk_f1(fix_inert_sum[k][2], tcpy(arg(fb[i], 0)));
+							delete(fb[i]);
+							fb[i] = h;
+							fe[i] = -fe[i];
+							break;
+							}
+			break;
+			}
+	for (i = 0; i < nf; i++)
+		{
+		Node * t = fb[i];
+		if (trig[i] == 1 && fe[i] == 0) { delete(t); continue; }
+		if (fe[i] != 1) t = mk_pow(t, mk_int(fe[i]));
+		r = r ? mk_mul(r, t) : t;
+		}
+	if (! r) r = mk_int(1);
+	if (nt == 0 || tequal(r, a[0])) { delete(r); return NULL; }	/* no change */
+	return r;
+}
+
+static Node * s_removecontent (Node * a[], int n, Symbol * f)	/* Rubi's RemoveContent */
+{
+	Node * s, * r;
+	if (n != 2) return NULL;
+	s = pi2_shift(a[0]);
+	r = s_freefactors_aux(s ? s : a[0], a[1], 0);		/* without constant factors */
+	delete(s);
+	return r;
 }
 
 /* coefficients c[0..deg] of the polynomial u in x (new terms), or 0 */
@@ -3106,6 +3331,8 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "denominator",     s_denominator },
 	{ "freefactors",     s_freefactors },
 	{ "nonfreefactors",  s_nonfreefactors },
+	{ "removecontent",   s_removecontent },
+	{ "trignorm",        s_trignorm },
 	{ "expandtosum",     s_expandtosum },
 	{ "polyquotient",    s_polyquotient },
 	{ "polyremainder",   s_polyremainder },

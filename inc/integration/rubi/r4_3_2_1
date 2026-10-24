@@ -40,7 +40,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (neq(((((O_b)*(O_c)))+((
 
 # Regel 9 (5832 Varianten):
 #   Int[(c_ + d_.*tan[e_. + f_.*x_])/(a_ + b_.*tan[e_. + f_.*x_]), x_Symbol] := c/(b*f)*Log[RemoveContent[a*Cos[e + f*x] + b*Sin[e + f*x], x]] /; FreeQ[{a, b, c, d, e, f}, x] && NeQ[b*c - a*d, 0] && NeQ[a^2 + b^2, 0] && EqQ[a*c + b*d, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,O_e,O_f), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)), (neq(((((P_a)^(2)))+(((O_b)^(2)))),0)), (eqq(((((P_a)*(P_c)))+(((O_b)*(O_d)))),0)) Int(((P_c)+((O_d)*(tan((O_e)+((O_f)*(Xv))))))*(((P_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((P_c)*(((O_b)^((-1))))*(((O_f)^((-1))))*(ln(((((P_a)*(cos(((O_e)+(((O_f)*(Xv))))))))+(((O_b)*(sin(((O_e)+(((O_f)*(Xv))))))))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,O_e,O_f), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)), (neq(((((P_a)^(2)))+(((O_b)^(2)))),0)), (eqq(((((P_a)*(P_c)))+(((O_b)*(O_d)))),0)) Int(((P_c)+((O_d)*(tan((O_e)+((O_f)*(Xv))))))*(((P_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((P_c)*(((O_b)^((-1))))*(((O_f)^((-1))))*(ln(removecontent(((((P_a)*(cos(((O_e)+(((O_f)*(Xv))))))))+(((O_b)*(sin(((O_e)+(((O_f)*(Xv))))))))),Xv))))
 
 # Regel 10 (13122 Varianten):
 #   Int[(c_. + d_.*tan[e_. + f_.*x_])/(a_. + b_.*tan[e_. + f_.*x_]), x_Symbol] := (a*c + b*d)*x/(a^2 + b^2) + (b*c - a*d)/(a^2 + b^2)* Int[(b - a*Tan[e + f*x])/(a + b*Tan[e + f*x]), x] /; FreeQ[{a, b, c, d, e, f}, x] && NeQ[b*c - a*d, 0] && NeQ[a^2 + b^2, 0] && NeQ[a*c + b*d, 0]

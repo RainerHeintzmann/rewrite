@@ -49,6 +49,8 @@ FUNC numerator : real >> real             ATT numerator  # Zaehler
 FUNC denominator : real >> real           ATT denominator # Nenner
 FUNC freefactors : real,real >> real      ATT freefactors     # Faktoren ohne x
 FUNC nonfreefactors : real,real >> real   ATT nonfreefactors  # Faktoren mit x
+FUNC removecontent : real,real >> real    ATT removecontent   # Rubi: RemoveContent[u,x]
+FUNC trignorm : real,real >> real         ATT trignorm        # 1/sin = csc, Rubis FixInertTrigFunction
 FUNC expandtosum : real,real >> real      ATT expandtosum     # Summe c_k*x^k
 OTHER expandtosum : real,real,real >> real ATT expandtosum
 FUNC polyquotient  : real,real,real >> real ATT polyquotient  # Polynomdivision

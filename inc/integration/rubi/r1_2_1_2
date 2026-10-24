@@ -16,7 +16,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_c,P_d,O_e,O_m,O_p), (eqq(((((O_c)*(((P_d)^(2
 
 # Regel 3 (648 Varianten):
 #   Int[(d_ + e_.*x_)/(a_. + b_.*x_ + c_.*x_^2), x_Symbol] := d*Log[RemoveContent[a + b*x + c*x^2, x]]/b /; FreeQ[{a, b, c, d, e}, x] && EqQ[2*c*d - b*e, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((2)*(O_c)*(P_d)))+((((-1))*(O_b)*(O_e)))),0)) Int(((P_d)+((O_e)*(Xv)))*(((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))^(K_1)),Xv) = ((P_d)*(ln(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))*(((O_b)^((-1)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((2)*(O_c)*(P_d)))+((((-1))*(O_b)*(O_e)))),0)) Int(((P_d)+((O_e)*(Xv)))*(((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))^(K_1)),Xv) = ((P_d)*(ln(removecontent(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))),Xv)))*(((O_b)^((-1)))))
 
 # Regel 4 (1296 Varianten):
 #   Int[(d_ + e_.*x_)*(a_. + b_.*x_ + c_.*x_^2)^p_., x_Symbol] := d*(a + b*x + c*x^2)^(p + 1)/(b*(p + 1)) /; FreeQ[{a, b, c, d, e, p}, x] && EqQ[2*c*d - b*e, 0] && NeQ[p, -1]

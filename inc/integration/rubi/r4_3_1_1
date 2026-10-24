@@ -16,7 +16,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (((P_n < (-1)))) Int(((O_b)*(tan((O_
 
 # Regel 3 (9 Varianten):
 #   Int[tan[c_. + d_.*x_], x_Symbol] := -Log[RemoveContent[Cos[c + d*x], x]]/d /; FreeQ[{c, d}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d) Int(tan((O_c)+((O_d)*(Xv))),Xv) = (((-1))*(ln(cos(((O_c)+(((O_d)*(Xv)))))))*(((O_d)^((-1)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d) Int(tan((O_c)+((O_d)*(Xv))),Xv) = (((-1))*(ln(removecontent(cos(((O_c)+(((O_d)*(Xv))))),Xv)))*(((O_d)^((-1)))))
 
 # Regel 4 (27 Varianten):
 #   Int[(b_.*tan[c_. + d_.*x_])^n_, x_Symbol] := b/d*Subst[Int[x^n/(b^2 + x^2), x], x, b*Tan[c + d*x]] /; FreeQ[{b, c, d, n}, x] && Not[IntegerQ[n]]

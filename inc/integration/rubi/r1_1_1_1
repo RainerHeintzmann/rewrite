@@ -16,7 +16,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_m), (neq(O_m,(-1))) Int((Xv)^(O_m),Xv) = ((((Xv)
 
 # Regel 3 (6 Varianten):
 #   Int[1/(a_ + b_.*x_), x_Symbol] := Log[RemoveContent[a + b*x, x]]/b /; FreeQ[{a, b}, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*(Xv)))^(K_1),Xv) = ((ln(((P_a)+(((O_b)*(Xv))))))*(((O_b)^((-1)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*(Xv)))^(K_1),Xv) = ((ln(removecontent(((P_a)+(((O_b)*(Xv)))),Xv)))*(((O_b)^((-1)))))
 
 # Regel 4 (9 Varianten):
 #   Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /; FreeQ[{a, b, m}, x] && NeQ[m, -1]

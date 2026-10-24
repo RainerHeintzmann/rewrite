@@ -38,8 +38,8 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{1292}
-\newcommand{\psolved}{84.0\%}
+\newcommand{\nsolved}{1316}
+\newcommand{\psolved}{85.5\%}
 \newcommand{\nwrong}{2}
 \newcommand{\nfailed}{0}
 
@@ -468,7 +468,12 @@ only for sine, secant and tangent; Rubi's utility function
 \texttt{UnifyInertTrigFunction} first rewrites cosine forms, such as
 $a+b\cos(e+fx)$ as $a+b\sin(e+\pi/2+fx)$. Its 69 definitions are translated
 by the same program into rules that run before the trigonometric ones, and
-the output rules turn $\sin(\pi/2+u)$ back into $\cos u$. For hyperbolic
+the output rules turn $\sin(\pi/2+u)$ back into $\cos u$. Rubi also relies
+on Mathematica writing $1/\sin x$ as $\csc x$, and on its own
+\texttt{FixInertTrigFunction}, which rewrites products of two trigonometric
+functions, e.g.\ $\sec x\sin^2x$ as $\cos^{-1}x\sin^2x$; a C function with
+Rubi's tables does both before the rules are tried. Without it, even
+$\int dx/\sin x$ remained unsolved. For hyperbolic
 functions, Rubi uses $\sinh u=-i\sin(iu)$, which needs complex numbers.
 Instead, a last rule writes hyperbolic functions for which no other rule
 applies with exponentials, $\sinh u=(e^u-e^{-u})/2$, so that
@@ -484,7 +489,7 @@ where \texttt{RubiCollect} combines like summands of the result and
 \subsection{Results}
 
 The translator converts 6830 of Rubi's 7422 rules (92\%), which become
-7321 \texttt{rewrite} rules after the expansion of function variables. The
+7327 \texttt{rewrite} rules after the expansion of function variables. The
 largest group of the remaining rules needs complex numbers (245 rules);
 others use the rest of Rubi's substitution machinery
 (\texttt{FunctionOfExponentialQ}), general pattern tests
@@ -539,7 +544,7 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 229 & 14.9\% \\
+no antiderivative found   & 205 & 13.3\% \\
 wrong result              & \nwrong  & 0.1\% \\
 crash or time-out         & \nfailed & 0.0\% \\
 not verifiable            & 16 & 1.0\% \\
@@ -557,8 +562,9 @@ functions and the missing helpers, raised the share of verified results.
 During a first measurement, 41\% of the problems were solved, 55\% before
 the cosine unification, the hyperbolic fallback and the symbolic $e$, 62\%
 after them, 79\% after partial fractions, the inside-out evaluation of
-nested helpers and the flat matching of products, and 84\% with Rubi's
-substitutions. The two
+nested helpers and the flat matching of products, 84\% with Rubi's
+substitutions, and 85.5\% with the normal form of trigonometric products.
+The two
 results counted as wrong contain special functions evaluated outside their
 real domain (${}_2F_1$ at an argument $e^{7x}/3>1$, the incomplete Gamma
 function of a negative argument), where the check compares different
@@ -610,7 +616,7 @@ the tests.
 
 Performance is adequate for interactive use. Loading the standard library
 and computing a derivative takes well below 0.1\,s on a current laptop;
-loading the 7321 integration rules about half a second. A scalar loop
+loading the 7327 integration rules about half a second. A scalar loop
 written in the language itself needs about 0.25\,$\mu$s per iteration
 (measured for $10^7$ iterations of \texttt{s = s + k*k}). We estimate this
 to be about two orders of magnitude slower than an equivalent compiled

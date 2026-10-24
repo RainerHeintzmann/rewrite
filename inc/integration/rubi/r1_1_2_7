@@ -119,7 +119,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (igtq(P_n,1)) Int
 
 # Regel 29 (72 Varianten):
 #   Int[1/((c_+d_.*x_)*(a_+b_.*x_^2)),x_Symbol] := d*Log[RemoveContent[c+d*x,x]]/(b*c^2+a*d^2) + b/(b*c^2+a*d^2) \[Star] Int[(c-d*x)/(a+b*x^2),x] /; FreeQ[{a,b,c,d},x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d) Int((((P_c)+((O_d)*(Xv)))^(K_1))*(((P_a)+((O_b)*((Xv)^(2))))^(K_2)),Xv) = ((((O_d)*(ln(((P_c)+(((O_d)*(Xv))))))*(((((((O_b)*(((P_c)^(2)))))+(((P_a)*(((O_d)^(2)))))))^((-1))))))+(((O_b)*(((((((O_b)*(((P_c)^(2)))))+(((P_a)*(((O_d)^(2)))))))^((-1))))*(Int(((((P_c)+((((-1))*(O_d)*(Xv)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d) Int((((P_c)+((O_d)*(Xv)))^(K_1))*(((P_a)+((O_b)*((Xv)^(2))))^(K_2)),Xv) = ((((O_d)*(ln(removecontent(((P_c)+(((O_d)*(Xv)))),Xv)))*(((((((O_b)*(((P_c)^(2)))))+(((P_a)*(((O_d)^(2)))))))^((-1))))))+(((O_b)*(((((((O_b)*(((P_c)^(2)))))+(((P_a)*(((O_d)^(2)))))))^((-1))))*(Int(((((P_c)+((((-1))*(O_d)*(Xv)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-1))))),Xv)))))
 
 # Regel 30 (72 Varianten):
 #   Int[(c_+d_.*x_)^n_/(a_+b_.*x_^2),x_Symbol] := d*(c+d*x)^(n+1)/((n+1)*(b*c^2+a*d^2)) + b/(b*c^2+a*d^2) \[Star] Int[(c+d*x)^(n+1)*(c-d*x)/(a+b*x^2),x] /; FreeQ[{a,b,c,d},x] && ILtQ[n,-1]

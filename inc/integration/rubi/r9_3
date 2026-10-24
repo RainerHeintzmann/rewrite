@@ -20,11 +20,11 @@
 
 # Regel 5 (2 Varianten):
 #   Int[u_/y_,x_Symbol] := With[{q=DerivativeDivides[y,u,x]}, q*Log[RemoveContent[y,x]] /; Not[FalseQ[q]]]
-ADDSPEC RubiRules : IF (K_1 == (-1)), (not(falseq(derivdivides(P_y,P_u,Xv)))) Int((P_u)*((P_y)^(K_1)),Xv) = ((derivdivides(P_y,P_u,Xv))*(ln(P_y)))
+ADDSPEC RubiRules : IF (K_1 == (-1)), (not(falseq(derivdivides(P_y,P_u,Xv)))) Int((P_u)*((P_y)^(K_1)),Xv) = ((derivdivides(P_y,P_u,Xv))*(ln(removecontent(P_y,Xv))))
 
 # Regel 6 (4 Varianten):
 #   Int[u_/(y_*w_),x_Symbol] := With[{q=DerivativeDivides[y*w,u,x]}, q*Log[RemoveContent[y*w,x]] /; Not[FalseQ[q]]]
-ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), (not(falseq(derivdivides(((P_y)*(P_w)),P_u,Xv)))) Int((P_u)*((P_y)^(K_1))*((P_w)^(K_2)),Xv) = ((derivdivides(((P_y)*(P_w)),P_u,Xv))*(ln(((P_y)*(P_w)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), (not(falseq(derivdivides(((P_y)*(P_w)),P_u,Xv)))) Int((P_u)*((P_y)^(K_1))*((P_w)^(K_2)),Xv) = ((derivdivides(((P_y)*(P_w)),P_u,Xv))*(ln(removecontent(((P_y)*(P_w)),Xv))))
 
 # Regel 7 (4 Varianten):
 #   Int[u_*y_^m_.,x_Symbol] := With[{q=DerivativeDivides[y,u,x]}, q*y^(m+1)/(m+1) /; Not[FalseQ[q]]] /; FreeQ[m,x] && NeQ[m,-1]

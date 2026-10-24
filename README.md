@@ -528,6 +528,7 @@ loaded by the integration rules and can also be used on their own:
 | `substexp(u,x)`, `intsubst(u,x,v)`, `hyp2exp(u,x)` | Rubi's substitution `x -> F^(g x)` for functions of exponentials; `Subst[Int[u,x],x,v]`; hyperbolic functions as exponentials |
 | `nonsumq(u)` | `u` is no sum |
 | `derivdivides(y,u,x)`, `falseq(u)` | `u/y'` if it is free of `x` (else unevaluated); `u` is an unevaluated helper, i.e. Rubi's `False` |
+| `trignorm(u,x)`, `removecontent(u,x)` | `1/sin = csc` and Rubi's `FixInertTrigFunction` for products of trig functions; `u` without constant factors, `cos(pi/2+x)` as `-sin(x)` |
 
 The predicates return true or false and can be used in conditions, also
 combined with `&&` and `||`:

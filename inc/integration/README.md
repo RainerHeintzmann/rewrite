@@ -119,7 +119,18 @@ have it, so a few steps are added:
   `a+b*sin(e+pi/2+f*x)`, `sec` becomes `csc`, ...). These 69 definitions
   are translated from Rubi's utility file into the rules of
   [rubi/r4_0_unify](rubi/r4_0_unify), loaded before the trigonometric rules;
-  `IntOut` turns `sin(pi/2+u)` back into `cos(u)`.
+  a definition with a single trig factor also gets a variant with a factor
+  `(g+h*x)^k`, as Rubi's `DeactivateTrig` keeps that factor. `IntOut` turns
+  `sin(pi/2+u)` back into `cos(u)`, and `cos(pi+u)` into `-cos(u)`.
+  Rubi's `RemoveContent` (`removecontent`) applies the shift and drops
+  constant factors, so that `Int[cot(x)]` gives `ln(sin(x))`, not
+  `ln(-sin(x))`.
+- Mathematica writes `1/Sin[x]` as `Csc[x]` and `Sin[x]^-3` as `Csc[x]^3`,
+  and Rubi's `FixInertTrigFunction` then rewrites products of trig
+  functions: `sec(x)*sin(x)^2` becomes `cos(x)^-1*sin(x)^2`, `csc(x)`
+  next to a power of a sum of cosines becomes `sin(x)^-1`, ... The first
+  rule of `RubiRules` after the constant factors does both (`trignorm`,
+  with Rubi's tables); it also combines `sin(x)*csc(x)^3 = csc(x)^2`.
 - Hyperbolic functions: Rubi turns `sinh(u)` into `-i*sin(i*u)`, which needs
   complex numbers. Instead, the last rule of `RubiRules` writes hyperbolic
   functions for which no rule applies with exponentials (`hyp2exp`):
@@ -219,8 +230,8 @@ results are:
 
 | Result | Problems | Share of tested |
 | --- | --- | --- |
-| solved and verified | 1292 | 84.0% |
-| no antiderivative found | 229 | 14.9% |
+| solved and verified | 1316 | 85.5% |
+| no antiderivative found | 205 | 13.3% |
 | wrong | 2 | 0.1% |
 | crash or time-out | 0 | 0.0% |
 | not verifiable | 16 | 1.0% |

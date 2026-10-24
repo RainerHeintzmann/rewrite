@@ -72,11 +72,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(O_e,((((O_c)^(2)))*(P_d
 
 # Regel 17 (324 Varianten):
 #   Int[1/((d_ + e_.*x_^2)*(a_. + b_.*ArcTan[c_.*x_])), x_Symbol] := Log[RemoveContent[a + b*ArcTan[c*x], x]]/(b*c*d) /; FreeQ[{a, b, c, d, e}, x] && EqQ[e, c^2*d]
-ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(O_e,((((O_c)^(2)))*(P_d)))) Int((((P_d)+((O_e)*((Xv)^(2))))^(K_1))*(((O_a)+((O_b)*(arctan((O_c)*(Xv)))))^(K_2)),Xv) = ((ln(((O_a)+(((O_b)*(arctan(((O_c)*(Xv)))))))))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((P_d)^((-1)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(O_e,((((O_c)^(2)))*(P_d)))) Int((((P_d)+((O_e)*((Xv)^(2))))^(K_1))*(((O_a)+((O_b)*(arctan((O_c)*(Xv)))))^(K_2)),Xv) = ((ln(removecontent(((O_a)+(((O_b)*(arctan(((O_c)*(Xv))))))),Xv)))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((P_d)^((-1)))))
 
 # Regel 18 (324 Varianten):
 #   Int[1/((d_ + e_.*x_^2)*(a_. + b_.*ArcCot[c_.*x_])), x_Symbol] := -Log[RemoveContent[a + b*ArcCot[c*x], x]]/(b*c*d) /; FreeQ[{a, b, c, d, e}, x] && EqQ[e, c^2*d]
-ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(O_e,((((O_c)^(2)))*(P_d)))) Int((((P_d)+((O_e)*((Xv)^(2))))^(K_1))*(((O_a)+((O_b)*(arccot((O_c)*(Xv)))))^(K_2)),Xv) = (((-1))*(ln(((O_a)+(((O_b)*(arccot(((O_c)*(Xv)))))))))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((P_d)^((-1)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(O_e,((((O_c)^(2)))*(P_d)))) Int((((P_d)+((O_e)*((Xv)^(2))))^(K_1))*(((O_a)+((O_b)*(arccot((O_c)*(Xv)))))^(K_2)),Xv) = (((-1))*(ln(removecontent(((O_a)+(((O_b)*(arccot(((O_c)*(Xv))))))),Xv)))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((P_d)^((-1)))))
 
 # Regel 19 (648 Varianten):
 #   Int[(a_. + b_.*ArcTan[c_.*x_])^p_./(d_ + e_.*x_^2), x_Symbol] := (a + b*ArcTan[c*x])^(p + 1)/(b*c*d*(p + 1)) /; FreeQ[{a, b, c, d, e, p}, x] && EqQ[e, c^2*d] && NeQ[p, -1]
