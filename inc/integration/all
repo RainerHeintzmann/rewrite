@@ -5,6 +5,7 @@
 #   INC "inc/integration/all"
 #   REWR Int(x*exp(2*x),x) : Integrate
 
+INC "inc/exact"      # exakte Zahlen: 1/3 bleibt ein Bruch (nicht nochmals laden)
 INC "inc/helpers"
 INC "inc/integration/base"
 INC "inc/integration/1.1.1.1_linear_power"

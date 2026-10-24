@@ -198,26 +198,26 @@ ADDSPEC RubiRules : IF (eqq(P_w,P_v)) Int((O_u)*((sin(P_v))^(O_p))*((sin(P_w))^(
 #   Int[u_.*Cos[v_]^p_.*Cos[w_]^q_., x_Symbol] := Int[u*Cos[v]^(p + q), x] /; EqQ[w, v]
 ADDSPEC RubiRules : IF (eqq(P_w,P_v)) Int((O_u)*((cos(P_v))^(O_p))*((cos(P_w))^(O_q)),Xv) = Int(((O_u)*(((cos(P_v))^(((O_p)+(O_q)))))),Xv)
 
-# Regel 55 nicht uebersetzt: function ExpandTrigReduce
+# Regel 55 nicht uebersetzt: function Cancel
 #   Int[Sin[v_]^p_.*Sin[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Sin[v]^p*Sin[w]^q, x], x] /; (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x]) && IGtQ[p, 0] && IGtQ[q, 0]
 
-# Regel 56 nicht uebersetzt: function ExpandTrigReduce
+# Regel 56 nicht uebersetzt: function Cancel
 #   Int[Cos[v_]^p_.*Cos[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Cos[v]^p*Cos[w]^q, x], x] /; (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x]) && IGtQ[p, 0] && IGtQ[q, 0]
 
-# Regel 57 nicht uebersetzt: function ExpandTrigReduce
+# Regel 57 nicht uebersetzt: function Cancel
 #   Int[x_^m_.*Sin[v_]^p_.*Sin[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Sin[v]^p*Sin[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
-# Regel 58 nicht uebersetzt: function ExpandTrigReduce
+# Regel 58 nicht uebersetzt: function Cancel
 #   Int[x_^m_.*Cos[v_]^p_.*Cos[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Cos[v]^p*Cos[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
 # Regel 59 (24 Varianten):
 #   Int[u_.*Sin[v_]^p_.*Cos[w_]^p_., x_Symbol] := 1/2^p*Int[u*Sin[2*v]^p, x] /; EqQ[w, v] && IntegerQ[p]
 ADDSPEC RubiRules : IF (eqq(P_w,P_v)), (integerq(O_p)) Int((O_u)*((sin(P_v))^(O_p))*((cos(P_w))^(O_p)),Xv) = ((((((2)^(O_p)))^((-1))))*(Int(((O_u)*(((sin(((2)*(P_v))))^(O_p)))),Xv)))
 
-# Regel 60 nicht uebersetzt: function ExpandTrigReduce
+# Regel 60 nicht uebersetzt: function Cancel
 #   Int[Sin[v_]^p_.*Cos[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Sin[v]^p*Cos[w]^q, x], x] /; IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
-# Regel 61 nicht uebersetzt: function ExpandTrigReduce
+# Regel 61 nicht uebersetzt: function Cancel
 #   Int[x_^m_.*Sin[v_]^p_.*Cos[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Sin[v]^p*Cos[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
 # Regel 62 (4 Varianten):
@@ -346,11 +346,13 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (integerq(((((O_m)+((-1))))*((1/2))))), 
 #   Int[Csc[v_]^m_.*(a_ + b_.*Cot[v_])^n_., x_Symbol] := Int[(b*Cos[v] + a*Sin[v])^n, x] /; FreeQ[{a, b}, x] && IntegerQ[(m - 1)/2] && EqQ[m + n, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (integerq(((((O_m)+((-1))))*((1/2))))), (eqq(((O_m)+(O_n)),0)) Int(((csc(P_v))^(O_m))*(((P_a)+((O_b)*(cot(P_v))))^(O_n)),Xv) = Int(((((((O_b)*(cos(P_v))))+(((P_a)*(sin(P_v))))))^(O_n)),Xv)
 
-# Regel 94 nicht uebersetzt: function ExpandTrigReduce
+# Regel 94 (1944 Varianten):
 #   Int[u_.*Sin[a_. + b_.*x_]^m_.*Sin[c_. + d_.*x_]^n_., x_Symbol] := Int[ExpandTrigReduce[u, Sin[a + b*x]^m*Sin[c + d*x]^n, x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_m,0)), (igtq(O_n,0)) Int((O_u)*((sin((O_a)+((O_b)*(Xv))))^(O_m))*((sin((O_c)+((O_d)*(Xv))))^(O_n)),Xv) = Int(expandtrigreduce(O_u,((((sin(((O_a)+(((O_b)*(Xv))))))^(O_m)))*(((sin(((O_c)+(((O_d)*(Xv))))))^(O_n)))),Xv),Xv)
 
-# Regel 95 nicht uebersetzt: function ExpandTrigReduce
+# Regel 95 (1944 Varianten):
 #   Int[u_.*Cos[a_. + b_.*x_]^m_.*Cos[c_. + d_.*x_]^n_., x_Symbol] := Int[ExpandTrigReduce[u, Cos[a + b*x]^m*Cos[c + d*x]^n, x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_m,0)), (igtq(O_n,0)) Int((O_u)*((cos((O_a)+((O_b)*(Xv))))^(O_m))*((cos((O_c)+((O_d)*(Xv))))^(O_n)),Xv) = Int(expandtrigreduce(O_u,((((cos(((O_a)+(((O_b)*(Xv))))))^(O_m)))*(((cos(((O_c)+(((O_d)*(Xv))))))^(O_n)))),Xv),Xv)
 
 # Regel 96 (108 Varianten):
 #   Int[Sec[a_. + b_.*x_]*Sec[c_ + d_.*x_], x_Symbol] := -Csc[(b*c - a*d)/d]*Int[Tan[a + b*x], x] + Csc[(b*c - a*d)/b]*Int[Tan[c + d*x], x] /; FreeQ[{a, b, c, d}, x] && EqQ[b^2 - d^2, 0] && NeQ[b*c - a*d, 0]

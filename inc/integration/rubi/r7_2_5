@@ -105,8 +105,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,P_f,O_g), (iltq(((P_m)+((1/2))
 #   Int[(d_ + e_.*x_)^m_.*(f_ + g_.*x_)^m_.*(a_. + b_.*ArcCosh[c_.*x_])^ n_., x_Symbol] := Int[ExpandIntegrand[(a + b*ArcCosh[c*x])^ n, (d + e*x)^m*(f + g*x)^m, x], x] /; FreeQ[{a, b, c, d, e, f, g, n}, x] && IntegerQ[m]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,P_f,O_g,O_n), (integerq(O_m)) Int((((P_d)+((O_e)*(Xv)))^(O_m))*(((P_f)+((O_g)*(Xv)))^(O_m))*(((O_a)+((O_b)*(arccosh((O_c)*(Xv)))))^(O_n)),Xv) = Int(expandintegrand(((((O_a)+(((O_b)*(arccosh(((O_c)*(Xv))))))))^(O_n)),((((((P_d)+(((O_e)*(Xv)))))^(O_m)))*(((((P_f)+(((O_g)*(Xv)))))^(O_m)))),Xv),Xv)
 
-# Regel 26 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 26 (54 Varianten):
 #   Int[u_*(a_. + b_.*ArcCosh[c_.*x_]), x_Symbol] := With[{v = IntHide[u, x]}, Dist[a + b*ArcCosh[c*x], v, x] - b*c*Sqrt[1 - c^2*x^2]/(Sqrt[-1 + c*x]*Sqrt[1 + c*x])* Int[SimplifyIntegrand[v/Sqrt[1 - c^2*x^2], x], x] /; InverseFunctionFreeQ[v, x]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (inversefunctionfreeq(inthide(P_u,Xv),Xv)) Int((P_u)*((O_a)+((O_b)*(arccosh((O_c)*(Xv))))),Xv) = ((dist(((O_a)+(((O_b)*(arccosh(((O_c)*(Xv))))))),inthide(P_u,Xv),Xv))+((((-1))*(O_b)*(O_c)*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((1/2))))*((((((((((-1))+(((O_c)*(Xv)))))^((1/2))))*(((((1)+(((O_c)*(Xv)))))^((1/2))))))^((-1))))*(Int(simp(((inthide(P_u,Xv))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((-(1/2)))))),Xv),Xv)))))
 
 # Regel 27 (7776 Varianten):
 #   Int[Px_*(d1_ + e1_.*x_)^p_*(d2_ + e2_.*x_)^ p_*(a_. + b_.*ArcCosh[c_.*x_])^n_, x_Symbol] := With[{u = ExpandIntegrand[ Px*(d1 + e1*x)^p*(d2 + e2*x)^p*(a + b*ArcCosh[c*x])^n, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{a, b, c, d1, e1, d2, e2, n}, x] && PolyQ[Px, x] && EqQ[e1 - c*d1, 0] && EqQ[e2 + c*d2, 0] && IntegerQ[p - 1/2]
@@ -116,17 +117,21 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d1,O_e1,P_d2,O_e2,P_n), (polyq(P_Px,
 #   Int[Px_.*(f_ + g_.*(d1_ + e1_.*x_)^p_*(d2_ + e2_.*x_)^p_)^ m_.*(a_. + b_.*ArcCosh[c_.*x_])^n_., x_Symbol] := With[{u = ExpandIntegrand[ Px*(f + g*(d1 + e1*x)^p*(d2 + e2*x)^p)^m*(a + b*ArcCosh[c*x])^n, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{a, b, c, d1, e1, d2, e2, f, g}, x] && PolyQ[Px, x] && EqQ[e1 - c*d1, 0] && EqQ[e2 + c*d2, 0] && IGtQ[p + 1/2, 0] && IntegersQ[m, n]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d1,O_e1,P_d2,O_e2,P_f,O_g), (polyq(O_Px,Xv)), (eqq(((O_e1)+((((-1))*(O_c)*(P_d1)))),0)), (eqq(((O_e2)+(((O_c)*(P_d2)))),0)), (igtq(((P_p)+((1/2))),0)), (integersq(O_m,O_n)), (sumq(expandintegrand(((O_Px)*(((((P_f)+(((O_g)*(((((P_d1)+(((O_e1)*(Xv)))))^(P_p)))*(((((P_d2)+(((O_e2)*(Xv)))))^(P_p)))))))^(O_m)))*(((((O_a)+(((O_b)*(arccosh(((O_c)*(Xv))))))))^(O_n)))),Xv))) Int((O_Px)*(((P_f)+((O_g)*(((P_d1)+((O_e1)*(Xv)))^(P_p))*(((P_d2)+((O_e2)*(Xv)))^(P_p))))^(O_m))*(((O_a)+((O_b)*(arccosh((O_c)*(Xv)))))^(O_n)),Xv) = Int(expandintegrand(((O_Px)*(((((P_f)+(((O_g)*(((((P_d1)+(((O_e1)*(Xv)))))^(P_p)))*(((((P_d2)+(((O_e2)*(Xv)))))^(P_p)))))))^(O_m)))*(((((O_a)+(((O_b)*(arccosh(((O_c)*(Xv))))))))^(O_n)))),Xv),Xv)
 
-# Regel 29 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 29 (12 Varianten):
 #   Int[RFx_*ArcCosh[c_.*x_]^n_., x_Symbol] := With[{u = ExpandIntegrand[ArcCosh[c*x]^n, RFx, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[c, x] && RationalFunctionQ[RFx, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_c), (rationalfunctionq(P_RFx,Xv)), (igtq(O_n,0)), (sumq(expandintegrand(((arccosh(((O_c)*(Xv))))^(O_n)),P_RFx,Xv))) Int((P_RFx)*((arccosh((O_c)*(Xv)))^(O_n)),Xv) = Int(expandintegrand(((arccosh(((O_c)*(Xv))))^(O_n)),P_RFx,Xv),Xv)
 
-# Regel 30 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 30 (72 Varianten):
 #   Int[RFx_*(a_ + b_.*ArcCosh[c_.*x_])^n_., x_Symbol] := Int[ExpandIntegrand[RFx*(a + b*ArcCosh[c*x])^n, x], x] /; FreeQ[{a, b, c}, x] && RationalFunctionQ[RFx, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c), (rationalfunctionq(P_RFx,Xv)), (igtq(O_n,0)) Int((P_RFx)*(((P_a)+((O_b)*(arccosh((O_c)*(Xv)))))^(O_n)),Xv) = Int(expandintegrand(((P_RFx)*(((((P_a)+(((O_b)*(arccosh(((O_c)*(Xv))))))))^(O_n)))),Xv),Xv)
 
-# Regel 31 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 31 (1728 Varianten):
 #   Int[RFx_*(d1_ + e1_.*x_)^p_*(d2_ + e2_.*x_)^p_*ArcCosh[c_.*x_]^n_., x_Symbol] := With[{u = ExpandIntegrand[(d1 + e1*x)^p*(d2 + e2*x)^p*ArcCosh[c*x]^n, RFx, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{c, d1, e1, d2, e2}, x] && RationalFunctionQ[RFx, x] && IGtQ[n, 0] && EqQ[e1 - c*d1, 0] && EqQ[e2 + c*d2, 0] && IntegerQ[p - 1/2]
+ADDSPEC RubiRules : IF NIN(Xv,O_c,P_d1,O_e1,P_d2,O_e2), (rationalfunctionq(P_RFx,Xv)), (igtq(O_n,0)), (eqq(((O_e1)+((((-1))*(O_c)*(P_d1)))),0)), (eqq(((O_e2)+(((O_c)*(P_d2)))),0)), (integerq(((P_p)+((-(1/2)))))), (sumq(expandintegrand(((((((P_d1)+(((O_e1)*(Xv)))))^(P_p)))*(((((P_d2)+(((O_e2)*(Xv)))))^(P_p)))*(((arccosh(((O_c)*(Xv))))^(O_n)))),P_RFx,Xv))) Int((P_RFx)*(((P_d1)+((O_e1)*(Xv)))^(P_p))*(((P_d2)+((O_e2)*(Xv)))^(P_p))*((arccosh((O_c)*(Xv)))^(O_n)),Xv) = Int(expandintegrand(((((((P_d1)+(((O_e1)*(Xv)))))^(P_p)))*(((((P_d2)+(((O_e2)*(Xv)))))^(P_p)))*(((arccosh(((O_c)*(Xv))))^(O_n)))),P_RFx,Xv),Xv)
 
-# Regel 32 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 32 (10368 Varianten):
 #   Int[RFx_*(d1_ + e1_.*x_)^p_*(d2_ + e2_.*x_)^ p_*(a_ + b_.*ArcCosh[c_.*x_])^n_., x_Symbol] := Int[ExpandIntegrand[(d1 + e1*x)^p*(d2 + e2*x)^p, RFx*(a + b*ArcCosh[c*x])^n, x], x] /; FreeQ[{a, b, c, d1, e1, d2, e2}, x] && RationalFunctionQ[RFx, x] && IGtQ[n, 0] && EqQ[e1 - c*d1, 0] && EqQ[e2 + c*d2, 0] && IntegerQ[p - 1/2]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_d1,O_e1,P_d2,O_e2), (rationalfunctionq(P_RFx,Xv)), (igtq(O_n,0)), (eqq(((O_e1)+((((-1))*(O_c)*(P_d1)))),0)), (eqq(((O_e2)+(((O_c)*(P_d2)))),0)), (integerq(((P_p)+((-(1/2)))))) Int((P_RFx)*(((P_d1)+((O_e1)*(Xv)))^(P_p))*(((P_d2)+((O_e2)*(Xv)))^(P_p))*(((P_a)+((O_b)*(arccosh((O_c)*(Xv)))))^(O_n)),Xv) = Int(expandintegrand(((((((P_d1)+(((O_e1)*(Xv)))))^(P_p)))*(((((P_d2)+(((O_e2)*(Xv)))))^(P_p)))),((P_RFx)*(((((P_a)+(((O_b)*(arccosh(((O_c)*(Xv))))))))^(O_n)))),Xv),Xv)
 
 # Regel 33 (162 Varianten):
 #   Int[u_.*(a_. + b_.*ArcCosh[c_.*x_])^n_., x_Symbol] := Unintegrable[u*(a + b*ArcCosh[c*x])^n, x] /; FreeQ[{a, b, c, n}, x]

@@ -31,7 +31,7 @@ SPEC    IntNorm : Uv-Vv   = Uv+(-1)*Vv
 ADDSPEC IntNorm : -Uv     = (-1)*Uv
 ADDSPEC IntNorm : Uv/Vv   = Uv*Vv^(-1)
 ADDSPEC IntNorm : mi Uv   = Uv^(-1)
-ADDSPEC IntNorm : sqrt Uv = Uv^0.5
+ADDSPEC IntNorm : sqrt Uv = Uv^(1/2)
 ADDSPEC IntNorm : IF (abs(Kf - e) < 1e-9) Kf^Uv = exp(Uv)
 ADDSPEC IntNorm : IF (Kc == 0) Uv^Kc = 1
 ADDSPEC IntNorm : IF (Kc == 1) Uv^Kc = Uv
@@ -64,7 +64,7 @@ SPEC    RubiNorm : Uv-Vv   = Uv+(-1)*Vv
 ADDSPEC RubiNorm : -Uv     = (-1)*Uv
 ADDSPEC RubiNorm : Uv/Vv   = Uv*Vv^(-1)
 ADDSPEC RubiNorm : mi Uv   = Uv^(-1)
-ADDSPEC RubiNorm : sqrt Uv = Uv^0.5
+ADDSPEC RubiNorm : sqrt Uv = Uv^(1/2)
 ADDSPEC RubiNorm : exp(Uv) = e^Uv   # wie Mathematica: E^u, damit F^u-Muster passen
 ADDSPEC RubiNorm : IF (Kc == 0) Uv^Kc = 1
 ADDSPEC RubiNorm : IF (Kc == 1) Uv^Kc = Uv

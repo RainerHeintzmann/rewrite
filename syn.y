@@ -20,6 +20,7 @@
 #include "nodes.h"
 #include "expand.h"
 #include "symfkt.h"
+#include "numsort.h"
 
 #ifdef BISON
 #include "unix.h"
@@ -58,7 +59,7 @@ mknod(FUNC,(Node *) declare, \
 %token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -116,6 +117,10 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	VORRANG att {	$$=mknod(FUNC,(
 																	}
 			| VAR idlist ':' Sort			 {$$=DECLARE($2,Var,(Node *) $4,NULL,FALSE);}
 			| NUM Sort	 			  			 {$$=mknod(FUNC,(Node *) set_numbertype,(Node *) ($2)); /* setzt numbertype fuer mknum */}
+			| SUBSORT Sort ',' Sort ATT Id	 {$$=mknod(FUNC,(Node *) subsort_def,   /* 2026: Untersorte */
+										      mknod(PARAM,(Node *) $2,mknod(PARAM,(Node *) $4,(Node *) give_ufkt(name($6)))));}
+			| INTNUM Sort ATT Id		 {$$=mknod(FUNC,(Node *) intnum_def,    /* 2026: Sorte ganzer Zahlen */
+										      mknod(PARAM,(Node *) $2,(Node *) give_ufkt(name($4))));}
 			| NUM idlist ':' Sort			 { /* Variablen fuer Numerische Zahlen */
 									                $$=DECLARE($2,Var,(Node *) $4,NULL,TRUE);}
 			| CST idlist ':' Sort			 {$$=DECLARE($2,Const,(Node *) $4,NULL,FALSE);}

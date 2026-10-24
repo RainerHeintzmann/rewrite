@@ -69,8 +69,9 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b,O_c), (neq(((((O_b)^(2)
 # Regel 17 nicht uebersetzt: function LessEqual
 #   Int[(a_. + b_.*x_ + c_.*x_^2)^p_, x_Symbol] := With[{d = Denominator[p]}, d*Sqrt[(b + 2*c*x)^2]/(b + 2*c*x)* Subst[Int[x^(d*(p + 1) - 1)/Sqrt[b^2 - 4*a*c + 4*c*x^d], x], x, (a + b*x + c*x^2)^(1/d)] /; 3 <= d <= 4] /; FreeQ[{a, b, c}, x] && NeQ[b^2 - 4*a*c, 0] && RationalQ[p]
 
-# Regel 18 nicht uebersetzt: function Hypergeometric2F1
+# Regel 18 (54 Varianten):
 #   Int[(a_. + b_.*x_ + c_.*x_^2)^p_, x_Symbol] := With[{q = Rt[b^2 - 4*a*c, 2]}, -(a + b*x + c*x^2)^(p + 1)/(q*(p + 1)*((q - b - 2*c*x)/(2*q))^(p + 1))* Hypergeometric2F1[-p, p + 1, p + 2, (b + q + 2*c*x)/(2*q)]] /; FreeQ[{a, b, c, p}, x] && NeQ[b^2 - 4*a*c, 0] && Not[IntegerQ[4*p]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_p), (neq(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),0)), (not(integerq(((4)*(P_p))))) Int(((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))^(P_p),Xv) = (((-1))*(((((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((((rt(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),2))*(((P_p)+(1)))*(((((((rt(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),2))+((((-1))*(O_b)))+((((-2))*(O_c)*(Xv)))))*(((((2)*(rt(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),2))))^((-1))))))^(((P_p)+(1)))))))^((-1))))*(hyp2f1((((-1))*(P_p)),((P_p)+(1)),((P_p)+(2)),((((O_b)+(rt(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),2))+(((2)*(O_c)*(Xv)))))*(((((2)*(rt(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),2))))^((-1))))))))
 
 # Regel 19 (54 Varianten):
 #   Int[(a_. + b_.*u_ + c_.*u_^2)^p_, x_Symbol] := 1/Coefficient[u, x, 1]*Subst[Int[(a + b*x + c*x^2)^p, x], x, u] /; FreeQ[{a, b, c, p}, x] && LinearQ[u, x] && NeQ[u, x]

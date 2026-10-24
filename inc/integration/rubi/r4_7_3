@@ -6,71 +6,93 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 1 (11664 Varianten):
 #   Int[u_*(c_.*sin[a_. + b_.*x_])^m_.*(d_.*csc[a_. + b_.*x_])^n_., x_Symbol] := (c*Sin[a + b*x])^m*(d*Csc[a + b*x])^m* Int[ActivateTrig[u]*(d*Csc[a + b*x])^(n - m), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(sin((O_a)+((O_b)*(Xv)))))^(O_m))*(((O_d)*(csc((O_a)+((O_b)*(Xv)))))^(O_n)),Xv) = ((((((O_c)*(sin(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(Int(((P_u)*(((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((((-1))*(O_m)))))))),Xv)))
 
-# Regel 2 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 2 (11664 Varianten):
 #   Int[u_*(c_.*cos[a_. + b_.*x_])^m_.*(d_.*sec[a_. + b_.*x_])^n_., x_Symbol] := (c*Cos[a + b*x])^m*(d*Sec[a + b*x])^m* Int[ActivateTrig[u]*(d*Sec[a + b*x])^(n - m), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(cos((O_a)+((O_b)*(Xv)))))^(O_m))*(((O_d)*(sec((O_a)+((O_b)*(Xv)))))^(O_n)),Xv) = ((((((O_c)*(cos(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(Int(((P_u)*(((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((((-1))*(O_m)))))))),Xv)))
 
-# Regel 3 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 3 (11664 Varianten):
 #   Int[u_*(c_.*tan[a_. + b_.*x_])^m_.*(d_.*sec[a_. + b_.*x_])^n_., x_Symbol] := (c*Tan[a + b*x])^m*(d*Csc[a + b*x])^m/(d*Sec[a + b*x])^m* Int[ActivateTrig[u]*(d*Sec[a + b*x])^(m + n)/(d*Csc[a + b*x])^m, x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSecantIntegrandQ[u, x] && Not[IntegerQ[m]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (knownsecantintegrandq(P_u,Xv)), (not(integerq(O_m))) Int((P_u)*(((O_c)*(tan((O_a)+((O_b)*(Xv)))))^(O_m))*(((O_d)*(sec((O_a)+((O_b)*(Xv)))))^(O_n)),Xv) = ((((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))*(Int(((P_u)*(((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(((O_m)+(O_n)))))*(((((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))),Xv)))
 
-# Regel 4 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 4 (11664 Varianten):
 #   Int[u_*(c_.*tan[a_. + b_.*x_])^m_.*(d_.*csc[a_. + b_.*x_])^n_., x_Symbol] := (c*Tan[a + b*x])^m*(d*Csc[a + b*x])^m/(d*Sec[a + b*x])^m* Int[ActivateTrig[u]*(d*Sec[a + b*x])^m/(d*Csc[a + b*x])^(m - n), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSecantIntegrandQ[u, x] && Not[IntegerQ[m]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (knownsecantintegrandq(P_u,Xv)), (not(integerq(O_m))) Int((P_u)*(((O_c)*(tan((O_a)+((O_b)*(Xv)))))^(O_m))*(((O_d)*(csc((O_a)+((O_b)*(Xv)))))^(O_n)),Xv) = ((((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))*(Int(((P_u)*(((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(((O_m)+((((-1))*(O_n)))))))^((-1))))),Xv)))
 
-# Regel 5 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 5 (11664 Varianten):
 #   Int[u_*(c_.*cot[a_. + b_.*x_])^m_.*(d_.*sec[a_. + b_.*x_])^n_., x_Symbol] := (c*Cot[a + b*x])^m*(d*Sec[a + b*x])^m/(d*Csc[a + b*x])^m* Int[ActivateTrig[u]*(d*Csc[a + b*x])^m/(d*Sec[a + b*x])^(m - n), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSecantIntegrandQ[u, x] && Not[IntegerQ[m]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (knownsecantintegrandq(P_u,Xv)), (not(integerq(O_m))) Int((P_u)*(((O_c)*(cot((O_a)+((O_b)*(Xv)))))^(O_m))*(((O_d)*(sec((O_a)+((O_b)*(Xv)))))^(O_n)),Xv) = ((((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))*(Int(((P_u)*(((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(((O_m)+((((-1))*(O_n)))))))^((-1))))),Xv)))
 
-# Regel 6 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 6 (11664 Varianten):
 #   Int[u_*(c_.*cot[a_. + b_.*x_])^m_.*(d_.*csc[a_. + b_.*x_])^n_., x_Symbol] := (c*Cot[a + b*x])^m*(d*Sec[a + b*x])^m/(d*Csc[a + b*x])^m* Int[ActivateTrig[u]*(d*Csc[a + b*x])^(m + n)/(d*Sec[a + b*x])^m, x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownSecantIntegrandQ[u, x] && Not[IntegerQ[m]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (knownsecantintegrandq(P_u,Xv)), (not(integerq(O_m))) Int((P_u)*(((O_c)*(cot((O_a)+((O_b)*(Xv)))))^(O_m))*(((O_d)*(csc((O_a)+((O_b)*(Xv)))))^(O_n)),Xv) = ((((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))*(Int(((P_u)*(((((O_d)*(csc(((O_a)+(((O_b)*(Xv))))))))^(((O_m)+(O_n)))))*(((((((O_d)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))),Xv)))
 
-# Regel 7 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 7 (108 Varianten):
 #   Int[u_*(c_.*sin[a_. + b_.*x_])^m_., x_Symbol] := (c*Csc[a + b*x])^m*(c*Sin[a + b*x])^m* Int[ActivateTrig[u]/(c*Csc[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m), (not(integerq(O_m))), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(sin((O_a)+((O_b)*(Xv)))))^(O_m)),Xv) = ((((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_c)*(sin(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(Int(((P_u)*(((((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))),Xv)))
 
-# Regel 8 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 8 (108 Varianten):
 #   Int[u_*(c_.*cos[a_. + b_.*x_])^m_., x_Symbol] := (c*Cos[a + b*x])^m*(c*Sec[a + b*x])^m* Int[ActivateTrig[u]/(c*Sec[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m), (not(integerq(O_m))), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(cos((O_a)+((O_b)*(Xv)))))^(O_m)),Xv) = ((((((O_c)*(cos(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(Int(((P_u)*(((((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))),Xv)))
 
-# Regel 9 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 9 (108 Varianten):
 #   Int[u_*(c_.*tan[a_. + b_.*x_])^m_., x_Symbol] := (c*Tan[a + b*x])^m*(c*Csc[a + b*x])^m/(c*Sec[a + b*x])^m* Int[ActivateTrig[u]*(c*Sec[a + b*x])^m/(c*Csc[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m), (not(integerq(O_m))), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(tan((O_a)+((O_b)*(Xv)))))^(O_m)),Xv) = ((((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))*(Int(((P_u)*(((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))),Xv)))
 
-# Regel 10 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 10 (108 Varianten):
 #   Int[u_*(c_.*cot[a_. + b_.*x_])^m_., x_Symbol] := (c*Cot[a + b*x])^m*(c*Sec[a + b*x])^m/(c*Csc[a + b*x])^m* Int[ActivateTrig[u]*(c*Csc[a + b*x])^m/(c*Sec[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m), (not(integerq(O_m))), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(cot((O_a)+((O_b)*(Xv)))))^(O_m)),Xv) = ((((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))*(Int(((P_u)*(((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))),Xv)))
 
-# Regel 11 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 11 (11664 Varianten):
 #   Int[u_*(c_.*sec[a_. + b_.*x_])^n_.*(A_ + B_.*cos[a_. + b_.*x_]), x_Symbol] := c*Int[ ActivateTrig[u]*(c*Sec[a + b*x])^(n - 1)*(B + A*Sec[a + b*x]), x] /; FreeQ[{a, b, c, A, B, n}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_A,O_B,O_n), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(sec((O_a)+((O_b)*(Xv)))))^(O_n))*((P_A)+((O_B)*(cos((O_a)+((O_b)*(Xv)))))),Xv) = ((O_c)*(Int(((P_u)*(((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-1))))))*(((O_B)+(((P_A)*(sec(((O_a)+(((O_b)*(Xv))))))))))),Xv)))
 
-# Regel 12 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 12 (11664 Varianten):
 #   Int[u_*(c_.*csc[a_. + b_.*x_])^n_.*(A_ + B_.*sin[a_. + b_.*x_]), x_Symbol] := c*Int[ ActivateTrig[u]*(c*Csc[a + b*x])^(n - 1)*(B + A*Csc[a + b*x]), x] /; FreeQ[{a, b, c, A, B, n}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_A,O_B,O_n), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(csc((O_a)+((O_b)*(Xv)))))^(O_n))*((P_A)+((O_B)*(sin((O_a)+((O_b)*(Xv)))))),Xv) = ((O_c)*(Int(((P_u)*(((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-1))))))*(((O_B)+(((P_A)*(csc(((O_a)+(((O_b)*(Xv))))))))))),Xv)))
 
-# Regel 13 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 13 (108 Varianten):
 #   Int[u_*(A_ + B_.*cos[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(B + A*Sec[a + b*x])/Sec[a + b*x], x] /; FreeQ[{a, b, A, B}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_A,O_B), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*((P_A)+((O_B)*(cos((O_a)+((O_b)*(Xv)))))),Xv) = Int(((P_u)*(((O_B)+(((P_A)*(sec(((O_a)+(((O_b)*(Xv))))))))))*(((sec(((O_a)+(((O_b)*(Xv))))))^((-1))))),Xv)
 
-# Regel 14 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 14 (108 Varianten):
 #   Int[u_*(A_ + B_.*sin[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(B + A*Csc[a + b*x])/Csc[a + b*x], x] /; FreeQ[{a, b, A, B}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_A,O_B), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*((P_A)+((O_B)*(sin((O_a)+((O_b)*(Xv)))))),Xv) = Int(((P_u)*(((O_B)+(((P_A)*(csc(((O_a)+(((O_b)*(Xv))))))))))*(((csc(((O_a)+(((O_b)*(Xv))))))^((-1))))),Xv)
 
-# Regel 15 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 15 (1417176 Varianten):
 #   Int[u_.*(c_.*sec[a_. + b_.*x_])^ n_.*(A_. + B_.*cos[a_. + b_.*x_] + C_.*cos[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[ u]*(c*Sec[a + b*x])^(n - 2)*(C + B*Sec[a + b*x] + A*Sec[a + b*x]^2), x] /; FreeQ[{a, b, c, A, B, C, n}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_A,O_B,O_C,O_n), (knownsecantintegrandq(O_u,Xv)) Int((O_u)*(((O_c)*(sec((O_a)+((O_b)*(Xv)))))^(O_n))*((O_A)+((O_B)*(cos((O_a)+((O_b)*(Xv)))))+((O_C)*((cos((O_a)+((O_b)*(Xv))))^(2)))),Xv) = ((((O_c)^(2)))*(Int(((O_u)*(((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-2))))))*(((O_C)+(((O_B)*(sec(((O_a)+(((O_b)*(Xv))))))))+(((O_A)*(((sec(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)))
 
-# Regel 16 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 16 (1417176 Varianten):
 #   Int[u_.*(c_.*csc[a_. + b_.*x_])^ n_.*(A_. + B_.*sin[a_. + b_.*x_] + C_.*sin[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[ u]*(c*Csc[a + b*x])^(n - 2)*(C + B*Csc[a + b*x] + A*Csc[a + b*x]^2), x] /; FreeQ[{a, b, c, A, B, C, n}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_A,O_B,O_C,O_n), (knownsecantintegrandq(O_u,Xv)) Int((O_u)*(((O_c)*(csc((O_a)+((O_b)*(Xv)))))^(O_n))*((O_A)+((O_B)*(sin((O_a)+((O_b)*(Xv)))))+((O_C)*((sin((O_a)+((O_b)*(Xv))))^(2)))),Xv) = ((((O_c)^(2)))*(Int(((O_u)*(((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-2))))))*(((O_C)+(((O_B)*(csc(((O_a)+(((O_b)*(Xv))))))))+(((O_A)*(((csc(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)))
 
-# Regel 17 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 17 (17496 Varianten):
 #   Int[u_.*(c_.*sec[a_. + b_.*x_])^n_.*(A_ + C_.*cos[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[u]*(c*Sec[a + b*x])^(n - 2)*(C + A*Sec[a + b*x]^2), x] /; FreeQ[{a, b, c, A, C, n}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_A,O_C,O_n), (knownsecantintegrandq(O_u,Xv)) Int((O_u)*(((O_c)*(sec((O_a)+((O_b)*(Xv)))))^(O_n))*((P_A)+((O_C)*((cos((O_a)+((O_b)*(Xv))))^(2)))),Xv) = ((((O_c)^(2)))*(Int(((O_u)*(((((O_c)*(sec(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-2))))))*(((O_C)+(((P_A)*(((sec(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)))
 
-# Regel 18 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 18 (17496 Varianten):
 #   Int[u_.*(c_.*csc[a_. + b_.*x_])^n_.*(A_ + C_.*sin[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[u]*(c*Csc[a + b*x])^(n - 2)*(C + A*Csc[a + b*x]^2), x] /; FreeQ[{a, b, c, A, C, n}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_A,O_C,O_n), (knownsecantintegrandq(O_u,Xv)) Int((O_u)*(((O_c)*(csc((O_a)+((O_b)*(Xv)))))^(O_n))*((P_A)+((O_C)*((sin((O_a)+((O_b)*(Xv))))^(2)))),Xv) = ((((O_c)^(2)))*(Int(((O_u)*(((((O_c)*(csc(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-2))))))*(((O_C)+(((P_A)*(((csc(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)))
 
-# Regel 19 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 19 (8748 Varianten):
 #   Int[u_*(A_. + B_.*cos[a_. + b_.*x_] + C_.*cos[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + B*Sec[a + b*x] + A*Sec[a + b*x]^2)/ Sec[a + b*x]^2, x] /; FreeQ[{a, b, A, B, C}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*((O_A)+((O_B)*(cos((O_a)+((O_b)*(Xv)))))+((O_C)*((cos((O_a)+((O_b)*(Xv))))^(2)))),Xv) = Int(((P_u)*(((O_C)+(((O_B)*(sec(((O_a)+(((O_b)*(Xv))))))))+(((O_A)*(((sec(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((sec(((O_a)+(((O_b)*(Xv))))))^((-2))))),Xv)
 
-# Regel 20 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 20 (8748 Varianten):
 #   Int[u_*(A_. + B_.*sin[a_. + b_.*x_] + C_.*sin[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + B*Csc[a + b*x] + A*Csc[a + b*x]^2)/ Csc[a + b*x]^2, x] /; FreeQ[{a, b, A, B, C}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*((O_A)+((O_B)*(sin((O_a)+((O_b)*(Xv)))))+((O_C)*((sin((O_a)+((O_b)*(Xv))))^(2)))),Xv) = Int(((P_u)*(((O_C)+(((O_B)*(csc(((O_a)+(((O_b)*(Xv))))))))+(((O_A)*(((csc(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((csc(((O_a)+(((O_b)*(Xv))))))^((-2))))),Xv)
 
-# Regel 21 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 21 (108 Varianten):
 #   Int[u_*(A_ + C_.*cos[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + A*Sec[a + b*x]^2)/Sec[a + b*x]^2, x] /; FreeQ[{a, b, A, C}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_A,O_C), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*((P_A)+((O_C)*((cos((O_a)+((O_b)*(Xv))))^(2)))),Xv) = Int(((P_u)*(((O_C)+(((P_A)*(((sec(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((sec(((O_a)+(((O_b)*(Xv))))))^((-2))))),Xv)
 
-# Regel 22 nicht uebersetzt: predicate KnownSecantIntegrandQ
+# Regel 22 (108 Varianten):
 #   Int[u_*(A_ + C_.*sin[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + A*Csc[a + b*x]^2)/Csc[a + b*x]^2, x] /; FreeQ[{a, b, A, C}, x] && KnownSecantIntegrandQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_A,O_C), (knownsecantintegrandq(P_u,Xv)) Int((P_u)*((P_A)+((O_C)*((sin((O_a)+((O_b)*(Xv))))^(2)))),Xv) = Int(((P_u)*(((O_C)+(((P_A)*(((csc(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((csc(((O_a)+(((O_b)*(Xv))))))^((-2))))),Xv)
 
 # Regel 23 (314928 Varianten):
 #   Int[u_*(A_.*sec[a_. + b_.*x_]^n_. + B_.*sec[a_. + b_.*x_]^n1_ + C_.*sec[a_. + b_.*x_]^n2_), x_Symbol] := Int[ActivateTrig[u]* Sec[a + b*x]^n*(A + B*Sec[a + b*x] + C*Sec[a + b*x]^2), x] /; FreeQ[{a, b, A, B, C, n}, x] && EqQ[n1, n + 1] && EqQ[n2, n + 2]

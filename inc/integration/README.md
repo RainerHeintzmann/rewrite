@@ -13,7 +13,7 @@ There are two rule sets:
   polynomials times them.
 - **`RubiIntegrate`** uses the rules in [rubi](rubi), which the script
   [tools/rubi2rewrite.py](../../tools/rubi2rewrite.py) translates
-  automatically from Rubi's rule files. About three quarters of Rubi's
+  automatically from Rubi's rule files. About 90% of Rubi's
   rules are translated. Loading takes about half a second.
 
 ## Usage
@@ -26,18 +26,20 @@ REWR Int(x^2*cos(x),x) : Integrate
 
 INC "inc/integration/rubi/all"
 REWR Int(1/(1+x^3),x) : RubiIntegrate
-0.333333 * ln (1 + x )+ 0.57735 * arctan (-0.57735 + 1.1547 * x )- 0.166667 * ln (1 + x ^ 2 - x )
+(1/3) * ln (1 + x )+ 0.57735 * arctan (-0.57735 + 1.1547 * x )- (1/6) * ln (1 + x ^ 2 - x )
 REWR Int(sqrt(1-x^2),x) : RubiIntegrate
-0.5 * arcsin (x )+ 0.5 * (1 - x ^ 2 )^ 0.5 * x
+(1/2) * arcsin (x )+ (1/2) * (1 - x ^ 2 )^ (1/2) * x
 REWR Int(x/(1+x^4),x) : RubiIntegrate
-0.5 * arctan (x ^ 2 )
+(1/2) * arctan (x ^ 2 )
 ```
 
 `Int(f,x)` is the indefinite integral without integration constant. If no
 rule applies, the remaining integral is returned unchanged.
 
-Numbers are real numbers. Rubi works with exact fractions and complex
-numbers, so a few things differ:
+Numbers are exact where possible: the integration package loads
+[inc/exact](../exact), so `1/3` stays the fraction `(1/3)`, and roots like
+`sqrt(3)` become real numbers. Rubi also uses complex numbers, which the
+rules here do not have:
 
 - Rules whose result needs `I` (the imaginary unit) are not translated.
 - A rule whose result contains a NaN, for example the square root of a

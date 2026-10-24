@@ -44,6 +44,7 @@ static const Reserved words [] = {	/* sortiert */
 	{ "IN",     IN  },
 	{ "INC",    INC },      /* Include */
 	{ "INFO",   INFO },
+	{ "INTNUM", INTNUM },   /* Sorte ganzzahliger Literale (2026) */
 	{ "IS",     IS  },
 	{ "LA1",    LA1  },			/* Linksassoziativ */
 	{ "LA2",    LA2  },
@@ -69,6 +70,7 @@ static const Reserved words [] = {	/* sortiert */
 	{ "SORT",   SORT },
 	{ "SPEC",   SPEC },
 	{ "STEP",   STEP },
+	{ "SUBSORT",SUBSORT },  /* Untersorte mit Umwandlung (2026) */
 	{ "SYS",    SYS },
 	{ "TERM",   TERM },
 	{ "TO",     TO },

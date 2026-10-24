@@ -6,8 +6,10 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: function List
+# Regel 1 (8 Varianten):
 #   Int[u_^m_.*Sech[v_]^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*Sech[ExpandToSum[v, x]]^n, x] /; FreeQ[{m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*((sech(P_v))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sech(expandtosum(P_v,Xv)))^(O_n)))),Xv)
 
-# Regel 2 nicht uebersetzt: function List
+# Regel 2 (8 Varianten):
 #   Int[u_^m_.*Csch[v_]^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*Csch[ExpandToSum[v, x]]^n, x] /; FreeQ[{m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*((csch(P_v))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((csch(expandtosum(P_v,Xv)))^(O_n)))),Xv)

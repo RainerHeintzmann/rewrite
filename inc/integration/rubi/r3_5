@@ -24,26 +24,33 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_n,O_p) Int(((O_a)
 #   Int[(e_.*x_)^m_.*(a_. + b_.*Log[c_.*Log[d_.*x_^n_.]^p_.]), x_Symbol] := (e*x)^(m + 1)*(a + b*Log[c*Log[d*x^n]^p])/(e*(m + 1)) - b*n*p/(m + 1)*Int[(e*x)^m/Log[d*x^n], x] /; FreeQ[{a, b, c, d, e, m, n, p}, x] && NeQ[m, -1]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n,O_p), (neq(O_m,(-1))) Int((((O_e)*(Xv))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((ln((O_d)*((Xv)^(O_n))))^(O_p)))))),Xv) = ((((((((O_e)*(Xv)))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(ln(((O_c)*(((ln(((O_d)*(((Xv)^(O_n))))))^(O_p))))))))))*(((((O_e)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_n)*(O_p)*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)*(Xv)))^(O_m)))*(((ln(((O_d)*(((Xv)^(O_n))))))^((-1))))),Xv)))))
 
-# Regel 6 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 6 (108 Varianten):
 #   Int[(a_. + b_.*Log[c_.*RFx_^p_.])^n_., x_Symbol] := x*(a + b*Log[c*RFx^p])^n - b*n*p* Int[SimplifyIntegrand[ x*(a + b*Log[c*RFx^p])^(n - 1)*D[RFx, x]/RFx, x], x] /; FreeQ[{a, b, c, p}, x] && RationalFunctionQ[RFx, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_p), (rationalfunctionq(P_RFx,Xv)), (igtq(O_n,0)) Int(((O_a)+((O_b)*(ln((O_c)*((P_RFx)^(O_p))))))^(O_n),Xv) = ((((Xv)*(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(O_n)))))+((((-1))*(O_b)*(O_n)*(O_p)*(Int(simp(((Xv)*(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(((O_n)+((-1))))))*(deriv(P_RFx,Xv))*(((P_RFx)^((-1))))),Xv),Xv)))))
 
-# Regel 7 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 7 (1944 Varianten):
 #   Int[(a_. + b_.*Log[c_.*RFx_^p_.])^n_./(d_. + e_.*x_), x_Symbol] := Log[d + e*x]*(a + b*Log[c*RFx^p])^n/e - b*n*p/e* Int[Log[d + e*x]*(a + b*Log[c*RFx^p])^(n - 1)*D[RFx, x]/RFx, x] /; FreeQ[{a, b, c, d, e, p}, x] && RationalFunctionQ[RFx, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_p), (rationalfunctionq(P_RFx,Xv)), (igtq(O_n,0)) Int((((O_a)+((O_b)*(ln((O_c)*((P_RFx)^(O_p))))))^(O_n))*(((O_d)+((O_e)*(Xv)))^(K_1)),Xv) = ((((ln(((O_d)+(((O_e)*(Xv))))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(O_n)))*(((O_e)^((-1))))))+((((-1))*(O_b)*(O_n)*(O_p)*(((O_e)^((-1))))*(Int(((ln(((O_d)+(((O_e)*(Xv))))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(((O_n)+((-1))))))*(deriv(P_RFx,Xv))*(((P_RFx)^((-1))))),Xv)))))
 
-# Regel 8 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 8 (3888 Varianten):
 #   Int[(d_. + e_.*x_)^m_.*(a_. + b_.*Log[c_.*RFx_^p_.])^n_., x_Symbol] := (d + e*x)^(m + 1)*(a + b*Log[c*RFx^p])^n/(e*(m + 1)) - b*n*p/(e*(m + 1))* Int[SimplifyIntegrand[(d + e*x)^(m + 1)*(a + b*Log[c*RFx^p])^(n - 1)*D[RFx, x]/RFx, x], x] /; FreeQ[{a, b, c, d, e, m, p}, x] && RationalFunctionQ[RFx, x] && IGtQ[n, 0] && (EqQ[n, 1] || IntegerQ[m]) && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_p), (rationalfunctionq(P_RFx,Xv)), (igtq(O_n,0)), (((eqq(O_n,1)) || (integerq(O_m)))), (neq(O_m,(-1))) Int((((O_d)+((O_e)*(Xv)))^(O_m))*(((O_a)+((O_b)*(ln((O_c)*((P_RFx)^(O_p))))))^(O_n)),Xv) = ((((((((O_d)+(((O_e)*(Xv)))))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(O_n)))*(((((O_e)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_n)*(O_p)*(((((O_e)*(((O_m)+(1)))))^((-1))))*(Int(simp(((((((O_d)+(((O_e)*(Xv)))))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(((O_n)+((-1))))))*(deriv(P_RFx,Xv))*(((P_RFx)^((-1))))),Xv),Xv)))))
 
-# Regel 9 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 9 (72 Varianten):
 #   Int[Log[c_.*RFx_^n_.]/(d_ + e_.*x_^2), x_Symbol] := With[{u = IntHide[1/(d + e*x^2), x]}, u*Log[c*RFx^n] - n*Int[SimplifyIntegrand[u*D[RFx, x]/RFx, x], x]] /; FreeQ[{c, d, e, n}, x] && RationalFunctionQ[RFx, x] && Not[PolynomialQ[RFx, x]]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_c,P_d,O_e,O_n), (rationalfunctionq(P_RFx,Xv)), (not(polyq(P_RFx,Xv))) Int((ln((O_c)*((P_RFx)^(O_n))))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = ((((inthide(((((P_d)+(((O_e)*(((Xv)^(2)))))))^((-1))),Xv))*(ln(((O_c)*(((P_RFx)^(O_n))))))))+((((-1))*(O_n)*(Int(simp(((inthide(((((P_d)+(((O_e)*(((Xv)^(2)))))))^((-1))),Xv))*(deriv(P_RFx,Xv))*(((P_RFx)^((-1))))),Xv),Xv)))))
 
-# Regel 10 nicht uebersetzt: predicate QuadraticQ
+# Regel 10 (12 Varianten):
 #   Int[Log[c_.*Px_^n_.]/Qx_, x_Symbol] := With[{u = IntHide[1/Qx, x]}, u*Log[c*Px^n] - n*Int[SimplifyIntegrand[u*D[Px, x]/Px, x], x]] /; FreeQ[{c, n}, x] && QuadraticQ[{Qx, Px}, x] && EqQ[D[Px/Qx, x], 0]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_c,O_n), (((quadraticq(P_Qx,Xv)) && (quadraticq(P_Px,Xv)))), (eqq(deriv(((P_Px)*(((P_Qx)^((-1))))),Xv),0)) Int((ln((O_c)*((P_Px)^(O_n))))*((P_Qx)^(K_1)),Xv) = ((((inthide(((P_Qx)^((-1))),Xv))*(ln(((O_c)*(((P_Px)^(O_n))))))))+((((-1))*(O_n)*(Int(simp(((inthide(((P_Qx)^((-1))),Xv))*(deriv(P_Px,Xv))*(((P_Px)^((-1))))),Xv),Xv)))))
 
-# Regel 11 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 11 (216 Varianten):
 #   Int[RGx_*(a_. + b_.*Log[c_.*RFx_^p_.])^n_., x_Symbol] := With[{u = ExpandIntegrand[(a + b*Log[c*RFx^p])^n, RGx, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{a, b, c, p}, x] && RationalFunctionQ[RFx, x] && RationalFunctionQ[RGx, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_p), (rationalfunctionq(P_RFx,Xv)), (rationalfunctionq(P_RGx,Xv)), (igtq(O_n,0)), (sumq(expandintegrand(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(O_n)),P_RGx,Xv))) Int((P_RGx)*(((O_a)+((O_b)*(ln((O_c)*((P_RFx)^(O_p))))))^(O_n)),Xv) = Int(expandintegrand(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(O_n)),P_RGx,Xv),Xv)
 
-# Regel 12 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 12 (216 Varianten):
 #   Int[RGx_*(a_. + b_.*Log[c_.*RFx_^p_.])^n_., x_Symbol] := With[{u = ExpandIntegrand[RGx*(a + b*Log[c*RFx^p])^n, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{a, b, c, p}, x] && RationalFunctionQ[RFx, x] && RationalFunctionQ[RGx, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_p), (rationalfunctionq(P_RFx,Xv)), (rationalfunctionq(P_RGx,Xv)), (igtq(O_n,0)), (sumq(expandintegrand(((P_RGx)*(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(O_n)))),Xv))) Int((P_RGx)*(((O_a)+((O_b)*(ln((O_c)*((P_RFx)^(O_p))))))^(O_n)),Xv) = Int(expandintegrand(((P_RGx)*(((((O_a)+(((O_b)*(ln(((O_c)*(((P_RFx)^(O_p))))))))))^(O_n)))),Xv),Xv)
 
 # Regel 13 nicht uebersetzt: parse error at '['
 #   Int[RFx_*(a_. + b_.*Log[u_]), x_Symbol] := With[{lst = SubstForFractionalPowerOfLinear[RFx*(a + b*Log[u]), x]}, lst[[2]]*lst[[4]]* Subst[Int[lst[[1]], x], x, lst[[3]]^(1/lst[[2]])] /; Not[FalseQ[lst]]] /; FreeQ[{a, b}, x] && RationalFunctionQ[RFx, x]
@@ -72,7 +79,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_g,O_m), (eqq(((((O_e)^(2
 #   Int[(g_.*x_)^m_.*Log[d_. + e_.*x_ + f_.*Sqrt[a_. + c_.*x_^2]], x_Symbol] := (g*x)^(m + 1)*Log[d + e*x + f*Sqrt[a + c*x^2]]/(g*(m + 1)) - a*c*f^2/(g*(m + 1))* Int[(g*x)^(m + 1)/(d*e*(a + c*x^2) + f*(a*e - c*d*x)*Sqrt[a + c*x^2]), x] /; FreeQ[{a, c, d, e, f, g, m}, x] && EqQ[e^2 - c*f^2, 0] && NeQ[m, -1] && IntegerQ[2*m]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_d,O_e,O_f,O_g,O_m), (eqq(((((O_e)^(2)))+((((-1))*(O_c)*(((O_f)^(2)))))),0)), (neq(O_m,(-1))), (integerq(((2)*(O_m)))) Int((((O_g)*(Xv))^(O_m))*(ln((O_d)+((O_e)*(Xv))+((O_f)*(((O_a)+((O_c)*((Xv)^(2))))^(0.5))))),Xv) = ((((((((O_g)*(Xv)))^(((O_m)+(1)))))*(ln(((O_d)+(((O_e)*(Xv)))+(((O_f)*(((((O_a)+(((O_c)*(((Xv)^(2)))))))^((1/2)))))))))*(((((O_g)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_a)*(O_c)*(((O_f)^(2)))*(((((O_g)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_g)*(Xv)))^(((O_m)+(1)))))*(((((((O_d)*(O_e)*(((O_a)+(((O_c)*(((Xv)^(2)))))))))+(((O_f)*(((((O_a)*(O_e)))+((((-1))*(O_c)*(O_d)*(Xv)))))*(((((O_a)+(((O_c)*(((Xv)^(2)))))))^((1/2))))))))^((-1))))),Xv)))))
 
-# Regel 20 nicht uebersetzt: predicate QuadraticQ
+# Regel 20 nicht uebersetzt: predicate MatchQ
 #   Int[v_.*Log[d_. + e_.*x_ + f_.*Sqrt[u_]], x_Symbol] := Int[v*Log[d + e*x + f*Sqrt[ExpandToSum[u, x]]], x] /; FreeQ[{d, e, f}, x] && QuadraticQ[u, x] && Not[QuadraticMatchQ[u, x]] && (EqQ[v, 1] || MatchQ[v, (g_.*x)^m_. /; FreeQ[{g, m}, x]])
 
 # Regel 21 (10368 Varianten):
@@ -115,43 +122,53 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m,O_n,O_q
 #   Int[(d_ + e_.*Log[c_.*x_^n_.])/(a_.*x_ + b_.*Log[c_.*x_^n_.]^q_)^2, x_Symbol] := -e*Log[c*x^n]/(a*(a*x + b*Log[c*x^n]^q)) + (d + e*n)/a* Int[1/(x*(a*x + b*Log[c*x^n]^q)), x] /; FreeQ[{a, b, c, d, e, n, q}, x] && EqQ[d + e*n*q, 0]
 ADDSPEC RubiRules : IF (K_1 == (-2)), NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_n,P_q), (eqq(((P_d)+(((O_e)*(O_n)*(P_q)))),0)) Int(((P_d)+((O_e)*(ln((O_c)*((Xv)^(O_n))))))*((((O_a)*(Xv))+((O_b)*((ln((O_c)*((Xv)^(O_n))))^(P_q))))^(K_1)),Xv) = (((((-1))*(O_e)*(ln(((O_c)*(((Xv)^(O_n))))))*(((((O_a)*(((((O_a)*(Xv)))+(((O_b)*(((ln(((O_c)*(((Xv)^(O_n))))))^(P_q)))))))))^((-1))))))+(((((P_d)+(((O_e)*(O_n)))))*(((O_a)^((-1))))*(Int(((((Xv)*(((((O_a)*(Xv)))+(((O_b)*(((ln(((O_c)*(((Xv)^(O_n))))))^(P_q)))))))))^((-1))),Xv)))))
 
-# Regel 31 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 31 (1 Varianten):
 #   Int[Log[u_], x_Symbol] := x*Log[u] - Int[SimplifyIntegrand[x*D[u, x]/u, x], x] /; InverseFunctionFreeQ[u, x]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)) Int(ln(P_u),Xv) = ((((Xv)*(ln(P_u))))+((((-1))*(Int(simp(((Xv)*(deriv(P_u,Xv))*(((P_u)^((-1))))),Xv),Xv)))))
 
 # Regel 32 (1 Varianten):
 #   Int[Log[u_], x_Symbol] := x*Log[u] - Int[SimplifyIntegrand[x*Simplify[D[u, x]/u], x], x] /; ProductQ[u]
 ADDSPEC RubiRules : IF (productq(P_u)) Int(ln(P_u),Xv) = ((((Xv)*(ln(P_u))))+((((-1))*(Int(simp(((Xv)*(simplify(((deriv(P_u,Xv))*(((P_u)^((-1)))))))),Xv),Xv)))))
 
-# Regel 33 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 33 (18 Varianten):
 #   Int[Log[u_]/(a_. + b_.*x_), x_Symbol] := Log[a + b*x]*Log[u]/b - 1/b*Int[SimplifyIntegrand[Log[a + b*x]*D[u, x]/u, x], x] /; FreeQ[{a, b}, x] && RationalFunctionQ[D[u, x]/u, x] && (NeQ[a, 0] || Not[BinomialQ[u, x] && EqQ[BinomialDegree[u, x]^2, 1]])
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b), (rationalfunctionq(((deriv(P_u,Xv))*(((P_u)^((-1))))),Xv)), (((neq(O_a,0)) || (not(((binomialq(P_u,Xv)) && (eqq(((binomialdegree(P_u,Xv))^(2)),1))))))) Int((ln(P_u))*(((O_a)+((O_b)*(Xv)))^(K_1)),Xv) = ((((ln(((O_a)+(((O_b)*(Xv))))))*(ln(P_u))*(((O_b)^((-1))))))+((((-1))*(((O_b)^((-1))))*(Int(simp(((ln(((O_a)+(((O_b)*(Xv))))))*(deriv(P_u,Xv))*(((P_u)^((-1))))),Xv),Xv)))))
 
-# Regel 34 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 34 (36 Varianten):
 #   Int[(a_. + b_.*x_)^m_.*Log[u_], x_Symbol] := (a + b*x)^(m + 1)*Log[u]/(b*(m + 1)) - 1/(b*(m + 1))* Int[SimplifyIntegrand[(a + b*x)^(m + 1)*D[u, x]/u, x], x] /; FreeQ[{a, b, m}, x] && InverseFunctionFreeQ[u, x] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m), (inversefunctionfreeq(P_u,Xv)), (neq(O_m,(-1))) Int((((O_a)+((O_b)*(Xv)))^(O_m))*(ln(P_u)),Xv) = ((((((((O_a)+(((O_b)*(Xv)))))^(((O_m)+(1)))))*(ln(P_u))*(((((O_b)*(((O_m)+(1)))))^((-1))))))+((((-1))*(((((O_b)*(((O_m)+(1)))))^((-1))))*(Int(simp(((((((O_a)+(((O_b)*(Xv)))))^(((O_m)+(1)))))*(deriv(P_u,Xv))*(((P_u)^((-1))))),Xv),Xv)))))
 
-# Regel 35 nicht uebersetzt: predicate QuadraticQ
+# Regel 35 (2 Varianten):
 #   Int[Log[u_]/Qx_, x_Symbol] := With[{v = IntHide[1/Qx, x]}, v*Log[u] - Int[SimplifyIntegrand[v*D[u, x]/u, x], x]] /; QuadraticQ[Qx, x] && InverseFunctionFreeQ[u, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), (quadraticq(P_Qx,Xv)), (inversefunctionfreeq(P_u,Xv)) Int((ln(P_u))*((P_Qx)^(K_1)),Xv) = ((((inthide(((P_Qx)^((-1))),Xv))*(ln(P_u))))+((((-1))*(Int(simp(((inthide(((P_Qx)^((-1))),Xv))*(deriv(P_u,Xv))*(((P_u)^((-1))))),Xv),Xv)))))
 
-# Regel 36 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 36 (6 Varianten):
 #   Int[u_^(a_.*x_)*Log[u_], x_Symbol] := u^(a*x)/a - Int[SimplifyIntegrand[x*u^(a*x - 1)*D[u, x], x], x] /; FreeQ[a, x] && InverseFunctionFreeQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a), (inversefunctionfreeq(P_u,Xv)) Int(((P_u)^((O_a)*(Xv)))*(ln(P_u)),Xv) = ((((((P_u)^(((O_a)*(Xv)))))*(((O_a)^((-1))))))+((((-1))*(Int(simp(((Xv)*(((P_u)^(((((O_a)*(Xv)))+((-1))))))*(deriv(P_u,Xv))),Xv),Xv)))))
 
-# Regel 37 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 37 (2 Varianten):
 #   Int[v_*Log[u_], x_Symbol] := With[{w = IntHide[v, x]}, Dist[Log[u], w, x] - Int[SimplifyIntegrand[w*D[u, x]/u, x], x] /; InverseFunctionFreeQ[w, x]] /; InverseFunctionFreeQ[u, x]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)), (inversefunctionfreeq(inthide(P_v,Xv),Xv)) Int((P_v)*(ln(P_u)),Xv) = ((dist(ln(P_u),inthide(P_v,Xv),Xv))+((((-1))*(Int(simp(((inthide(P_v,Xv))*(deriv(P_u,Xv))*(((P_u)^((-1))))),Xv),Xv)))))
 
-# Regel 38 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 38 (2 Varianten):
 #   Int[v_*Log[u_], x_Symbol] := With[{w = IntHide[v, x]}, Dist[Log[u], w, x] - Int[SimplifyIntegrand[w*Simplify[D[u, x]/u], x], x] /; InverseFunctionFreeQ[w, x]] /; ProductQ[u]
+ADDSPEC RubiRules : IF (productq(P_u)), (inversefunctionfreeq(inthide(P_v,Xv),Xv)) Int((P_v)*(ln(P_u)),Xv) = ((dist(ln(P_u),inthide(P_v,Xv),Xv))+((((-1))*(Int(simp(((inthide(P_v,Xv))*(simplify(((deriv(P_u,Xv))*(((P_u)^((-1)))))))),Xv),Xv)))))
 
-# Regel 39 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 39 (2 Varianten):
 #   Int[Log[v_]*Log[w_], x_Symbol] := x*Log[v]*Log[w] - Int[SimplifyIntegrand[x*Log[w]*D[v, x]/v, x], x] - Int[SimplifyIntegrand[x*Log[v]*D[w, x]/w, x], x] /; InverseFunctionFreeQ[v, x] && InverseFunctionFreeQ[w, x]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_v,Xv)), (inversefunctionfreeq(P_w,Xv)) Int((ln(P_v))*(ln(P_w)),Xv) = ((((Xv)*(ln(P_v))*(ln(P_w))))+((((-1))*(Int(simp(((Xv)*(ln(P_w))*(deriv(P_v,Xv))*(((P_v)^((-1))))),Xv),Xv))))+((((-1))*(Int(simp(((Xv)*(ln(P_v))*(deriv(P_w,Xv))*(((P_w)^((-1))))),Xv),Xv)))))
 
-# Regel 40 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 40 (4 Varianten):
 #   Int[u_*Log[v_]*Log[w_], x_Symbol] := With[{z = IntHide[u, x]}, Dist[Log[v]*Log[w], z, x] - Int[SimplifyIntegrand[z*Log[w]*D[v, x]/v, x], x] - Int[SimplifyIntegrand[z*Log[v]*D[w, x]/w, x], x] /; InverseFunctionFreeQ[z, x]] /; InverseFunctionFreeQ[v, x] && InverseFunctionFreeQ[w, x]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_v,Xv)), (inversefunctionfreeq(P_w,Xv)), (inversefunctionfreeq(inthide(P_u,Xv),Xv)) Int((P_u)*(ln(P_v))*(ln(P_w)),Xv) = ((dist(((ln(P_v))*(ln(P_w))),inthide(P_u,Xv),Xv))+((((-1))*(Int(simp(((inthide(P_u,Xv))*(ln(P_w))*(deriv(P_v,Xv))*(((P_v)^((-1))))),Xv),Xv))))+((((-1))*(Int(simp(((inthide(P_u,Xv))*(ln(P_v))*(deriv(P_w,Xv))*(((P_w)^((-1))))),Xv),Xv)))))
 
 # Regel 41 (3 Varianten):
 #   Int[f_^(a_.*Log[u_]), x_Symbol] := Int[u^(a*Log[f]), x] /; FreeQ[{a, f}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,P_f) Int((P_f)^((O_a)*(ln(P_u))),Xv) = Int(((P_u)^(((O_a)*(ln(P_f))))),Xv)
 
-# Regel 42 nicht uebersetzt: function Gamma in pattern
+# Regel 42 (3 Varianten):
 #   Int[u_.*Log[Gamma[v_]], x_Symbol] := (Log[Gamma[v]] - LogGamma[v])*Int[u, x] + Int[u*LogGamma[v], x]
+ADDSPEC RubiRules : Int((O_u)*(ln(Gamma(P_v))),Xv) = ((((((ln(Gamma(P_v)))+((((-1))*(loggamma(P_v))))))*(Int(O_u,Xv))))+(Int(((O_u)*(loggamma(P_v))),Xv)))
 
 # Regel 43 (10368 Varianten):
 #   Int[u_.*(a_.*x_^m_. + b_.*x_^r_.*Log[c_.*x_^n_.]^q_.)^p_., x_Symbol] := Int[u*x^(p*r)*(a*x^(m - r) + b*Log[c*x^n]^q)^p, x] /; FreeQ[{a, b, c, m, n, p, q, r}, x] && IntegerQ[p]

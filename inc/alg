@@ -118,6 +118,39 @@ FUNC  arccoth : real >> real      ATT r_arccoth
 FUNC  polylog : real,real >> real ATT r_polylog    # polylog(n,x), |x| <= 1
 FUNC  productlog : real >> real   ATT r_productlog # Lambert W
 
+# 2026: Spezialfunktionen (specfun.c), Konventionen wie in Mathematica
+FUNC  arcsec  : real >> real      ATT r_arcsec     # arccos(1/x)
+FUNC  arccsc  : real >> real      ATT r_arccsc     # arcsin(1/x)
+FUNC  arcsech : real >> real      ATT r_arcsech
+FUNC  arccsch : real >> real      ATT r_arccsch
+FUNC  erf     : real >> real      ATT r_erf        # Fehlerfunktion
+FUNC  erfc    : real >> real      ATT r_erfc       # 1 - erf
+FUNC  erfi    : real >> real      ATT r_erfi       # -i erf(i x)
+FUNC  fresnels : real >> real     ATT r_fresnels   # Integral sin(pi t^2/2)
+FUNC  fresnelc : real >> real     ATT r_fresnelc   # Integral cos(pi t^2/2)
+FUNC  sinint  : real >> real      ATT r_si         # Integral sin(t)/t
+FUNC  cosint  : real >> real      ATT r_ci         # -Integral_x^oo cos(t)/t
+FUNC  sinhint : real >> real      ATT r_shi
+FUNC  coshint : real >> real      ATT r_chi
+FUNC  expint  : real >> real      ATT r_ei         # Ei(x)
+FUNC  expinte : real,real >> real ATT r_expinte    # E_n(x)
+FUNC  logint  : real >> real      ATT r_li         # li(x) = Ei(ln x)
+FUNC  Gamma   : real >> real      ATT r_gamma      # (gamma ist eine Konstante in inc/physik)
+OTHER Gamma   : real,real >> real ATT r_gamma2     # Gamma(a,x) = Integral_x^oo t^(a-1) e^-t
+FUNC  loggamma : real >> real     ATT r_loggamma
+FUNC  polygamma : real,real >> real ATT r_polygamma # polygamma(n,x), n = 0: digamma
+FUNC  zeta    : real >> real      ATT r_zeta       # Riemann
+OTHER zeta    : real,real >> real ATT r_zeta2      # Hurwitz zeta(s,a)
+FUNC  elliptick : real >> real    ATT r_elliptick  # K(m)
+FUNC  ellipticf : real,real >> real ATT r_ellipticf  # F(phi|m)
+FUNC  elliptice : real >> real    ATT r_elliptice1   # E(m)
+OTHER elliptice : real,real >> real ATT r_elliptice2 # E(phi|m)
+FUNC  ellipticpi : real,real >> real ATT r_ellipticpi2       # Pi(n|m)
+OTHER ellipticpi : real,real,real >> real ATT r_ellipticpi3  # Pi(n;phi|m)
+FUNC  hyp2f1  : real,real,real,real >> real ATT r_hyp2f1     # 2F1(a,b;c;z)
+FUNC  appellf1 : real,real,real,real,real,real >> real ATT r_appellf1  # F1(a;b1,b2;c;x,y)
+FUNC  besselj : real,real >> real ATT r_besselj    # J_nu(x)
+
 FUNC  -      : group,group >> group LA2
 OTHER -      : agroup,agroup >> agroup
 OTHER -      : ring,ring >> ring
@@ -371,6 +404,35 @@ ADDSPEC     diff : D(arctanh X,Z) = D(X,Z)*mi(1+(-(X^2)))       # 2026 ergaenzt
 ADDSPEC     diff : D(arccoth X,Z) = D(X,Z)*mi(1+(-(X^2)))       # 2026 ergaenzt
 ADDSPEC     diff : D(polylog(N,X),Z)  = D(X,Z)*polylog(N+(-1),X)*mi(X)                  # 2026 ergaenzt
 ADDSPEC     diff : D(productlog X,Z)  = D(X,Z)*productlog(X)*mi(X*(1+productlog(X)))  # 2026 ergaenzt
+# 2026: Ableitungen der Spezialfunktionen (nach dem Argument, das von Z abhaengt)
+ADDSPEC     diff : D(arcsec X,Z)  = D(X,Z)*mi(X^2*(1+(-(mi(X^2))))^.5)
+ADDSPEC     diff : D(arccsc X,Z)  = - D(X,Z)*mi(X^2*(1+(-(mi(X^2))))^.5)
+ADDSPEC     diff : D(arcsech X,Z) = - D(X,Z)*mi(X*(1+(-(X^2)))^.5)
+ADDSPEC     diff : D(arccsch X,Z) = - D(X,Z)*mi(X^2*(1+mi(X^2))^.5)
+ADDSPEC     diff : D(erf X,Z)     = D(X,Z)*2*mi(pi^.5)*exp(-(X^2))
+ADDSPEC     diff : D(erfc X,Z)    = - D(X,Z)*2*mi(pi^.5)*exp(-(X^2))
+ADDSPEC     diff : D(erfi X,Z)    = D(X,Z)*2*mi(pi^.5)*exp(X^2)
+ADDSPEC     diff : D(fresnels X,Z) = D(X,Z)*sin(pi*X^2*.5)
+ADDSPEC     diff : D(fresnelc X,Z) = D(X,Z)*cos(pi*X^2*.5)
+ADDSPEC     diff : D(sinint X,Z)  = D(X,Z)*sin(X)*mi(X)
+ADDSPEC     diff : D(cosint X,Z)  = D(X,Z)*cos(X)*mi(X)
+ADDSPEC     diff : D(sinhint X,Z) = D(X,Z)*sinh(X)*mi(X)
+ADDSPEC     diff : D(coshint X,Z) = D(X,Z)*cosh(X)*mi(X)
+ADDSPEC     diff : D(expint X,Z)  = D(X,Z)*exp(X)*mi(X)
+ADDSPEC     diff : D(logint X,Z)  = D(X,Z)*mi(ln X)
+ADDSPEC     diff : IF NIN(Z,Y) D(expinte(Y,X),Z) = - D(X,Z)*expinte(Y+(-1),X)
+ADDSPEC     diff : D(Gamma X,Z)   = D(X,Z)*Gamma(X)*polygamma(0,X)
+ADDSPEC     diff : IF NIN(Z,Y) D(Gamma(Y,X),Z) = - D(X,Z)*X^(Y+(-1))*exp(-X)
+ADDSPEC     diff : D(loggamma X,Z) = D(X,Z)*polygamma(0,X)
+ADDSPEC     diff : IF NIN(Z,Y) D(polygamma(Y,X),Z) = D(X,Z)*polygamma(Y+1,X)
+ADDSPEC     diff : IF NIN(Z,Y) D(zeta(Y,X),Z) = - D(X,Z)*Y*zeta(Y+1,X)
+ADDSPEC     diff : D(elliptice X,Z) = D(X,Z)*(elliptice(X)+(-(elliptick(X))))*mi(2*X)
+ADDSPEC     diff : D(elliptick X,Z) = D(X,Z)*(elliptice(X)+(-((1+(-X))*elliptick(X))))*mi(2*X*(1+(-X)))
+ADDSPEC     diff : IF NIN(Z,Y) D(ellipticf(X,Y),Z) = D(X,Z)*mi((1+(-(Y*sin(X)^2)))^.5)
+ADDSPEC     diff : IF NIN(Z,Y) D(elliptice(X,Y),Z) = D(X,Z)*(1+(-(Y*sin(X)^2)))^.5
+ADDSPEC     diff : IF NIN(Z,A,Y) D(ellipticpi(A,X,Y),Z) = D(X,Z)*mi((1+(-(A*sin(X)^2)))*(1+(-(Y*sin(X)^2)))^.5)
+ADDSPEC     diff : IF NIN(Z,A,B,C) D(hyp2f1(A,B,C,X),Z) = D(X,Z)*A*B*mi(C)*hyp2f1(A+1,B+1,C+1,X)
+ADDSPEC     diff : IF NIN(Z,Y) D(besselj(Y,X),Z) = D(X,Z)*(besselj(Y+(-1),X)+(-(besselj(Y+1,X))))*.5
 
 ADDSPEC     diff : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # Allg. Differenziationsregeln
 ADDSPEC     diff : IF NIN (Z,X) D(_Fre(X),Z)=D(X,Z)*D(_Fre(X),X)  # Kettenregel

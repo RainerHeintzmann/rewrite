@@ -97,15 +97,17 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b,P_c), ((((((-1))*(O_b)*
 #   Int[(c_.*x_)^m_*(a_+b_.*x_^2)^p_,x_Symbol] := c*(c*x)^(m-1)*(a+b*x^2)^(p+1)/(b*(m+2*p+1)) - a*c^2*(m-1)/(b*(m+2*p+1)) \[Star] Int[(c*x)^(m-2)*(a+b*x^2)^p,x] /; FreeQ[{a,b,c,p},x] && GtQ[m,2-1] && NeQ[m+2*p+1,0] && IntBinomialQ[a,b,c,2,m,p,x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (((P_m > ((2)+((-1)))))), (neq(((P_m)+(((2)*(P_p)))+(1)),0)), (((igtq(P_p,0)) || (((rationalq(P_m)) && (integersq(2,((2)*(P_p)))))) || (integerq(((((((P_m)+(1)))*((1/2))))+(P_p)))) || (((((eqq(2,2)) || (eqq(2,4)))) && (integersq(((2)*(P_m)),((4)*(P_p)))))) || (((eqq(2,2)) && (integerq(((6)*(P_p)))) && (((integerq(P_m)) || (integerq(((P_m)+((((-1))*(P_p)))))))))))) Int((((O_c)*(Xv))^(P_m))*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = ((((O_c)*(((((O_c)*(Xv)))^(((P_m)+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((((O_b)*(((P_m)+(((2)*(P_p)))+(1)))))^((-1))))))+((((-1))*(P_a)*(((O_c)^(2)))*(((P_m)+((-1))))*(((((O_b)*(((P_m)+(((2)*(P_p)))+(1)))))^((-1))))*(Int(((((((O_c)*(Xv)))^(((P_m)+((-2))))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)))),Xv)))))
 
-# Regel 24 nicht uebersetzt: predicate SumSimplerQ
+# Regel 24 (36 Varianten):
 #   Int[(c_.*x_)^m_*(a_+b_.*x_^2)^p_,x_Symbol] := c*(c*x)^(m-1)*(a+b*x^2)^(p+1)/(b*(m+2*p+1)) - a*c^2*(m-1)/(b*(m+2*p+1)) \[Star] Int[(c*x)^(m-2)*(a+b*x^2)^p,x] /; FreeQ[{a,b,c,m,p},x] && SumSimplerQ[m,-2] && NeQ[m+2*p+1,0] && ILtQ[Simplify[(m+1)/2+p],0]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_m,P_p), (sumsimplerq(P_m,(-2))), (neq(((P_m)+(((2)*(P_p)))+(1)),0)), (iltq(simplify(((((((P_m)+(1)))*((1/2))))+(P_p))),0)) Int((((O_c)*(Xv))^(P_m))*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = ((((O_c)*(((((O_c)*(Xv)))^(((P_m)+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((((O_b)*(((P_m)+(((2)*(P_p)))+(1)))))^((-1))))))+((((-1))*(P_a)*(((O_c)^(2)))*(((P_m)+((-1))))*(((((O_b)*(((P_m)+(((2)*(P_p)))+(1)))))^((-1))))*(Int(((((((O_c)*(Xv)))^(((P_m)+((-2))))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)))),Xv)))))
 
 # Regel 25 (36 Varianten):
 #   Int[(c_.*x_)^m_*(a_+b_.*x_^2)^p_,x_Symbol] := (c*x)^(m+1)*(a+b*x^2)^(p+1)/(a*c*(m+1)) - b*(m+2*p+3)/(a*c^2*(m+1)) \[Star] Int[(c*x)^(m+2)*(a+b*x^2)^p,x] /; FreeQ[{a,b,c,p},x] && LtQ[m,-1] && IntBinomialQ[a,b,c,2,m,p,x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (((P_m < (-1)))), (((igtq(P_p,0)) || (((rationalq(P_m)) && (integersq(2,((2)*(P_p)))))) || (integerq(((((((P_m)+(1)))*((1/2))))+(P_p)))) || (((((eqq(2,2)) || (eqq(2,4)))) && (integersq(((2)*(P_m)),((4)*(P_p)))))) || (((eqq(2,2)) && (integerq(((6)*(P_p)))) && (((integerq(P_m)) || (integerq(((P_m)+((((-1))*(P_p)))))))))))) Int((((O_c)*(Xv))^(P_m))*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = ((((((((O_c)*(Xv)))^(((P_m)+(1)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((((P_a)*(O_c)*(((P_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(((P_m)+(((2)*(P_p)))+(3)))*(((((P_a)*(((O_c)^(2)))*(((P_m)+(1)))))^((-1))))*(Int(((((((O_c)*(Xv)))^(((P_m)+(2)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)))),Xv)))))
 
-# Regel 26 nicht uebersetzt: predicate SumSimplerQ
+# Regel 26 (36 Varianten):
 #   Int[(c_.*x_)^m_*(a_+b_.*x_^2)^p_,x_Symbol] := (c*x)^(m+1)*(a+b*x^2)^(p+1)/(a*c*(m+1)) - b*(m+2*p+3)/(a*c^2*(m+1)) \[Star] Int[(c*x)^(m+2)*(a+b*x^2)^p,x] /; FreeQ[{a,b,c,m,p},x] && SumSimplerQ[m,2] && ILtQ[Simplify[(m+1)/2+p],0]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_m,P_p), (sumsimplerq(P_m,2)), (iltq(simplify(((((((P_m)+(1)))*((1/2))))+(P_p))),0)) Int((((O_c)*(Xv))^(P_m))*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = ((((((((O_c)*(Xv)))^(((P_m)+(1)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((((P_a)*(O_c)*(((P_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(((P_m)+(((2)*(P_p)))+(3)))*(((((P_a)*(((O_c)^(2)))*(((P_m)+(1)))))^((-1))))*(Int(((((((O_c)*(Xv)))^(((P_m)+(2)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)))),Xv)))))
 
 # Regel 27 (36 Varianten):
 #   Int[(c_.*x_)^m_*(a_+b_.*x_^2)^p_,x_Symbol] := With[{k=Denominator[m]}, k/c \[Star] Subst[Int[x^(k*(m+1)-1)*(a+b*x^(2*k)/c^2)^p,x],x,(c*x)^(1/k)]] /; FreeQ[{a,b,c,p},x] && FractionQ[m] && IntBinomialQ[a,b,c,2,m,p,x]
@@ -143,17 +145,21 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,P_m), (integerq(((P_p)+(simplify(((((P
 #   Int[(c_.*x_)^m_.*(a_+b_.*x_^2)^p_,x_Symbol] := -(c*x)^(m+1)*(a+b*x^2)^(p+1)/(a*c*2*(p+1)) + (m+2*(p+1)+1)/(a*2*(p+1)) \[Star] Int[(c*x)^m*(a+b*x^2)^(p+1),x] /; FreeQ[{a,b,c,m},x] && IntegerQ[p+Simplify[(m+1)/2]] && LtQ[p,-1]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_m), (integerq(((P_p)+(simplify(((((O_m)+(1)))*((1/2)))))))), (((P_p < (-1)))) Int((((O_c)*(Xv))^(O_m))*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = (((((-1))*(((((O_c)*(Xv)))^(((O_m)+(1)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((((P_a)*(O_c)*(2)*(((P_p)+(1)))))^((-1))))))+(((((O_m)+(((2)*(((P_p)+(1)))))+(1)))*(((((P_a)*(2)*(((P_p)+(1)))))^((-1))))*(Int(((((((O_c)*(Xv)))^(O_m)))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))),Xv)))))
 
-# Regel 36 nicht uebersetzt: predicate SumSimplerQ
+# Regel 36 (24 Varianten):
 #   Int[x_^m_./(a_+b_.*x_^2),x_Symbol] := x^(m-1)/(b*(m-1)) - a/b \[Star] Int[x^(m-2)/(a+b*x^2),x] /; FreeQ[{a,b,m},x] && FractionQ[(m+1)/2] && SumSimplerQ[m,-2]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_m), (fractionq(((((O_m)+(1)))*((1/2))))), (sumsimplerq(O_m,(-2))) Int(((Xv)^(O_m))*(((P_a)+((O_b)*((Xv)^(2))))^(K_1)),Xv) = ((((((Xv)^(((O_m)+((-1))))))*(((((O_b)*(((O_m)+((-1))))))^((-1))))))+((((-1))*(P_a)*(((O_b)^((-1))))*(Int(((((Xv)^(((O_m)+((-2))))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-1))))),Xv)))))
 
-# Regel 37 nicht uebersetzt: predicate SumSimplerQ
+# Regel 37 (12 Varianten):
 #   Int[x_^m_/(a_+b_.*x_^2),x_Symbol] := x^(m+1)/(a*(m+1)) - b/a \[Star] Int[x^Simplify[m+2]/(a+b*x^2),x] /; FreeQ[{a,b,m},x] && FractionQ[(m+1)/2] && SumSimplerQ[m,2]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_m), (fractionq(((((P_m)+(1)))*((1/2))))), (sumsimplerq(P_m,2)) Int(((Xv)^(P_m))*(((P_a)+((O_b)*((Xv)^(2))))^(K_1)),Xv) = ((((((Xv)^(((P_m)+(1)))))*(((((P_a)*(((P_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(((P_a)^((-1))))*(Int(((((Xv)^(simplify(((P_m)+(2))))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-1))))),Xv)))))
 
-# Regel 38 nicht uebersetzt: predicate SumSimplerQ
+# Regel 38 (24 Varianten):
 #   Int[(c_*x_)^m_/(a_+b_.*x_^2),x_Symbol] := c^IntPart[m]*(c*x)^FracPart[m]/x^FracPart[m] \[Star] Int[x^m/(a+b*x^2),x] /; FreeQ[{a,b,c,m},x] && FractionQ[(m+1)/2] && (SumSimplerQ[m,2] || SumSimplerQ[m,-2])
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,P_m), (fractionq(((((P_m)+(1)))*((1/2))))), (((sumsimplerq(P_m,2)) || (sumsimplerq(P_m,(-2))))) Int((((P_c)*(Xv))^(P_m))*(((P_a)+((O_b)*((Xv)^(2))))^(K_1)),Xv) = ((((P_c)^(intpart(P_m))))*(((((P_c)*(Xv)))^(fracpart(P_m))))*(((((Xv)^(fracpart(P_m))))^((-1))))*(Int(((((Xv)^(P_m)))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-1))))),Xv)))
 
-# Regel 39 nicht uebersetzt: function Hypergeometric2F1
+# Regel 39 (72 Varianten):
 #   Int[(c_.*x_)^m_.*(a_+b_.*x_^2)^p_,x_Symbol] := a^p*(c*x)^(m+1)/(c*(m+1))*Hypergeometric2F1[-p,(m+1)/2,(m+1)/2+1,-b*x^2/a] /; FreeQ[{a,b,c,m,p},x] && Not[IGtQ[p,0]] && (ILtQ[p,0] || GtQ[a,0])
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_m,P_p), (not(igtq(P_p,0))), (((iltq(P_p,0)) || (((P_a > 0))))) Int((((O_c)*(Xv))^(O_m))*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = ((((P_a)^(P_p)))*(((((O_c)*(Xv)))^(((O_m)+(1)))))*(((((O_c)*(((O_m)+(1)))))^((-1))))*(hyp2f1((((-1))*(P_p)),((((O_m)+(1)))*((1/2))),((((((O_m)+(1)))*((1/2))))+(1)),(((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))))
 
 # Regel 40 (72 Varianten):
 #   Int[(c_.*x_)^m_.*(a_+b_.*x_^2)^p_,x_Symbol] := a^IntPart[p]*(a+b*x^2)^FracPart[p]/(1+b*x^2/a)^FracPart[p] \[Star] Int[(c*x)^m*(1+b*x^2/a)^p,x] /; FreeQ[{a,b,c,m,p},x] && Not[IGtQ[p,0]] && Not[ILtQ[p,0] || GtQ[a,0]]

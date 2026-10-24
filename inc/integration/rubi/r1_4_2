@@ -6,35 +6,45 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: predicate LinearMatchQ
+# Regel 1 (1 Varianten):
 #   Int[u_^m_,x_Symbol] := Int[ExpandToSum[u,x]^m,x] /; FreeQ[m,x] && LinearQ[u,x] && Not[LinearMatchQ[u,x]]
+ADDSPEC RubiRules : IF NIN(Xv,P_m), (linearq(P_u,Xv)), (not(linearmatchq(P_u,Xv))) Int((P_u)^(P_m),Xv) = Int(((expandtosum(P_u,Xv))^(P_m)),Xv)
 
-# Regel 2 nicht uebersetzt: function List
+# Regel 2 (8 Varianten):
 #   Int[u_^m_.*v_^n_.,x_Symbol] := Int[ExpandToSum[u,x]^m*ExpandToSum[v,x]^n,x] /; FreeQ[{m,n},x] && LinearQ[{u,v},x] && Not[LinearMatchQ[{u,v},x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*((P_v)^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((expandtosum(P_v,Xv))^(O_n)))),Xv)
 
-# Regel 3 nicht uebersetzt: function List
+# Regel 3 (32 Varianten):
 #   Int[u_^m_.*v_^n_.*w_^p_.,x_Symbol] := Int[ExpandToSum[u,x]^m*ExpandToSum[v,x]^n*ExpandToSum[w,x]^p,x] /; FreeQ[{m,n,p},x] && LinearQ[{u,v,w},x] && Not[LinearMatchQ[{u,v,w},x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((P_v)^(O_n))*((P_w)^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((expandtosum(P_v,Xv))^(O_n)))*(((expandtosum(P_w,Xv))^(O_p)))),Xv)
 
-# Regel 4 nicht uebersetzt: function List
+# Regel 4 (128 Varianten):
 #   Int[u_^m_.*v_^n_.*w_^p_.*z_^q_.,x_Symbol] := Int[ExpandToSum[u,x]^m*ExpandToSum[v,x]^n*ExpandToSum[w,x]^p*ExpandToSum[z,x]^q,x] /; FreeQ[{m,n,p,q},x] && LinearQ[{u,v,w,z},x] && Not[LinearMatchQ[{u,v,w,z},x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p,O_q), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)) && (linearq(P_z,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv)) && (linearmatchq(P_z,Xv))))) Int(((P_u)^(O_m))*((P_v)^(O_n))*((P_w)^(O_p))*((P_z)^(O_q)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((expandtosum(P_v,Xv))^(O_n)))*(((expandtosum(P_w,Xv))^(O_p)))*(((expandtosum(P_z,Xv))^(O_q)))),Xv)
 
-# Regel 5 nicht uebersetzt: predicate BinomialQ
+# Regel 5 (1 Varianten):
 #   Int[u_^p_,x_Symbol] := Int[ExpandToSum[u,x]^p,x] /; FreeQ[p,x] && BinomialQ[u,x] && Not[BinomialMatchQ[u,x]]
+ADDSPEC RubiRules : IF NIN(Xv,P_p), (binomialq(P_u,Xv)), (not(binomialmatchq(P_u,Xv))) Int((P_u)^(P_p),Xv) = Int(((expandtosum(P_u,Xv))^(P_p)),Xv)
 
-# Regel 6 nicht uebersetzt: predicate BinomialQ
+# Regel 6 (24 Varianten):
 #   Int[(c_.*x_)^m_.*u_^p_.,x_Symbol] := Int[(c*x)^m*ExpandToSum[u,x]^p,x] /; FreeQ[{c,m,p},x] && BinomialQ[u,x] && Not[BinomialMatchQ[u,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_m,O_p), (binomialq(P_u,Xv)), (not(binomialmatchq(P_u,Xv))) Int((((O_c)*(Xv))^(O_m))*((P_u)^(O_p)),Xv) = Int(((((((O_c)*(Xv)))^(O_m)))*(((expandtosum(P_u,Xv))^(O_p)))),Xv)
 
-# Regel 7 nicht uebersetzt: predicate BinomialQ
+# Regel 7 (8 Varianten):
 #   Int[u_^p_.*v_^q_.,x_Symbol] := Int[ExpandToSum[u,x]^p*ExpandToSum[v,x]^q,x] /; FreeQ[{p,q},x] && BinomialQ[{u,v},x] && EqQ[BinomialDegree[u,x]-BinomialDegree[v,x],0] && Not[BinomialMatchQ[{u,v},x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_p,O_q), (((binomialq(P_u,Xv)) && (binomialq(P_v,Xv)))), (eqq(((binomialdegree(P_u,Xv))+((((-1))*(binomialdegree(P_v,Xv))))),0)), (not(((binomialmatchq(P_u,Xv)) && (binomialmatchq(P_v,Xv))))) Int(((P_u)^(O_p))*((P_v)^(O_q)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_p)))*(((expandtosum(P_v,Xv))^(O_q)))),Xv)
 
-# Regel 8 nicht uebersetzt: predicate BinomialQ
+# Regel 8 (96 Varianten):
 #   Int[(e_.*x_)^m_.*u_^p_.*v_^q_.,x_Symbol] := Int[(e*x)^m*ExpandToSum[u,x]^p*ExpandToSum[v,x]^q,x] /; FreeQ[{e,m,p,q},x] && BinomialQ[{u,v},x] && EqQ[BinomialDegree[u,x]-BinomialDegree[v,x],0] && Not[BinomialMatchQ[{u,v},x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_e,O_m,O_p,O_q), (((binomialq(P_u,Xv)) && (binomialq(P_v,Xv)))), (eqq(((binomialdegree(P_u,Xv))+((((-1))*(binomialdegree(P_v,Xv))))),0)), (not(((binomialmatchq(P_u,Xv)) && (binomialmatchq(P_v,Xv))))) Int((((O_e)*(Xv))^(O_m))*((P_u)^(O_p))*((P_v)^(O_q)),Xv) = Int(((((((O_e)*(Xv)))^(O_m)))*(((expandtosum(P_u,Xv))^(O_p)))*(((expandtosum(P_v,Xv))^(O_q)))),Xv)
 
-# Regel 9 nicht uebersetzt: predicate BinomialQ
+# Regel 9 (32 Varianten):
 #   Int[u_^m_.*v_^p_.*w_^q_.,x_Symbol] := Int[ExpandToSum[u,x]^m*ExpandToSum[v,x]^p*ExpandToSum[w,x]^q,x] /; FreeQ[{m,p,q},x] && BinomialQ[{u,v,w},x] && EqQ[BinomialDegree[u,x]-BinomialDegree[v,x],0] && EqQ[BinomialDegree[u,x]-BinomialDegree[w,x],0] && Not[BinomialMatchQ[{u,v,w},x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_p,O_q), (((binomialq(P_u,Xv)) && (binomialq(P_v,Xv)) && (binomialq(P_w,Xv)))), (eqq(((binomialdegree(P_u,Xv))+((((-1))*(binomialdegree(P_v,Xv))))),0)), (eqq(((binomialdegree(P_u,Xv))+((((-1))*(binomialdegree(P_w,Xv))))),0)), (not(((binomialmatchq(P_u,Xv)) && (binomialmatchq(P_v,Xv)) && (binomialmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((P_v)^(O_p))*((P_w)^(O_q)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((expandtosum(P_v,Xv))^(O_p)))*(((expandtosum(P_w,Xv))^(O_q)))),Xv)
 
-# Regel 10 nicht uebersetzt: predicate BinomialQ
+# Regel 10 (384 Varianten):
 #   Int[(g_.*x_)^m_.*u_^p_.*v_^q_.*z_^r_.,x_Symbol] := Int[(g*x)^m*ExpandToSum[u,x]^p*ExpandToSum[v,x]^q*ExpandToSum[z,x]^r,x] /; FreeQ[{g,m,p,q,r},x] && BinomialQ[{u,v,z},x] && EqQ[BinomialDegree[u,x]-BinomialDegree[v,x],0] && EqQ[BinomialDegree[u,x]-BinomialDegree[z,x],0] && Not[BinomialMatchQ[{u,v,z},x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_g,O_m,O_p,O_q,O_r), (((binomialq(P_u,Xv)) && (binomialq(P_v,Xv)) && (binomialq(P_z,Xv)))), (eqq(((binomialdegree(P_u,Xv))+((((-1))*(binomialdegree(P_v,Xv))))),0)), (eqq(((binomialdegree(P_u,Xv))+((((-1))*(binomialdegree(P_z,Xv))))),0)), (not(((binomialmatchq(P_u,Xv)) && (binomialmatchq(P_v,Xv)) && (binomialmatchq(P_z,Xv))))) Int((((O_g)*(Xv))^(O_m))*((P_u)^(O_p))*((P_v)^(O_q))*((P_z)^(O_r)),Xv) = Int(((((((O_g)*(Xv)))^(O_m)))*(((expandtosum(P_u,Xv))^(O_p)))*(((expandtosum(P_v,Xv))^(O_q)))*(((expandtosum(P_z,Xv))^(O_r)))),Xv)
 
 # Regel 11 nicht uebersetzt: predicate GeneralizedBinomialQ
 #   Int[u_^p_,x_Symbol] := Int[ExpandToSum[u,x]^p,x] /; FreeQ[p,x] && GeneralizedBinomialQ[u,x] && Not[GeneralizedBinomialMatchQ[u,x]]
@@ -42,44 +52,51 @@
 # Regel 12 nicht uebersetzt: predicate GeneralizedBinomialQ
 #   Int[(c_.*x_)^m_.*u_^p_.,x_Symbol] := Int[(c*x)^m*ExpandToSum[u,x]^p,x] /; FreeQ[{c,m,p},x] && GeneralizedBinomialQ[u,x] && Not[GeneralizedBinomialMatchQ[u,x]]
 
-# Regel 13 nicht uebersetzt: predicate QuadraticQ
+# Regel 13 (1 Varianten):
 #   Int[u_^p_,x_Symbol] := Int[ExpandToSum[u,x]^p,x] /; FreeQ[p,x] && QuadraticQ[u,x] && Not[QuadraticMatchQ[u,x]]
+ADDSPEC RubiRules : IF NIN(Xv,P_p), (quadraticq(P_u,Xv)), (not(quadraticmatchq(P_u,Xv))) Int((P_u)^(P_p),Xv) = Int(((expandtosum(P_u,Xv))^(P_p)),Xv)
 
-# Regel 14 nicht uebersetzt: predicate QuadraticQ
+# Regel 14 (8 Varianten):
 #   Int[u_^m_.*v_^p_.,x_Symbol] := Int[ExpandToSum[u,x]^m*ExpandToSum[v,x]^p,x] /; FreeQ[{m,p},x] && LinearQ[u,x] && QuadraticQ[v,x] && Not[LinearMatchQ[u,x] && QuadraticMatchQ[v,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_p), (linearq(P_u,Xv)), (quadraticq(P_v,Xv)), (not(((linearmatchq(P_u,Xv)) && (quadraticmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*((P_v)^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((expandtosum(P_v,Xv))^(O_p)))),Xv)
 
-# Regel 15 nicht uebersetzt: function List
+# Regel 15 (32 Varianten):
 #   Int[u_^m_.*v_^n_.*w_^p_.,x_Symbol] := Int[ExpandToSum[u,x]^m*ExpandToSum[v,x]^n*ExpandToSum[w,x]^p,x] /; FreeQ[{m,n,p},x] && LinearQ[{u,v},x] && QuadraticQ[w,x] && Not[LinearMatchQ[{u,v},x] && QuadraticMatchQ[w,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n,O_p), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (quadraticq(P_w,Xv)), (not(((((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)))) && (quadraticmatchq(P_w,Xv))))) Int(((P_u)^(O_m))*((P_v)^(O_n))*((P_w)^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((expandtosum(P_v,Xv))^(O_n)))*(((expandtosum(P_w,Xv))^(O_p)))),Xv)
 
-# Regel 16 nicht uebersetzt: predicate QuadraticQ
+# Regel 16 (8 Varianten):
 #   Int[u_^p_.*v_^q_.,x_Symbol] := Int[ExpandToSum[u,x]^p*ExpandToSum[v,x]^q,x] /; FreeQ[{p,q},x] && QuadraticQ[{u,v},x] && Not[QuadraticMatchQ[{u,v},x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_p,O_q), (((quadraticq(P_u,Xv)) && (quadraticq(P_v,Xv)))), (not(((quadraticmatchq(P_u,Xv)) && (quadraticmatchq(P_v,Xv))))) Int(((P_u)^(O_p))*((P_v)^(O_q)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_p)))*(((expandtosum(P_v,Xv))^(O_q)))),Xv)
 
-# Regel 17 nicht uebersetzt: predicate QuadraticQ
+# Regel 17 nicht uebersetzt: predicate MatchQ
 #   Int[z_^m_.*u_^p_.*v_^q_.,x_Symbol] := Int[ExpandToSum[z,x]^m*ExpandToSum[u,x]^p*ExpandToSum[v,x]^q,x] /; FreeQ[{m,p,q},x] && LinearQ[z,x] && QuadraticQ[{u,v},x] && Not[LinearMatchQ[z,x] && QuadraticMatchQ[{u,v},x]] && Not[MatchQ[z^m*u^p*v^q, (d_.+e_.*x)^m*(f_.+g_.*x)^2*(a_.+b_.*x+c_.*x^2)^t_. /; FreeQ[{a,b,c,d,e,f,g,t},x]]] && Not[MatchQ[z^m*u^p*v^q, (d_.+e_.*x)^m*(f_.+g_.*x)^2*(a_.+c_.*x^2)^t_. /; FreeQ[{a,c,d,e,f,g,t},x]]]
 
-# Regel 18 nicht uebersetzt: predicate TrinomialQ
+# Regel 18 nicht uebersetzt: predicate TrinomialMatchQ
 #   Int[u_^p_,x_Symbol] := Int[ExpandToSum[u,x]^p,x] /; FreeQ[p,x] && TrinomialQ[u,x] && Not[TrinomialMatchQ[u,x]]
 
-# Regel 19 nicht uebersetzt: predicate TrinomialQ
+# Regel 19 nicht uebersetzt: predicate TrinomialMatchQ
 #   Int[(d_.*x_)^m_.*u_^p_.,x_Symbol] := Int[(d*x)^m*ExpandToSum[u,x]^p,x] /; FreeQ[{d,m,p},x] && TrinomialQ[u,x] && Not[TrinomialMatchQ[u,x]]
 
-# Regel 20 nicht uebersetzt: predicate BinomialQ
+# Regel 20 nicht uebersetzt: predicate TrinomialMatchQ
 #   Int[u_^q_.*v_^p_.,x_Symbol] := Int[ExpandToSum[u,x]^q*ExpandToSum[v,x]^p,x] /; FreeQ[{p,q},x] && BinomialQ[u,x] && TrinomialQ[v,x] && Not[BinomialMatchQ[u,x] && TrinomialMatchQ[v,x]]
 
-# Regel 21 nicht uebersetzt: predicate BinomialQ
+# Regel 21 (8 Varianten):
 #   Int[u_^q_.*v_^p_.,x_Symbol] := Int[ExpandToSum[u,x]^q*ExpandToSum[v,x]^p,x] /; FreeQ[{p,q},x] && BinomialQ[u,x] && BinomialQ[v,x] && Not[BinomialMatchQ[u,x] && BinomialMatchQ[v,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_p,O_q), (binomialq(P_u,Xv)), (binomialq(P_v,Xv)), (not(((binomialmatchq(P_u,Xv)) && (binomialmatchq(P_v,Xv))))) Int(((P_u)^(O_q))*((P_v)^(O_p)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_q)))*(((expandtosum(P_v,Xv))^(O_p)))),Xv)
 
-# Regel 22 nicht uebersetzt: predicate BinomialQ
+# Regel 22 nicht uebersetzt: predicate TrinomialMatchQ
 #   Int[(f_.*x_)^m_.*z_^q_.*u_^p_.,x_Symbol] := Int[(f*x)^m*ExpandToSum[z,x]^q*ExpandToSum[u,x]^p,x] /; FreeQ[{f,m,p,q},x] && BinomialQ[z,x] && TrinomialQ[u,x] && Not[BinomialMatchQ[z,x] && TrinomialMatchQ[u,x]]
 
-# Regel 23 nicht uebersetzt: predicate BinomialQ
+# Regel 23 (96 Varianten):
 #   Int[(f_.*x_)^m_.*z_^q_.*u_^p_.,x_Symbol] := Int[(f*x)^m*ExpandToSum[z,x]^q*ExpandToSum[u,x]^p,x] /; FreeQ[{f,m,p,q},x] && BinomialQ[z,x] && BinomialQ[u,x] && Not[BinomialMatchQ[z,x] && BinomialMatchQ[u,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_f,O_m,O_p,O_q), (binomialq(P_z,Xv)), (binomialq(P_u,Xv)), (not(((binomialmatchq(P_z,Xv)) && (binomialmatchq(P_u,Xv))))) Int((((O_f)*(Xv))^(O_m))*((P_z)^(O_q))*((P_u)^(O_p)),Xv) = Int(((((((O_f)*(Xv)))^(O_m)))*(((expandtosum(P_z,Xv))^(O_q)))*(((expandtosum(P_u,Xv))^(O_p)))),Xv)
 
-# Regel 24 nicht uebersetzt: predicate BinomialQ
+# Regel 24 nicht uebersetzt: predicate TrinomialMatchQ
 #   Int[Px_*z_^q_.*u_^p_.,x_Symbol] := Int[Px*ExpandToSum[z,x]^q*ExpandToSum[u,x]^p,x] /; FreeQ[{p,q},x] && PolyQ[Px,x] && BinomialQ[z,x] && TrinomialQ[u,x] && Not[BinomialMatchQ[z,x] && TrinomialMatchQ[u,x]]
 
-# Regel 25 nicht uebersetzt: predicate BinomialQ
+# Regel 25 (16 Varianten):
 #   Int[Px_*z_^q_.*u_^p_.,x_Symbol] := Int[Px*ExpandToSum[z,x]^q*ExpandToSum[u,x]^p,x] /; FreeQ[{p,q},x] && BinomialQ[z,x] && BinomialQ[u,x] && Not[BinomialMatchQ[z,x] && BinomialMatchQ[u,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_p,O_q), (binomialq(P_z,Xv)), (binomialq(P_u,Xv)), (not(((binomialmatchq(P_z,Xv)) && (binomialmatchq(P_u,Xv))))) Int((P_Px)*((P_z)^(O_q))*((P_u)^(O_p)),Xv) = Int(((P_Px)*(((expandtosum(P_z,Xv))^(O_q)))*(((expandtosum(P_u,Xv))^(O_p)))),Xv)
 
 # Regel 26 nicht uebersetzt: predicate GeneralizedTrinomialQ
 #   Int[u_^p_,x_Symbol] := Int[ExpandToSum[u,x]^p,x] /; FreeQ[p,x] && GeneralizedTrinomialQ[u,x] && Not[GeneralizedTrinomialMatchQ[u,x]]
@@ -87,8 +104,8 @@
 # Regel 27 nicht uebersetzt: predicate GeneralizedTrinomialQ
 #   Int[(d_.*x_)^m_.*u_^p_.,x_Symbol] := Int[(d*x)^m*ExpandToSum[u,x]^p,x] /; FreeQ[{d,m,p},x] && GeneralizedTrinomialQ[u,x] && Not[GeneralizedTrinomialMatchQ[u,x]]
 
-# Regel 28 nicht uebersetzt: predicate BinomialQ
+# Regel 28 nicht uebersetzt: predicate GeneralizedTrinomialQ
 #   Int[z_*u_^p_.,x_Symbol] := Int[ExpandToSum[z,x]*ExpandToSum[u,x]^p,x] /; FreeQ[p,x] && BinomialQ[z,x] && GeneralizedTrinomialQ[u,x] && EqQ[BinomialDegree[z,x]-GeneralizedTrinomialDegree[u,x],0] && Not[BinomialMatchQ[z,x] && GeneralizedTrinomialMatchQ[u,x]]
 
-# Regel 29 nicht uebersetzt: predicate BinomialQ
+# Regel 29 nicht uebersetzt: predicate GeneralizedTrinomialQ
 #   Int[(f_.*x_)^m_.*z_*u_^p_.,x_Symbol] := Int[(f*x)^m*ExpandToSum[z,x]*ExpandToSum[u,x]^p,x] /; FreeQ[{f,m,p},x] && BinomialQ[z,x] && GeneralizedTrinomialQ[u,x] && EqQ[BinomialDegree[z,x]-GeneralizedTrinomialDegree[u,x],0] && Not[BinomialMatchQ[z,x] && GeneralizedTrinomialMatchQ[u,x]]

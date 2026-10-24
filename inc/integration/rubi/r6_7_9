@@ -220,26 +220,26 @@ ADDSPEC RubiRules : IF (eqq(P_w,P_v)) Int((O_u)*((sinh(P_v))^(O_p))*((sinh(P_w))
 #   Int[u_.*Cosh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[u*Cosh[v]^(p + q), x] /; EqQ[w, v]
 ADDSPEC RubiRules : IF (eqq(P_w,P_v)) Int((O_u)*((cosh(P_v))^(O_p))*((cosh(P_w))^(O_q)),Xv) = Int(((O_u)*(((cosh(P_v))^(((O_p)+(O_q)))))),Xv)
 
-# Regel 57 nicht uebersetzt: function ExpandTrigReduce
+# Regel 57 nicht uebersetzt: function Cancel
 #   Int[Sinh[v_]^p_.*Sinh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Sinh[v]^p*Sinh[w]^q, x], x] /; IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
-# Regel 58 nicht uebersetzt: function ExpandTrigReduce
+# Regel 58 nicht uebersetzt: function Cancel
 #   Int[Cosh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Cosh[v]^p*Cosh[w]^q, x], x] /; IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
-# Regel 59 nicht uebersetzt: function ExpandTrigReduce
+# Regel 59 nicht uebersetzt: function Cancel
 #   Int[x_^m_.*Sinh[v_]^p_.*Sinh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Sinh[v]^p*Sinh[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
-# Regel 60 nicht uebersetzt: function ExpandTrigReduce
+# Regel 60 nicht uebersetzt: function Cancel
 #   Int[x_^m_.*Cosh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Cosh[v]^p*Cosh[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
 # Regel 61 (24 Varianten):
 #   Int[u_.*Sinh[v_]^p_.*Cosh[w_]^p_., x_Symbol] := 1/2^p*Int[u*Sinh[2*v]^p, x] /; EqQ[w, v] && IntegerQ[p]
 ADDSPEC RubiRules : IF (eqq(P_w,P_v)), (integerq(O_p)) Int((O_u)*((sinh(P_v))^(O_p))*((cosh(P_w))^(O_p)),Xv) = ((((((2)^(O_p)))^((-1))))*(Int(((O_u)*(((sinh(((2)*(P_v))))^(O_p)))),Xv)))
 
-# Regel 62 nicht uebersetzt: function ExpandTrigReduce
+# Regel 62 nicht uebersetzt: function Cancel
 #   Int[Sinh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Sinh[v]^p*Cosh[w]^q, x], x] /; IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
-# Regel 63 nicht uebersetzt: function ExpandTrigReduce
+# Regel 63 nicht uebersetzt: function Cancel
 #   Int[x_^m_.*Sinh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Sinh[v]^p*Cosh[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
 
 # Regel 64 (4 Varianten):
@@ -330,11 +330,13 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (integerq(((((O_m)+((-1))))*((1/2))))), 
 #   Int[Csch[v_]^m_.*(a_ + b_.*Coth[v_])^n_., x_Symbol] := Int[(b*Cosh[v] + a*Sinh[v])^n, x] /; FreeQ[{a, b}, x] && IntegerQ[(m - 1)/2] && EqQ[m + n, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (integerq(((((O_m)+((-1))))*((1/2))))), (eqq(((O_m)+(O_n)),0)) Int(((csch(P_v))^(O_m))*(((P_a)+((O_b)*(coth(P_v))))^(O_n)),Xv) = Int(((((((O_b)*(cosh(P_v))))+(((P_a)*(sinh(P_v))))))^(O_n)),Xv)
 
-# Regel 86 nicht uebersetzt: function ExpandTrigReduce
+# Regel 86 (1944 Varianten):
 #   Int[u_.*Sinh[a_. + b_.*x_]^m_.*Sinh[c_. + d_.*x_]^n_., x_Symbol] := Int[ExpandTrigReduce[u, Sinh[a + b*x]^m*Sinh[c + d*x]^n, x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_m,0)), (igtq(O_n,0)) Int((O_u)*((sinh((O_a)+((O_b)*(Xv))))^(O_m))*((sinh((O_c)+((O_d)*(Xv))))^(O_n)),Xv) = Int(expandtrigreduce(O_u,((((sinh(((O_a)+(((O_b)*(Xv))))))^(O_m)))*(((sinh(((O_c)+(((O_d)*(Xv))))))^(O_n)))),Xv),Xv)
 
-# Regel 87 nicht uebersetzt: function ExpandTrigReduce
+# Regel 87 (1944 Varianten):
 #   Int[u_.*Cosh[a_. + b_.*x_]^m_.*Cosh[c_. + d_.*x_]^n_., x_Symbol] := Int[ExpandTrigReduce[u, Cosh[a + b*x]^m*Cosh[c + d*x]^n, x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_m,0)), (igtq(O_n,0)) Int((O_u)*((cosh((O_a)+((O_b)*(Xv))))^(O_m))*((cosh((O_c)+((O_d)*(Xv))))^(O_n)),Xv) = Int(expandtrigreduce(O_u,((((cosh(((O_a)+(((O_b)*(Xv))))))^(O_m)))*(((cosh(((O_c)+(((O_d)*(Xv))))))^(O_n)))),Xv),Xv)
 
 # Regel 88 (108 Varianten):
 #   Int[Sech[a_. + b_.*x_]*Sech[c_ + d_.*x_], x_Symbol] := -Csch[(b*c - a*d)/d]*Int[Tanh[a + b*x], x] + Csch[(b*c - a*d)/b]*Int[Tanh[c + d*x], x] /; FreeQ[{a, b, c, d}, x] && EqQ[b^2 - d^2, 0] && NeQ[b*c - a*d, 0]

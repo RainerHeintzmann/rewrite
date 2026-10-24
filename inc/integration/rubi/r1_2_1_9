@@ -6,8 +6,9 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: function LeafCount
+# Regel 1 (20736 Varianten):
 #   Int[Px_*(a_+b_.*x_+c_.*x_^2)^p_.*(d_+e_.*x_+f_.*x_^2)^q_.,x_Symbol] := (c/f)^p \[Star] Int[Px*(d+e*x+f*x^2)^(p+q),x] /; FreeQ[{a,b,c,d,e,f,p,q},x] && PolyQ[Px,x] && EqQ[c*d-a*f,0] && EqQ[b*d-a*e,0] && (IntegerQ[p] || GtQ[c/f,0]) && (Not[IntegerQ[q]] || LeafCount[d+e*x+f*x^2]<=LeafCount[a+b*x+c*x^2])
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_d,O_e,O_f,O_p,O_q), (polyq(P_Px,Xv)), (eqq(((((O_c)*(P_d)))+((((-1))*(P_a)*(O_f)))),0)), (eqq(((((O_b)*(P_d)))+((((-1))*(P_a)*(O_e)))),0)), (((integerq(O_p)) || (((((O_c)*(((O_f)^((-1))))) > 0))))), (((not(integerq(O_q))) || ((leafcount(((P_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2))))))) <= leafcount(((P_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))))) Int((P_Px)*(((P_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))^(O_p))*(((P_d)+((O_e)*(Xv))+((O_f)*((Xv)^(2))))^(O_q)),Xv) = ((((((O_c)*(((O_f)^((-1))))))^(O_p)))*(Int(((P_Px)*(((((P_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(((O_p)+(O_q)))))),Xv)))
 
 # Regel 2 (20736 Varianten):
 #   Int[Px_*(a_+b_.*x_+c_.*x_^2)^p_.*(d_+e_.*x_+f_.*x_^2)^q_.,x_Symbol] := a^IntPart[p]*(a+b*x+c*x^2)^FracPart[p]/(d^IntPart[p]*(d+e*x+f*x^2)^FracPart[p]) \[Star] Int[Px*(d+e*x+f*x^2)^(p+q),x] /; FreeQ[{a,b,c,d,e,f,p,q},x] && PolyQ[Px,x] && EqQ[c*d-a*f,0] && EqQ[b*d-a*e,0] && Not[IntegerQ[p]] && Not[IntegerQ[q]] && Not[GtQ[c/f,0]]

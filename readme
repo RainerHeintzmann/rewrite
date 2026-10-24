@@ -401,7 +401,12 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Symbolische Hilfsfunktionen in C (symfkt.c, inc/helpers) wie expand, coeff,
    polyq, freeq, subst, und weitere elementare Funktionen (csc, sec, cot,
    arccot, hyperbolische und Area-Funktionen, polylog, productlog).
- - tools/rubi2rewrite.py uebersetzt etwa drei Viertel der Rubi-Regeln
+ - Spezialfunktionen (specfun.c, z.B. erf, Fresnel, Ei, Gamma, zeta,
+   elliptische Integrale, 2F1) mit Ableitungsregeln; weitere Rubi-Hilfsfunktionen.
+ - Exakte Zahlen (inc/exact, exact.c mit GMP): Sorten integer und rational,
+   Untersorten mit SUBSORT, ganze Literale mit INTNUM; Operatorvarianten
+   werden nach den Sorten der Argumente gewaehlt.
+ - tools/rubi2rewrite.py uebersetzt etwa 90% der Rubi-Regeln
    automatisch nach inc/integration/rubi (RubiIntegrate); tools/rubitest.py
    prueft sie mit Rubis Testsammlung.
 

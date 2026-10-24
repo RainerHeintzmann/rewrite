@@ -11,6 +11,7 @@
 #include "sym.h"		/* Symbol */
 #include "syn.h"		/* Number */
 #include "node.h"		/* mknum */
+#include "numsort.h"		/* int_literal (2026) */
 
 #ifdef	FLEX_SCANNER
 
@@ -58,6 +59,12 @@ sp_ops2 ([\-\+])
 {sp_ops2}*	{ return lookup(yytext); }	/* Id, etc */
 {numb}	   { double * value;
               Symbol * sp;
+				  if (strspn(yytext,"0123456789") == strlen(yytext)
+				      && (sp = int_literal(yytext)) != NULL)  /* 2026: ganze Zahl (INTNUM) */
+					{
+					yylval.y_sym = sp;
+					return lexval(sp);
+					}
 				  value = (double *) malloc(sizeof(double));
 				  if (! value)
 						fatal("lex: no room for making real-number !\n");

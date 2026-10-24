@@ -142,14 +142,17 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_m,O_n,P_p), (not(integerq(P_p))), (not((free
 #   Int[u_.*(a_.*v_^m_.)^p_,x_Symbol] := a^IntPart[p]*(a*v^m)^FracPart[p]/v^(m*FracPart[p]) \[Star] Int[u*v^(m*p),x] /; FreeQ[{a,m,p},x] && Not[IntegerQ[p]] && Not[FreeQ[v,x]] && Not[EqQ[a,1] && EqQ[m,1]] && Not[EqQ[v,x] && EqQ[m,1]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_m,P_p), (not(integerq(P_p))), (not((freeq(P_v,Xv)))), (not(((eqq(O_a,1)) && (eqq(O_m,1))))), (not(((eqq(P_v,Xv)) && (eqq(O_m,1))))) Int((O_u)*(((O_a)*((P_v)^(O_m)))^(P_p)),Xv) = ((((O_a)^(intpart(P_p))))*(((((O_a)*(((P_v)^(O_m)))))^(fracpart(P_p))))*(((((P_v)^(((O_m)*(fracpart(P_p))))))^((-1))))*(Int(((O_u)*(((P_v)^(((O_m)*(P_p)))))),Xv)))
 
-# Regel 42 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 42 (27 Varianten):
 #   Int[u_.*(a_.+b_.*x_^n_)^p_,x_Symbol] := b^IntPart[p]*(a+b*x^n)^FracPart[p]/(x^(n*FracPart[p])*(1+a*x^(-n)/b)^FracPart[p]) \[Star] Int[u*x^(n*p)*(1+a*x^(-n)/b)^p,x] /; FreeQ[{a,b,p},x] && Not[IntegerQ[p]] && ILtQ[n,0] && Not[RationalFunctionQ[u,x]] && IntegerQ[p+1/2]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_p), (not(integerq(P_p))), (iltq(P_n,0)), (not(rationalfunctionq(O_u,Xv))), (integerq(((P_p)+((1/2))))) Int((O_u)*(((O_a)+((O_b)*((Xv)^(P_n))))^(P_p)),Xv) = ((((O_b)^(intpart(P_p))))*(((((O_a)+(((O_b)*(((Xv)^(P_n)))))))^(fracpart(P_p))))*(((((((Xv)^(((P_n)*(fracpart(P_p))))))*(((((1)+(((O_a)*(((Xv)^((((-1))*(P_n)))))*(((O_b)^((-1))))))))^(fracpart(P_p))))))^((-1))))*(Int(((O_u)*(((Xv)^(((P_n)*(P_p)))))*(((((1)+(((O_a)*(((Xv)^((((-1))*(P_n)))))*(((O_b)^((-1))))))))^(P_p)))),Xv)))
 
-# Regel 43 nicht uebersetzt: predicate BinomialQ
+# Regel 43 (27 Varianten):
 #   Int[u_.*(a_.+b_.*v_^n_)^p_,x_Symbol] := (a+b*v^n)^FracPart[p]/(v^(n*FracPart[p])*(b+a*v^(-n))^FracPart[p]) \[Star] Int[u*v^(n*p)*(b+a*v^(-n))^p,x] /; FreeQ[{a,b,p},x] && Not[IntegerQ[p]] && ILtQ[n,0] && BinomialQ[v,x] && Not[LinearQ[v,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_p), (not(integerq(P_p))), (iltq(P_n,0)), (binomialq(P_v,Xv)), (not(linearq(P_v,Xv))) Int((O_u)*(((O_a)+((O_b)*((P_v)^(P_n))))^(P_p)),Xv) = ((((((O_a)+(((O_b)*(((P_v)^(P_n)))))))^(fracpart(P_p))))*(((((((P_v)^(((P_n)*(fracpart(P_p))))))*(((((O_b)+(((O_a)*(((P_v)^((((-1))*(P_n)))))))))^(fracpart(P_p))))))^((-1))))*(Int(((O_u)*(((P_v)^(((P_n)*(P_p)))))*(((((O_b)+(((O_a)*(((P_v)^((((-1))*(P_n)))))))))^(P_p)))),Xv)))
 
-# Regel 44 nicht uebersetzt: predicate BinomialQ
+# Regel 44 (108 Varianten):
 #   Int[u_.*(a_.+b_.*x_^m_.*v_^n_)^p_,x_Symbol] := (a+b*x^m*v^n)^FracPart[p]/(v^(n*FracPart[p])*(b*x^m+a*v^(-n))^FracPart[p]) \[Star] Int[u*v^(n*p)*(b*x^m+a*v^(-n))^p,x] /; FreeQ[{a,b,m,p},x] && Not[IntegerQ[p]] && ILtQ[n,0] && BinomialQ[v,x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,P_p), (not(integerq(P_p))), (iltq(P_n,0)), (binomialq(P_v,Xv)) Int((O_u)*(((O_a)+((O_b)*((Xv)^(O_m))*((P_v)^(P_n))))^(P_p)),Xv) = ((((((O_a)+(((O_b)*(((Xv)^(O_m)))*(((P_v)^(P_n)))))))^(fracpart(P_p))))*(((((((P_v)^(((P_n)*(fracpart(P_p))))))*(((((((O_b)*(((Xv)^(O_m)))))+(((O_a)*(((P_v)^((((-1))*(P_n)))))))))^(fracpart(P_p))))))^((-1))))*(Int(((O_u)*(((P_v)^(((P_n)*(P_p)))))*(((((((O_b)*(((Xv)^(O_m)))))+(((O_a)*(((P_v)^((((-1))*(P_n)))))))))^(P_p)))),Xv)))
 
 # Regel 45 (216 Varianten):
 #   Int[u_.*(a_.*x_^r_.+b_.*x_^s_.)^m_,x_Symbol] := With[{v=(a*x^r+b*x^s)^FracPart[m]/(x^(r*FracPart[m])*(a+b*x^(s-r))^FracPart[m])}, v \[Star] Int[u*x^(m*r)*(a+b*x^(s-r))^m,x] /; NeQ[Simplify[v],1]] /; FreeQ[{a,b,m,r,s},x] && Not[IntegerQ[m]] && PosQ[s-r]
@@ -158,11 +161,13 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m,O_r,O_s), (not(integerq(P_m))), (posq(
 # Regel 46 nicht uebersetzt: function RationalFunctionExpand
 #   Int[u_/(a_+b_.*x_^n_),x_Symbol] := With[{v=RationalFunctionExpand[u/(a+b*x^n),x]}, Int[v,x] /; SumQ[v]] /; FreeQ[{a,b},x] && IGtQ[n,0]
 
-# Regel 47 nicht uebersetzt: predicate AlgebraicFunctionQ
+# Regel 47 (864 Varianten):
 #   Int[u_*(a_.+b_.*x_^n_.+c_.*x_^n2_.)^p_.,x_Symbol] := 1/(4^p*c^p) \[Star] Int[u*(b+2*c*x^n)^(2*p),x] /; FreeQ[{a,b,c,n},x] && EqQ[n2,2*n] && EqQ[b^2-4*a*c,0] && IntegerQ[p] && Not[AlgebraicFunctionQ[u,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (eqq(O_n2,((2)*(O_n)))), (eqq(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),0)), (integerq(O_p)), (not(algebraicfunctionq(P_u,Xv))) Int((P_u)*(((O_a)+((O_b)*((Xv)^(O_n)))+((O_c)*((Xv)^(O_n2))))^(O_p)),Xv) = ((((((((4)^(O_p)))*(((O_c)^(O_p)))))^((-1))))*(Int(((P_u)*(((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(O_p)))))),Xv)))
 
-# Regel 48 nicht uebersetzt: predicate AlgebraicFunctionQ
+# Regel 48 (432 Varianten):
 #   Int[u_*(a_.+b_.*x_^n_.+c_.*x_^n2_.)^p_,x_Symbol] := (a+b*x^n+c*x^(2*n))^p/(b+2*c*x^n)^(2*p) \[Star] Int[u*(b+2*c*x^n)^(2*p),x] /; FreeQ[{a,b,c,n,p},x] && EqQ[n2,2*n] && EqQ[b^2-4*a*c,0] && Not[IntegerQ[p]] && Not[AlgebraicFunctionQ[u,x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n,P_p), (eqq(O_n2,((2)*(O_n)))), (eqq(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),0)), (not(integerq(P_p))), (not(algebraicfunctionq(P_u,Xv))) Int((P_u)*(((O_a)+((O_b)*((Xv)^(O_n)))+((O_c)*((Xv)^(O_n2))))^(P_p)),Xv) = ((((((O_a)+(((O_b)*(((Xv)^(O_n)))))+(((O_c)*(((Xv)^(((2)*(O_n)))))))))^(P_p)))*(((((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(P_p)))))^((-1))))*(Int(((P_u)*(((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(P_p)))))),Xv)))
 
 # Regel 49 nicht uebersetzt: function RationalFunctionExpand
 #   Int[u_/(a_.+b_.*x_^n_.+c_.*x_^n2_.),x_Symbol] := With[{v=RationalFunctionExpand[u/(a+b*x^n+c*x^(2*n)),x]}, Int[v,x] /; SumQ[v]] /; FreeQ[{a,b,c},x] && EqQ[n2,2*n] && IGtQ[n,0]
@@ -201,7 +206,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_m,P_n) Int((O_u)*((((
 # Regel 60 nicht uebersetzt: function Sum
 #   Int[1/(a_+b_.*v_^n_),x_Symbol] := 1/(a*n) \[Star] Sum[Int[Together[1/(1-v/((-1)^(2*k/n)*Rt[-a/b,n]))],x],{k,1,n}] /; FreeQ[{a,b},x] && IGtQ[(n-1)/2,0]
 
-# Regel 61 nicht uebersetzt: function ReplaceAll
+# Regel 61 nicht uebersetzt: function PolynomialInSubst
 #   Int[v_/(a_+b_.*u_^n_.),x_Symbol] := Int[ReplaceAll[ExpandIntegrand[PolynomialInSubst[v,u,x]/(a+b*x^n),x],x->u],x] /; FreeQ[{a,b},x] && IGtQ[n,0] && PolynomialInQ[v,u,x]
 
 # Regel 62 nicht uebersetzt: parse error at '!='

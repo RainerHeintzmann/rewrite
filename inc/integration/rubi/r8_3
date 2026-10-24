@@ -6,80 +6,104 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 1 (9 Varianten):
 #   Int[ExpIntegralE[n_, a_. + b_.*x_], x_Symbol] := -ExpIntegralE[n + 1, a + b*x]/b /; FreeQ[{a, b, n}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_n) Int(expinte(P_n,(O_a)+((O_b)*(Xv))),Xv) = (((-1))*(expinte(((P_n)+(1)),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1)))))
 
-# Regel 2 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 2 (12 Varianten):
 #   Int[x_^m_.*ExpIntegralE[n_, b_.*x_], x_Symbol] := -x^m*ExpIntegralE[n + 1, b*x]/b + m/b*Int[x^(m - 1)*ExpIntegralE[n + 1, b*x], x] /; FreeQ[b, x] && EqQ[m + n, 0] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_b), (eqq(((O_m)+(P_n)),0)), (igtq(O_m,0)) Int(((Xv)^(O_m))*(expinte(P_n,(O_b)*(Xv))),Xv) = (((((-1))*(((Xv)^(O_m)))*(expinte(((P_n)+(1)),((O_b)*(Xv))))*(((O_b)^((-1))))))+(((O_m)*(((O_b)^((-1))))*(Int(((((Xv)^(((O_m)+((-1))))))*(expinte(((P_n)+(1)),((O_b)*(Xv))))),Xv)))))
 
-# Regel 3 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 3 nicht uebersetzt: function HypergeometricPFQ
 #   Int[ExpIntegralE[1, b_.*x_]/x_, x_Symbol] := b*x*HypergeometricPFQ[{1, 1, 1}, {2, 2, 2}, -b*x] - EulerGamma*Log[x] - 1/2*Log[b*x]^2 /; FreeQ[b, x]
 
-# Regel 4 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 4 (6 Varianten):
 #   Int[x_^m_*ExpIntegralE[n_, b_.*x_], x_Symbol] := x^(m + 1)*ExpIntegralE[n, b*x]/(m + 1) + b/(m + 1)*Int[x^(m + 1)*ExpIntegralE[n - 1, b*x], x] /; FreeQ[b, x] && EqQ[m + n, 0] && ILtQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_b), (eqq(((P_m)+(P_n)),0)), (iltq(P_m,(-1))) Int(((Xv)^(P_m))*(expinte(P_n,(O_b)*(Xv))),Xv) = ((((((Xv)^(((P_m)+(1)))))*(expinte(P_n,((O_b)*(Xv))))*(((((P_m)+(1)))^((-1))))))+(((O_b)*(((((P_m)+(1)))^((-1))))*(Int(((((Xv)^(((P_m)+(1)))))*(expinte(((P_n)+((-1))),((O_b)*(Xv))))),Xv)))))
 
-# Regel 5 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 5 nicht uebersetzt: function HypergeometricPFQ
 #   Int[(d_.*x_)^m_*ExpIntegralE[n_, b_.*x_], x_Symbol] := (d*x)^m*Gamma[m + 1]*Log[x]/(b*(b*x)^m) - (d*x)^(m + 1)* HypergeometricPFQ[{m + 1, m + 1}, {m + 2, m + 2}, -b* x]/(d*(m + 1)^2) /; FreeQ[{b, d, m, n}, x] && EqQ[m + n, 0] && Not[IntegerQ[m]]
 
-# Regel 6 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 6 (36 Varianten):
 #   Int[(d_.*x_)^m_.*ExpIntegralE[n_, b_.*x_], x_Symbol] := (d*x)^(m + 1)*ExpIntegralE[n, b*x]/(d*(m + n)) - (d*x)^(m + 1)* ExpIntegralE[-m, b*x]/(d*(m + n)) /; FreeQ[{b, d, m, n}, x] && NeQ[m + n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_d,O_m,P_n), (neq(((O_m)+(P_n)),0)) Int((((O_d)*(Xv))^(O_m))*(expinte(P_n,(O_b)*(Xv))),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(expinte(P_n,((O_b)*(Xv))))*(((((O_d)*(((O_m)+(P_n)))))^((-1))))))+((((-1))*(((((O_d)*(Xv)))^(((O_m)+(1)))))*(expinte((((-1))*(O_m)),((O_b)*(Xv))))*(((((O_d)*(((O_m)+(P_n)))))^((-1)))))))
 
-# Regel 7 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 7 (216 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*ExpIntegralE[n_, a_ + b_.*x_], x_Symbol] := -(c + d*x)^m*ExpIntegralE[n + 1, a + b*x]/b + d*m/b*Int[(c + d*x)^(m - 1)*ExpIntegralE[n + 1, a + b*x], x] /; FreeQ[{a, b, c, d, m, n}, x] && (IGtQ[m, 0] || ILtQ[n, 0] || GtQ[m, 0] && LtQ[n, -1])
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_m,P_n), (((igtq(O_m,0)) || (iltq(P_n,0)) || (((((O_m > 0))) && (((P_n < (-1)))))))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(expinte(P_n,(P_a)+((O_b)*(Xv)))),Xv) = (((((-1))*(((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(expinte(((P_n)+(1)),((P_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))))+(((O_d)*(O_m)*(((O_b)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(expinte(((P_n)+(1)),((P_a)+(((O_b)*(Xv))))))),Xv)))))
 
-# Regel 8 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 8 (216 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*ExpIntegralE[n_, a_ + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*ExpIntegralE[n, a + b*x]/(d*(m + 1)) + b/(d*(m + 1))* Int[(c + d*x)^(m + 1)*ExpIntegralE[n - 1, a + b*x], x] /; FreeQ[{a, b, c, d, m, n}, x] && (IGtQ[n, 0] || LtQ[m, -1] && GtQ[n, 0]) && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_m,P_n), (((igtq(P_n,0)) || (((((O_m < (-1)))) && (((P_n > 0))))))), (neq(O_m,(-1))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(expinte(P_n,(P_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(expinte(P_n,((P_a)+(((O_b)*(Xv))))))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+(((O_b)*(((((O_d)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(expinte(((P_n)+((-1))),((P_a)+(((O_b)*(Xv))))))),Xv)))))
 
-# Regel 9 nicht uebersetzt: function ExpIntegralE in pattern
+# Regel 9 (216 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*ExpIntegralE[n_, a_ + b_.*x_], x_Symbol] := Unintegrable[(c + d*x)^m*ExpIntegralE[n, a + b*x], x] /; FreeQ[{a, b, c, d, m, n}, x]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_m,P_n) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(expinte(P_n,(P_a)+((O_b)*(Xv)))),Xv) = unintegrable(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(expinte(P_n,((P_a)+(((O_b)*(Xv))))))),Xv)
 
-# Regel 10 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 10 (9 Varianten):
 #   Int[ExpIntegralEi[a_. + b_.*x_], x_Symbol] := (a + b*x)*ExpIntegralEi[a + b*x]/b - E^(a + b*x)/b /; FreeQ[{a, b}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b) Int(expint((O_a)+((O_b)*(Xv))),Xv) = ((((((O_a)+(((O_b)*(Xv)))))*(expint(((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(exp(((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1)))))))
 
-# Regel 11 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 11 (6 Varianten):
 #   Int[ExpIntegralEi[b_.*x_]/x_, x_Symbol] := Log[x]*(ExpIntegralEi[b*x] + ExpIntegralE[1, -b*x]) - Int[ExpIntegralE[1, -b*x]/x, x] /; FreeQ[b, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_b) Int((expint((O_b)*(Xv)))*((Xv)^(K_1)),Xv) = ((((ln(Xv))*(((expint(((O_b)*(Xv))))+(expinte(1,(((-1))*(O_b)*(Xv))))))))+((((-1))*(Int(((expinte(1,(((-1))*(O_b)*(Xv))))*(((Xv)^((-1))))),Xv)))))
 
-# Regel 12 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 12 (162 Varianten):
 #   Int[ExpIntegralEi[a_. + b_.*x_]/(c_. + d_.*x_), x_Symbol] := Unintegrable[ExpIntegralEi[a + b*x]/(c + d*x), x] /; FreeQ[{a, b, c, d}, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d) Int((expint((O_a)+((O_b)*(Xv))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = unintegrable(((expint(((O_a)+(((O_b)*(Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))),Xv)
 
-# Regel 13 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 13 (324 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*ExpIntegralEi[a_. + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*ExpIntegralEi[a + b*x]/(d*(m + 1)) - b/(d*(m + 1))*Int[(c + d*x)^(m + 1)*E^(a + b*x)/(a + b*x), x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (neq(O_m,(-1))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(expint((O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(expint(((O_a)+(((O_b)*(Xv))))))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(((((O_d)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(exp(((O_a)+(((O_b)*(Xv))))))*(((((O_a)+(((O_b)*(Xv)))))^((-1))))),Xv)))))
 
-# Regel 14 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 14 (9 Varianten):
 #   Int[ExpIntegralEi[a_. + b_.*x_]^2, x_Symbol] := (a + b*x)*ExpIntegralEi[a + b*x]^2/b - 2*Int[E^(a + b*x)*ExpIntegralEi[a + b*x], x] /; FreeQ[{a, b}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b) Int((expint((O_a)+((O_b)*(Xv))))^(2),Xv) = ((((((O_a)+(((O_b)*(Xv)))))*(((expint(((O_a)+(((O_b)*(Xv))))))^(2)))*(((O_b)^((-1))))))+((((-2))*(Int(((exp(((O_a)+(((O_b)*(Xv))))))*(expint(((O_a)+(((O_b)*(Xv))))))),Xv)))))
 
-# Regel 15 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 15 (12 Varianten):
 #   Int[x_^m_.*ExpIntegralEi[b_.*x_]^2, x_Symbol] := x^(m + 1)*ExpIntegralEi[b*x]^2/(m + 1) - 2/(m + 1)*Int[x^m*E^(b*x)*ExpIntegralEi[b*x], x] /; FreeQ[b, x] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_b), (igtq(O_m,0)) Int(((Xv)^(O_m))*((expint((O_b)*(Xv)))^(2)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((expint(((O_b)*(Xv))))^(2)))*(((((O_m)+(1)))^((-1))))))+((((-2))*(((((O_m)+(1)))^((-1))))*(Int(((((Xv)^(O_m)))*(exp(((O_b)*(Xv))))*(expint(((O_b)*(Xv))))),Xv)))))
 
-# Regel 16 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 16 (24 Varianten):
 #   Int[x_^m_.*ExpIntegralEi[a_ + b_.*x_]^2, x_Symbol] := x^(m + 1)*ExpIntegralEi[a + b*x]^2/(m + 1) + a*x^m*ExpIntegralEi[a + b*x]^2/(b*(m + 1)) - 2/(m + 1)*Int[x^m*E^(a + b*x)*ExpIntegralEi[a + b*x], x] - a*m/(b*(m + 1))*Int[x^(m - 1)*ExpIntegralEi[a + b*x]^2, x] /; FreeQ[{a, b}, x] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (igtq(O_m,0)) Int(((Xv)^(O_m))*((expint((P_a)+((O_b)*(Xv))))^(2)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((expint(((P_a)+(((O_b)*(Xv))))))^(2)))*(((((O_m)+(1)))^((-1))))))+(((P_a)*(((Xv)^(O_m)))*(((expint(((P_a)+(((O_b)*(Xv))))))^(2)))*(((((O_b)*(((O_m)+(1)))))^((-1))))))+((((-2))*(((((O_m)+(1)))^((-1))))*(Int(((((Xv)^(O_m)))*(exp(((P_a)+(((O_b)*(Xv))))))*(expint(((P_a)+(((O_b)*(Xv))))))),Xv))))+((((-1))*(P_a)*(O_m)*(((((O_b)*(((O_m)+(1)))))^((-1))))*(Int(((((Xv)^(((O_m)+((-1))))))*(((expint(((P_a)+(((O_b)*(Xv))))))^(2)))),Xv)))))
 
-# Regel 17 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 17 (162 Varianten):
 #   Int[E^(a_. + b_.*x_)*ExpIntegralEi[c_. + d_.*x_], x_Symbol] := E^(a + b*x)*ExpIntegralEi[c + d*x]/b - d/b*Int[E^(a + c + (b + d)*x)/(c + d*x), x] /; FreeQ[{a, b, c, d}, x]
+ADDSPEC RubiRules : IF (abs(K_1 - e) < 1e-9), NIN(Xv,O_a,O_b,O_c,O_d) Int(((K_1)^((O_a)+((O_b)*(Xv))))*(expint((O_c)+((O_d)*(Xv)))),Xv) = ((((exp(((O_a)+(((O_b)*(Xv))))))*(expint(((O_c)+(((O_d)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(O_d)*(((O_b)^((-1))))*(Int(((exp(((O_a)+(O_c)+(((((O_b)+(O_d)))*(Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))),Xv)))))
 
-# Regel 18 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 18 (648 Varianten):
 #   Int[x_^m_.*E^(a_. + b_.*x_)*ExpIntegralEi[c_. + d_.*x_], x_Symbol] := x^m*E^(a + b*x)*ExpIntegralEi[c + d*x]/b - d/b*Int[x^m*E^(a + c + (b + d)*x)/(c + d*x), x] - m/b*Int[x^(m - 1)*E^(a + b*x)*ExpIntegralEi[c + d*x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF (abs(K_1 - e) < 1e-9), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_m,0)) Int(((Xv)^(O_m))*((K_1)^((O_a)+((O_b)*(Xv))))*(expint((O_c)+((O_d)*(Xv)))),Xv) = ((((((Xv)^(O_m)))*(exp(((O_a)+(((O_b)*(Xv))))))*(expint(((O_c)+(((O_d)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(O_d)*(((O_b)^((-1))))*(Int(((((Xv)^(O_m)))*(exp(((O_a)+(O_c)+(((((O_b)+(O_d)))*(Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))),Xv))))+((((-1))*(O_m)*(((O_b)^((-1))))*(Int(((((Xv)^(((O_m)+((-1))))))*(exp(((O_a)+(((O_b)*(Xv))))))*(expint(((O_c)+(((O_d)*(Xv))))))),Xv)))))
 
-# Regel 19 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 19 (324 Varianten):
 #   Int[x_^m_*E^(a_. + b_.*x_)*ExpIntegralEi[c_. + d_.*x_], x_Symbol] := x^(m + 1)*E^(a + b*x)*ExpIntegralEi[c + d*x]/(m + 1) - d/(m + 1)*Int[x^(m + 1)*E^(a + c + (b + d)*x)/(c + d*x), x] - b/(m + 1)*Int[x^(m + 1)*E^(a + b*x)*ExpIntegralEi[c + d*x], x] /; FreeQ[{a, b, c, d}, x] && ILtQ[m, -1]
+ADDSPEC RubiRules : IF (abs(K_1 - e) < 1e-9), NIN(Xv,O_a,O_b,O_c,O_d), (iltq(P_m,(-1))) Int(((Xv)^(P_m))*((K_1)^((O_a)+((O_b)*(Xv))))*(expint((O_c)+((O_d)*(Xv)))),Xv) = ((((((Xv)^(((P_m)+(1)))))*(exp(((O_a)+(((O_b)*(Xv))))))*(expint(((O_c)+(((O_d)*(Xv))))))*(((((P_m)+(1)))^((-1))))))+((((-1))*(O_d)*(((((P_m)+(1)))^((-1))))*(Int(((((Xv)^(((P_m)+(1)))))*(exp(((O_a)+(O_c)+(((((O_b)+(O_d)))*(Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))),Xv))))+((((-1))*(O_b)*(((((P_m)+(1)))^((-1))))*(Int(((((Xv)^(((P_m)+(1)))))*(exp(((O_a)+(((O_b)*(Xv))))))*(expint(((O_c)+(((O_d)*(Xv))))))),Xv)))))
 
-# Regel 20 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 20 (162 Varianten):
 #   Int[ExpIntegralEi[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := x*ExpIntegralEi[d*(a + b*Log[c*x^n])] - b*n*E^(a*d)*Int[(c*x^n)^(b*d)/(a + b*Log[c*x^n]), x] /; FreeQ[{a, b, c, d, n}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n) Int(expint((O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))),Xv) = ((((Xv)*(expint(((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))))+((((-1))*(O_b)*(O_n)*(exp(((O_a)*(O_d))))*(Int(((((((O_c)*(((Xv)^(O_n)))))^(((O_b)*(O_d)))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^((-1))))),Xv)))))
 
-# Regel 21 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 21 (324 Varianten):
 #   Int[ExpIntegralEi[d_.*(a_. + b_.*Log[c_.*x_^n_.])]/x_, x_Symbol] := 1/n*Subst[ExpIntegralEi[d*(a + b*x)], x, Log[c*x^n]] /; FreeQ[{a, b, c, d, n}, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_n) Int((expint((O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))))*((Xv)^(K_1)),Xv) = ((((O_n)^((-1))))*(subst(expint(((O_d)*(((O_a)+(((O_b)*(Xv))))))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
 
-# Regel 22 nicht uebersetzt: function ExpIntegralEi in pattern
+# Regel 22 (1944 Varianten):
 #   Int[(e_.*x_)^m_.*ExpIntegralEi[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := (e*x)^(m + 1)*ExpIntegralEi[d*(a + b*Log[c*x^n])]/(e*(m + 1)) - b*n*E^(a*d)*(c*x^n)^(b*d)/((m + 1)*(e*x)^(b*d*n))* Int[(e*x)^(m + b*d*n)/(a + b*Log[c*x^n]), x] /; FreeQ[{a, b, c, d, e, m, n}, x] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n), (neq(O_m,(-1))) Int((((O_e)*(Xv))^(O_m))*(expint((O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))))),Xv) = ((((((((O_e)*(Xv)))^(((O_m)+(1)))))*(expint(((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))*(((((O_e)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_n)*(exp(((O_a)*(O_d))))*(((((O_c)*(((Xv)^(O_n)))))^(((O_b)*(O_d)))))*(((((((O_m)+(1)))*(((((O_e)*(Xv)))^(((O_b)*(O_d)*(O_n)))))))^((-1))))*(Int(((((((O_e)*(Xv)))^(((O_m)+(((O_b)*(O_d)*(O_n)))))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^((-1))))),Xv)))))
 
-# Regel 23 nicht uebersetzt: function LogIntegral in pattern
+# Regel 23 (9 Varianten):
 #   Int[LogIntegral[a_. + b_.*x_], x_Symbol] := (a + b*x)*LogIntegral[a + b*x]/b - ExpIntegralEi[2*Log[a + b*x]]/b /; FreeQ[{a, b}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b) Int(logint((O_a)+((O_b)*(Xv))),Xv) = ((((((O_a)+(((O_b)*(Xv)))))*(logint(((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(expint(((2)*(ln(((O_a)+(((O_b)*(Xv)))))))))*(((O_b)^((-1)))))))
 
-# Regel 24 nicht uebersetzt: function LogIntegral in pattern
+# Regel 24 (6 Varianten):
 #   Int[LogIntegral[b_.*x_]/x_, x_Symbol] := -b*x + Log[b*x]*LogIntegral[b*x] /; FreeQ[b, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_b) Int((logint((O_b)*(Xv)))*((Xv)^(K_1)),Xv) = (((((-1))*(O_b)*(Xv)))+(((ln(((O_b)*(Xv))))*(logint(((O_b)*(Xv)))))))
 
-# Regel 25 nicht uebersetzt: function LogIntegral in pattern
+# Regel 25 (162 Varianten):
 #   Int[LogIntegral[a_. + b_.*x_]/(c_. + d_.*x_), x_Symbol] := Unintegrable[LogIntegral[a + b*x]/(c + d*x), x] /; FreeQ[{a, b, c, d}, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d) Int((logint((O_a)+((O_b)*(Xv))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = unintegrable(((logint(((O_a)+(((O_b)*(Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))),Xv)
 
-# Regel 26 nicht uebersetzt: function LogIntegral in pattern
+# Regel 26 (324 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*LogIntegral[a_. + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*LogIntegral[a + b*x]/(d*(m + 1)) - b/(d*(m + 1))*Int[(c + d*x)^(m + 1)/Log[a + b*x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (neq(O_m,(-1))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(logint((O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(logint(((O_a)+(((O_b)*(Xv))))))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(((((O_d)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(((ln(((O_a)+(((O_b)*(Xv))))))^((-1))))),Xv)))))

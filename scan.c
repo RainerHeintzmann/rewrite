@@ -470,6 +470,7 @@ char *yytext;
 #include "sym.h"		/* Symbol */
 #include "syn.h"		/* Number */
 #include "node.h"		/* mknum */
+#include "numsort.h"		/* int_literal (2026) */
 
 #ifdef	FLEX_SCANNER
 
@@ -494,8 +495,8 @@ static int i;
 #endif
 
 
-#line 497 "<stdout>"
 #line 498 "<stdout>"
+#line 499 "<stdout>"
 
 #define INITIAL 0
 
@@ -712,10 +713,10 @@ YY_DECL
 		}
 
 	{
-#line 47 "scan.l"
+#line 48 "scan.l"
 
 
-#line 718 "<stdout>"
+#line 719 "<stdout>"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -775,7 +776,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 49 "scan.l"
+#line 50 "scan.l"
 { int i;
 				  	for (i=1;yytext[i]!=0;i++)
 						;
@@ -785,24 +786,30 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 56 "scan.l"
+#line 57 "scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 57 "scan.l"
+#line 58 "scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 58 "scan.l"
+#line 59 "scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 59 "scan.l"
+#line 60 "scan.l"
 { double * value;
               Symbol * sp;
+				  if (strspn(yytext,"0123456789") == strlen(yytext)
+				      && (sp = int_literal(yytext)) != NULL)  /* 2026: ganze Zahl (INTNUM) */
+					{
+					yylval.y_sym = sp;
+					return lexval(sp);
+					}
 				  value = (double *) malloc(sizeof(double));
 				  if (! value)
 						fatal("lex: no room for making real-number !\n");
@@ -816,7 +823,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 71 "scan.l"
+#line 78 "scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 7:
@@ -824,29 +831,29 @@ case 7:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 73 "scan.l"
+#line 80 "scan.l"
 ;			/* #... ignorieren */
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 74 "scan.l"
+#line 81 "scan.l"
 ;			/* Zwischenraum ignorieren */
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
-#line 77 "scan.l"
+#line 84 "scan.l"
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 77 "scan.l"
+#line 84 "scan.l"
 return (int) yytext[0];	/* 'x' fuer yyparse() */
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 79 "scan.l"
+#line 86 "scan.l"
 ECHO;
 	YY_BREAK
-#line 849 "<stdout>"
+#line 856 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1851,7 +1858,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 79 "scan.l"
+#line 86 "scan.l"
 
 
 /*

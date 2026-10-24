@@ -35,8 +35,9 @@ ADDSPEC RubiRules : IF (not(integerq(P_p))), (polyq(P_Px,Xv)), (((expon(P_Px,Xv)
 # Regel 8 nicht uebersetzt: predicate MatchQ
 #   Int[(c_.*x_)^m_.*u_,x_Symbol] := Int[ExpandIntegrand[(c*x)^m*u,x],x] /; FreeQ[{c,m},x] && SumQ[u] && Not[LinearQ[u,x]] && Not[MatchQ[u,a_+b_.*v_ /; FreeQ[{a,b},x] && InverseFunctionQ[v]]]
 
-# Regel 9 nicht uebersetzt: predicate SimplerQ
+# Regel 9 (864 Varianten):
 #   Int[u_.*(a_+b_.*v_)^m_.*(c_+d_.*v_)^n_.,x_Symbol] := (b/d)^m \[Star] Int[u*(c+d*v)^(m+n),x] /; FreeQ[{a,b,c,d,n},x] && EqQ[b*c-a*d,0] && IntegerQ[m] && (Not[IntegerQ[n]] || SimplerQ[c+d*x,a+b*x])
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d,O_n), (eqq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)), (integerq(O_m)), (((not(integerq(O_n))) || (simplerq(((P_c)+(((O_d)*(Xv)))),((P_a)+(((O_b)*(Xv)))))))) Int((O_u)*(((P_a)+((O_b)*(P_v)))^(O_m))*(((P_c)+((O_d)*(P_v)))^(O_n)),Xv) = ((((((O_b)*(((O_d)^((-1))))))^(O_m)))*(Int(((O_u)*(((((P_c)+(((O_d)*(P_v)))))^(((O_m)+(O_n)))))),Xv)))
 
 # Regel 10 (216 Varianten):
 #   Int[u_.*(a_+b_.*v_)^m_*(c_+d_.*v_)^n_,x_Symbol] := (b/d)^m \[Star] Int[u*(c+d*v)^(m+n),x] /; FreeQ[{a,b,c,d,m,n},x] && EqQ[b*c-a*d,0] && GtQ[b/d,0] && Not[IntegerQ[m] || IntegerQ[n]]
@@ -204,11 +205,13 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,P_c,O_d,O_e,O_m,O_n,P_p), (
 #   Int[(f_*x_)^m_*(e_.*(a_.+b_.*x_^n_.)/(c_+d_.*x_^n_.))^p_,x_Symbol] := Simp[(c*x)^m/x^m] \[Star] Int[x^m*(e*(a+b*x^n)/(c+d*x^n))^p,x] /; FreeQ[{a,b,c,d,e,f,m,n,p},x] && IntegerQ[Simplify[(m+1)/n]]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,P_c,O_d,O_e,P_f,P_m,O_n,P_p), (integerq(simplify(((((P_m)+(1)))*(((O_n)^((-1)))))))) Int((((P_f)*(Xv))^(P_m))*(((O_e)*((O_a)+((O_b)*((Xv)^(O_n))))*(((P_c)+((O_d)*((Xv)^(O_n))))^(K_1)))^(P_p)),Xv) = ((simp(((((((P_c)*(Xv)))^(P_m)))*(((((Xv)^(P_m)))^((-1)))))))*(Int(((((Xv)^(P_m)))*(((((O_e)*(((O_a)+(((O_b)*(((Xv)^(O_n)))))))*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^((-1))))))^(P_p)))),Xv)))
 
-# Regel 53 nicht uebersetzt: function ReplaceAll
+# Regel 53 (5184 Varianten):
 #   Int[u_^r_.*(e_.*(a_.+b_.*x_^n_.)/(c_+d_.*x_^n_.))^p_,x_Symbol] := With[{q=Denominator[p]}, q*e*(b*c-a*d)/n \[Star] Subst[Int[SimplifyIntegrand[x^(q*(p+1)-1)*(-a*e+c*x^q)^(1/n-1)/(b*e-d*x^q)^(1/n+1)* ReplaceAll[u,x->(-a*e+c*x^q)^(1/n)/(b*e-d*x^q)^(1/n)]^r,x],x],x,(e*(a+b*x^n)/(c+d*x^n))^(1/q)]] /; FreeQ[{a,b,c,d,e},x] && PolynomialQ[u,x] && FractionQ[p] && IntegerQ[1/n] && IntegerQ[r]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,P_c,O_d,O_e), (polyq(P_u,Xv)), (fractionq(P_p)), (integerq(((O_n)^((-1))))), (integerq(O_r)) Int(((P_u)^(O_r))*(((O_e)*((O_a)+((O_b)*((Xv)^(O_n))))*(((P_c)+((O_d)*((Xv)^(O_n))))^(K_1)))^(P_p)),Xv) = ((denominator(P_p))*(O_e)*(((((O_b)*(P_c)))+((((-1))*(O_a)*(O_d)))))*(((O_n)^((-1))))*(subst(Int(simp(((((Xv)^(((((denominator(P_p))*(((P_p)+(1)))))+((-1))))))*((((((((-1))*(O_a)*(O_e)))+(((P_c)*(((Xv)^(denominator(P_p))))))))^(((((O_n)^((-1))))+((-1))))))*(((((((((O_b)*(O_e)))+((((-1))*(O_d)*(((Xv)^(denominator(P_p))))))))^(((((O_n)^((-1))))+(1)))))^((-1))))*(((replaceall(P_u,Xv,(((((((((-1))*(O_a)*(O_e)))+(((P_c)*(((Xv)^(denominator(P_p))))))))^(((O_n)^((-1))))))*(((((((((O_b)*(O_e)))+((((-1))*(O_d)*(((Xv)^(denominator(P_p))))))))^(((O_n)^((-1))))))^((-1)))))))^(O_r)))),Xv),Xv),Xv,((((O_e)*(((O_a)+(((O_b)*(((Xv)^(O_n)))))))*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^((-1))))))^(((denominator(P_p))^((-1))))))))
 
-# Regel 54 nicht uebersetzt: function ReplaceAll
+# Regel 54 (20736 Varianten):
 #   Int[x_^m_.*u_^r_.*(e_.*(a_.+b_.*x_^n_.)/(c_+d_.*x_^n_.))^p_,x_Symbol] := With[{q=Denominator[p]}, q*e*(b*c-a*d)/n \[Star] Subst[Int[SimplifyIntegrand[x^(q*(p+1)-1)*(-a*e+c*x^q)^((m+1)/n-1)/(b*e-d*x^q)^((m+1)/n+1)* ReplaceAll[u,x->(-a*e+c*x^q)^(1/n)/(b*e-d*x^q)^(1/n)]^r,x],x],x,(e*(a+b*x^n)/(c+d*x^n))^(1/q)]] /; FreeQ[{a,b,c,d,e},x] && PolynomialQ[u,x] && FractionQ[p] && IntegerQ[1/n] && IntegersQ[m,r]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,P_c,O_d,O_e), (polyq(P_u,Xv)), (fractionq(P_p)), (integerq(((O_n)^((-1))))), (integersq(O_m,O_r)) Int(((Xv)^(O_m))*((P_u)^(O_r))*(((O_e)*((O_a)+((O_b)*((Xv)^(O_n))))*(((P_c)+((O_d)*((Xv)^(O_n))))^(K_1)))^(P_p)),Xv) = ((denominator(P_p))*(O_e)*(((((O_b)*(P_c)))+((((-1))*(O_a)*(O_d)))))*(((O_n)^((-1))))*(subst(Int(simp(((((Xv)^(((((denominator(P_p))*(((P_p)+(1)))))+((-1))))))*((((((((-1))*(O_a)*(O_e)))+(((P_c)*(((Xv)^(denominator(P_p))))))))^(((((((O_m)+(1)))*(((O_n)^((-1))))))+((-1))))))*(((((((((O_b)*(O_e)))+((((-1))*(O_d)*(((Xv)^(denominator(P_p))))))))^(((((((O_m)+(1)))*(((O_n)^((-1))))))+(1)))))^((-1))))*(((replaceall(P_u,Xv,(((((((((-1))*(O_a)*(O_e)))+(((P_c)*(((Xv)^(denominator(P_p))))))))^(((O_n)^((-1))))))*(((((((((O_b)*(O_e)))+((((-1))*(O_d)*(((Xv)^(denominator(P_p))))))))^(((O_n)^((-1))))))^((-1)))))))^(O_r)))),Xv),Xv),Xv,((((O_e)*(((O_a)+(((O_b)*(((Xv)^(O_n)))))))*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^((-1))))))^(((denominator(P_p))^((-1))))))))
 
 # Regel 55 (108 Varianten):
 #   Int[u_.*(a_+b_./(c_+d_.*x_^n_))^p_,x_Symbol] := Int[u*((b+a*c+a*d*x^n)/(c+d*x^n))^p,x] /; FreeQ[{a,b,c,d,n,p},x]

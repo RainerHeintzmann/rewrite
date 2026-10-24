@@ -246,20 +246,22 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f), (igtq(O_m,0)) Int((((O_e)+((O_f)
 # Regel 64 nicht uebersetzt: symbol I
 #   Int[(e_. + f_.*x_)^m_.*ArcCoth[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcCoth[c + d*Cot[a + b*x]]/(f*(m + 1)) - I*b*(1 - c - I*d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 - c + I*d - (1 - c - I*d)*E^(2*I*a + 2*I*b*x)), x] + I*b*(1 + c + I*d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 + c - I*d - (1 + c + I*d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c - I*d)^2, 1]
 
-# Regel 65 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 65 (1 Varianten):
 #   Int[ArcTanh[u_], x_Symbol] := x*ArcTanh[u] - Int[SimplifyIntegrand[x*D[u, x]/(1 - u^2), x], x] /; InverseFunctionFreeQ[u, x]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)) Int(arctanh(P_u),Xv) = ((((Xv)*(arctanh(P_u))))+((((-1))*(Int(simp(((Xv)*(deriv(P_u,Xv))*(((((1)+((((-1))*(((P_u)^(2)))))))^((-1))))),Xv),Xv)))))
 
-# Regel 66 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 66 (1 Varianten):
 #   Int[ArcCoth[u_], x_Symbol] := x*ArcCoth[u] - Int[SimplifyIntegrand[x*D[u, x]/(1 - u^2), x], x] /; InverseFunctionFreeQ[u, x]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)) Int(arccoth(P_u),Xv) = ((((Xv)*(arccoth(P_u))))+((((-1))*(Int(simp(((Xv)*(deriv(P_u,Xv))*(((((1)+((((-1))*(((P_u)^(2)))))))^((-1))))),Xv),Xv)))))
 
-# Regel 67 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 67 nicht uebersetzt: predicate FunctionOfQ
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcTanh[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcTanh[u])/(d*(m + 1)) - b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(1 - u^2), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && FalseQ[PowerVariableExpn[u, m + 1, x]]
 
-# Regel 68 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 68 nicht uebersetzt: predicate FunctionOfQ
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcCoth[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcCoth[u])/(d*(m + 1)) - b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(1 - u^2), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && FalseQ[PowerVariableExpn[u, m + 1, x]]
 
-# Regel 69 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 69 nicht uebersetzt: predicate MatchQ
 #   Int[v_*(a_. + b_.*ArcTanh[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcTanh[u]), w, x] - b*Int[SimplifyIntegrand[w*D[u, x]/(1 - u^2), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]] && FalseQ[FunctionOfLinear[v*(a + b*ArcTanh[u]), x]]
 
-# Regel 70 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 70 nicht uebersetzt: predicate MatchQ
 #   Int[v_*(a_. + b_.*ArcCoth[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcCoth[u]), w, x] - b*Int[SimplifyIntegrand[w*D[u, x]/(1 - u^2), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]] && FalseQ[FunctionOfLinear[v*(a + b*ArcCoth[u]), x]]

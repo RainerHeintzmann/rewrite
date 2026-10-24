@@ -94,8 +94,9 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_n,O_r), (inte
 #   Int[(d_ + e_.*x_^r_.)^q_*(a_. + b_.*Log[c_.*x_^n_.])^p_./x_, x_Symbol] := 1/d*Int[(d + e*x^r)^(q + 1)*(a + b*Log[c*x^n])^p/x, x] - e/d*Int[x^(r - 1)*(d + e*x^r)^q*(a + b*Log[c*x^n])^p, x] /; FreeQ[{a, b, c, d, e, n, r}, x] && IGtQ[p, 0] && ILtQ[q, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_n,O_r), (igtq(O_p,0)), (iltq(P_q,(-1))) Int((((P_d)+((O_e)*((Xv)^(O_r))))^(P_q))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p))*((Xv)^(K_1)),Xv) = ((((((P_d)^((-1))))*(Int(((((((P_d)+(((O_e)*(((Xv)^(O_r)))))))^(((P_q)+(1)))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))*(((Xv)^((-1))))),Xv))))+((((-1))*(O_e)*(((P_d)^((-1))))*(Int(((((Xv)^(((O_r)+((-1))))))*(((((P_d)+(((O_e)*(((Xv)^(O_r)))))))^(P_q)))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))),Xv)))))
 
-# Regel 23 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 23 (31104 Varianten):
 #   Int[(f_.*x_)^m_.*(d_ + e_.*x_^r_.)^q_.*(a_. + b_.*Log[c_.*x_^n_.]), x_Symbol] := With[{u = IntHide[(f*x)^m*(d + e*x^r)^q, x]}, Dist[(a + b*Log[c*x^n]), u, x] - b*n*Int[SimplifyIntegrand[u/x, x], x] /; (EqQ[r, 1] || EqQ[r, 2]) && IntegerQ[m] && IntegerQ[q - 1/2] || InverseFunctionFreeQ[u, x]] /; FreeQ[{a, b, c, d, e, f, m, n, q, r}, x] && IntegerQ[2*q] && (IntegerQ[m] && IntegerQ[r] || IGtQ[q, 0])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_m,O_n,O_q,O_r), (integerq(((2)*(O_q)))), (((((integerq(O_m)) && (integerq(O_r)))) || (igtq(O_q,0)))), (((((((eqq(O_r,1)) || (eqq(O_r,2)))) && (integerq(O_m)) && (integerq(((O_q)+((-(1/2)))))))) || (inversefunctionfreeq(inthide(((((((O_f)*(Xv)))^(O_m)))*(((((P_d)+(((O_e)*(((Xv)^(O_r)))))))^(O_q)))),Xv),Xv)))) Int((((O_f)*(Xv))^(O_m))*(((P_d)+((O_e)*((Xv)^(O_r))))^(O_q))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))),inthide(((((((O_f)*(Xv)))^(O_m)))*(((((P_d)+(((O_e)*(((Xv)^(O_r)))))))^(O_q)))),Xv),Xv))+((((-1))*(O_b)*(O_n)*(Int(simp(((inthide(((((((O_f)*(Xv)))^(O_m)))*(((((P_d)+(((O_e)*(((Xv)^(O_r)))))))^(O_q)))),Xv))*(((Xv)^((-1))))),Xv),Xv)))))
 
 # Regel 24 (31104 Varianten):
 #   Int[(f_.*x_)^m_.*(d_ + e_.*x_^r_.)^q_.*(a_. + b_.*Log[c_.*x_^n_.]), x_Symbol] := With[{u = ExpandIntegrand[(a + b*Log[c*x^n]), (f*x)^m*(d + e*x^r)^q, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{a, b, c, d, e, f, m, n, q, r}, x] && IntegerQ[q] && (GtQ[q, 0] || IntegerQ[m] && IntegerQ[r])
@@ -113,8 +114,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_m,O_n,O_p,O_q,O_r), (int
 #   Int[(f_.*x_)^m_.*(d_ + e_.*x_^r_.)^q_.*(a_. + b_.*Log[c_.*x_^n_.])^ p_., x_Symbol] := Unintegrable[(f*x)^m*(d + e*x^r)^q*(a + b*Log[c*x^n])^p, x] /; FreeQ[{a, b, c, d, e, f, m, n, p, q, r}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_m,O_n,O_p,O_q,O_r) Int((((O_f)*(Xv))^(O_m))*(((P_d)+((O_e)*((Xv)^(O_r))))^(O_q))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p)),Xv) = unintegrable(((((((O_f)*(Xv)))^(O_m)))*(((((P_d)+(((O_e)*(((Xv)^(O_r)))))))^(O_q)))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))),Xv)
 
-# Regel 28 nicht uebersetzt: predicate BinomialQ
+# Regel 28 (5184 Varianten):
 #   Int[(f_.*x_)^m_.*u_^q_.*(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := Int[(f*x)^m*ExpandToSum[u, x]^q*(a + b*Log[c*x^n])^p, x] /; FreeQ[{a, b, c, f, m, n, p, q}, x] && BinomialQ[u, x] && Not[BinomialMatchQ[u, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_f,O_m,O_n,O_p,O_q), (binomialq(P_u,Xv)), (not(binomialmatchq(P_u,Xv))) Int((((O_f)*(Xv))^(O_m))*((P_u)^(O_q))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p)),Xv) = Int(((((((O_f)*(Xv)))^(O_m)))*(((expandtosum(P_u,Xv))^(O_q)))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))),Xv)
 
 # Regel 29 (31104 Varianten):
 #   Int[(f_ + g_.*x_)^m_.*(d_ + e_.*x_)^q_*(a_. + b_.*Log[c_.*x_^n_.])^ p_., x_Symbol] := (f + g*x)^(m + 1)*(d + e*x)^(q + 1)*(a + b*Log[c*x^n])^ p/((q + 1)*(e*f - d*g)) - b*n*p/((q + 1)*(e*f - d*g))* Int[(f + g*x)^(m + 1)*(d + e*x)^(q + 1)*(a + b*Log[c*x^n])^(p - 1)/x, x] /; FreeQ[{a, b, c, d, e, f, g, m, n, q}, x] && NeQ[e*f - d*g, 0] && EqQ[m + q + 2, 0] && IGtQ[p, 0] && LtQ[q, -1]

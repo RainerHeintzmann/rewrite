@@ -7,6 +7,7 @@
 #include "sym.h"
 #include "node.h"
 #include "syn.h"
+#include "numsort.h"	/* 2026: SUBSORT (symeq) */
 
 #define ANZNODES 1024
 
@@ -164,7 +165,28 @@ if ((lexval(a) != Const) || (lexval(b)!=Const))
 /* Numerische Werte vergleichen ? */
 
 if (rtypes(a) != rtypes(b))  /* Resultattypen */
-	return FALSE;
+	{			/* 2026: Zahlen verschiedener Sorten einer SUBSORT-Kette */
+	Node * sa = rtypes(a), * sb = rtypes(b), * to = NULL;
+	void * w;
+	BOOLEAN eq;
+	if (sort_dist(sa, sb) > 0) to = sb;
+	else if (sort_dist(sb, sa) > 0) to = sa;
+	if (! to) return FALSE;
+	if (to == sb)
+		{
+		w = sort_convert(value(a), sa, sb);
+		if (! w) return FALSE;
+		eq = (0==((int (*)(void *,void *)) cmp(sb))(w,value(b)));
+		}
+	else
+		{
+		w = sort_convert(value(b), sb, sa);
+		if (! w) return FALSE;
+		eq = (0==((int (*)(void *,void *)) cmp(sa))(value(a),w));
+		}
+	((void (*) (void *)) del(to)) (w);
+	return eq;
+	}
 
 tmp=(0==((int (*)(void *,void *)) cmp(rtypes(a)))(value(a),value(b)));
 

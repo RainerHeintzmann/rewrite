@@ -57,8 +57,10 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f), (iltq(O_n,0)), (igtq(O_m
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*csc[e_. + f_.*x_])^n_., x_Symbol] := Unintegrable[(c + d*x)^m*(a + b*Csc[e + f*x])^n, x] /; FreeQ[{a, b, c, d, e, f, m, n}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m,O_n) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((O_a)+((O_b)*(csc((O_e)+((O_f)*(Xv))))))^(O_n)),Xv) = unintegrable(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(((((O_a)+(((O_b)*(csc(((O_e)+(((O_f)*(Xv))))))))))^(O_n)))),Xv)
 
-# Regel 15 nicht uebersetzt: function List
+# Regel 15 (72 Varianten):
 #   Int[u_^m_.*(a_. + b_.*Sec[v_])^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*(a + b*Sec[ExpandToSum[v, x]])^n, x] /; FreeQ[{a, b, m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*(((O_a)+((O_b)*(sec(P_v))))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((((O_a)+(((O_b)*(sec(expandtosum(P_v,Xv)))))))^(O_n)))),Xv)
 
-# Regel 16 nicht uebersetzt: function List
+# Regel 16 (72 Varianten):
 #   Int[u_^m_.*(a_. + b_.*Csc[v_])^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*(a + b*Csc[ExpandToSum[v, x]])^n, x] /; FreeQ[{a, b, m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*(((O_a)+((O_b)*(csc(P_v))))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((((O_a)+(((O_b)*(csc(expandtosum(P_v,Xv)))))))^(O_n)))),Xv)

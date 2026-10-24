@@ -18,8 +18,9 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f) Int(((P_e)
 #   Int[(e_+f_.*x_^2)/((a_+b_.*x_^2)*Sqrt[c_+d_.*x_^2]),x_Symbol] := f/b \[Star] Int[1/Sqrt[c+d*x^2],x] + (b*e-a*f)/b \[Star] Int[1/((a+b*x^2)*Sqrt[c+d*x^2]),x] /; FreeQ[{a,b,c,d,e,f},x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f) Int(((P_e)+((O_f)*((Xv)^(2))))*((((P_a)+((O_b)*((Xv)^(2))))*(((P_c)+((O_d)*((Xv)^(2))))^(0.5)))^(K_1)),Xv) = ((((O_f)*(((O_b)^((-1))))*(Int(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((-(1/2)))),Xv))))+(((((((O_b)*(P_e)))+((((-1))*(P_a)*(O_f)))))*(((O_b)^((-1))))*(Int(((((((P_a)+(((O_b)*(((Xv)^(2)))))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((1/2))))))^((-1))),Xv)))))
 
-# Regel 4 nicht uebersetzt: predicate SimplerSqrtQ
+# Regel 4 (864 Varianten):
 #   Int[(e_+f_.*x_^2)/(Sqrt[a_+b_.*x_^2]*Sqrt[c_+d_.*x_^2]),x_Symbol] := f/b \[Star] Int[Sqrt[a+b*x^2]/Sqrt[c+d*x^2],x] + (b*e-a*f)/b \[Star] Int[1/(Sqrt[a+b*x^2]*Sqrt[c+d*x^2]),x] /; FreeQ[{a,b,c,d,e,f},x] && Not[PosQ[b/a] && PosQ[d/c] || NegQ[b/a] && (PosQ[d/c] || GtQ[a,0] && (Not[GtQ[c,0]] || SimplerSqrtQ[-b/a,-d/c]))]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f), (not(((((posq(((O_b)*(((P_a)^((-1))))))) && (posq(((O_d)*(((P_c)^((-1))))))))) || (((negq(((O_b)*(((P_a)^((-1))))))) && (((posq(((O_d)*(((P_c)^((-1))))))) || (((((P_a > 0))) && (((not(((P_c > 0)))) || (simplersqrtq((((-1))*(O_b)*(((P_a)^((-1))))),(((-1))*(O_d)*(((P_c)^((-1)))))))))))))))))) Int(((P_e)+((O_f)*((Xv)^(2))))*(((((P_a)+((O_b)*((Xv)^(2))))^(0.5))*(((P_c)+((O_d)*((Xv)^(2))))^(0.5)))^(K_1)),Xv) = ((((O_f)*(((O_b)^((-1))))*(Int(((((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/2))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((-(1/2)))))),Xv))))+(((((((O_b)*(P_e)))+((((-1))*(P_a)*(O_f)))))*(((O_b)^((-1))))*(Int(((((((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/2))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((1/2))))))^((-1))),Xv)))))
 
 # Regel 5 (864 Varianten):
 #   Int[(e_+f_.*x_^2)/(Sqrt[a_+b_.*x_^2]*(c_+d_.*x_^2)^(3/2)),x_Symbol] := (b*e-a*f)/(b*c-a*d) \[Star] Int[1/(Sqrt[a+b*x^2]*Sqrt[c+d*x^2]),x] - (d*e-c*f)/(b*c-a*d) \[Star] Int[Sqrt[a+b*x^2]/(c+d*x^2)^(3/2),x] /; FreeQ[{a,b,c,d,e,f},x] && PosQ[b/a] && PosQ[d/c]
@@ -57,24 +58,29 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f) Int((((P_a
 #   Int[1/(x_^2*(c_+d_.*x_^2)*Sqrt[e_+f_.*x_^2]),x_Symbol] := 1/c \[Star] Int[1/(x^2*Sqrt[e+f*x^2]),x] - d/c \[Star] Int[1/((c+d*x^2)*Sqrt[e+f*x^2]),x] /; FreeQ[{c,d,e,f},x] && NeQ[d*e-c*f,0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_c,O_d,P_e,O_f), (neq(((((O_d)*(P_e)))+((((-1))*(P_c)*(O_f)))),0)) Int((((Xv)^(2))*((P_c)+((O_d)*((Xv)^(2))))*(((P_e)+((O_f)*((Xv)^(2))))^(0.5)))^(K_1),Xv) = ((((((P_c)^((-1))))*(Int(((((((Xv)^(2)))*(((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))))^((-1))),Xv))))+((((-1))*(O_d)*(((P_c)^((-1))))*(Int(((((((P_c)+(((O_d)*(((Xv)^(2)))))))*(((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))))^((-1))),Xv)))))
 
-# Regel 14 nicht uebersetzt: predicate SimplerSqrtQ
+# Regel 14 (864 Varianten):
 #   Int[Sqrt[c_+d_.*x_^2]*Sqrt[e_+f_.*x_^2]/(a_+b_.*x_^2),x_Symbol] := d/b \[Star] Int[Sqrt[e+f*x^2]/Sqrt[c+d*x^2],x] + (b*c-a*d)/b \[Star] Int[Sqrt[e+f*x^2]/((a+b*x^2)*Sqrt[c+d*x^2]),x] /; FreeQ[{a,b,c,d,e,f},x] && GtQ[d/c,0] && GtQ[f/e,0] && Not[SimplerSqrtQ[d/c,f/e]]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f), (((((O_d)*(((P_c)^((-1))))) > 0))), (((((O_f)*(((P_e)^((-1))))) > 0))), (not(simplersqrtq(((O_d)*(((P_c)^((-1))))),((O_f)*(((P_e)^((-1)))))))) Int((((P_c)+((O_d)*((Xv)^(2))))^(0.5))*(((P_e)+((O_f)*((Xv)^(2))))^(0.5))*(((P_a)+((O_b)*((Xv)^(2))))^(K_1)),Xv) = ((((O_d)*(((O_b)^((-1))))*(Int(((((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((-(1/2)))))),Xv))))+(((((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))))*(((O_b)^((-1))))*(Int(((((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))*(((((((P_a)+(((O_b)*(((Xv)^(2)))))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((1/2))))))^((-1))))),Xv)))))
 
-# Regel 15 nicht uebersetzt: predicate SimplerSqrtQ
+# Regel 15 (864 Varianten):
 #   Int[Sqrt[c_+d_.*x_^2]*Sqrt[e_+f_.*x_^2]/(a_+b_.*x_^2),x_Symbol] := d/b \[Star] Int[Sqrt[e+f*x^2]/Sqrt[c+d*x^2],x] + (b*c-a*d)/b \[Star] Int[Sqrt[e+f*x^2]/((a+b*x^2)*Sqrt[c+d*x^2]),x] /; FreeQ[{a,b,c,d,e,f},x] && Not[SimplerSqrtQ[-f/e,-d/c]]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f), (not(simplersqrtq((((-1))*(O_f)*(((P_e)^((-1))))),(((-1))*(O_d)*(((P_c)^((-1)))))))) Int((((P_c)+((O_d)*((Xv)^(2))))^(0.5))*(((P_e)+((O_f)*((Xv)^(2))))^(0.5))*(((P_a)+((O_b)*((Xv)^(2))))^(K_1)),Xv) = ((((O_d)*(((O_b)^((-1))))*(Int(((((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((-(1/2)))))),Xv))))+(((((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))))*(((O_b)^((-1))))*(Int(((((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))*(((((((P_a)+(((O_b)*(((Xv)^(2)))))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((1/2))))))^((-1))))),Xv)))))
 
-# Regel 16 nicht uebersetzt: predicate SimplerSqrtQ
+# Regel 16 (864 Varianten):
 #   Int[1/((a_+b_.*x_^2)*Sqrt[c_+d_.*x_^2]*Sqrt[e_+f_.*x_^2]),x_Symbol] := -f/(b*e-a*f) \[Star] Int[1/(Sqrt[c+d*x^2]*Sqrt[e+f*x^2]),x] + b/(b*e-a*f) \[Star] Int[Sqrt[e+f*x^2]/((a+b*x^2)*Sqrt[c+d*x^2]),x] /; FreeQ[{a,b,c,d,e,f},x] && GtQ[d/c,0] && GtQ[f/e,0] && Not[SimplerSqrtQ[d/c,f/e]]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f), (((((O_d)*(((P_c)^((-1))))) > 0))), (((((O_f)*(((P_e)^((-1))))) > 0))), (not(simplersqrtq(((O_d)*(((P_c)^((-1))))),((O_f)*(((P_e)^((-1)))))))) Int((((P_a)+((O_b)*((Xv)^(2))))*(((P_c)+((O_d)*((Xv)^(2))))^(0.5))*(((P_e)+((O_f)*((Xv)^(2))))^(0.5)))^(K_1),Xv) = (((((-1))*(O_f)*(((((((O_b)*(P_e)))+((((-1))*(P_a)*(O_f)))))^((-1))))*(Int(((((((((P_c)+(((O_d)*(((Xv)^(2)))))))^((1/2))))*(((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))))^((-1))),Xv))))+(((O_b)*(((((((O_b)*(P_e)))+((((-1))*(P_a)*(O_f)))))^((-1))))*(Int(((((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))*(((((((P_a)+(((O_b)*(((Xv)^(2)))))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((1/2))))))^((-1))))),Xv)))))
 
-# Regel 17 nicht uebersetzt: function EllipticPi
+# Regel 17 (864 Varianten):
 #   Int[1/((a_+b_.*x_^2)*Sqrt[c_+d_.*x_^2]*Sqrt[e_+f_.*x_^2]),x_Symbol] := 1/(a*Sqrt[c]*Sqrt[e]*Rt[-d/c,2])*EllipticPi[b*c/(a*d), ArcSin[Rt[-d/c,2]*x], c*f/(d*e)] /; FreeQ[{a,b,c,d,e,f},x] && Not[GtQ[d/c,0]] && GtQ[c,0] && GtQ[e,0] && Not[Not[GtQ[f/e,0]] && SimplerSqrtQ[-f/e,-d/c]]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f), (not(((((O_d)*(((P_c)^((-1))))) > 0)))), (((P_c > 0))), (((P_e > 0))), (not(((not(((((O_f)*(((P_e)^((-1))))) > 0)))) && (simplersqrtq((((-1))*(O_f)*(((P_e)^((-1))))),(((-1))*(O_d)*(((P_c)^((-1)))))))))) Int((((P_a)+((O_b)*((Xv)^(2))))*(((P_c)+((O_d)*((Xv)^(2))))^(0.5))*(((P_e)+((O_f)*((Xv)^(2))))^(0.5)))^(K_1),Xv) = ((((((P_a)*(((P_c)^((1/2))))*(((P_e)^((1/2))))*(rt((((-1))*(O_d)*(((P_c)^((-1))))),2))))^((-1))))*(ellipticpi(((O_b)*(P_c)*(((((P_a)*(O_d)))^((-1))))),arcsin(((rt((((-1))*(O_d)*(((P_c)^((-1))))),2))*(Xv))),((P_c)*(O_f)*(((((O_d)*(P_e)))^((-1))))))))
 
 # Regel 18 (864 Varianten):
 #   Int[1/((a_+b_.*x_^2)*Sqrt[c_+d_.*x_^2]*Sqrt[e_+f_.*x_^2]),x_Symbol] := Sqrt[1+d/c*x^2]/Sqrt[c+d*x^2] \[Star] Int[1/((a+b*x^2)*Sqrt[1+d/c*x^2]*Sqrt[e+f*x^2]),x] /; FreeQ[{a,b,c,d,e,f},x] && Not[GtQ[c,0]]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f), (not(((P_c > 0)))) Int((((P_a)+((O_b)*((Xv)^(2))))*(((P_c)+((O_d)*((Xv)^(2))))^(0.5))*(((P_e)+((O_f)*((Xv)^(2))))^(0.5)))^(K_1),Xv) = ((((((1)+(((O_d)*(((P_c)^((-1))))*(((Xv)^(2)))))))^((1/2))))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((-(1/2)))))*(Int(((((((P_a)+(((O_b)*(((Xv)^(2)))))))*(((((1)+(((O_d)*(((P_c)^((-1))))*(((Xv)^(2)))))))^((1/2))))*(((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))))^((-1))),Xv)))
 
-# Regel 19 nicht uebersetzt: function EllipticPi
+# Regel 19 (864 Varianten):
 #   Int[Sqrt[c_+d_.*x_^2]/((a_+b_.*x_^2)*Sqrt[e_+f_.*x_^2]),x_Symbol] := c*Sqrt[e+f*x^2]/(a*e*Rt[d/c,2]*Sqrt[c+d*x^2]*Sqrt[c*(e+f*x^2)/(e*(c+d*x^2))])* EllipticPi[1-b*c/(a*d),ArcTan[Rt[d/c,2]*x],1-c*f/(d*e)] /; FreeQ[{a,b,c,d,e,f},x] && PosQ[d/c]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d,P_e,O_f), (posq(((O_d)*(((P_c)^((-1))))))) Int((((P_c)+((O_d)*((Xv)^(2))))^(0.5))*((((P_a)+((O_b)*((Xv)^(2))))*(((P_e)+((O_f)*((Xv)^(2))))^(0.5)))^(K_1)),Xv) = ((P_c)*(((((P_e)+(((O_f)*(((Xv)^(2)))))))^((1/2))))*(((((P_a)*(P_e)*(rt(((O_d)*(((P_c)^((-1))))),2))*(((((P_c)+(((O_d)*(((Xv)^(2)))))))^((1/2))))*(((((P_c)*(((P_e)+(((O_f)*(((Xv)^(2)))))))*(((((P_e)*(((P_c)+(((O_d)*(((Xv)^(2)))))))))^((-1))))))^((1/2))))))^((-1))))*(ellipticpi(((1)+((((-1))*(O_b)*(P_c)*(((((P_a)*(O_d)))^((-1))))))),arctan(((rt(((O_d)*(((P_c)^((-1))))),2))*(Xv))),((1)+((((-1))*(P_c)*(O_f)*(((((O_d)*(P_e)))^((-1))))))))))
 
 # Regel 20 (864 Varianten):
 #   Int[Sqrt[c_+d_.*x_^2]/((a_+b_.*x_^2)*Sqrt[e_+f_.*x_^2]),x_Symbol] := d/b \[Star] Int[1/(Sqrt[c+d*x^2]*Sqrt[e+f*x^2]),x] + (b*c-a*d)/b \[Star] Int[1/((a+b*x^2)*Sqrt[c+d*x^2]*Sqrt[e+f*x^2]),x] /; FreeQ[{a,b,c,d,e,f},x] && NegQ[d/c]

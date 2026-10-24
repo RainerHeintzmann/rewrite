@@ -120,8 +120,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_e,O_f), (integerq(((((O_m)+((-1))))*((1/
 #   Int[sec[e_. + f_.*x_]^m_.*(a_ + b_.*sec[e_. + f_.*x_]^n_)^p_, x_Symbol] := With[{ff = FreeFactors[Sin[e + f*x], x]}, ff/f* Subst[Int[(a + b/(1 - ff^2*x^2)^(n/2))^ p/(1 - ff^2*x^2)^((m + 1)/2), x], x, Sin[e + f*x]/ff]] /; FreeQ[{a, b, e, f, p}, x] && IntegerQ[(m - 1)/2] && IntegerQ[n/2] && Not[IntegerQ[p]]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_e,O_f,P_p), (integerq(((((O_m)+((-1))))*((1/2))))), (integerq(((P_n)*((1/2))))), (not(integerq(P_p))) Int(((sec((O_e)+((O_f)*(Xv))))^(O_m))*(((P_a)+((O_b)*((sec((O_e)+((O_f)*(Xv))))^(P_n))))^(P_p)),Xv) = ((freefactors(sin(((O_e)+(((O_f)*(Xv))))),Xv))*(((O_f)^((-1))))*(subst(Int(((((((P_a)+(((O_b)*(((((((1)+((((-1))*(((freefactors(sin(((O_e)+(((O_f)*(Xv))))),Xv))^(2)))*(((Xv)^(2)))))))^(((P_n)*((1/2))))))^((-1))))))))^(P_p)))*(((((((1)+((((-1))*(((freefactors(sin(((O_e)+(((O_f)*(Xv))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((O_m)+(1)))*((1/2))))))^((-1))))),Xv),Xv,((sin(((O_e)+(((O_f)*(Xv))))))*(((freefactors(sin(((O_e)+(((O_f)*(Xv))))),Xv))^((-1))))))))
 
-# Regel 30 nicht uebersetzt: function ExpandTrig
+# Regel 30 (1944 Varianten):
 #   Int[sec[e_. + f_.*x_]^m_.*(a_ + b_.*sec[e_. + f_.*x_]^n_)^p_, x_Symbol] := Int[ExpandTrig[sec[e + f*x]^m*(a + b*sec[e + f*x]^n)^p, x], x] /; FreeQ[{a, b, e, f}, x] && IntegersQ[m, n, p]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_e,O_f), (integersq(O_m,P_n,P_p)) Int(((sec((O_e)+((O_f)*(Xv))))^(O_m))*(((P_a)+((O_b)*((sec((O_e)+((O_f)*(Xv))))^(P_n))))^(P_p)),Xv) = Int(expandintegrand(((((sec(((O_e)+(((O_f)*(Xv))))))^(O_m)))*(((((P_a)+(((O_b)*(((sec(((O_e)+(((O_f)*(Xv))))))^(P_n)))))))^(P_p)))),Xv),Xv)
 
 # Regel 31 (34992 Varianten):
 #   Int[(d_.*sec[e_. + f_.*x_])^m_.*(a_ + b_.*(c_.*sec[e_. + f_.*x_])^n_)^ p_., x_Symbol] := Unintegrable[(d*Sec[e + f*x])^m*(a + b*(c*Sec[e + f*x])^n)^p, x] /; FreeQ[{a, b, c, d, e, f, m, n, p}, x]

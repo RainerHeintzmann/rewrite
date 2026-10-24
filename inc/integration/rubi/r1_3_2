@@ -18,10 +18,10 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e), (polyq(O_Px,Xv)), (iltq(P_p,
 #   Int[Px_.*(a_+b_.*x_+d_.*x_^3+e_.*x_^4)^p_,x_Symbol] := e^p \[Star] Int[ExpandIntegrand[Px*(b/d+(d+Sqrt[d^2+8*a*d*e/b])/(2*e)*x+x^2)^p*(b/d+(d-Sqrt[d^2+8*a*d*e/b])/(2*e)*x+x^2)^p,x],x] /; FreeQ[{a,b,d,e},x] && PolyQ[Px,x] && ILtQ[p,0] && EqQ[a*d^2-b^2*e,0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_d,O_e), (polyq(O_Px,Xv)), (iltq(P_p,0)), (eqq(((((P_a)*(((O_d)^(2)))))+((((-1))*(((O_b)^(2)))*(O_e)))),0)) Int((O_Px)*(((P_a)+((O_b)*(Xv))+((O_d)*((Xv)^(3)))+((O_e)*((Xv)^(4))))^(P_p)),Xv) = ((((O_e)^(P_p)))*(Int(expandintegrand(((O_Px)*(((((((O_b)*(((O_d)^((-1))))))+(((((O_d)+(((((((O_d)^(2)))+(((8)*(P_a)*(O_d)*(O_e)*(((O_b)^((-1))))))))^((1/2))))))*(((((2)*(O_e)))^((-1))))*(Xv)))+(((Xv)^(2)))))^(P_p)))*(((((((O_b)*(((O_d)^((-1))))))+(((((O_d)+((((-1))*(((((((O_d)^(2)))+(((8)*(P_a)*(O_d)*(O_e)*(((O_b)^((-1))))))))^((1/2))))))))*(((((2)*(O_e)))^((-1))))*(Xv)))+(((Xv)^(2)))))^(P_p)))),Xv),Xv)))
 
-# Regel 4 nicht uebersetzt: function ReplaceAll
+# Regel 4 nicht uebersetzt: function Root
 #   Int[Px_.*(a_+b_.*x_+c_.*x_^2+d_.*x_^3+e_.*x_^4)^p_,x_Symbol] := With[{S=Root[a*d^2-b^2*e+(b*d^2-4*b*c*e+8*a*d*e)*x+(c*d^2-4*c^2*e+2*b*d*e+16*a*e^2)*x^2+(d^3-4*c*d*e+8*b*e^2)*x^3,3]}, Subst[Int[ReplaceAll[Px,x->x+S]*ExpandToSum[a+b*(x+S)+c*(x+S)^2+d*(x+S)^3+e*(x+S)^4,x]^p,x],x,x-S] /; RationalQ[S]] /; FreeQ[{a,b,c,d,e},x] && PolyQ[Px,x] && ILtQ[p,0] && RationalQ[a,b,c,d,e] && NeQ[a*d^2-b^2*e,0]
 
-# Regel 5 nicht uebersetzt: function ReplaceAll
+# Regel 5 nicht uebersetzt: function Root
 #   Int[Px_.*(a_+b_.*x_+d_.*x_^3+e_.*x_^4)^p_,x_Symbol] := With[{S=Root[a*d^2-b^2*e+(b*d^2+8*a*d*e)*x+(2*b*d*e+16*a*e^2)*x^2+(d^3+8*b*e^2)*x^3,3]}, Subst[Int[ReplaceAll[Px,x->x+S]*ExpandToSum[a+b*(x+S)+d*(x+S)^3+e*(x+S)^4,x]^p,x],x,x-S] /; RationalQ[S]] /; FreeQ[{a,b,d,e},x] && PolyQ[Px,x] && ILtQ[p,0] && RationalQ[a,b,d,e] && NeQ[a*d^2-b^2*e,0]
 
 # Regel 6 (15552 Varianten):

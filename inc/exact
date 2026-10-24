@@ -1,0 +1,67 @@
+# inc/exact (2026)
+# Exakte Zahlen: die Sorten integer (beliebig gross) und rational (Brueche),
+# in C mit GMP (exact.c). Nach inc/all laden:
+#     INC "inc/all"
+#     INC "inc/exact"
+# Danach sind ganze Zahlen ohne Punkt (3, 12) vom Typ integer, 1/3 ist der
+# Bruch (1/3), und 0.5 bleibt eine reelle Zahl.
+#
+# Untersorten: integer < rational < real. Eine Funktion fuer real nimmt auch
+# integer und rational (die Werte werden beim Rechnen umgewandelt), und die
+# Regeln fuer real gelten auch fuer rational und integer (LIFT).
+
+SORT integer
+SORT rational
+ATT integer  show_int,cmp_int,cpy_int,del_int
+ATT rational show_rat,cmp_rat,cpy_rat,del_rat
+
+SUBSORT integer,rational ATT int2rat
+SUBSORT rational,real ATT rat2real
+
+VAR Az,Bz : integer
+VAR Aq,Bq : rational
+
+# ---------------- integer ----------------
+OTHER +  : integer,integer >> integer   ATT int_plus
+OTHER -  : integer,integer >> integer   ATT int_minus
+OTHER *  : integer,integer >> integer   ATT int_mal
+OTHER /  : integer,integer >> rational  ATT int_div
+OTHER -  : integer >> integer           ATT int_neg
+OTHER ^  : integer,integer >> rational  ATT int_pow   # 2^-1 = 1/2
+OTHER !  : integer >> integer           ATT int_fak
+OTHER abs : integer >> integer          ATT int_abs
+OTHER >  : integer,integer >> bool      ATT int_gt
+OTHER >= : integer,integer >> bool      ATT int_ge
+OTHER <  : integer,integer >> bool      ATT int_lt
+OTHER <= : integer,integer >> bool      ATT int_le
+OTHER == : integer,integer >> bool      ATT int_eq
+OTHER != : integer,integer >> bool      ATT int_ne
+FUNC  mod  : integer,integer >> integer ATT int_mod    # Rest, Vorzeichen des Teilers
+FUNC  quot : integer,integer >> integer ATT int_quot   # ganzzahliger Quotient
+FUNC  gcd_int : integer,integer >> integer ATT int_gcd
+
+# ---------------- rational ----------------
+OTHER +  : rational,rational >> rational ATT rat_plus
+OTHER -  : rational,rational >> rational ATT rat_minus
+OTHER *  : rational,rational >> rational ATT rat_mal
+OTHER /  : rational,rational >> rational ATT rat_div
+OTHER -  : rational >> rational          ATT rat_neg
+OTHER mi : rational >> rational          ATT rat_mi
+OTHER ^  : rational,integer >> rational  ATT rat_pow
+OTHER abs : rational >> rational         ATT rat_abs
+OTHER >  : rational,rational >> bool     ATT rat_gt
+OTHER >= : rational,rational >> bool     ATT rat_ge
+OTHER <  : rational,rational >> bool     ATT rat_lt
+OTHER <= : rational,rational >> bool     ATT rat_le
+OTHER == : rational,rational >> bool     ATT rat_eq
+OTHER != : rational,rational >> bool     ATT rat_ne
+FUNC  numer : rational >> integer        ATT rat_num   # Zaehler
+FUNC  denom : rational >> integer        ATT rat_den   # Nenner
+
+# ---------------- Regeln uebernehmen ----------------
+# rational erbt die Regeln von real, integer die von rational
+LIFT (A+A,A-A,A*A,A/A,-A,mi(A),A^A) TO (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,mi(Aq),Aq^Az)
+LIFT (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,Aq^Az) TO (Az+Az,Az-Az,Az*Az,Az/Az,-Az,Az^Az)
+
+# ganze Zahlen ohne Punkt sind ab hier integer
+INTNUM integer ATT read_int

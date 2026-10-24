@@ -118,8 +118,9 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_b,O_e,O_f) Int((((O_b)*(tan((O_e)
 #   Int[(a_.*sec[e_. + f_.*x_])^m_*(b_.*tan[e_. + f_.*x_])^n_, x_Symbol] := a^(m + n)*(b*Tan[e + f*x])^ n/((a*Sec[e + f*x])^n*(b*Sin[e + f*x])^n)* Int[(b*Sin[e + f*x])^n/Cos[e + f*x]^(m + n), x] /; FreeQ[{a, b, e, f, m, n}, x] && IntegerQ[n + 1/2] && IntegerQ[m + 1/2]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,P_m,P_n), (integerq(((P_n)+((1/2))))), (integerq(((P_m)+((1/2))))) Int((((O_a)*(sec((O_e)+((O_f)*(Xv)))))^(P_m))*(((O_b)*(tan((O_e)+((O_f)*(Xv)))))^(P_n)),Xv) = ((((O_a)^(((P_m)+(P_n)))))*(((((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))^(P_n)))*(((((((((O_a)*(sec(((O_e)+(((O_f)*(Xv))))))))^(P_n)))*(((((O_b)*(sin(((O_e)+(((O_f)*(Xv))))))))^(P_n)))))^((-1))))*(Int(((((((O_b)*(sin(((O_e)+(((O_f)*(Xv))))))))^(P_n)))*(((((cos(((O_e)+(((O_f)*(Xv))))))^(((P_m)+(P_n)))))^((-1))))),Xv)))
 
-# Regel 29 nicht uebersetzt: function Hypergeometric2F1
+# Regel 29 (2916 Varianten):
 #   Int[(a_.*sec[e_. + f_.*x_])^m_.*(b_.*tan[e_. + f_.*x_])^n_, x_Symbol] := (a*Sec[e + f*x])^ m*(b*Tan[e + f*x])^(n + 1)*(Cos[e + f*x]^2)^((m + n + 1)/2)/(b* f*(n + 1))* Hypergeometric2F1[(n + 1)/2, (m + n + 1)/2, (n + 3)/2, Sin[e + f*x]^2] /; FreeQ[{a, b, e, f, m, n}, x] && Not[IntegerQ[(n - 1)/2]] && Not[IntegerQ[m/2]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_m,P_n), (not(integerq(((((P_n)+((-1))))*((1/2)))))), (not(integerq(((O_m)*((1/2)))))) Int((((O_a)*(sec((O_e)+((O_f)*(Xv)))))^(O_m))*(((O_b)*(tan((O_e)+((O_f)*(Xv)))))^(P_n)),Xv) = ((((((O_a)*(sec(((O_e)+(((O_f)*(Xv))))))))^(O_m)))*(((((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))^(((P_n)+(1)))))*(((((cos(((O_e)+(((O_f)*(Xv))))))^(2)))^(((((O_m)+(P_n)+(1)))*((1/2))))))*(((((O_b)*(O_f)*(((P_n)+(1)))))^((-1))))*(hyp2f1(((((P_n)+(1)))*((1/2))),((((O_m)+(P_n)+(1)))*((1/2))),((((P_n)+(3)))*((1/2))),((sin(((O_e)+(((O_f)*(Xv))))))^(2)))))
 
 # Regel 30 (1458 Varianten):
 #   Int[(a_.*csc[e_. + f_.*x_])^m_*(b_.*tan[e_. + f_.*x_])^n_, x_Symbol] := (a*Csc[e + f*x])^FracPart[m]*(Sin[e + f*x]/a)^FracPart[m]* Int[(b*Tan[e + f*x])^n/(Sin[e + f*x]/a)^m, x] /; FreeQ[{a, b, e, f, m, n}, x] && Not[IntegerQ[m]] && Not[IntegerQ[n]]

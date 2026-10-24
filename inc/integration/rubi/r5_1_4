@@ -166,10 +166,10 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((
 #   Int[x_^m_*(a_. + b_.*ArcCos[c_.*x_])^n_./Sqrt[d_ + e_.*x_^2], x_Symbol] := -1/c^(m + 1)*Simp[Sqrt[1 - c^2*x^2]/Sqrt[d + e*x^2]]* Subst[Int[(a + b*x)^n*Cos[x]^m, x], x, ArcCos[c*x]] /; FreeQ[{a, b, c, d, e}, x] && EqQ[c^2*d + e, 0] && IGtQ[n, 0] && IntegerQ[m]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((((O_c)^(2)))*(P_d)))+(O_e)),0)), (igtq(O_n,0)), (integerq(P_m)) Int(((Xv)^(P_m))*(((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(O_n))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = (((-1))*(((((O_c)^(((P_m)+(1)))))^((-1))))*(simp(((((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(2)))))))^((1/2))))*(((((P_d)+(((O_e)*(((Xv)^(2)))))))^((-(1/2))))))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(((cos(Xv))^(P_m)))),Xv),Xv,arccos(((O_c)*(Xv))))))
 
-# Regel 41 nicht uebersetzt: function Hypergeometric2F1
+# Regel 41 nicht uebersetzt: function HypergeometricPFQ
 #   Int[(f_.*x_)^m_*(a_. + b_.*ArcSin[c_.*x_])/Sqrt[d_ + e_.*x_^2], x_Symbol] := (f*x)^(m + 1)/(f*(m + 1))* Simp[Sqrt[1 - c^2*x^2]/Sqrt[d + e*x^2]]*(a + b*ArcSin[c*x])* Hypergeometric2F1[1/2, (1 + m)/2, (3 + m)/2, c^2*x^2] - b*c*(f*x)^(m + 2)/(f^2*(m + 1)*(m + 2))* Simp[Sqrt[1 - c^2*x^2]/Sqrt[d + e*x^2]]* HypergeometricPFQ[{1, 1 + m/2, 1 + m/2}, {3/2 + m/2, 2 + m/2}, c^2*x^2] /; FreeQ[{a, b, c, d, e, f, m}, x] && EqQ[c^2*d + e, 0] && Not[IntegerQ[m]]
 
-# Regel 42 nicht uebersetzt: function Hypergeometric2F1
+# Regel 42 nicht uebersetzt: function HypergeometricPFQ
 #   Int[(f_.*x_)^m_*(a_. + b_.*ArcCos[c_.*x_])/Sqrt[d_ + e_.*x_^2], x_Symbol] := (f*x)^(m + 1)/(f*(m + 1))*(a + b*ArcCos[c*x])* Simp[Sqrt[1 - c^2*x^2]/Sqrt[d + e*x^2]]* Hypergeometric2F1[1/2, (1 + m)/2, (3 + m)/2, c^2*x^2] + b*c*(f*x)^(m + 2)/(f^2*(m + 1)*(m + 2))* Simp[Sqrt[1 - c^2*x^2]/Sqrt[d + e*x^2]]* HypergeometricPFQ[{1, 1 + m/2, 1 + m/2}, {3/2 + m/2, 2 + m/2}, c^2*x^2] /; FreeQ[{a, b, c, d, e, f, m}, x] && EqQ[c^2*d + e, 0] && Not[IntegerQ[m]]
 
 # Regel 43 (3888 Varianten):

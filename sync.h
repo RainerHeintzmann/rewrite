@@ -71,6 +71,9 @@ extern Symbol * IS_search (Symbol * from,Symbol * to);
 extern BOOLEAN lock_rtypes (Symbol * which,Symbol * from,Node ** chain);
 
 extern Symbol * getsymbol (Symbol * symbol,Node * termlist); /* sucht aus gleinamigen Symbolen das, mit den richtigen Argumenten heraus */
+extern Symbol * getsymbol_widen (Symbol * symbol,Node * termlist); /* 2026: mit SUBSORT-Erweiterung, NULL wenn keine passt */
+extern void retype_term (Node * t);  /* 2026: Varianten nach den Sorten der Argumente waehlen */
+extern void retype_node (Node * t);  /* 2026: dasselbe nur fuer diesen Knoten */
 
 extern int read_input (FILE * fp);
 

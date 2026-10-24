@@ -66,17 +66,21 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), (K_2 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,
 #   Int[(a_. + b_.*Log[c_.*Sqrt[d_. + e_.*x_]/Sqrt[f_. + g_.*x_]])^ n_./(A_. + C_.*x_^2), x_Symbol] := g/(C*f)* Subst[Int[(a + b*Log[c*x])^n/x, x], x, Sqrt[d + e*x]/Sqrt[f + g*x]] /; FreeQ[{a, b, c, d, e, f, g, A, C, n}, x] && EqQ[C*d*f - A*e*g, 0] && EqQ[e*f + d*g, 0]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), (K_2 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_g,O_A,O_C,O_n), (eqq(((((O_C)*(O_d)*(O_f)))+((((-1))*(O_A)*(O_e)*(O_g)))),0)), (eqq(((((O_e)*(O_f)))+(((O_d)*(O_g)))),0)) Int((((O_a)+((O_b)*(ln((O_c)*(((O_d)+((O_e)*(Xv)))^(0.5))*(((O_f)+((O_g)*(Xv)))^(K_1))))))^(O_n))*(((O_A)+((O_C)*((Xv)^(2))))^(K_2)),Xv) = ((O_g)*(((((O_C)*(O_f)))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(ln(((O_c)*(Xv))))))))^(O_n)))*(((Xv)^((-1))))),Xv),Xv,((((((O_d)+(((O_e)*(Xv)))))^((1/2))))*(((((O_f)+(((O_g)*(Xv)))))^((-(1/2)))))))))
 
-# Regel 16 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 16 nicht uebersetzt: predicate MatchQ
 #   Int[RFx_.*Log[e_.*(f_.*(a_. + b_.*x_)^p_.*(c_. + d_.*x_)^q_.)^r_.], x_Symbol] := p*r*Int[RFx*Log[a + b*x], x] + q*r*Int[RFx*Log[c + d*x], x] - (p*r*Log[a + b*x] + q*r*Log[c + d*x] - Log[e*(f*(a + b*x)^p*(c + d*x)^q)^r])*Int[RFx, x] /; FreeQ[{a, b, c, d, e, f, p, q, r}, x] && RationalFunctionQ[RFx, x] && NeQ[b*c - a*d, 0] && Not[ MatchQ[RFx, u_.*(a + b*x)^m_.*(c + d*x)^n_. /; IntegersQ[m, n]]]
 
-# Regel 17 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 17 (46656 Varianten):
 #   Int[RFx_*Log[e_.*(f_.*(a_. + b_.*x_)^p_.*(c_. + d_.*x_)^q_.)^r_.]^s_., x_Symbol] := With[{u = ExpandIntegrand[Log[e*(f*(a + b*x)^p*(c + d*x)^q)^r]^s, RFx, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{a, b, c, d, e, f, p, q, r, s}, x] && RationalFunctionQ[RFx, x] && IGtQ[s, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_p,O_q,O_r,O_s), (rationalfunctionq(P_RFx,Xv)), (igtq(O_s,0)), (sumq(expandintegrand(((ln(((O_e)*(((((O_f)*(((((O_a)+(((O_b)*(Xv)))))^(O_p)))*(((((O_c)+(((O_d)*(Xv)))))^(O_q)))))^(O_r))))))^(O_s)),P_RFx,Xv))) Int((P_RFx)*((ln((O_e)*(((O_f)*(((O_a)+((O_b)*(Xv)))^(O_p))*(((O_c)+((O_d)*(Xv)))^(O_q)))^(O_r))))^(O_s)),Xv) = Int(expandintegrand(((ln(((O_e)*(((((O_f)*(((((O_a)+(((O_b)*(Xv)))))^(O_p)))*(((((O_c)+(((O_d)*(Xv)))))^(O_q)))))^(O_r))))))^(O_s)),P_RFx,Xv),Xv)
 
-# Regel 18 nicht uebersetzt: predicate RationalFunctionQ
+# Regel 18 (46656 Varianten):
 #   Int[RFx_*Log[e_.*(f_.*(a_. + b_.*x_)^p_.*(c_. + d_.*x_)^q_.)^r_.]^s_., x_Symbol] := Unintegrable[RFx*Log[e*(f*(a + b*x)^p*(c + d*x)^q)^r]^s, x] /; FreeQ[{a, b, c, d, e, f, p, q, r, s}, x] && RationalFunctionQ[RFx, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_p,O_q,O_r,O_s), (rationalfunctionq(P_RFx,Xv)) Int((P_RFx)*((ln((O_e)*(((O_f)*(((O_a)+((O_b)*(Xv)))^(O_p))*(((O_c)+((O_d)*(Xv)))^(O_q)))^(O_r))))^(O_s)),Xv) = unintegrable(((P_RFx)*(((ln(((O_e)*(((((O_f)*(((((O_a)+(((O_b)*(Xv)))))^(O_p)))*(((((O_c)+(((O_d)*(Xv)))))^(O_q)))))^(O_r))))))^(O_s)))),Xv)
 
-# Regel 19 nicht uebersetzt: function List
+# Regel 19 (864 Varianten):
 #   Int[u_.*Log[e_.*(f_.*v_^p_.*w_^q_.)^r_.]^s_., x_Symbol] := Int[u*Log[e*(f*ExpandToSum[v, x]^p*ExpandToSum[w, x]^q)^r]^s, x] /; FreeQ[{e, f, p, q, r, s}, x] && LinearQ[{v, w}, x] && Not[LinearMatchQ[{v, w}, x]] && AlgebraicFunctionQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_e,O_f,O_p,O_q,O_r,O_s), (((linearq(P_v,Xv)) && (linearq(P_w,Xv)))), (not(((linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv))))), (algebraicfunctionq(O_u,Xv)) Int((O_u)*((ln((O_e)*(((O_f)*((P_v)^(O_p))*((P_w)^(O_q)))^(O_r))))^(O_s)),Xv) = Int(((O_u)*(((ln(((O_e)*(((((O_f)*(((expandtosum(P_v,Xv))^(O_p)))*(((expandtosum(P_w,Xv))^(O_q)))))^(O_r))))))^(O_s)))),Xv)
 
-# Regel 20 nicht uebersetzt: predicate AlgebraicFunctionQ
+# Regel 20 (648 Varianten):
 #   Int[u_.*Log[e_.*(f_.*(g_ + v_./w_))^r_.]^s_., x_Symbol] := Int[u*Log[e*(f*ExpandToSum[v + g*w, x]/ExpandToSum[w, x])^r]^s, x] /; FreeQ[{e, f, g, r, s}, x] && LinearQ[w, x] && (FreeQ[v, x] || LinearQ[v, x]) && AlgebraicFunctionQ[u, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_e,O_f,P_g,O_r,O_s), (linearq(P_w,Xv)), ((((freeq(O_v,Xv))) || (linearq(O_v,Xv)))), (algebraicfunctionq(O_u,Xv)) Int((O_u)*((ln((O_e)*(((O_f)*((P_g)+((O_v)*((P_w)^(K_1)))))^(O_r))))^(O_s)),Xv) = Int(((O_u)*(((ln(((O_e)*(((((O_f)*(expandtosum(((O_v)+(((P_g)*(P_w)))),Xv))*(((expandtosum(P_w,Xv))^((-1))))))^(O_r))))))^(O_s)))),Xv)

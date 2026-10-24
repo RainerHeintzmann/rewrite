@@ -22,8 +22,9 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_e,O_f) Int(((csc((O_e)+((
 #   Int[csc[e_. + f_.*x_]^3/(a_ + b_.*csc[e_. + f_.*x_]), x_Symbol] := -Cot[e + f*x]/(b*f) - a/b*Int[Csc[e + f*x]^2/(a + b*Csc[e + f*x]), x] /; FreeQ[{a, b, e, f}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_e,O_f) Int(((csc((O_e)+((O_f)*(Xv))))^(3))*(((P_a)+((O_b)*(csc((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = (((((-1))*(cot(((O_e)+(((O_f)*(Xv))))))*(((((O_b)*(O_f)))^((-1))))))+((((-1))*(P_a)*(((O_b)^((-1))))*(Int(((((csc(((O_e)+(((O_f)*(Xv))))))^(2)))*(((((P_a)+(((O_b)*(csc(((O_e)+(((O_f)*(Xv))))))))))^((-1))))),Xv)))))
 
-# Regel 5 nicht uebersetzt: function ExpandTrig
+# Regel 5 (5832 Varianten):
 #   Int[(a_ + b_.*csc[e_. + f_.*x_])^m_*(d_.*csc[e_. + f_.*x_])^n_., x_Symbol] := Int[ExpandTrig[(a + b*csc[e + f*x])^m*(d*csc[e + f*x])^n, x], x] /; FreeQ[{a, b, d, e, f, m, n}, x] && EqQ[a^2 - b^2, 0] && IGtQ[m, 0] && RationalQ[n]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_d,O_e,O_f,P_m,O_n), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (igtq(P_m,0)), (rationalq(O_n)) Int((((P_a)+((O_b)*(csc((O_e)+((O_f)*(Xv))))))^(P_m))*(((O_d)*(csc((O_e)+((O_f)*(Xv)))))^(O_n)),Xv) = Int(expandintegrand(((((((P_a)+(((O_b)*(csc(((O_e)+(((O_f)*(Xv))))))))))^(P_m)))*(((((O_d)*(csc(((O_e)+(((O_f)*(Xv))))))))^(O_n)))),Xv),Xv)
 
 # Regel 6 (972 Varianten):
 #   Int[csc[e_. + f_.*x_]*Sqrt[a_ + b_.*csc[e_. + f_.*x_]], x_Symbol] := -2*b*Cot[e + f*x]/(f*Sqrt[a + b*Csc[e + f*x]]) /; FreeQ[{a, b, e, f}, x] && EqQ[a^2 - b^2, 0]
@@ -185,8 +186,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_e,O_f), (neq(((((P_a)^(2)))+((((-1))*(((
 #   Int[csc[e_. + f_.*x_]/(a_ + b_.*csc[e_. + f_.*x_]), x_Symbol] := 1/b*Int[1/(1 + a/b*Sin[e + f*x]), x] /; FreeQ[{a, b, e, f}, x] && NeQ[a^2 - b^2, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_e,O_f), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int((csc((O_e)+((O_f)*(Xv))))*(((P_a)+((O_b)*(csc((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((((O_b)^((-1))))*(Int(((((1)+(((P_a)*(((O_b)^((-1))))*(sin(((O_e)+(((O_f)*(Xv))))))))))^((-1))),Xv)))
 
-# Regel 46 nicht uebersetzt: function EllipticF
+# Regel 46 (972 Varianten):
 #   Int[csc[e_. + f_.*x_]/Sqrt[a_ + b_.*csc[e_. + f_.*x_]], x_Symbol] := -2*Rt[a + b, 2]/(b*f*Cot[e + f*x])* Sqrt[(b*(1 - Csc[e + f*x]))/(a + b)]* Sqrt[-b*(1 + Csc[e + f*x])/(a - b)]* EllipticF[ ArcSin[Sqrt[a + b*Csc[e + f*x]]/Rt[a + b, 2]], (a + b)/(a - b)] /; FreeQ[{a, b, e, f}, x] && NeQ[a^2 - b^2, 0]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b,O_e,O_f), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int((csc((O_e)+((O_f)*(Xv))))*(((P_a)+((O_b)*(csc((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = (((-2))*(rt(((P_a)+(O_b)),2))*(((((O_b)*(O_f)*(cot(((O_e)+(((O_f)*(Xv))))))))^((-1))))*(((((O_b)*(((1)+((((-1))*(csc(((O_e)+(((O_f)*(Xv))))))))))*(((((P_a)+(O_b)))^((-1))))))^((1/2))))*((((((-1))*(O_b)*(((1)+(csc(((O_e)+(((O_f)*(Xv))))))))*(((((P_a)+((((-1))*(O_b)))))^((-1))))))^((1/2))))*(ellipticf(arcsin(((((((P_a)+(((O_b)*(csc(((O_e)+(((O_f)*(Xv))))))))))^((1/2))))*(((rt(((P_a)+(O_b)),2))^((-1)))))),((((P_a)+(O_b)))*(((((P_a)+((((-1))*(O_b)))))^((-1))))))))
 
 # Regel 47 (972 Varianten):
 #   Int[csc[e_. + f_.*x_]*(a_ + b_.*csc[e_. + f_.*x_])^m_, x_Symbol] := -b*Cot[ e + f*x]*(a + b*Csc[e + f*x])^(m + 1)/(f*(m + 1)*(a^2 - b^2)) + 1/((m + 1)*(a^2 - b^2))* Int[Csc[e + f*x]*(a + b*Csc[e + f*x])^(m + 1)*(a*(m + 1) - b*(m + 2)*Csc[e + f*x]), x] /; FreeQ[{a, b, e, f}, x] && NeQ[a^2 - b^2, 0] && LtQ[m, -1] && IntegerQ[2*m]

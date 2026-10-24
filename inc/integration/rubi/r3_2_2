@@ -54,14 +54,17 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_g,O_h,O_i
 #   Int[(f_. + g_.*x_)^m_.*(h_. + i_.*x_)^ q_.*(A_. + B_.*Log[e_.*(a_. + b_.*x_)^n_.*(c_. + d_.*x_)^mn_])^ p_., x_Symbol] := Unintegrable[(f + g*x)^m*(h + i*x)^ q*(A + B*Log[e*(a + b*x)^n/(c + d*x)^n])^p, x] /; FreeQ[{a, b, c, d, e, f, g, h, i, A, B, m, n, p, q}, x] && EqQ[n + mn, 0] && IntegerQ[n]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_g,O_h,O_i,O_A,O_B,O_m,O_n,O_p,O_q), (eqq(((O_n)+(P_mn)),0)), (integerq(O_n)) Int((((O_f)+((O_g)*(Xv)))^(O_m))*(((O_h)+((O_i)*(Xv)))^(O_q))*(((O_A)+((O_B)*(ln((O_e)*(((O_a)+((O_b)*(Xv)))^(O_n))*(((O_c)+((O_d)*(Xv)))^(P_mn))))))^(O_p)),Xv) = unintegrable(((((((O_f)+(((O_g)*(Xv)))))^(O_m)))*(((((O_h)+(((O_i)*(Xv)))))^(O_q)))*(((((O_A)+(((O_B)*(ln(((O_e)*(((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(((((((O_c)+(((O_d)*(Xv)))))^(O_n)))^((-1)))))))))))^(O_p)))),Xv)
 
-# Regel 13 nicht uebersetzt: function List
+# Regel 13 (3456 Varianten):
 #   Int[w_^m_.*y_^q_.*(A_. + B_.*Log[e_.*(u_/v_)^n_.])^p_., x_Symbol] := Int[ExpandToSum[w, x]^m* ExpandToSum[y, x]^ q*(A + B*Log[e*(ExpandToSum[u, x]/ExpandToSum[v, x])^n])^p, x] /; FreeQ[{e, A, B, m, n, p, q}, x] && LinearQ[{u, v, w, y}, x] && Not[LinearMatchQ[{u, v, w, y}, x]]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_e,O_A,O_B,O_m,O_n,O_p,O_q), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)) && (linearq(P_y,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv)) && (linearmatchq(P_y,Xv))))) Int(((P_w)^(O_m))*((P_y)^(O_q))*(((O_A)+((O_B)*(ln((O_e)*(((P_u)*((P_v)^(K_1)))^(O_n))))))^(O_p)),Xv) = Int(((((expandtosum(P_w,Xv))^(O_m)))*(((expandtosum(P_y,Xv))^(O_q)))*(((((O_A)+(((O_B)*(ln(((O_e)*(((((expandtosum(P_u,Xv))*(((expandtosum(P_v,Xv))^((-1))))))^(O_n))))))))))^(O_p)))),Xv)
 
-# Regel 14 nicht uebersetzt: function List
+# Regel 14 (3456 Varianten):
 #   Int[w_^m_.*y_^q_.*(A_. + B_.*Log[e_.*u_^n_.*v_^mn_])^p_., x_Symbol] := Int[ExpandToSum[w, x]^m* ExpandToSum[y, x]^ q*(A + B*Log[e*ExpandToSum[u, x]^n/ExpandToSum[v, x]^n])^p, x] /; FreeQ[{e, A, B, m, n, p, q}, x] && EqQ[n + mn, 0] && IGtQ[n, 0] && LinearQ[{u, v, w, y}, x] && Not[LinearMatchQ[{u, v, w, y}, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_e,O_A,O_B,O_m,O_n,O_p,O_q), (eqq(((O_n)+(P_mn)),0)), (igtq(O_n,0)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)) && (linearq(P_w,Xv)) && (linearq(P_y,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv)) && (linearmatchq(P_w,Xv)) && (linearmatchq(P_y,Xv))))) Int(((P_w)^(O_m))*((P_y)^(O_q))*(((O_A)+((O_B)*(ln((O_e)*((P_u)^(O_n))*((P_v)^(P_mn))))))^(O_p)),Xv) = Int(((((expandtosum(P_w,Xv))^(O_m)))*(((expandtosum(P_y,Xv))^(O_q)))*(((((O_A)+(((O_B)*(ln(((O_e)*(((expandtosum(P_u,Xv))^(O_n)))*(((((expandtosum(P_v,Xv))^(O_n)))^((-1)))))))))))^(O_p)))),Xv)
 
-# Regel 15 nicht uebersetzt: function List
+# Regel 15 (648 Varianten):
 #   Int[w_.*(A_. + B_.*Log[e_.*u_^n_.*v_^mn_])^p_., x_Symbol] := Subst[Int[w*(A + B*Log[e*(u/v)^n])^p, x], e*(u/v)^n, e*u^n/v^n] /; FreeQ[{e, A, B, n, p}, x] && EqQ[n + mn, 0] && LinearQ[{u, v}, x] && Not[IntegerQ[n]]
+ADDSPEC RubiRules : IF NIN(Xv,O_e,O_A,O_B,O_n,O_p), (eqq(((O_n)+(P_mn)),0)), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(integerq(O_n))) Int((O_w)*(((O_A)+((O_B)*(ln((O_e)*((P_u)^(O_n))*((P_v)^(P_mn))))))^(O_p)),Xv) = subst(Int(((O_w)*(((((O_A)+(((O_B)*(ln(((O_e)*(((((P_u)*(((P_v)^((-1))))))^(O_n))))))))))^(O_p)))),Xv),((O_e)*(((((P_u)*(((P_v)^((-1))))))^(O_n)))),((O_e)*(((P_u)^(O_n)))*(((((P_v)^(O_n)))^((-1))))))
 
 # Regel 16 (3779136 Varianten):
 #   Int[(f_. + g_.*x_ + h_.*x_^2)^ m_.*(A_. + B_.*Log[e_.*((a_. + b_.*x_)/(c_. + d_.*x_))^n_.])^p_., x_Symbol] := h^m/(b^m*d^m)* Int[(a + b*x)^m*(c + d*x)^m*(A + B*Log[e*((a + b*x)/(c + d*x))^n])^ p, x] /; FreeQ[{a, b, c, d, e, f, g, h, A, B, n, p}, x] && EqQ[b*d*f - a*c*h, 0] && EqQ[b*d*g - h*(b*c + a*d), 0] && IntegerQ[m]

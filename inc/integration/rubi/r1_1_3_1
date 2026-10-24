@@ -34,8 +34,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (igtq(P_n,0)), (igtq(P_p,0)) Int(((P_a)+
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := x*(a + b*x^n)^p/(n*p + 1) + a*n*p/(n*p + 1)*Int[(a + b*x^n)^(p - 1), x] /; FreeQ[{a, b}, x] && IGtQ[n, 0] && GtQ[p, 0] && (IntegerQ[2*p] || EqQ[n, 2] && IntegerQ[4*p] || EqQ[n, 2] && IntegerQ[3*p] || LtQ[Denominator[p + 1/n], Denominator[p]])
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (igtq(P_n,0)), (((P_p > 0))), (((integerq(((2)*(P_p)))) || (((eqq(P_n,2)) && (integerq(((4)*(P_p)))))) || (((eqq(P_n,2)) && (integerq(((3)*(P_p)))))) || (((denominator(((P_p)+(((P_n)^((-1)))))) < denominator(P_p)))))) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((((Xv)*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)))*(((((((P_n)*(P_p)))+(1)))^((-1))))))+(((P_a)*(P_n)*(P_p)*(((((((P_n)*(P_p)))+(1)))^((-1))))*(Int(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_p)+((-1))))),Xv)))))
 
-# Regel 8 nicht uebersetzt: function EllipticE
+# Regel 8 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(5/4), x_Symbol] := 2/(a^(5/4)*Rt[b/a, 2])*EllipticE[1/2*ArcTan[Rt[b/a, 2]*x], 2] /; FreeQ[{a, b}, x] && GtQ[a, 0] && PosQ[b/a]
+ADDSPEC RubiRules : IF (K_1 == (-(5/4))), NIN(Xv,P_a,O_b), (((P_a > 0))), (posq(((O_b)*(((P_a)^((-1))))))) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*(((((((P_a)^((5/4))))*(rt(((O_b)*(((P_a)^((-1))))),2))))^((-1))))*(elliptice((((1/2))*(arctan(((rt(((O_b)*(((P_a)^((-1))))),2))*(Xv))))),2)))
 
 # Regel 9 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(5/4), x_Symbol] := (1 + b*x^2/a)^(1/4)/(a*(a + b*x^2)^(1/4))* Int[1/(1 + b*x^2/a)^(5/4), x] /; FreeQ[{a, b}, x] && PosQ[a] && PosQ[b/a]
@@ -116,30 +117,37 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (((P_a > 0))), (negq(
 #   Int[1/Sqrt[a_ + b_.*x_^2], x_Symbol] := Subst[Int[1/(1 - b*x^2), x], x, x/Sqrt[a + b*x^2]] /; FreeQ[{a, b}, x] && Not[GtQ[a, 0]]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (not(((P_a > 0)))) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = subst(Int(((((1)+((((-1))*(O_b)*(((Xv)^(2)))))))^((-1))),Xv),Xv,((Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(1/2)))))))
 
-# Regel 30 nicht uebersetzt: function Numer
+# Regel 30 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^3], x_Symbol] := With[{r = Numer[Rt[b/a, 3]], s = Denom[Rt[b/a, 3]]}, 2*Sqrt[2 + Sqrt[3]]*(s + r*x)* Sqrt[(s^2 - r*s*x + r^2*x^2)/((1 + Sqrt[3])*s + r*x)^2]/ (3^(1/4)*r*Sqrt[a + b*x^3]* Sqrt[s*(s + r*x)/((1 + Sqrt[3])*s + r*x)^2])* EllipticF[ ArcSin[((1 - Sqrt[3])*s + r*x)/((1 + Sqrt[3])*s + r*x)], -7 - 4*Sqrt[3]]] /; FreeQ[{a, b}, x] && PosQ[a]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (posq(P_a)) Int(((P_a)+((O_b)*((Xv)^(3))))^(K_1),Xv) = ((2)*(((((2)+(((3)^((1/2))))))^((1/2))))*(((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))*(((((((((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))^(2)))+((((-1))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))+(((((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))^(2)))*(((Xv)^(2)))))))*(((((((((1)+(((3)^((1/2))))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))^((-2))))))^((1/2))))*(((((((3)^((1/4))))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((((P_a)+(((O_b)*(((Xv)^(3)))))))^((1/2))))*(((((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))*(((((((((1)+(((3)^((1/2))))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))^((-2))))))^((1/2))))))^((-1))))*(ellipticf(arcsin(((((((((1)+((((-1))*(((3)^((1/2))))))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))*(((((((((1)+(((3)^((1/2))))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))^((-1)))))),(((-7))+((((-4))*(((3)^((1/2))))))))))
 
-# Regel 31 nicht uebersetzt: function Numer
+# Regel 31 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^3], x_Symbol] := With[{r = Numer[Rt[b/a, 3]], s = Denom[Rt[b/a, 3]]}, 2*Sqrt[2 - Sqrt[3]]*(s + r*x)* Sqrt[(s^2 - r*s*x + r^2*x^2)/((1 - Sqrt[3])*s + r*x)^2]/ (3^(1/4)*r*Sqrt[a + b*x^3]* Sqrt[-s*(s + r*x)/((1 - Sqrt[3])*s + r*x)^2])* EllipticF[ ArcSin[((1 + Sqrt[3])*s + r*x)/((1 - Sqrt[3])*s + r*x)], -7 + 4*Sqrt[3]]] /; FreeQ[{a, b}, x] && NegQ[a]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (negq(P_a)) Int(((P_a)+((O_b)*((Xv)^(3))))^(K_1),Xv) = ((2)*(((((2)+((((-1))*(((3)^((1/2))))))))^((1/2))))*(((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))*(((((((((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))^(2)))+((((-1))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))+(((((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))^(2)))*(((Xv)^(2)))))))*(((((((((1)+((((-1))*(((3)^((1/2))))))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))^((-2))))))^((1/2))))*(((((((3)^((1/4))))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((((P_a)+(((O_b)*(((Xv)^(3)))))))^((1/2))))*((((((-1))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))*(((((((((1)+((((-1))*(((3)^((1/2))))))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))^((-2))))))^((1/2))))))^((-1))))*(ellipticf(arcsin(((((((((1)+(((3)^((1/2))))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))*(((((((((1)+((((-1))*(((3)^((1/2))))))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(Xv)))))^((-1)))))),(((-7))+(((4)*(((3)^((1/2))))))))))
 
-# Regel 32 nicht uebersetzt: function EllipticF
+# Regel 32 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^4], x_Symbol] := With[{q = Rt[b/a, 4]}, (1 + q^2*x^2)* Sqrt[(a + b*x^4)/(a*(1 + q^2*x^2)^2)]/(2*q*Sqrt[a + b*x^4])* EllipticF[2*ArcTan[q*x], 1/2]] /; FreeQ[{a, b}, x] && PosQ[b/a]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (posq(((O_b)*(((P_a)^((-1))))))) Int(((P_a)+((O_b)*((Xv)^(4))))^(K_1),Xv) = ((((1)+(((((rt(((O_b)*(((P_a)^((-1))))),4))^(2)))*(((Xv)^(2)))))))*(((((((P_a)+(((O_b)*(((Xv)^(4)))))))*(((((P_a)*(((((1)+(((((rt(((O_b)*(((P_a)^((-1))))),4))^(2)))*(((Xv)^(2)))))))^(2)))))^((-1))))))^((1/2))))*(((((2)*(rt(((O_b)*(((P_a)^((-1))))),4))*(((((P_a)+(((O_b)*(((Xv)^(4)))))))^((1/2))))))^((-1))))*(ellipticf(((2)*(arctan(((rt(((O_b)*(((P_a)^((-1))))),4))*(Xv))))),(1/2))))
 
-# Regel 33 nicht uebersetzt: function EllipticF
+# Regel 33 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^4], x_Symbol] := EllipticF[ArcSin[Rt[-b, 4]*x/Rt[a, 4]], -1]/(Rt[a, 4]*Rt[-b, 4]) /; FreeQ[{a, b}, x] && NegQ[b/a] && GtQ[a, 0]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (negq(((O_b)*(((P_a)^((-1))))))), (((P_a > 0))) Int(((P_a)+((O_b)*((Xv)^(4))))^(K_1),Xv) = ((ellipticf(arcsin(((rt((((-1))*(O_b)),4))*(Xv)*(((rt(P_a,4))^((-1)))))),(-1)))*(((((rt(P_a,4))*(rt((((-1))*(O_b)),4))))^((-1)))))
 
-# Regel 34 nicht uebersetzt: function EllipticF
+# Regel 34 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^4], x_Symbol] := With[{q = Rt[-a*b, 2]}, Sqrt[-a + q*x^2]* Sqrt[(a + q*x^2)/q]/(Sqrt[2]*Sqrt[-a]*Sqrt[a + b*x^4])* EllipticF[ArcSin[x/Sqrt[(a + q*x^2)/(2*q)]], 1/2] /; IntegerQ[q]] /; FreeQ[{a, b}, x] && LtQ[a, 0] && GtQ[b, 0]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (((P_a < 0))), (((O_b > 0))), (integerq(rt((((-1))*(P_a)*(O_b)),2))) Int(((P_a)+((O_b)*((Xv)^(4))))^(K_1),Xv) = (((((((((-1))*(P_a)))+(((rt((((-1))*(P_a)*(O_b)),2))*(((Xv)^(2)))))))^((1/2))))*(((((((P_a)+(((rt((((-1))*(P_a)*(O_b)),2))*(((Xv)^(2)))))))*(((rt((((-1))*(P_a)*(O_b)),2))^((-1))))))^((1/2))))*(((((((2)^((1/2))))*((((((-1))*(P_a)))^((1/2))))*(((((P_a)+(((O_b)*(((Xv)^(4)))))))^((1/2))))))^((-1))))*(ellipticf(arcsin(((Xv)*(((((((P_a)+(((rt((((-1))*(P_a)*(O_b)),2))*(((Xv)^(2)))))))*(((((2)*(rt((((-1))*(P_a)*(O_b)),2))))^((-1))))))^((-(1/2))))))),(1/2))))
 
-# Regel 35 nicht uebersetzt: function EllipticF
+# Regel 35 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^4], x_Symbol] := With[{q = Rt[-a*b, 2]}, Sqrt[(a - q*x^2)/(a + q*x^2)]* Sqrt[(a + q*x^2)/q]/(Sqrt[2]*Sqrt[a + b*x^4]* Sqrt[a/(a + q*x^2)])* EllipticF[ArcSin[x/Sqrt[(a + q*x^2)/(2*q)]], 1/2]] /; FreeQ[{a, b}, x] && LtQ[a, 0] && GtQ[b, 0]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (((P_a < 0))), (((O_b > 0))) Int(((P_a)+((O_b)*((Xv)^(4))))^(K_1),Xv) = ((((((((P_a)+((((-1))*(rt((((-1))*(P_a)*(O_b)),2))*(((Xv)^(2)))))))*(((((P_a)+(((rt((((-1))*(P_a)*(O_b)),2))*(((Xv)^(2)))))))^((-1))))))^((1/2))))*(((((((P_a)+(((rt((((-1))*(P_a)*(O_b)),2))*(((Xv)^(2)))))))*(((rt((((-1))*(P_a)*(O_b)),2))^((-1))))))^((1/2))))*(((((((2)^((1/2))))*(((((P_a)+(((O_b)*(((Xv)^(4)))))))^((1/2))))*(((((P_a)*(((((P_a)+(((rt((((-1))*(P_a)*(O_b)),2))*(((Xv)^(2)))))))^((-1))))))^((1/2))))))^((-1))))*(ellipticf(arcsin(((Xv)*(((((((P_a)+(((rt((((-1))*(P_a)*(O_b)),2))*(((Xv)^(2)))))))*(((((2)*(rt((((-1))*(P_a)*(O_b)),2))))^((-1))))))^((-(1/2))))))),(1/2))))
 
 # Regel 36 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^4], x_Symbol] := Sqrt[1 + b*x^4/a]/Sqrt[a + b*x^4]*Int[1/Sqrt[1 + b*x^4/a], x] /; FreeQ[{a, b}, x] && NegQ[b/a] && Not[GtQ[a, 0]]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (negq(((O_b)*(((P_a)^((-1))))))), (not(((P_a > 0)))) Int(((P_a)+((O_b)*((Xv)^(4))))^(K_1),Xv) = ((((((1)+(((O_b)*(((Xv)^(4)))*(((P_a)^((-1))))))))^((1/2))))*(((((P_a)+(((O_b)*(((Xv)^(4)))))))^((-(1/2)))))*(Int(((((1)+(((O_b)*(((Xv)^(4)))*(((P_a)^((-1))))))))^((-(1/2)))),Xv)))
 
-# Regel 37 nicht uebersetzt: function Numer
+# Regel 37 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^6], x_Symbol] := With[{r = Numer[Rt[b/a, 3]], s = Denom[Rt[b/a, 3]]}, x*(s + r*x^2)* Sqrt[(s^2 - r*s*x^2 + r^2*x^4)/(s + (1 + Sqrt[3])*r*x^2)^2]/ (2*3^(1/4)*s*Sqrt[a + b*x^6]* Sqrt[r*x^2*(s + r*x^2)/(s + (1 + Sqrt[3])*r*x^2)^2])* EllipticF[ ArcCos[(s + (1 - Sqrt[3])*r*x^2)/(s + (1 + Sqrt[3])*r*x^2)], (2 + Sqrt[3])/4]] /; FreeQ[{a, b}, x]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv)^(6))))^(K_1),Xv) = ((Xv)*(((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((Xv)^(2)))))))*(((((((((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))^(2)))+((((-1))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((Xv)^(2)))))+(((((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))^(2)))*(((Xv)^(4)))))))*(((((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((((1)+(((3)^((1/2))))))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((Xv)^(2)))))))^((-2))))))^((1/2))))*(((((2)*(((3)^((1/4))))*(denominator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((((P_a)+(((O_b)*(((Xv)^(6)))))))^((1/2))))*(((((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((Xv)^(2)))*(((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((Xv)^(2)))))))*(((((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((((1)+(((3)^((1/2))))))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((Xv)^(2)))))))^((-2))))))^((1/2))))))^((-1))))*(ellipticf(arccos(((((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((((1)+((((-1))*(((3)^((1/2))))))))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((Xv)^(2)))))))*(((((denominator(rt(((O_b)*(((P_a)^((-1))))),3)))+(((((1)+(((3)^((1/2))))))*(numerator(rt(((O_b)*(((P_a)^((-1))))),3)))*(((Xv)^(2)))))))^((-1)))))),((((2)+(((3)^((1/2))))))*((1/4))))))
 
 # Regel 38 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^8], x_Symbol] := 1/2*Int[(1 - Rt[b/a, 4]*x^2)/Sqrt[a + b*x^8], x] + 1/2*Int[(1 + Rt[b/a, 4]*x^2)/Sqrt[a + b*x^8], x] /; FreeQ[{a, b}, x]
@@ -149,8 +157,9 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv
 #   Int[1/(a_ + b_.*x_^2)^(1/4), x_Symbol] := 2*x/(a + b*x^2)^(1/4) - a*Int[1/(a + b*x^2)^(5/4), x] /; FreeQ[{a, b}, x] && GtQ[a, 0] && PosQ[b/a]
 ADDSPEC RubiRules : IF (K_1 == (-(1/4))), NIN(Xv,P_a,O_b), (((P_a > 0))), (posq(((O_b)*(((P_a)^((-1))))))) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((((2)*(Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(1/4)))))))+((((-1))*(P_a)*(Int(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(5/4)))),Xv)))))
 
-# Regel 40 nicht uebersetzt: function EllipticE
+# Regel 40 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(1/4), x_Symbol] := 2/(a^(1/4)*Rt[-b/a, 2])*EllipticE[1/2*ArcSin[Rt[-b/a, 2]*x], 2] /; FreeQ[{a, b}, x] && GtQ[a, 0] && NegQ[b/a]
+ADDSPEC RubiRules : IF (K_1 == (-(1/4))), NIN(Xv,P_a,O_b), (((P_a > 0))), (negq(((O_b)*(((P_a)^((-1))))))) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*(((((((P_a)^((1/4))))*(rt((((-1))*(O_b)*(((P_a)^((-1))))),2))))^((-1))))*(elliptice((((1/2))*(arcsin(((rt((((-1))*(O_b)*(((P_a)^((-1))))),2))*(Xv))))),2)))
 
 # Regel 41 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(1/4), x_Symbol] := (1 + b*x^2/a)^(1/4)/(a + b*x^2)^(1/4)* Int[1/(1 + b*x^2/a)^(1/4), x] /; FreeQ[{a, b}, x] && PosQ[a]
@@ -160,11 +169,13 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/4))), NIN(Xv,P_a,O_b), (posq(P_a)) Int(((P_a
 #   Int[1/(a_ + b_.*x_^2)^(1/4), x_Symbol] := 2*Sqrt[-b*x^2/a]/(b*x)* Subst[Int[x^2/Sqrt[1 - x^4/a], x], x, (a + b*x^2)^(1/4)] /; FreeQ[{a, b}, x] && NegQ[a]
 ADDSPEC RubiRules : IF (K_1 == (-(1/4))), NIN(Xv,P_a,O_b), (negq(P_a)) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((((O_b)*(Xv)))^((-1))))*(subst(Int(((((Xv)^(2)))*(((((1)+((((-1))*(((Xv)^(4)))*(((P_a)^((-1))))))))^((-(1/2)))))),Xv),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/4))))))
 
-# Regel 43 nicht uebersetzt: function EllipticF
+# Regel 43 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(3/4), x_Symbol] := 2/(a^(3/4)*Rt[b/a, 2])*EllipticF[1/2*ArcTan[Rt[b/a, 2]*x], 2] /; FreeQ[{a, b}, x] && GtQ[a, 0] && PosQ[b/a]
+ADDSPEC RubiRules : IF (K_1 == (-(3/4))), NIN(Xv,P_a,O_b), (((P_a > 0))), (posq(((O_b)*(((P_a)^((-1))))))) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*(((((((P_a)^((3/4))))*(rt(((O_b)*(((P_a)^((-1))))),2))))^((-1))))*(ellipticf((((1/2))*(arctan(((rt(((O_b)*(((P_a)^((-1))))),2))*(Xv))))),2)))
 
-# Regel 44 nicht uebersetzt: function EllipticF
+# Regel 44 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(3/4), x_Symbol] := 2/(a^(3/4)*Rt[-b/a, 2])*EllipticF[1/2*ArcSin[Rt[-b/a, 2]*x], 2] /; FreeQ[{a, b}, x] && GtQ[a, 0] && NegQ[b/a]
+ADDSPEC RubiRules : IF (K_1 == (-(3/4))), NIN(Xv,P_a,O_b), (((P_a > 0))), (negq(((O_b)*(((P_a)^((-1))))))) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*(((((((P_a)^((3/4))))*(rt((((-1))*(O_b)*(((P_a)^((-1))))),2))))^((-1))))*(ellipticf((((1/2))*(arcsin(((rt((((-1))*(O_b)*(((P_a)^((-1))))),2))*(Xv))))),2)))
 
 # Regel 45 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(3/4), x_Symbol] := (1 + b*x^2/a)^(3/4)/(a + b*x^2)^(3/4)* Int[1/(1 + b*x^2/a)^(3/4), x] /; FreeQ[{a, b}, x] && PosQ[a]
@@ -214,8 +225,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (fractionq(P_n)) Int(((P_a)+((O_b)*(
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := Int[ExpandIntegrand[(a + b*x^n)^p, x], x] /; FreeQ[{a, b, n}, x] && IGtQ[p, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_n), (igtq(P_p,0)) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = Int(expandintegrand(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)),Xv),Xv)
 
-# Regel 57 nicht uebersetzt: function Hypergeometric2F1
+# Regel 57 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := a^p*x*Hypergeometric2F1[-p, 1/n, 1/n + 1, -b*x^n/a] /; FreeQ[{a, b, n, p}, x] && Not[IGtQ[p, 0]] && Not[IntegerQ[1/n]] && Not[ILtQ[Simplify[1/n + p], 0]] && (IntegerQ[p] || GtQ[a, 0])
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_n,P_p), (not(igtq(P_p,0))), (not(integerq(((P_n)^((-1)))))), (not(iltq(simplify(((((P_n)^((-1))))+(P_p))),0))), (((integerq(P_p)) || (((P_a > 0))))) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((((P_a)^(P_p)))*(Xv)*(hyp2f1((((-1))*(P_p)),((P_n)^((-1))),((((P_n)^((-1))))+(1)),(((-1))*(O_b)*(((Xv)^(P_n)))*(((P_a)^((-1))))))))
 
 # Regel 58 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := a^IntPart[p]*(a + b*x^n)^FracPart[p]/(1 + b*x^n/a)^FracPart[p]* Int[(1 + b*x^n/a)^p, x] /; FreeQ[{a, b, n, p}, x] && Not[IGtQ[p, 0]] && Not[IntegerQ[1/n]] && Not[ILtQ[Simplify[1/n + p], 0]] && Not[IntegerQ[p] || GtQ[a, 0]]

@@ -168,7 +168,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_p), (eqq(((O_b)+(O_c)),0)) I
 # Regel 53 nicht uebersetzt: call of a non-symbol
 #   Int[u_.*(a_.*(b_.*F_[c_. + d_.*x_])^p_)^n_., x_Symbol] := With[{v = ActivateTrig[F[c + d*x]]}, a^IntPart[n]*(a*(b*v)^p)^FracPart[n]/(b*v)^(p*FracPart[n])* Int[ActivateTrig[u]*(b*v)^(n*p), x]] /; FreeQ[{a, b, c, d, n, p}, x] && InertTrigQ[F] && Not[IntegerQ[n]] && Not[IntegerQ[p]]
 
-# Regel 54 nicht uebersetzt: predicate InverseFunctionFreeQ
+# Regel 54 nicht uebersetzt: predicate FalseQ
 #   Int[u_*(c_.*sin[v_])^m_, x_Symbol] := With[{w = FunctionOfTrig[u*Sin[v/2]^(2*m)/(c*Tan[v/2])^m, x]}, (c*Sin[v])^m*(c*Tan[v/2])^m/Sin[v/2]^(2*m)* Int[u*Sin[v/2]^(2*m)/(c*Tan[v/2])^m, x] /; Not[FalseQ[w]] && FunctionOfQ[NonfreeFactors[Tan[w], x], u*Sin[v/2]^(2*m)/(c*Tan[v/2])^m, x]] /; FreeQ[c, x] && LinearQ[v, x] && IntegerQ[m + 1/2] && Not[SumQ[u]] && InverseFunctionFreeQ[u, x]
 
 # Regel 55 (17496 Varianten):
@@ -204,7 +204,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n), (eqq(((((O_a)^(2)))+(((O_b)^
 # Regel 64 nicht uebersetzt: predicate InertTrigFreeQ
 #   Int[u_.*(v_^m_.*w_^n_.)^p_, x_Symbol] := With[{uu = ActivateTrig[u], vv = ActivateTrig[v], ww = ActivateTrig[w]}, (vv^m*ww^n)^FracPart[p]/(vv^(m*FracPart[p])*ww^(n*FracPart[p]))* Int[uu*vv^(m*p)*ww^(n*p), x]] /; FreeQ[{m, n, p}, x] && Not[IntegerQ[p]] && (Not[InertTrigFreeQ[v]] || Not[InertTrigFreeQ[w]])
 
-# Regel 65 nicht uebersetzt: function ExpandTrig
+# Regel 65 nicht uebersetzt: predicate InertTrigFreeQ
 #   Int[u_, x_Symbol] := With[{v = ExpandTrig[u, x]}, Int[v, x] /; SumQ[v]] /; Not[InertTrigFreeQ[u]]
 
 # Regel 66 nicht uebersetzt: function CannotIntegrate

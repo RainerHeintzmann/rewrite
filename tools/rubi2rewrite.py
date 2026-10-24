@@ -307,6 +307,16 @@ FUNCS = {
     'ArcCosh': 'arccosh', 'ArcTanh': 'arctanh', 'ArcCoth': 'arccoth',
     'Log': 'ln', 'PolyLog': 'polylog', 'ProductLog': 'productlog',
     'Abs': 'abs',
+    # special functions (inc/alg, specfun.c)
+    'ArcSec': 'arcsec', 'ArcCsc': 'arccsc', 'ArcSech': 'arcsech', 'ArcCsch': 'arccsch',
+    'Erf': 'erf', 'Erfc': 'erfc', 'Erfi': 'erfi', 'FresnelS': 'fresnels',
+    'FresnelC': 'fresnelc', 'SinIntegral': 'sinint', 'CosIntegral': 'cosint',
+    'SinhIntegral': 'sinhint', 'CoshIntegral': 'coshint', 'ExpIntegralEi': 'expint',
+    'ExpIntegralE': 'expinte', 'LogIntegral': 'logint', 'Gamma': 'Gamma',
+    'LogGamma': 'loggamma', 'PolyGamma': 'polygamma', 'Zeta': 'zeta',
+    'EllipticK': 'elliptick', 'EllipticF': 'ellipticf', 'EllipticE': 'elliptice',
+    'EllipticPi': 'ellipticpi', 'Hypergeometric2F1': 'hyp2f1', 'AppellF1': 'appellf1',
+    'BesselJ': 'besselj',
     # Rubi's inert trig functions (lower case) in the trig sections
     'sin': 'sin', 'cos': 'cos', 'tan': 'tan', 'cot': 'cot', 'sec': 'sec', 'csc': 'csc',
 }
@@ -322,6 +332,9 @@ RHS_HELPERS = {
     'NonfreeFactors': 'nonfreefactors', 'ExpandToSum': 'expandtosum',
     'PolynomialQuotient': 'polyquotient', 'PolynomialRemainder': 'polyremainder',
     'SimplifyIntegrand': 'simp',
+    'ExpandTrig': 'expandintegrand', 'ExpandTrigReduce': 'expandtrigreduce',
+    'LeafCount': 'leafcount', 'BinomialDegree': 'binomialdegree',
+    'Numer': 'numerator',
 }
 # predicates in conditions
 PREDICATES = {
@@ -331,6 +344,16 @@ PREDICATES = {
     'ProductQ': 'productq', 'PowerQ': 'powerq',
     'FractionQ': 'fractionq', 'HalfIntegerQ': 'halfintegerq',
     'PolynomialQ': 'polyq', 'NiceSqrtQ': 'nicesqrtq',
+    'BinomialQ': 'binomialq', 'QuadraticQ': 'quadraticq',
+    'RationalFunctionQ': 'rationalfunctionq', 'InverseFunctionFreeQ': 'inversefunctionfreeq',
+    'SimplerQ': 'simplerq', 'SumSimplerQ': 'sumsimplerq', 'SimplerSqrtQ': 'simplersqrtq',
+    'KnownSineIntegrandQ': 'knownsineintegrandq', 'KnownTangentIntegrandQ': 'knowntangentintegrandq',
+    'KnownCotangentIntegrandQ': 'knowncotangentintegrandq',
+    'KnownSecantIntegrandQ': 'knownsecantintegrandq',
+    'PiecewiseLinearQ': 'piecewiselinearq', 'LinearMatchQ': 'linearmatchq',
+    'BinomialMatchQ': 'binomialmatchq', 'QuadraticMatchQ': 'quadraticmatchq',
+    'TrinomialQ': 'trinomialq', 'IndependentQ': 'freeq', 'LinearPairQ': 'linearpairq',
+    'AlgebraicFunctionQ': 'algebraicfunctionq',
 }
 ORDER = {'GtQ': '>', 'LtQ': '<', 'GeQ': '>=', 'LeQ': '<='}
 CONSTANTS = {'Pi': 'pi', 'E': 'e'}
@@ -451,6 +474,8 @@ def tr_rhs(e, ctx):
         return FUNCS[head] + paren(','.join(tr_rhs(a, ctx) for a in args))
     if head == 'Subst' and len(args) == 2 and args[1][0] == 'call' and args[1][1] == 'Rule':
         args = [args[0]] + args[1][2]
+    if head == 'ReplaceAll' and len(args) == 2 and args[1][0] == 'call' and args[1][1] == 'Rule':
+        return 'replaceall' + paren(','.join(tr_rhs(a, ctx) for a in [args[0]] + args[1][2]))
     if head == 'RemoveContent' and len(args) == 2:
         return tr_rhs(args[0], ctx)          # only a constant factor differs
     if head in RHS_HELPERS:
@@ -482,6 +507,10 @@ def tr_bool(e, ctx):
     if head in ('EqQ', 'NeQ') and len(args) != 2:
         # invalid in Rubi too (CheckArguments gives Null): the rule never applies
         raise Untranslatable("%s with %d arguments (never true in Rubi either)" % (head, len(args)))
+    if head in PREDICATES and args and args[0][0] == 'call' and args[0][1] == 'List':
+        # P[{u, v}, x] = P[u, x] && P[v, x]
+        return paren(' && '.join(paren(tr_bool(('call', head, [item] + args[1:]), ctx))
+                                 for item in args[0][2]))
     if head in PREDICATES:
         return PREDICATES[head] + paren(','.join(tr_rhs(a, ctx) for a in args))
     if head in ORDER:

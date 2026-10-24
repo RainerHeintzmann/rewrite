@@ -21,6 +21,7 @@
 #include "nodes.h"
 #include "symfkt.h"
 #include "listmatch.h"
+#include "numsort.h"	/* 2026: SUBSORT */
 
 #define EQUAL  0	/* wichtig wegen strcmp */
 
@@ -163,6 +164,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 				else
 					maintype=NULL;
 				neu = tcopy(RES_RHS(ers)); /* Formel einsetzen (Es wird auch 'geliftet' !) */
+				retype_term(neu);	/* 2026: Varianten zu den Sorten der Argumente (SUBSORT) */
 				neu = tcalc(neu);  /* Formel numerisch auswerten */
 				if (Baum && Baum->type == RULELIST)
 					term_simplify_trivial(& neu);	/* x^0, 1*u, ... wie Mathematica */
@@ -555,7 +557,8 @@ BOOLEAN isnt_zero (Node * np)
 	else */
 
 		{
-		val=(* ((double *) value((Symbol *) erg1)));
+		if (! num_to_double((Symbol *) erg1, & val))	/* 2026: auch integer, rational */
+			val=(* ((double *) value((Symbol *) erg1)));
 		iszero=(val==0.0);
 		}
 	delete (erg1);
@@ -649,11 +652,33 @@ Node * get_numbertype (void)
 return numbertype; 
 }
 
+
+/* 2026: deklarierte Sorte des i-ten Arguments einer Funktion (NULL: unbekannt) */
+static Node * param_sort (Symbol * f, int i)
+{
+	Node * a = atypes(f);
+	int k;
+	if (! a) return NULL;
+	if (a->type == VARPAR)
+		{
+		a = a->l;
+		for (k = 0; k < i && a->r != NULL; k++) a = a->r;
+		return (a->r != NULL) ? a->l : a;
+		}
+	for (k = 0; k < i; k++)
+		{
+		if (a->r == NULL) return NULL;
+		a = a->r;
+		}
+	return (a->r != NULL) ? a->l : a;
+}
+
+static Symbol * lastsym = NULL;	/* Symbol mit der Sorte des letzten Werts von realcalk */
+
 void * realcalk(Node * term,int * perr)
 {
 	Node * lterm;
 	void * erg; /* Ergebnisse der Teilbaeume */
-	static Symbol * lastsym;
 
 	DEBG((5,"realcalk : "));
 	DBFK(5,print(term));
@@ -681,6 +706,16 @@ void * realcalk(Node * term,int * perr)
 		if (res)
 			{
 			v = realcalk(res, perr);
+			/* 2026: der Wert hat die Sorte des Ergebnisses (z.B. rational); fuer
+			   den Aufrufer muss er die deklarierte Sorte der Funktion haben */
+			if (! * perr && v && rtypes(lastsym) != rtypes(TERM_HEAD(term)))
+				{
+				Node * from = rtypes(lastsym), * to = rtypes(TERM_HEAD(term));
+				void * w = (sort_dist(from, to) > 0) ? sort_convert(v, from, to) : NULL;
+				((void (*) (void *)) del(from)) (v);
+				v = w;
+				if (! v) * perr = TRUE;
+				}
 			delete(res);
 			}
 		else
@@ -732,12 +767,28 @@ void * realcalk(Node * term,int * perr)
 	{
 	void * feld[MAXARGS];
 	Symbol * syms[MAXARGS];
+	Node * conv[MAXARGS];		/* 2026: Sorte nach Erweiterung (SUBSORT), sonst NULL */
 	int i=0,j;
 
 	for ( ; lterm; lterm = ARGS_NEXT(lterm))
 		{
+		Node * want;
 		feld[i]=realcalk(ARGS_ITEM(lterm),perr);/* Const oder Funct */
-		syms[i++]=lastsym;
+		syms[i]=lastsym;
+		conv[i]=NULL;
+		/* 2026: Wert einer Untersorte in die deklarierte Sorte umwandeln */
+		if (! * perr && feld[i] && (want = param_sort(TERM_HEAD(term), i)) != NULL
+		    && want != rtypes(syms[i]) && sort_dist(rtypes(syms[i]), want) > 0)
+			{
+			void * w = sort_convert(feld[i], rtypes(syms[i]), want);
+			if (w)
+				{
+				DELNUM(syms[i],feld[i]);
+				feld[i] = w;
+				conv[i] = want;
+				}
+			}
+		i++;
 		if (i > MAXARGS-2) fatal("Fatal Error run.c : Too max Arguments for Function !");
 		if (* perr)
 			break;
@@ -747,15 +798,19 @@ void * realcalk(Node * term,int * perr)
 		feld[i] = NULL; /* Ende (bei variabel Argumenten) kennzeichnen */
 		lastsym = TERM_HEAD(term);
 		erg= ((void * (*) (void * [])) value(TERM_HEAD(term)))(feld); /* Aufruf der Benutzerfunktion */
+		if (erg == NULL)	/* 2026: kein Ergebnis (z.B. exakte Division durch 0) */
+			* perr = TRUE;
 		}
 
 	for (j=0;j<i;j++)
 		{
 		if (((Node *) syms[j])->type != SYM_TYPE)
 			 fatal("run.c : Not a Symbol to delete !! j: %d, type: %d\n",j,((Node *) syms[j])->type);
-		if (feld[j])  /* bei Fehler (perr) ist der Wert NULL: nichts freizugeben */
+		if (feld[j] && conv[j])	/* umgewandelter Wert */
+			((void (*) (void *)) del(conv[j])) (feld[j]);
+		else if (feld[j])  /* bei Fehler (perr) ist der Wert NULL: nichts freizugeben */
 			DELNUM(syms[j],feld[j]);
-		}		
+		}
 	}
 
 	if (!(* perr))
@@ -832,7 +887,15 @@ Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 				sp=mknum(erg,rtypes((Symbol *) term));
 
 				if ((term->type == SYM_TYPE) && (lexval((Symbol *)term) == Term))
-					rtypes(sp)=rtypes((Symbol *) term);
+					{
+					/* 2026: ein Wert einer Untersorte (z.B. integer in einem
+					   real-Term) behaelt seine Sorte */
+					if (lastsym && rtypes(lastsym) != rtypes((Symbol *) term)
+					    && sort_dist(rtypes(lastsym), rtypes((Symbol *) term)) > 0)
+						rtypes(sp)=rtypes(lastsym);
+					else
+						rtypes(sp)=rtypes((Symbol *) term);
+					}
 				else
 					{
 					printfOut("calkulate : Internal ERROR : unexpected term-type : ");
@@ -856,6 +919,9 @@ if (! term)
 	return NULL;
 term->l = tcalc(term->l);
 term->r = tcalc(term->r);
+
+if ((term -> type) == Func && ! builtin(term->l))
+	retype_node(term);	/* 2026: Argumente koennen jetzt exakte Zahlen sein (SUBSORT) */
 
 if ((term -> type) == Func && builtin(term->l))  /* symbolische C-Funktion (symfkt.c) */
 	{

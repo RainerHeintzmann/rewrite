@@ -14,8 +14,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n), (igtq(O_m,0)), (neq(O_n,(-1)
 #   Int[(c_. + d_.*x_)^m_.*Sinh[a_. + b_.*x_]*Cosh[a_. + b_.*x_]^n_., x_Symbol] := (c + d*x)^m*Cosh[a + b*x]^(n + 1)/(b*(n + 1)) - d*m/(b*(n + 1))*Int[(c + d*x)^(m - 1)*Cosh[a + b*x]^(n + 1), x] /; FreeQ[{a, b, c, d, n}, x] && IGtQ[m, 0] && NeQ[n, -1]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n), (igtq(O_m,0)), (neq(O_n,(-1))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(sinh((O_a)+((O_b)*(Xv))))*((cosh((O_a)+((O_b)*(Xv))))^(O_n)),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(((cosh(((O_a)+(((O_b)*(Xv))))))^(((O_n)+(1)))))*(((((O_b)*(((O_n)+(1)))))^((-1))))))+((((-1))*(O_d)*(O_m)*(((((O_b)*(((O_n)+(1)))))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(((cosh(((O_a)+(((O_b)*(Xv))))))^(((O_n)+(1)))))),Xv)))))
 
-# Regel 3 nicht uebersetzt: function ExpandTrigReduce
+# Regel 3 (23328 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*Sinh[a_. + b_.*x_]^n_.*Cosh[a_. + b_.*x_]^p_., x_Symbol] := Int[ExpandTrigReduce[(c + d*x)^m, Sinh[a + b*x]^n*Cosh[a + b*x]^p, x], x] /; FreeQ[{a, b, c, d, m}, x] && IGtQ[n, 0] && IGtQ[p, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (igtq(O_n,0)), (igtq(O_p,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((sinh((O_a)+((O_b)*(Xv))))^(O_n))*((cosh((O_a)+((O_b)*(Xv))))^(O_p)),Xv) = Int(expandtrigreduce(((((O_c)+(((O_d)*(Xv)))))^(O_m)),((((sinh(((O_a)+(((O_b)*(Xv))))))^(O_n)))*(((cosh(((O_a)+(((O_b)*(Xv))))))^(O_p)))),Xv),Xv)
 
 # Regel 4 (23328 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*Sinh[a_. + b_.*x_]^n_.*Tanh[a_. + b_.*x_]^p_., x_Symbol] := Int[(c + d*x)^m*Sinh[a + b*x]^n*Tanh[a + b*x]^(p - 2), x] - Int[(c + d*x)^m*Sinh[a + b*x]^(n - 2)*Tanh[a + b*x]^p, x] /; FreeQ[{a, b, c, d, m}, x] && IGtQ[n, 0] && IGtQ[p, 0]
@@ -100,14 +101,17 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,O_n), (igtq(O_m,0)), (neq(
 #   Int[(e_. + f_.*x_)^m_.*Csch[c_. + d_.*x_]* Coth[c_. + d_.*x_]*(a_ + b_.*Csch[c_. + d_.*x_])^n_., x_Symbol] := -(e + f*x)^m*(a + b*Csch[c + d*x])^(n + 1)/(b*d*(n + 1)) + f*m/(b*d*(n + 1))* Int[(e + f*x)^(m - 1)*(a + b*Csch[c + d*x])^(n + 1), x] /; FreeQ[{a, b, c, d, e, f, n}, x] && IGtQ[m, 0] && NeQ[n, -1]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,O_n), (igtq(O_m,0)), (neq(O_n,(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(csch((O_c)+((O_d)*(Xv))))*(coth((O_c)+((O_d)*(Xv))))*(((P_a)+((O_b)*(csch((O_c)+((O_d)*(Xv))))))^(O_n)),Xv) = (((((-1))*(((((O_e)+(((O_f)*(Xv)))))^(O_m)))*(((((P_a)+(((O_b)*(csch(((O_c)+(((O_d)*(Xv))))))))))^(((O_n)+(1)))))*(((((O_b)*(O_d)*(((O_n)+(1)))))^((-1))))))+(((O_f)*(O_m)*(((((O_b)*(O_d)*(((O_n)+(1)))))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+((-1))))))*(((((P_a)+(((O_b)*(csch(((O_c)+(((O_d)*(Xv))))))))))^(((O_n)+(1)))))),Xv)))))
 
-# Regel 25 nicht uebersetzt: function ExpandTrigReduce
+# Regel 25 (23328 Varianten):
 #   Int[(e_. + f_.*x_)^m_.*Sinh[a_. + b_.*x_]^p_.*Sinh[c_. + d_.*x_]^q_., x_Symbol] := Int[ExpandTrigReduce[(e + f*x)^m, Sinh[a + b*x]^p*Sinh[c + d*x]^q, x], x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[p, 0] && IGtQ[q, 0] && IntegerQ[m]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (integerq(O_m)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*((sinh((O_a)+((O_b)*(Xv))))^(O_p))*((sinh((O_c)+((O_d)*(Xv))))^(O_q)),Xv) = Int(expandtrigreduce(((((O_e)+(((O_f)*(Xv)))))^(O_m)),((((sinh(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((sinh(((O_c)+(((O_d)*(Xv))))))^(O_q)))),Xv),Xv)
 
-# Regel 26 nicht uebersetzt: function ExpandTrigReduce
+# Regel 26 (23328 Varianten):
 #   Int[(e_. + f_.*x_)^m_.*Cosh[a_. + b_.*x_]^p_.*Cosh[c_. + d_.*x_]^q_., x_Symbol] := Int[ExpandTrigReduce[(e + f*x)^m, Cosh[a + b*x]^p*Cosh[c + d*x]^q, x], x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[p, 0] && IGtQ[q, 0] && IntegerQ[m]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (integerq(O_m)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*((cosh((O_a)+((O_b)*(Xv))))^(O_p))*((cosh((O_c)+((O_d)*(Xv))))^(O_q)),Xv) = Int(expandtrigreduce(((((O_e)+(((O_f)*(Xv)))))^(O_m)),((((cosh(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cosh(((O_c)+(((O_d)*(Xv))))))^(O_q)))),Xv),Xv)
 
-# Regel 27 nicht uebersetzt: function ExpandTrigReduce
+# Regel 27 (23328 Varianten):
 #   Int[(e_. + f_.*x_)^m_.*Sinh[a_. + b_.*x_]^p_.*Cosh[c_. + d_.*x_]^q_., x_Symbol] := Int[ExpandTrigReduce[(e + f*x)^m, Sinh[a + b*x]^p*Cosh[c + d*x]^q, x], x] /; FreeQ[{a, b, c, d, e, f, m}, x] && IGtQ[p, 0] && IGtQ[q, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m), (igtq(O_p,0)), (igtq(O_q,0)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*((sinh((O_a)+((O_b)*(Xv))))^(O_p))*((cosh((O_c)+((O_d)*(Xv))))^(O_q)),Xv) = Int(expandtrigreduce(((((O_e)+(((O_f)*(Xv)))))^(O_m)),((((sinh(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cosh(((O_c)+(((O_d)*(Xv))))))^(O_q)))),Xv),Xv)
 
 # Regel 28 nicht uebersetzt: call of a non-symbol
 #   Int[(e_. + f_.*x_)^m_.*F_[a_. + b_.*x_]^p_.*G_[c_. + d_.*x_]^q_., x_Symbol] := Int[ExpandTrigExpand[(e + f*x)^m*G[c + d*x]^q, F, c + d*x, p, b/d, x], x] /; FreeQ[{a, b, c, d, e, f, m}, x] && MemberQ[{Sinh, Cosh}, F] && MemberQ[{Sech, Csch}, G] && IGtQ[p, 0] && IGtQ[q, 0] && EqQ[b*c - a*d, 0] && IGtQ[b/d, 1]

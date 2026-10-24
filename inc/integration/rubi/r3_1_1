@@ -18,8 +18,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (((O_p > 0))), (integerq(((2)*(O
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := x*(a + b*Log[c*x^n])^(p + 1)/(b*n*(p + 1)) - 1/(b*n*(p + 1))*Int[(a + b*Log[c*x^n])^(p + 1), x] /; FreeQ[{a, b, c, n}, x] && LtQ[p, -1] && IntegerQ[2*p]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (((P_p < (-1)))), (integerq(((2)*(P_p)))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p),Xv) = ((((Xv)*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))))*(((((O_b)*(O_n)*(((P_p)+(1)))))^((-1))))))+((((-1))*(((((O_b)*(O_n)*(((P_p)+(1)))))^((-1))))*(Int(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))),Xv)))))
 
-# Regel 4 nicht uebersetzt: function LogIntegral
+# Regel 4 (3 Varianten):
 #   Int[1/Log[c_.*x_], x_Symbol] := LogIntegral[c*x]/c /; FreeQ[c, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_c) Int((ln((O_c)*(Xv)))^(K_1),Xv) = ((logint(((O_c)*(Xv))))*(((O_c)^((-1)))))
 
 # Regel 5 (54 Varianten):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := 1/(n*c^(1/n))*Subst[Int[E^(x/n)*(a + b*x)^p, x], x, Log[c*x^n]] /; FreeQ[{a, b, c, p}, x] && IntegerQ[1/n]

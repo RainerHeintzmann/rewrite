@@ -1,0 +1,45 @@
+# Exact numbers (inc/exact): sorts integer and rational with GMP, subsorts
+# integer < rational < real (SUBSORT), integer literals (INTNUM).
+INC "inc/all"
+INC "inc/exact"
+# ---- arithmetic stays exact
+1/3 + 1/6
+2/4
+3*(1/3)
+(2/3)^-2
+2^-3
+2^100
+25!
+7 - 10
+-(1/2)
+abs(-7/3)
+numer(6/4), denom(6/4)
+mod(-7,3), quot(-7,3)
+# ---- comparisons
+7/2 > 3
+1/3 == 2/6
+2 == 2.0
+# ---- widening to real
+1/3 + 0.5
+sin(1/2)
+2^(1/2)
+# ---- division by zero stays a term
+1/0
+# ---- assignment to a real constant and loops
+CONST z : real
+z = 3/4
+z
+z*4
+CONST sumk : real
+sumk = 0
+CONST kk : real
+FOR kk = 1 TO 4 DO sumk = sumk + kk
+sumk
+# ---- rules for real apply to the exact sorts (LIFT)
+TERM T1 : real
+CONST yy : real
+x = yy
+T1 = REWR x*1 + 0*x + (1/2)*x : All
+T1
+T1 = REWR D(x^3/3,x) : All
+T1

@@ -15,6 +15,8 @@
 #include "vector.h"
 #include "matrix.h"
 #include "userfkt.h"
+#include "exact.h"		/* 2026: integer, rational */
+#include "specfun.h"		/* 2026: special functions */
 
 typedef struct {
 char * name;
@@ -24,6 +26,54 @@ u_function * function;
 #define FKT(x) {#x,(u_function *) &(x)}
 
 t_funct (userfunction [])  = {
+#define X(n) FKT(n),
+	SPECFUN_LIST
+#undef X
+	FKT(show_int),
+	FKT(cmp_int),
+	FKT(cpy_int),
+	FKT(del_int),
+	FKT(read_int),
+	FKT(int_plus),
+	FKT(int_minus),
+	FKT(int_mal),
+	FKT(int_neg),
+	FKT(int_abs),
+	FKT(int_fak),
+	FKT(int_mod),
+	FKT(int_quot),
+	FKT(int_gcd),
+	FKT(int_div),
+	FKT(int_gt),
+	FKT(int_ge),
+	FKT(int_lt),
+	FKT(int_le),
+	FKT(int_eq),
+	FKT(int_ne),
+	FKT(show_rat),
+	FKT(cmp_rat),
+	FKT(cpy_rat),
+	FKT(del_rat),
+	FKT(int2rat),
+	FKT(rat2real),
+	FKT(rat_plus),
+	FKT(rat_minus),
+	FKT(rat_mal),
+	FKT(rat_div),
+	FKT(rat_neg),
+	FKT(rat_abs),
+	FKT(rat_mi),
+	FKT(rat_pow),
+	FKT(int_pow),
+	FKT(rat_num),
+	FKT(rat_den),
+	FKT(rat_is_int),
+	FKT(rat_gt),
+	FKT(rat_ge),
+	FKT(rat_lt),
+	FKT(rat_le),
+	FKT(rat_eq),
+	FKT(rat_ne),
 	FKT(show_real),
 	FKT(cmp_real),	
 	FKT(cpy_real),	

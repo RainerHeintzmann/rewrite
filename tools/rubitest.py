@@ -35,6 +35,11 @@ Must be started in the rewrite folder (the INC paths are relative).
 
 import cmath
 import math
+
+try:
+    import mpmath           # special functions in the numerical check
+except ImportError:
+    mpmath = None
 import os
 import re
 import subprocess
@@ -85,6 +90,55 @@ PY_FUNCS = {
     'Csch': 'csch', 'ArcSinh': 'asinh', 'ArcCosh': 'acosh', 'ArcTanh': 'atanh',
     'ArcCoth': 'acoth', 'Log': 'log', 'Sqrt': 'sqrt', 'Exp': 'exp', 'Abs': 'abs',
 }
+
+# special functions: name in the check -> mpmath function
+SPECIAL = {
+    'erf': 'erf', 'erfc': 'erfc', 'erfi': 'erfi', 'fresnels': 'fresnels',
+    'fresnelc': 'fresnelc', 'sinint': 'si', 'cosint': 'ci', 'sinhint': 'shi',
+    'coshint': 'chi', 'expint': 'ei', 'expinte': 'expint', 'logint': 'li',
+    'Gamma': None, 'loggamma': 'loggamma', 'polygamma': 'psi', 'zeta': 'zeta',
+    'elliptick': 'ellipk', 'ellipticf': 'ellipf', 'elliptice': 'ellipe',
+    'ellipticpi': 'ellippi', 'hyp2f1': 'hyp2f1', 'appellf1': 'appellf1',
+    'besselj': 'besselj', 'asec': 'asec', 'acsc': 'acsc', 'asech': 'asech',
+    'acsch': 'acsch',
+}
+for _m, _r in [('Erf', 'erf'), ('Erfc', 'erfc'), ('Erfi', 'erfi'), ('FresnelS', 'fresnels'),
+               ('FresnelC', 'fresnelc'), ('SinIntegral', 'sinint'), ('CosIntegral', 'cosint'),
+               ('SinhIntegral', 'sinhint'), ('CoshIntegral', 'coshint'),
+               ('ExpIntegralEi', 'expint'), ('ExpIntegralE', 'expinte'),
+               ('LogIntegral', 'logint'), ('Gamma', 'Gamma'), ('LogGamma', 'loggamma'),
+               ('PolyGamma', 'polygamma'), ('Zeta', 'zeta'), ('EllipticK', 'elliptick'),
+               ('EllipticF', 'ellipticf'), ('EllipticE', 'elliptice'),
+               ('EllipticPi', 'ellipticpi'), ('Hypergeometric2F1', 'hyp2f1'),
+               ('AppellF1', 'appellf1'), ('BesselJ', 'besselj'), ('ArcSec', 'asec'),
+               ('ArcCsc', 'acsc'), ('ArcSech', 'asech'), ('ArcCsch', 'acsch')]:
+    PY_FUNCS[_m] = _r
+    RW_FUNCS.setdefault(_m, {'asec': 'arcsec', 'acsc': 'arccsc', 'asech': 'arcsech',
+                             'acsch': 'arccsch'}.get(_r, _r))
+
+
+def _mp_gamma(*a):
+    return mpmath.gamma(a[0]) if len(a) == 1 else mpmath.gammainc(a[0], a[1])
+
+
+def _special_env(real):
+    """special functions for eval: complex results, or real only (else ValueError)"""
+    env = {}
+    if mpmath is None:
+        return env
+    for name, mp in SPECIAL.items():
+        f = _mp_gamma if name == 'Gamma' else getattr(mpmath, mp)
+
+        def wrap(*a, f=f):
+            v = complex(f(*a))
+            if real:
+                if abs(v.imag) > 1e-12 * (1 + abs(v.real)):
+                    raise ValueError('complex value')
+                return v.real
+            return v
+        env[name] = wrap
+    return env
+
 
 # values of the parameters for the numerical check
 PARAM_VALUES = {'a': 1.7, 'b': 0.6, 'c': 1.3, 'd': 0.9, 'e': 1.1, 'f': 0.7,
@@ -197,6 +251,7 @@ NUMENV = {
     'log': cmath.log, 'sqrt': cmath.sqrt, 'exp': cmath.exp, 'abs': abs,
     'pi': math.pi, 'E': math.e, 'pw': pw,
 }
+NUMENV.update(_special_env(False))
 
 def rpw(a, b):
     """real power; ValueError outside the real domain"""
@@ -219,6 +274,7 @@ REALENV = {
     'log': math.log, 'sqrt': math.sqrt, 'exp': math.exp, 'abs': abs,
     'pi': math.pi, 'E': math.e, 'pw': rpw,
 }
+REALENV.update(_special_env(True))
 
 # rewrite's output -> Python
 RW_TO_PY = {
@@ -229,6 +285,8 @@ RW_TO_PY = {
     'arccoth': 'acoth', 'ln': 'log', 'sqrt': 'sqrt', 'exp': 'exp', 'abs': 'abs',
     'pi': 'pi', 'e': 'E',
 }
+RW_TO_PY.update({n: n for n in SPECIAL if not n.startswith('a')})
+RW_TO_PY.update({'arcsec': 'asec', 'arccsc': 'acsc', 'arcsech': 'asech', 'arccsch': 'acsch'})
 
 OUT_TOKEN = re.compile(r'\s*(?:(?P<num>(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)|(?P<id>[A-Za-z_][A-Za-z0-9_]*)|(?P<op>[-+*/^(),]))')
 

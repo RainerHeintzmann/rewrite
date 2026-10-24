@@ -1,0 +1,33 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+1.159279481 0.6778011938 80197458.9 0.519286085 1.673929528 0.02391330447 
+-0.008939042542 -0.3786710431 0.1952212648 2.363271801 0.3333343441 
+2.882540549 -1.460354509 3.656127045 3.397301478 0.4766904836 
+0.6198270018 1.047372546 0.4127263257 
+D arcsec(x): true 
+D arccsc(x): true 
+D arcsech(x): true 
+D arccsch(x): true 
+D erf(x): true 
+D erfc(x): true 
+D erfi(x): true 
+D fresnels(x): true 
+D fresnelc(x): true 
+D sinint(x): true 
+D cosint(x): true 
+D sinhint(x): true 
+D coshint(x): true 
+D expint(x): true 
+D logint(x): true 
+D expinte(2,x): true 
+D Gamma(x): true 
+D Gamma(2.5,x): true 
+D loggamma(x): true 
+D polygamma(1,x): true 
+D zeta(3,x): true 
+D elliptick(x): true 
+D elliptice(x): true 
+D ellipticf(x,0.6): true 
+D elliptice(x,0.6): true 
+D ellipticpi(0.3,x,0.6): true 
+D hyp2f1(0.5,1.5,2.5,x): true 
+D besselj(1.5,x): true 

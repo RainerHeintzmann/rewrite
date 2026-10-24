@@ -414,11 +414,13 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_d,O_e,O_f,O_m,P_n,O_p,O_q), (eqq(O_n
 #   Int[(f_.*x_)^m_.*(d_ + e_.*x_^n_)^q_.*(a_ + c_.*x_^n2_.)^p_., x_Symbol] := Unintegrable[(f*x)^m*(d + e*x^n)^q*(a + c*x^(2*n))^p, x] /; FreeQ[{a, c, d, e, f, m, n, p, q}, x] && EqQ[n2, 2*n]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_c,P_d,O_e,O_f,O_m,P_n,O_p,O_q), (eqq(O_n2,((2)*(P_n)))) Int((((O_f)*(Xv))^(O_m))*(((P_d)+((O_e)*((Xv)^(P_n))))^(O_q))*(((P_a)+((O_c)*((Xv)^(O_n2))))^(O_p)),Xv) = unintegrable(((((((O_f)*(Xv)))^(O_m)))*(((((P_d)+(((O_e)*(((Xv)^(P_n)))))))^(O_q)))*(((((P_a)+(((O_c)*(((Xv)^(((2)*(P_n)))))))))^(O_p)))),Xv)
 
-# Regel 104 nicht uebersetzt: predicate LinearPairQ
+# Regel 104 (13824 Varianten):
 #   Int[u_^m_.*(d_ + e_.*v_^n_)^q_.*(a_ + b_.*v_^n_ + c_.*v_^n2_.)^p_., x_Symbol] := u^m/(Coefficient[v, x, 1]*v^m)* Subst[Int[x^m*(d + e*x^n)^q*(a + b*x^n + c*x^(2*n))^p, x], x, v] /; FreeQ[{a, b, c, d, e, m, n, p, q}, x] && EqQ[n2, 2*n] && LinearPairQ[u, v, x] && NeQ[v, x]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_d,O_e,O_m,P_n,O_p,O_q), (eqq(O_n2,((2)*(P_n)))), (linearpairq(P_u,P_v,Xv)), (neq(P_v,Xv)) Int(((P_u)^(O_m))*(((P_d)+((O_e)*((P_v)^(P_n))))^(O_q))*(((P_a)+((O_b)*((P_v)^(P_n)))+((O_c)*((P_v)^(O_n2))))^(O_p)),Xv) = ((((P_u)^(O_m)))*(((((coeff(P_v,Xv,1))*(((P_v)^(O_m)))))^((-1))))*(subst(Int(((((Xv)^(O_m)))*(((((P_d)+(((O_e)*(((Xv)^(P_n)))))))^(O_q)))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))+(((O_c)*(((Xv)^(((2)*(P_n)))))))))^(O_p)))),Xv),Xv,P_v)))
 
-# Regel 105 nicht uebersetzt: predicate LinearPairQ
+# Regel 105 (2304 Varianten):
 #   Int[u_^m_.*(d_ + e_.*v_^n_)^q_.*(a_ + c_.*v_^n2_.)^p_., x_Symbol] := u^m/(Coefficient[v, x, 1]*v^m)* Subst[Int[x^m*(d + e*x^n)^q*(a + c*x^(2*n))^p, x], x, v] /; FreeQ[{a, c, d, e, m, n, p}, x] && EqQ[n2, 2*n] && LinearPairQ[u, v, x] && NeQ[v, x]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_c,P_d,O_e,O_m,P_n,O_p), (eqq(O_n2,((2)*(P_n)))), (linearpairq(P_u,P_v,Xv)), (neq(P_v,Xv)) Int(((P_u)^(O_m))*(((P_d)+((O_e)*((P_v)^(P_n))))^(O_q))*(((P_a)+((O_c)*((P_v)^(O_n2))))^(O_p)),Xv) = ((((P_u)^(O_m)))*(((((coeff(P_v,Xv,1))*(((P_v)^(O_m)))))^((-1))))*(subst(Int(((((Xv)^(O_m)))*(((((P_d)+(((O_e)*(((Xv)^(P_n)))))))^(O_q)))*(((((P_a)+(((O_c)*(((Xv)^(((2)*(P_n)))))))))^(O_p)))),Xv),Xv,P_v)))
 
 # Regel 106 (82944 Varianten):
 #   Int[x_^m_.*(d_ + e_.*x_^mn_.)^q_.*(a_. + b_.*x_^n_. + c_.*x_^n2_.)^ p_., x_Symbol] := Int[x^(m - n*q)*(e + d*x^n)^q*(a + b*x^n + c*x^(2*n))^p, x] /; FreeQ[{a, b, c, d, e, m, n, p}, x] && EqQ[n2, 2*n] && EqQ[mn, -n] && IntegerQ[q] && (PosQ[n] || Not[IntegerQ[p]])

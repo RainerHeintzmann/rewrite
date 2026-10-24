@@ -58,8 +58,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_n), (eqq(((((P_a)^(2)))+((((-1))
 #   Int[(a_ + b_.*csc[c_. + d_.*x_])^n_, x_Symbol] := a^IntPart[n]*(a + b*Csc[c + d*x])^ FracPart[n]/(1 + b/a*Csc[c + d*x])^FracPart[n]* Int[(1 + b/a*Csc[c + d*x])^n, x] /; FreeQ[{a, b, c, d, n}, x] && EqQ[a^2 - b^2, 0] && Not[IntegerQ[2*n]] && Not[GtQ[a, 0]]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_n), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (not(integerq(((2)*(P_n))))), (not(((P_a > 0)))) Int(((P_a)+((O_b)*(csc((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = ((((P_a)^(intpart(P_n))))*(((((P_a)+(((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))))^(fracpart(P_n))))*(((((((1)+(((O_b)*(((P_a)^((-1))))*(csc(((O_c)+(((O_d)*(Xv))))))))))^(fracpart(P_n))))^((-1))))*(Int(((((1)+(((O_b)*(((P_a)^((-1))))*(csc(((O_c)+(((O_d)*(Xv))))))))))^(P_n)),Xv)))
 
-# Regel 14 nicht uebersetzt: function EllipticPi
+# Regel 14 (54 Varianten):
 #   Int[Sqrt[a_ + b_.*csc[c_. + d_.*x_]], x_Symbol] := 2*(a + b*Csc[c + d*x])/(d*Rt[a + b, 2]*Cot[c + d*x])* Sqrt[b*(1 + Csc[c + d*x])/(a + b*Csc[c + d*x])]* Sqrt[-b*(1 - Csc[c + d*x])/(a + b*Csc[c + d*x])]* EllipticPi[a/(a + b), ArcSin[Rt[a + b, 2]/Sqrt[a + b*Csc[c + d*x]]], (a - b)/(a + b)] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int(((P_a)+((O_b)*(csc((O_c)+((O_d)*(Xv))))))^(0.5),Xv) = ((2)*(((P_a)+(((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))))*(((((O_d)*(rt(((P_a)+(O_b)),2))*(cot(((O_c)+(((O_d)*(Xv))))))))^((-1))))*(((((O_b)*(((1)+(csc(((O_c)+(((O_d)*(Xv))))))))*(((((P_a)+(((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))))^((-1))))))^((1/2))))*((((((-1))*(O_b)*(((1)+((((-1))*(csc(((O_c)+(((O_d)*(Xv))))))))))*(((((P_a)+(((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))))^((-1))))))^((1/2))))*(ellipticpi(((P_a)*(((((P_a)+(O_b)))^((-1))))),arcsin(((rt(((P_a)+(O_b)),2))*(((((P_a)+(((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))))^((-(1/2))))))),((((P_a)+((((-1))*(O_b)))))*(((((P_a)+(O_b)))^((-1))))))))
 
 # Regel 15 (54 Varianten):
 #   Int[(a_ + b_.*csc[c_. + d_.*x_])^(3/2), x_Symbol] := Int[(a^2 + b*(2*a - b)*Csc[c + d*x])/Sqrt[a + b*Csc[c + d*x]], x] + b^2* Int[Csc[c + d*x]*(1 + Csc[c + d*x])/Sqrt[a + b*Csc[c + d*x]], x] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0]
@@ -73,8 +74,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((
 #   Int[1/(a_ + b_.*csc[c_. + d_.*x_]), x_Symbol] := x/a - 1/a*Int[1/(1 + a/b*Sin[c + d*x]), x] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int(((P_a)+((O_b)*(csc((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = ((((Xv)*(((P_a)^((-1))))))+((((-1))*(((P_a)^((-1))))*(Int(((((1)+(((P_a)*(((O_b)^((-1))))*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-1))),Xv)))))
 
-# Regel 18 nicht uebersetzt: function EllipticPi
+# Regel 18 (54 Varianten):
 #   Int[1/Sqrt[a_ + b_.*csc[c_. + d_.*x_]], x_Symbol] := 2*Rt[a + b, 2]/(a*d*Cot[c + d*x])* Sqrt[b*(1 - Csc[c + d*x])/(a + b)]* Sqrt[-b*(1 + Csc[c + d*x])/(a - b)]* EllipticPi[(a + b)/a, ArcSin[Sqrt[a + b*Csc[c + d*x]]/Rt[a + b, 2]], (a + b)/(a - b)] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int(((P_a)+((O_b)*(csc((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = ((2)*(rt(((P_a)+(O_b)),2))*(((((P_a)*(O_d)*(cot(((O_c)+(((O_d)*(Xv))))))))^((-1))))*(((((O_b)*(((1)+((((-1))*(csc(((O_c)+(((O_d)*(Xv))))))))))*(((((P_a)+(O_b)))^((-1))))))^((1/2))))*((((((-1))*(O_b)*(((1)+(csc(((O_c)+(((O_d)*(Xv))))))))*(((((P_a)+((((-1))*(O_b)))))^((-1))))))^((1/2))))*(ellipticpi(((((P_a)+(O_b)))*(((P_a)^((-1))))),arcsin(((((((P_a)+(((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))))^((1/2))))*(((rt(((P_a)+(O_b)),2))^((-1)))))),((((P_a)+(O_b)))*(((((P_a)+((((-1))*(O_b)))))^((-1))))))))
 
 # Regel 19 (54 Varianten):
 #   Int[(a_ + b_.*csc[c_. + d_.*x_])^n_, x_Symbol] := b^2*Cot[ c + d*x]*(a + b*Csc[c + d*x])^(n + 1)/(a*d*(n + 1)*(a^2 - b^2)) + 1/(a*(n + 1)*(a^2 - b^2))* Int[(a + b*Csc[c + d*x])^(n + 1)* Simp[(a^2 - b^2)*(n + 1) - a*b*(n + 1)*Csc[c + d*x] + b^2*(n + 2)*Csc[c + d*x]^2, x], x] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && LtQ[n, -1] && IntegerQ[2*n]

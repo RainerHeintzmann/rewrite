@@ -1,0 +1,182 @@
+# Special functions (specfun.c, declared in inc/alg): a value of each,
+# compared with mpmath, and each derivative rule, checked against a central
+# difference quotient (prints true).
+INC "inc/all"
+PRTNUM "%.10g "
+# ---- values
+arcsec(2.5), erf(0.7), erfi(4.5), fresnels(3.3), sinint(9.3), cosint(9.3)
+expint(-3.3), logint(0.5), expinte(2.5,0.7), Gamma(-1.5), Gamma(-1.5,0.7)
+polygamma(0,-1.3), zeta(0.5), ellipticf(2.9,0.6), elliptice(4.0,0.6), ellipticpi(2.5,0.4,0.6)
+hyp2f1(0.5,1.5,2.5,-3.0), appellf1(0.5,1.5,0.7,2.5,0.3,-0.4), besselj(1.5,3.3)
+# ---- derivatives
+TERM FF : real
+CONST yy,zz,hh : real
+hh = 1e-6
+x = yy
+FF = REWR D(arcsec(x),x) : All
+x = 2.5
+zz = 2.5
+PRT "D arcsec(x): "
+abs(FF - (arcsec((zz+hh))-arcsec((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(arccsc(x),x) : All
+x = 2.5
+zz = 2.5
+PRT "D arccsc(x): "
+abs(FF - (arccsc((zz+hh))-arccsc((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(arcsech(x),x) : All
+x = 0.4
+zz = 0.4
+PRT "D arcsech(x): "
+abs(FF - (arcsech((zz+hh))-arcsech((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(arccsch(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D arccsch(x): "
+abs(FF - (arccsch((zz+hh))-arccsch((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(erf(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D erf(x): "
+abs(FF - (erf((zz+hh))-erf((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(erfc(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D erfc(x): "
+abs(FF - (erfc((zz+hh))-erfc((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(erfi(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D erfi(x): "
+abs(FF - (erfi((zz+hh))-erfi((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(fresnels(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D fresnels(x): "
+abs(FF - (fresnels((zz+hh))-fresnels((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(fresnelc(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D fresnelc(x): "
+abs(FF - (fresnelc((zz+hh))-fresnelc((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(sinint(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D sinint(x): "
+abs(FF - (sinint((zz+hh))-sinint((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(cosint(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D cosint(x): "
+abs(FF - (cosint((zz+hh))-cosint((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(sinhint(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D sinhint(x): "
+abs(FF - (sinhint((zz+hh))-sinhint((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(coshint(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D coshint(x): "
+abs(FF - (coshint((zz+hh))-coshint((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(expint(x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D expint(x): "
+abs(FF - (expint((zz+hh))-expint((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(logint(x),x) : All
+x = 2.5
+zz = 2.5
+PRT "D logint(x): "
+abs(FF - (logint((zz+hh))-logint((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(expinte(2,x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D expinte(2,x): "
+abs(FF - (expinte(2,(zz+hh))-expinte(2,(zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(Gamma(x),x) : All
+x = 2.5
+zz = 2.5
+PRT "D Gamma(x): "
+abs(FF - (Gamma((zz+hh))-Gamma((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(Gamma(2.5,x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D Gamma(2.5,x): "
+abs(FF - (Gamma(2.5,(zz+hh))-Gamma(2.5,(zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(loggamma(x),x) : All
+x = 2.5
+zz = 2.5
+PRT "D loggamma(x): "
+abs(FF - (loggamma((zz+hh))-loggamma((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(polygamma(1,x),x) : All
+x = 2.5
+zz = 2.5
+PRT "D polygamma(1,x): "
+abs(FF - (polygamma(1,(zz+hh))-polygamma(1,(zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(zeta(3,x),x) : All
+x = 2.5
+zz = 2.5
+PRT "D zeta(3,x): "
+abs(FF - (zeta(3,(zz+hh))-zeta(3,(zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(elliptick(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D elliptick(x): "
+abs(FF - (elliptick((zz+hh))-elliptick((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(elliptice(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D elliptice(x): "
+abs(FF - (elliptice((zz+hh))-elliptice((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(ellipticf(x,0.6),x) : All
+x = 0.7
+zz = 0.7
+PRT "D ellipticf(x,0.6): "
+abs(FF - (ellipticf((zz+hh),0.6)-ellipticf((zz-hh),0.6))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(elliptice(x,0.6),x) : All
+x = 0.7
+zz = 0.7
+PRT "D elliptice(x,0.6): "
+abs(FF - (elliptice((zz+hh),0.6)-elliptice((zz-hh),0.6))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(ellipticpi(0.3,x,0.6),x) : All
+x = 0.7
+zz = 0.7
+PRT "D ellipticpi(0.3,x,0.6): "
+abs(FF - (ellipticpi(0.3,(zz+hh),0.6)-ellipticpi(0.3,(zz-hh),0.6))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(hyp2f1(0.5,1.5,2.5,x),x) : All
+x = 0.7
+zz = 0.7
+PRT "D hyp2f1(0.5,1.5,2.5,x): "
+abs(FF - (hyp2f1(0.5,1.5,2.5,(zz+hh))-hyp2f1(0.5,1.5,2.5,(zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(besselj(1.5,x),x) : All
+x = 3.3
+zz = 3.3
+PRT "D besselj(1.5,x): "
+abs(FF - (besselj(1.5,(zz+hh))-besselj(1.5,(zz-hh)))/(2*hh)) < 1e-5

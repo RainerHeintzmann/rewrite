@@ -13,6 +13,7 @@
 #include "run.h"
 #include "node.h"  /* fuer symeq */
 #include "sync.h"
+#include "numsort.h"		/* 2026: SUBSORT */
 #include "inout.h"
 #include "defs.h"
 #include "nodes.h"
@@ -142,14 +143,16 @@ int termassign2 (Node * toass, Node * froass)
 Node * merkold;
 
 if (froass->type != SYM_TYPE)
-	{if (rtypes((Symbol *) toass) != rtypes((Symbol *) (froass->l)))
+	{if (rtypes((Symbol *) toass) != rtypes((Symbol *) (froass->l))
+	     && sort_dist(rtypes((Symbol *) (froass->l)), rtypes((Symbol *) toass)) < 0)	/* 2026: Untersorte erlaubt */
 		{
 		ErrorMsg("");
 		printfErr("Termsort equals not the used sort ! (Converted to %s )\n",name((Symbol *) rtypes((Symbol *) toass)));
 		}
 	}
 else
-	if (rtypes((Symbol *) toass) != rtypes((Symbol *) froass))
+	if (rtypes((Symbol *) toass) != rtypes((Symbol *) froass)
+	    && sort_dist(rtypes((Symbol *) froass), rtypes((Symbol *) toass)) < 0)
 		{
 		ErrorMsg("");
 		printfErr("Termsort equals not the used sort ! (Converted to %s )\n",name((Symbol *) rtypes((Symbol *) toass)));
@@ -285,7 +288,10 @@ printfOut("\n");
 
 void setdebug (Node * np)
 {
-	setDebug((int) (* (double *) value(np ->r)));
+	double d;
+	if (! num_to_double((Symbol *) np->r, & d))	/* 2026: auch integer */
+		d = * (double *) value(np ->r);
+	setDebug((int) d);
 }
 
 void numassign2 (Node * froass, Symbol * toass)   /* Setzt bzw Loescht Nummer */
@@ -298,7 +304,8 @@ while (((froass)->type != Const) && (froass->type != Func))
 		return;}
 	froass=froass->l;
 	}
-if (rtypes(toass) != rtypes((Symbol *)froass->l))
+if (rtypes(toass) != rtypes((Symbol *)froass->l)
+    && sort_dist(rtypes((Symbol *)froass->l), rtypes(toass)) < 0)	/* 2026: Untersorte erlaubt */
  	{ErrorMsg("Wrong const-assignment : different types\n");
  	return;}
 
@@ -306,6 +313,14 @@ erg = calkulate(froass);
 
 if (hasval(toass)) DELNUM(toass,value(toass));
 
+if (erg && rtypes((Symbol *) erg) != rtypes(toass))	/* 2026: Wert umwandeln (SUBSORT) */
+	{
+	void * w = sort_convert(value((Symbol *) erg), rtypes((Symbol *) erg), rtypes(toass));
+	delete(erg);
+	hasval(toass) = (w != NULL);
+	value(toass) = w;
+	return;
+	}
 if (erg)
 	{
 	if (is_shared_num((Symbol *) erg))  /* 0,1: statischen Wert kopieren, sonst spaeter free() auf statischen Speicher */
@@ -364,11 +379,14 @@ if (	!( p_anf = calkulate(FOR_FROM(np)))
 	if (p_step) delnum((Symbol *) p_step,TRUE); /* auch value */
 	return;
 	}
-anf = * (double *) value(p_anf);
-ende = * (double *) value(p_ende);
+/* 2026: auch Werte von Untersorten (integer, rational) */
+if (! num_to_double((Symbol *) p_anf, & anf)) anf = * (double *) value(p_anf);
+if (! num_to_double((Symbol *) p_ende, & ende)) ende = * (double *) value(p_ende);
 
 if (p_step)
-	step = * (double *) value(p_step);
+	{
+	if (! num_to_double((Symbol *) p_step, & step)) step = * (double *) value(p_step);
+	}
 else
 	step = (double) 1.0;
 
@@ -656,6 +674,94 @@ return TRUE;
 }
 
 
+/* 2026: Kosten einer Variante mit Erweiterung der Sorten (SUBSORT):
+   Summe der Schritte integer -> rational -> real ...; -1 wenn sie nicht passt */
+static int arg_cost (Node * a, Node * typ)
+{
+	if (a->type == Terms) return -1;
+	return sort_dist(arg_sort(a), typ);
+}
+
+static int variant_cost (Symbol * sym, Node * termlist)
+{
+	Node * at1, * at2, * asym = atypes(sym);
+	int atype, cost = 0, c;
+	if (! asym) return -1;
+	atype = asym->type;
+	if (atype == VARPAR) asym = asym->l;
+	for (at1=termlist,at2=asym;(at2->r!=NULL);at1=at1->r,at2=at2->r)
+		{
+		if ((at1->r==NULL) || (at1->type!=Terms)) return -1;
+		if ((c = arg_cost(at1->l,at2->l)) < 0) return -1;
+		cost += c;
+		}
+	if (atype == VARPAR)
+		for ( ;(at1->r!=NULL) && (at1->type==Terms);at1=at1->r)
+			{
+			if ((c = arg_cost(at1->l,at2)) < 0) return -1;
+			cost += c;
+			}
+	if ((c = arg_cost(at1,at2)) < 0) return -1;
+	return cost + c;
+}
+
+/* Variante mit den wenigsten Erweiterungen, oder NULL */
+Symbol * getsymbol_widen (Symbol * symbol,Node * termlist)
+{
+	Symbol * sym = symbol, * best = NULL;
+	int bestc = -1, c;
+	if (! termlist) return NULL;
+	do	{
+		c = variant_cost(sym, termlist);
+		if (c >= 0 && (bestc < 0 || c < bestc))
+			{
+			bestc = c;
+			best = sym;
+			}
+		sym = kette(sym);
+		} while ((sym != (Symbol *) NULL) && (sym != symbol));
+	return best;
+}
+
+/* 2026: nach dem Einsetzen einer rechten Seite fuer jede Funktion die
+   guenstigste Variante zu den tatsaechlichen Sorten der Argumente waehlen.
+   Das LIFTen ersetzt alle Symbole einer Sorte durch die einer anderen; mit
+   Untersorten (integer < rational < real) passen die Argumente dann nicht
+   immer. Ohne SUBSORT passen die Varianten genau und nichts aendert sich. */
+void retype_term (Node * t)
+{
+	Node * a;
+	if (! t) return;
+	if (t->type != Func)
+		{
+		if (t->type != SYM_TYPE && t->type != Const)
+			{
+			retype_term(t->l);
+			retype_term(t->r);
+			}
+		return;
+		}
+	for (a = TERM_ARGS(t); a; a = ARGS_NEXT(a))
+		retype_term(ARGS_ITEM(a));
+	retype_node(t);
+}
+
+/* nur dieser Knoten (die Argumente sind schon richtig) */
+void retype_node (Node * t)
+{
+	Symbol * best;
+	int c, cb;
+	if (! t || t->type != Func) return;
+	if (! TERM_ARGS(t) || ! atypes(TERM_HEAD(t))) return;
+	c = variant_cost(TERM_HEAD(t), TERM_ARGS(t));
+	if (c == 0) return;
+	best = getsymbol_widen(TERM_HEAD(t), TERM_ARGS(t));
+	if (! best || best == TERM_HEAD(t)) return;
+	cb = variant_cost(best, TERM_ARGS(t));
+	if (c < 0 || cb < c)
+		t->l = (Node *) best;
+}
+
 Symbol * getsymbol (Symbol * symbol,Node * termlist) /* sucht aus gleinamigen Symbolen das, mit den richtigen Argumenten heraus */
 {                                                    /* termlist ist Liste der Argumente,die tatsaechlich vorliegen */
 	Node * at1,* at2,* asym;
@@ -704,6 +810,12 @@ Symbol * getsymbol (Symbol * symbol,Node * termlist) /* sucht aus gleinamigen Sy
 	sym=kette(sym); /* naechstes Symbol */
 	}  while	((sym != (Symbol *) NULL) && (sym != symbol));  /* NULL fuer den Fall nur eines Symbols */
 
+	if (iseq==FALSE)		/* 2026: mit Erweiterung der Sorten (SUBSORT) */
+		{
+		Symbol * w = getsymbol_widen(symbol, termlist);
+		if (w)
+			return w;
+		}
 	if (iseq==FALSE)
 		{
 		ErrorMsg("");

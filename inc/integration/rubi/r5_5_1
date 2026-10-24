@@ -6,110 +6,144 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: function ArcSec in pattern
+# Regel 1 (3 Varianten):
 #   Int[ArcSec[c_.*x_], x_Symbol] := x*ArcSec[c*x] - 1/c*Int[1/(x*Sqrt[1 - 1/(c^2*x^2)]), x] /; FreeQ[c, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_c) Int(arcsec((O_c)*(Xv)),Xv) = ((((Xv)*(arcsec(((O_c)*(Xv))))))+((((-1))*(((O_c)^((-1))))*(Int(((((Xv)*(((((1)+((((-1))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-1))))))))^((1/2))))))^((-1))),Xv)))))
 
-# Regel 2 nicht uebersetzt: function ArcCsc in pattern
+# Regel 2 (3 Varianten):
 #   Int[ArcCsc[c_.*x_], x_Symbol] := x*ArcCsc[c*x] + 1/c*Int[1/(x*Sqrt[1 - 1/(c^2*x^2)]), x] /; FreeQ[c, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_c) Int(arccsc((O_c)*(Xv)),Xv) = ((((Xv)*(arccsc(((O_c)*(Xv))))))+(((((O_c)^((-1))))*(Int(((((Xv)*(((((1)+((((-1))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-1))))))))^((1/2))))))^((-1))),Xv)))))
 
-# Regel 3 nicht uebersetzt: function ArcSec in pattern
+# Regel 3 (27 Varianten):
 #   Int[(a_. + b_.*ArcSec[c_.*x_])^n_, x_Symbol] := 1/c*Subst[Int[(a + b*x)^n*Sec[x]*Tan[x], x], x, ArcSec[c*x]] /; FreeQ[{a, b, c, n}, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_n), (igtq(P_n,0)) Int(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(P_n),Xv) = ((((O_c)^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(P_n)))*(sec(Xv))*(tan(Xv))),Xv),Xv,arcsec(((O_c)*(Xv))))))
 
-# Regel 4 nicht uebersetzt: function ArcCsc in pattern
+# Regel 4 (27 Varianten):
 #   Int[(a_. + b_.*ArcCsc[c_.*x_])^n_, x_Symbol] := -1/c*Subst[Int[(a + b*x)^n*Csc[x]*Cot[x], x], x, ArcCsc[c*x]] /; FreeQ[{a, b, c, n}, x] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_n), (igtq(P_n,0)) Int(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(P_n),Xv) = (((-1))*(((O_c)^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(P_n)))*(csc(Xv))*(cot(Xv))),Xv),Xv,arccsc(((O_c)*(Xv))))))
 
-# Regel 5 nicht uebersetzt: function ArcSec in pattern
+# Regel 5 (54 Varianten):
 #   Int[(a_. + b_.*ArcSec[c_.*x_])/x_, x_Symbol] := -Subst[Int[(a + b*ArcCos[x/c])/x, x], x, 1/x] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c) Int(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))*((Xv)^(K_1)),Xv) = (((-1))*(subst(Int(((((O_a)+(((O_b)*(arccos(((Xv)*(((O_c)^((-1)))))))))))*(((Xv)^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 6 nicht uebersetzt: function ArcCsc in pattern
+# Regel 6 (54 Varianten):
 #   Int[(a_. + b_.*ArcCsc[c_.*x_])/x_, x_Symbol] := -Subst[Int[(a + b*ArcSin[x/c])/x, x], x, 1/x] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c) Int(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))*((Xv)^(K_1)),Xv) = (((-1))*(subst(Int(((((O_a)+(((O_b)*(arcsin(((Xv)*(((O_c)^((-1)))))))))))*(((Xv)^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 7 nicht uebersetzt: function ArcSec in pattern
+# Regel 7 (324 Varianten):
 #   Int[(d_.*x_)^m_.*(a_. + b_.*ArcSec[c_.*x_]), x_Symbol] := (d*x)^(m + 1)*(a + b*ArcSec[c*x])/(d*(m + 1)) - b*d/(c*(m + 1))*Int[(d*x)^(m - 1)/Sqrt[1 - 1/(c^2*x^2)], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (neq(O_m,(-1))) Int((((O_d)*(Xv))^(O_m))*((O_a)+((O_b)*(arcsec((O_c)*(Xv))))),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(arcsec(((O_c)*(Xv))))))))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_d)*(((((O_c)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_d)*(Xv)))^(((O_m)+((-1))))))*(((((1)+((((-1))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-1))))))))^((-(1/2)))))),Xv)))))
 
-# Regel 8 nicht uebersetzt: function ArcCsc in pattern
+# Regel 8 (324 Varianten):
 #   Int[(d_.*x_)^m_.*(a_. + b_.*ArcCsc[c_.*x_]), x_Symbol] := (d*x)^(m + 1)*(a + b*ArcCsc[c*x])/(d*(m + 1)) + b*d/(c*(m + 1))*Int[(d*x)^(m - 1)/Sqrt[1 - 1/(c^2*x^2)], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (neq(O_m,(-1))) Int((((O_d)*(Xv))^(O_m))*((O_a)+((O_b)*(arccsc((O_c)*(Xv))))),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(arccsc(((O_c)*(Xv))))))))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+(((O_b)*(O_d)*(((((O_c)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_d)*(Xv)))^(((O_m)+((-1))))))*(((((1)+((((-1))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-1))))))))^((-(1/2)))))),Xv)))))
 
-# Regel 9 nicht uebersetzt: function ArcSec in pattern
+# Regel 9 (108 Varianten):
 #   Int[x_^m_.*(a_. + b_.*ArcSec[c_.*x_])^n_, x_Symbol] := 1/c^(m + 1)* Subst[Int[(a + b*x)^n*Sec[x]^(m + 1)*Tan[x], x], x, ArcSec[c*x]] /; FreeQ[{a, b, c}, x] && IntegerQ[n] && IntegerQ[m] && (GtQ[n, 0] || LtQ[m, -1])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(P_n)), (integerq(O_m)), (((((P_n > 0))) || (((O_m < (-1)))))) Int(((Xv)^(O_m))*(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(P_n)),Xv) = ((((((O_c)^(((O_m)+(1)))))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(P_n)))*(((sec(Xv))^(((O_m)+(1)))))*(tan(Xv))),Xv),Xv,arcsec(((O_c)*(Xv))))))
 
-# Regel 10 nicht uebersetzt: function ArcCsc in pattern
+# Regel 10 (108 Varianten):
 #   Int[x_^m_.*(a_. + b_.*ArcCsc[c_.*x_])^n_, x_Symbol] := -1/c^(m + 1)* Subst[Int[(a + b*x)^n*Csc[x]^(m + 1)*Cot[x], x], x, ArcCsc[c*x]] /; FreeQ[{a, b, c}, x] && IntegerQ[n] && IntegerQ[m] && (GtQ[n, 0] || LtQ[m, -1])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(P_n)), (integerq(O_m)), (((((P_n > 0))) || (((O_m < (-1)))))) Int(((Xv)^(O_m))*(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(P_n)),Xv) = (((-1))*(((((O_c)^(((O_m)+(1)))))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(P_n)))*(((csc(Xv))^(((O_m)+(1)))))*(cot(Xv))),Xv),Xv,arccsc(((O_c)*(Xv))))))
 
-# Regel 11 nicht uebersetzt: function ArcSec in pattern
+# Regel 11 nicht uebersetzt: symbol I
 #   Int[(a_. + b_.*ArcSec[c_.*x_])/(d_. + e_.*x_), x_Symbol] := (a + b*ArcSec[c*x])* Log[1 + (e - Sqrt[-c^2*d^2 + e^2])*E^(I*ArcSec[c*x])/(c*d)]/e + (a + b*ArcSec[c*x])* Log[1 + (e + Sqrt[-c^2*d^2 + e^2])*E^(I*ArcSec[c*x])/(c*d)]/e - (a + b*ArcSec[c*x])*Log[1 + E^(2*I*ArcSec[c*x])]/e - b/(c*e)* Int[Log[1 + (e - Sqrt[-c^2*d^2 + e^2])* E^(I*ArcSec[c*x])/(c*d)]/(x^2*Sqrt[1 - 1/(c^2*x^2)]), x] - b/(c*e)* Int[Log[1 + (e + Sqrt[-c^2*d^2 + e^2])* E^(I*ArcSec[c*x])/(c*d)]/(x^2*Sqrt[1 - 1/(c^2*x^2)]), x] + b/(c*e)* Int[Log[1 + E^(2*I*ArcSec[c*x])]/(x^2*Sqrt[1 - 1/(c^2*x^2)]), x] /; FreeQ[{a, b, c, d, e}, x]
 
-# Regel 12 nicht uebersetzt: function ArcCsc in pattern
+# Regel 12 nicht uebersetzt: symbol I
 #   Int[(a_. + b_.*ArcCsc[c_.*x_])/(d_. + e_.*x_), x_Symbol] := (a + b*ArcCsc[c*x])* Log[1 - I*(e - Sqrt[-c^2*d^2 + e^2])*E^(I*ArcCsc[c*x])/(c*d)]/ e + (a + b*ArcCsc[c*x])* Log[1 - I*(e + Sqrt[-c^2*d^2 + e^2])*E^(I*ArcCsc[c*x])/(c*d)]/ e - (a + b*ArcCsc[c*x])*Log[1 - E^(2*I*ArcCsc[c*x])]/e + b/(c*e)* Int[Log[1 - I*(e - Sqrt[-c^2*d^2 + e^2])*E^(I*ArcCsc[c*x])/(c*d)]/(x^2* Sqrt[1 - 1/(c^2*x^2)]), x] + b/(c*e)* Int[Log[1 - I*(e + Sqrt[-c^2*d^2 + e^2])*E^(I*ArcCsc[c*x])/(c*d)]/(x^2* Sqrt[1 - 1/(c^2*x^2)]), x] - b/(c*e)* Int[Log[1 - E^(2*I*ArcCsc[c*x])]/(x^2*Sqrt[1 - 1/(c^2*x^2)]), x] /; FreeQ[{a, b, c, d, e}, x]
 
-# Regel 13 nicht uebersetzt: function ArcSec in pattern
+# Regel 13 (972 Varianten):
 #   Int[(d_. + e_.*x_)^m_.*(a_. + b_.*ArcSec[c_.*x_]), x_Symbol] := (d + e*x)^(m + 1)*(a + b*ArcSec[c*x])/(e*(m + 1)) - b/(c*e*(m + 1))* Int[(d + e*x)^(m + 1)/(x^2*Sqrt[1 - 1/(c^2*x^2)]), x] /; FreeQ[{a, b, c, d, e, m}, x] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m), (neq(O_m,(-1))) Int((((O_d)+((O_e)*(Xv)))^(O_m))*((O_a)+((O_b)*(arcsec((O_c)*(Xv))))),Xv) = ((((((((O_d)+(((O_e)*(Xv)))))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(arcsec(((O_c)*(Xv))))))))*(((((O_e)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(((((O_c)*(O_e)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_d)+(((O_e)*(Xv)))))^(((O_m)+(1)))))*(((((((Xv)^(2)))*(((((1)+((((-1))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-1))))))))^((1/2))))))^((-1))))),Xv)))))
 
-# Regel 14 nicht uebersetzt: function ArcCsc in pattern
+# Regel 14 (972 Varianten):
 #   Int[(d_. + e_.*x_)^m_.*(a_. + b_.*ArcCsc[c_.*x_]), x_Symbol] := (d + e*x)^(m + 1)*(a + b*ArcCsc[c*x])/(e*(m + 1)) + b/(c*e*(m + 1))* Int[(d + e*x)^(m + 1)/(x^2*Sqrt[1 - 1/(c^2*x^2)]), x] /; FreeQ[{a, b, c, d, e, m}, x] && NeQ[m, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m), (neq(O_m,(-1))) Int((((O_d)+((O_e)*(Xv)))^(O_m))*((O_a)+((O_b)*(arccsc((O_c)*(Xv))))),Xv) = ((((((((O_d)+(((O_e)*(Xv)))))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(arccsc(((O_c)*(Xv))))))))*(((((O_e)*(((O_m)+(1)))))^((-1))))))+(((O_b)*(((((O_c)*(O_e)*(((O_m)+(1)))))^((-1))))*(Int(((((((O_d)+(((O_e)*(Xv)))))^(((O_m)+(1)))))*(((((((Xv)^(2)))*(((((1)+((((-1))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-1))))))))^((1/2))))))^((-1))))),Xv)))))
 
-# Regel 15 nicht uebersetzt: function ArcSec in pattern
+# Regel 15 (972 Varianten):
 #   Int[(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcSec[c_.*x_]), x_Symbol] := With[{u = IntHide[(d + e*x^2)^p, x]}, Dist[(a + b*ArcSec[c*x]), u, x] - b*c*x/Sqrt[c^2*x^2]* Int[SimplifyIntegrand[u/(x*Sqrt[c^2*x^2 - 1]), x], x]] /; FreeQ[{a, b, c, d, e}, x] && (IGtQ[p, 0] || ILtQ[p + 1/2, 0])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e), (((igtq(O_p,0)) || (iltq(((O_p)+((1/2))),0)))) Int((((O_d)+((O_e)*((Xv)^(2))))^(O_p))*((O_a)+((O_b)*(arcsec((O_c)*(Xv))))),Xv) = ((dist(((O_a)+(((O_b)*(arcsec(((O_c)*(Xv))))))),inthide(((((O_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)),Xv),Xv))+((((-1))*(O_b)*(O_c)*(Xv)*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-(1/2)))))*(Int(simp(((inthide(((((O_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)),Xv))*(((((Xv)*(((((((((O_c)^(2)))*(((Xv)^(2)))))+((-1))))^((1/2))))))^((-1))))),Xv),Xv)))))
 
-# Regel 16 nicht uebersetzt: function ArcCsc in pattern
+# Regel 16 (972 Varianten):
 #   Int[(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcCsc[c_.*x_]), x_Symbol] := With[{u = IntHide[(d + e*x^2)^p, x]}, Dist[(a + b*ArcCsc[c*x]), u, x] + b*c*x/Sqrt[c^2*x^2]* Int[SimplifyIntegrand[u/(x*Sqrt[c^2*x^2 - 1]), x], x]] /; FreeQ[{a, b, c, d, e}, x] && (IGtQ[p, 0] || ILtQ[p + 1/2, 0])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e), (((igtq(O_p,0)) || (iltq(((O_p)+((1/2))),0)))) Int((((O_d)+((O_e)*((Xv)^(2))))^(O_p))*((O_a)+((O_b)*(arccsc((O_c)*(Xv))))),Xv) = ((dist(((O_a)+(((O_b)*(arccsc(((O_c)*(Xv))))))),inthide(((((O_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)),Xv),Xv))+(((O_b)*(O_c)*(Xv)*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-(1/2)))))*(Int(simp(((inthide(((((O_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)),Xv))*(((((Xv)*(((((((((O_c)^(2)))*(((Xv)^(2)))))+((-1))))^((1/2))))))^((-1))))),Xv),Xv)))))
 
-# Regel 17 nicht uebersetzt: function ArcSec in pattern
+# Regel 17 (1944 Varianten):
 #   Int[(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcSec[c_.*x_])^n_., x_Symbol] := -Subst[Int[(e + d*x^2)^p*(a + b*ArcCos[x/c])^n/x^(2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && IntegerQ[p]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (integerq(O_p)) Int((((O_d)+((O_e)*((Xv)^(2))))^(O_p))*(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(O_p)))*(((((O_a)+(((O_b)*(arccos(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((2)*(((O_p)+(1)))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 18 nicht uebersetzt: function ArcCsc in pattern
+# Regel 18 (1944 Varianten):
 #   Int[(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcCsc[c_.*x_])^n_., x_Symbol] := -Subst[Int[(e + d*x^2)^p*(a + b*ArcSin[x/c])^n/x^(2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && IntegerQ[p]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (integerq(O_p)) Int((((O_d)+((O_e)*((Xv)^(2))))^(O_p))*(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(O_p)))*(((((O_a)+(((O_b)*(arcsin(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((2)*(((O_p)+(1)))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 19 nicht uebersetzt: function ArcSec in pattern
+# Regel 19 (972 Varianten):
 #   Int[(d_. + e_.*x_^2)^p_*(a_. + b_.*ArcSec[c_.*x_])^n_., x_Symbol] := -Sqrt[x^2]/x* Subst[Int[(e + d*x^2)^p*(a + b*ArcCos[x/c])^n/x^(2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && EqQ[c^2*d + e, 0] && IntegerQ[p + 1/2] && GtQ[e, 0] && LtQ[d, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (eqq(((((((O_c)^(2)))*(O_d)))+(O_e)),0)), (integerq(((P_p)+((1/2))))), (((O_e > 0))), (((O_d < 0))) Int((((O_d)+((O_e)*((Xv)^(2))))^(P_p))*(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(((((Xv)^(2)))^((1/2))))*(((Xv)^((-1))))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(P_p)))*(((((O_a)+(((O_b)*(arccos(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((2)*(((P_p)+(1)))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 20 nicht uebersetzt: function ArcCsc in pattern
+# Regel 20 (972 Varianten):
 #   Int[(d_. + e_.*x_^2)^p_*(a_. + b_.*ArcCsc[c_.*x_])^n_., x_Symbol] := -Sqrt[x^2]/x* Subst[Int[(e + d*x^2)^p*(a + b*ArcSin[x/c])^n/x^(2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && EqQ[c^2*d + e, 0] && IntegerQ[p + 1/2] && GtQ[e, 0] && LtQ[d, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (eqq(((((((O_c)^(2)))*(O_d)))+(O_e)),0)), (integerq(((P_p)+((1/2))))), (((O_e > 0))), (((O_d < 0))) Int((((O_d)+((O_e)*((Xv)^(2))))^(P_p))*(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(((((Xv)^(2)))^((1/2))))*(((Xv)^((-1))))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(P_p)))*(((((O_a)+(((O_b)*(arcsin(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((2)*(((P_p)+(1)))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 21 nicht uebersetzt: function ArcSec in pattern
+# Regel 21 (972 Varianten):
 #   Int[(d_. + e_.*x_^2)^p_*(a_. + b_.*ArcSec[c_.*x_])^n_., x_Symbol] := -Sqrt[d + e*x^2]/(x*Sqrt[e + d/x^2])* Subst[Int[(e + d*x^2)^p*(a + b*ArcCos[x/c])^n/x^(2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && EqQ[c^2*d + e, 0] && IntegerQ[p + 1/2] && Not[GtQ[e, 0] && LtQ[d, 0]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (eqq(((((((O_c)^(2)))*(O_d)))+(O_e)),0)), (integerq(((P_p)+((1/2))))), (not(((((O_e > 0))) && (((O_d < 0)))))) Int((((O_d)+((O_e)*((Xv)^(2))))^(P_p))*(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(((((O_d)+(((O_e)*(((Xv)^(2)))))))^((1/2))))*(((((Xv)*(((((O_e)+(((O_d)*(((Xv)^((-2))))))))^((1/2))))))^((-1))))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(P_p)))*(((((O_a)+(((O_b)*(arccos(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((2)*(((P_p)+(1)))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 22 nicht uebersetzt: function ArcCsc in pattern
+# Regel 22 (972 Varianten):
 #   Int[(d_. + e_.*x_^2)^p_*(a_. + b_.*ArcCsc[c_.*x_])^n_., x_Symbol] := -Sqrt[d + e*x^2]/(x*Sqrt[e + d/x^2])* Subst[Int[(e + d*x^2)^p*(a + b*ArcSin[x/c])^n/x^(2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && EqQ[c^2*d + e, 0] && IntegerQ[p + 1/2] && Not[GtQ[e, 0] && LtQ[d, 0]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (eqq(((((((O_c)^(2)))*(O_d)))+(O_e)),0)), (integerq(((P_p)+((1/2))))), (not(((((O_e > 0))) && (((O_d < 0)))))) Int((((O_d)+((O_e)*((Xv)^(2))))^(P_p))*(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(((((O_d)+(((O_e)*(((Xv)^(2)))))))^((1/2))))*(((((Xv)*(((((O_e)+(((O_d)*(((Xv)^((-2))))))))^((1/2))))))^((-1))))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(P_p)))*(((((O_a)+(((O_b)*(arcsin(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((2)*(((P_p)+(1)))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 23 nicht uebersetzt: function ArcSec in pattern
+# Regel 23 (1944 Varianten):
 #   Int[x_*(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcSec[c_.*x_]), x_Symbol] := (d + e*x^2)^(p + 1)*(a + b*ArcSec[c*x])/(2*e*(p + 1)) - b*c*x/(2*e*(p + 1)*Sqrt[c^2*x^2])* Int[(d + e*x^2)^(p + 1)/(x*Sqrt[c^2*x^2 - 1]), x] /; FreeQ[{a, b, c, d, e, p}, x] && NeQ[p, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_p), (neq(O_p,(-1))) Int((Xv)*(((O_d)+((O_e)*((Xv)^(2))))^(O_p))*((O_a)+((O_b)*(arcsec((O_c)*(Xv))))),Xv) = ((((((((O_d)+(((O_e)*(((Xv)^(2)))))))^(((O_p)+(1)))))*(((O_a)+(((O_b)*(arcsec(((O_c)*(Xv))))))))*(((((2)*(O_e)*(((O_p)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_c)*(Xv)*(((((2)*(O_e)*(((O_p)+(1)))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((1/2))))))^((-1))))*(Int(((((((O_d)+(((O_e)*(((Xv)^(2)))))))^(((O_p)+(1)))))*(((((Xv)*(((((((((O_c)^(2)))*(((Xv)^(2)))))+((-1))))^((1/2))))))^((-1))))),Xv)))))
 
-# Regel 24 nicht uebersetzt: function ArcCsc in pattern
+# Regel 24 (1944 Varianten):
 #   Int[x_*(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcCsc[c_.*x_]), x_Symbol] := (d + e*x^2)^(p + 1)*(a + b*ArcCsc[c*x])/(2*e*(p + 1)) + b*c*x/(2*e*(p + 1)*Sqrt[c^2*x^2])* Int[(d + e*x^2)^(p + 1)/(x*Sqrt[c^2*x^2 - 1]), x] /; FreeQ[{a, b, c, d, e, p}, x] && NeQ[p, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_p), (neq(O_p,(-1))) Int((Xv)*(((O_d)+((O_e)*((Xv)^(2))))^(O_p))*((O_a)+((O_b)*(arccsc((O_c)*(Xv))))),Xv) = ((((((((O_d)+(((O_e)*(((Xv)^(2)))))))^(((O_p)+(1)))))*(((O_a)+(((O_b)*(arccsc(((O_c)*(Xv))))))))*(((((2)*(O_e)*(((O_p)+(1)))))^((-1))))))+(((O_b)*(O_c)*(Xv)*(((((2)*(O_e)*(((O_p)+(1)))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((1/2))))))^((-1))))*(Int(((((((O_d)+(((O_e)*(((Xv)^(2)))))))^(((O_p)+(1)))))*(((((Xv)*(((((((((O_c)^(2)))*(((Xv)^(2)))))+((-1))))^((1/2))))))^((-1))))),Xv)))))
 
-# Regel 25 nicht uebersetzt: function ArcSec in pattern
+# Regel 25 (11664 Varianten):
 #   Int[(f_.*x_)^m_.*(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcSec[c_.*x_]), x_Symbol] := With[{u = IntHide[(f*x)^m*(d + e*x^2)^p, x]}, Dist[(a + b*ArcSec[c*x]), u, x] - b*c*x/Sqrt[c^2*x^2]* Int[SimplifyIntegrand[u/(x*Sqrt[c^2*x^2 - 1]), x], x]] /; FreeQ[{a, b, c, d, e, f, m, p}, x] && ( IGtQ[p, 0] && Not[ILtQ[(m - 1)/2, 0] && GtQ[m + 2*p + 3, 0]] || IGtQ[(m + 1)/2, 0] && Not[ILtQ[p, 0] && GtQ[m + 2*p + 3, 0]] || ILtQ[(m + 2*p + 1)/2, 0] && Not[ILtQ[(m - 1)/2, 0]])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m,O_p), (((((igtq(O_p,0)) && (not(((iltq(((((O_m)+((-1))))*((1/2))),0)) && (((((O_m)+(((2)*(O_p)))+(3)) > 0)))))))) || (((igtq(((((O_m)+(1)))*((1/2))),0)) && (not(((iltq(O_p,0)) && (((((O_m)+(((2)*(O_p)))+(3)) > 0)))))))) || (((iltq(((((O_m)+(((2)*(O_p)))+(1)))*((1/2))),0)) && (not(iltq(((((O_m)+((-1))))*((1/2))),0))))))) Int((((O_f)*(Xv))^(O_m))*(((O_d)+((O_e)*((Xv)^(2))))^(O_p))*((O_a)+((O_b)*(arcsec((O_c)*(Xv))))),Xv) = ((dist(((O_a)+(((O_b)*(arcsec(((O_c)*(Xv))))))),inthide(((((((O_f)*(Xv)))^(O_m)))*(((((O_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)))),Xv),Xv))+((((-1))*(O_b)*(O_c)*(Xv)*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-(1/2)))))*(Int(simp(((inthide(((((((O_f)*(Xv)))^(O_m)))*(((((O_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)))),Xv))*(((((Xv)*(((((((((O_c)^(2)))*(((Xv)^(2)))))+((-1))))^((1/2))))))^((-1))))),Xv),Xv)))))
 
-# Regel 26 nicht uebersetzt: function ArcCsc in pattern
+# Regel 26 (11664 Varianten):
 #   Int[(f_.*x_)^m_.*(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcCsc[c_.*x_]), x_Symbol] := With[{u = IntHide[(f*x)^m*(d + e*x^2)^p, x]}, Dist[(a + b*ArcCsc[c*x]), u, x] + b*c*x/Sqrt[c^2*x^2]* Int[SimplifyIntegrand[u/(x*Sqrt[c^2*x^2 - 1]), x], x]] /; FreeQ[{a, b, c, d, e, f, m, p}, x] && ( IGtQ[p, 0] && Not[ILtQ[(m - 1)/2, 0] && GtQ[m + 2*p + 3, 0]] || IGtQ[(m + 1)/2, 0] && Not[ILtQ[p, 0] && GtQ[m + 2*p + 3, 0]] || ILtQ[(m + 2*p + 1)/2, 0] && Not[ILtQ[(m - 1)/2, 0]])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_m,O_p), (((((igtq(O_p,0)) && (not(((iltq(((((O_m)+((-1))))*((1/2))),0)) && (((((O_m)+(((2)*(O_p)))+(3)) > 0)))))))) || (((igtq(((((O_m)+(1)))*((1/2))),0)) && (not(((iltq(O_p,0)) && (((((O_m)+(((2)*(O_p)))+(3)) > 0)))))))) || (((iltq(((((O_m)+(((2)*(O_p)))+(1)))*((1/2))),0)) && (not(iltq(((((O_m)+((-1))))*((1/2))),0))))))) Int((((O_f)*(Xv))^(O_m))*(((O_d)+((O_e)*((Xv)^(2))))^(O_p))*((O_a)+((O_b)*(arccsc((O_c)*(Xv))))),Xv) = ((dist(((O_a)+(((O_b)*(arccsc(((O_c)*(Xv))))))),inthide(((((((O_f)*(Xv)))^(O_m)))*(((((O_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)))),Xv),Xv))+(((O_b)*(O_c)*(Xv)*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-(1/2)))))*(Int(simp(((inthide(((((((O_f)*(Xv)))^(O_m)))*(((((O_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)))),Xv))*(((((Xv)*(((((((((O_c)^(2)))*(((Xv)^(2)))))+((-1))))^((1/2))))))^((-1))))),Xv),Xv)))))
 
-# Regel 27 nicht uebersetzt: function ArcSec in pattern
+# Regel 27 (7776 Varianten):
 #   Int[x_^m_.*(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcSec[c_.*x_])^n_., x_Symbol] := -Subst[ Int[(e + d*x^2)^p*(a + b*ArcCos[x/c])^n/x^(m + 2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && IntegerQ[m] && IntegerQ[p]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (integerq(O_m)), (integerq(O_p)) Int(((Xv)^(O_m))*(((O_d)+((O_e)*((Xv)^(2))))^(O_p))*(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(O_p)))*(((((O_a)+(((O_b)*(arccos(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((O_m)+(((2)*(((O_p)+(1)))))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 28 nicht uebersetzt: function ArcCsc in pattern
+# Regel 28 (7776 Varianten):
 #   Int[x_^m_.*(d_. + e_.*x_^2)^p_.*(a_. + b_.*ArcCsc[c_.*x_])^n_., x_Symbol] := -Subst[ Int[(e + d*x^2)^p*(a + b*ArcSin[x/c])^n/x^(m + 2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && IntegerQ[m] && IntegerQ[p]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (integerq(O_m)), (integerq(O_p)) Int(((Xv)^(O_m))*(((O_d)+((O_e)*((Xv)^(2))))^(O_p))*(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(O_p)))*(((((O_a)+(((O_b)*(arcsin(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((O_m)+(((2)*(((O_p)+(1)))))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 29 nicht uebersetzt: function ArcSec in pattern
+# Regel 29 (3888 Varianten):
 #   Int[x_^m_.*(d_. + e_.*x_^2)^p_*(a_. + b_.*ArcSec[c_.*x_])^n_., x_Symbol] := -Sqrt[x^2]/x* Subst[Int[(e + d*x^2)^p*(a + b*ArcCos[x/c])^n/x^(m + 2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && EqQ[c^2*d + e, 0] && IntegerQ[m] && IntegerQ[p + 1/2] && GtQ[e, 0] && LtQ[d, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (eqq(((((((O_c)^(2)))*(O_d)))+(O_e)),0)), (integerq(O_m)), (integerq(((P_p)+((1/2))))), (((O_e > 0))), (((O_d < 0))) Int(((Xv)^(O_m))*(((O_d)+((O_e)*((Xv)^(2))))^(P_p))*(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(((((Xv)^(2)))^((1/2))))*(((Xv)^((-1))))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(P_p)))*(((((O_a)+(((O_b)*(arccos(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((O_m)+(((2)*(((P_p)+(1)))))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 30 nicht uebersetzt: function ArcCsc in pattern
+# Regel 30 (3888 Varianten):
 #   Int[x_^m_.*(d_. + e_.*x_^2)^p_*(a_. + b_.*ArcCsc[c_.*x_])^n_., x_Symbol] := -Sqrt[x^2]/x* Subst[Int[(e + d*x^2)^p*(a + b*ArcSin[x/c])^n/x^(m + 2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && EqQ[c^2*d + e, 0] && IntegerQ[m] && IntegerQ[p + 1/2] && GtQ[e, 0] && LtQ[d, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (eqq(((((((O_c)^(2)))*(O_d)))+(O_e)),0)), (integerq(O_m)), (integerq(((P_p)+((1/2))))), (((O_e > 0))), (((O_d < 0))) Int(((Xv)^(O_m))*(((O_d)+((O_e)*((Xv)^(2))))^(P_p))*(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(((((Xv)^(2)))^((1/2))))*(((Xv)^((-1))))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(P_p)))*(((((O_a)+(((O_b)*(arcsin(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((O_m)+(((2)*(((P_p)+(1)))))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 31 nicht uebersetzt: function ArcSec in pattern
+# Regel 31 (3888 Varianten):
 #   Int[x_^m_.*(d_. + e_.*x_^2)^p_*(a_. + b_.*ArcSec[c_.*x_])^n_., x_Symbol] := -Sqrt[d + e*x^2]/(x*Sqrt[e + d/x^2])* Subst[Int[(e + d*x^2)^p*(a + b*ArcCos[x/c])^n/x^(m + 2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && EqQ[c^2*d + e, 0] && IntegerQ[m] && IntegerQ[p + 1/2] && Not[GtQ[e, 0] && LtQ[d, 0]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (eqq(((((((O_c)^(2)))*(O_d)))+(O_e)),0)), (integerq(O_m)), (integerq(((P_p)+((1/2))))), (not(((((O_e > 0))) && (((O_d < 0)))))) Int(((Xv)^(O_m))*(((O_d)+((O_e)*((Xv)^(2))))^(P_p))*(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(((((O_d)+(((O_e)*(((Xv)^(2)))))))^((1/2))))*(((((Xv)*(((((O_e)+(((O_d)*(((Xv)^((-2))))))))^((1/2))))))^((-1))))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(P_p)))*(((((O_a)+(((O_b)*(arccos(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((O_m)+(((2)*(((P_p)+(1)))))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 32 nicht uebersetzt: function ArcCsc in pattern
+# Regel 32 (3888 Varianten):
 #   Int[x_^m_.*(d_. + e_.*x_^2)^p_*(a_. + b_.*ArcCsc[c_.*x_])^n_., x_Symbol] := -Sqrt[d + e*x^2]/(x*Sqrt[e + d/x^2])* Subst[Int[(e + d*x^2)^p*(a + b*ArcSin[x/c])^n/x^(m + 2*(p + 1)), x], x, 1/x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[n, 0] && EqQ[c^2*d + e, 0] && IntegerQ[m] && IntegerQ[p + 1/2] && Not[GtQ[e, 0] && LtQ[d, 0]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_n,0)), (eqq(((((((O_c)^(2)))*(O_d)))+(O_e)),0)), (integerq(O_m)), (integerq(((P_p)+((1/2))))), (not(((((O_e > 0))) && (((O_d < 0)))))) Int(((Xv)^(O_m))*(((O_d)+((O_e)*((Xv)^(2))))^(P_p))*(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(O_n)),Xv) = (((-1))*(((((O_d)+(((O_e)*(((Xv)^(2)))))))^((1/2))))*(((((Xv)*(((((O_e)+(((O_d)*(((Xv)^((-2))))))))^((1/2))))))^((-1))))*(subst(Int(((((((O_e)+(((O_d)*(((Xv)^(2)))))))^(P_p)))*(((((O_a)+(((O_b)*(arcsin(((Xv)*(((O_c)^((-1)))))))))))^(O_n)))*(((((Xv)^(((O_m)+(((2)*(((P_p)+(1)))))))))^((-1))))),Xv),Xv,((Xv)^((-1))))))
 
-# Regel 33 nicht uebersetzt: function ArcSec in pattern
+# Regel 33 (54 Varianten):
 #   Int[u_*(a_. + b_.*ArcSec[c_.*x_]), x_Symbol] := With[{v = IntHide[u, x]}, Dist[(a + b*ArcSec[c*x]), v, x] - b/c* Int[SimplifyIntegrand[v/(x^2*Sqrt[1 - 1/(c^2*x^2)]), x], x] /; InverseFunctionFreeQ[v, x]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (inversefunctionfreeq(inthide(P_u,Xv),Xv)) Int((P_u)*((O_a)+((O_b)*(arcsec((O_c)*(Xv))))),Xv) = ((dist(((O_a)+(((O_b)*(arcsec(((O_c)*(Xv))))))),inthide(P_u,Xv),Xv))+((((-1))*(O_b)*(((O_c)^((-1))))*(Int(simp(((inthide(P_u,Xv))*(((((((Xv)^(2)))*(((((1)+((((-1))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-1))))))))^((1/2))))))^((-1))))),Xv),Xv)))))
 
-# Regel 34 nicht uebersetzt: function ArcCsc in pattern
+# Regel 34 (54 Varianten):
 #   Int[u_*(a_. + b_.*ArcCsc[c_.*x_]), x_Symbol] := With[{v = IntHide[u, x]}, Dist[(a + b*ArcCsc[c*x]), v, x] + b/c* Int[SimplifyIntegrand[v/(x^2*Sqrt[1 - 1/(c^2*x^2)]), x], x] /; InverseFunctionFreeQ[v, x]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (inversefunctionfreeq(inthide(P_u,Xv),Xv)) Int((P_u)*((O_a)+((O_b)*(arccsc((O_c)*(Xv))))),Xv) = ((dist(((O_a)+(((O_b)*(arccsc(((O_c)*(Xv))))))),inthide(P_u,Xv),Xv))+(((O_b)*(((O_c)^((-1))))*(Int(simp(((inthide(P_u,Xv))*(((((((Xv)^(2)))*(((((1)+((((-1))*(((((((O_c)^(2)))*(((Xv)^(2)))))^((-1))))))))^((1/2))))))^((-1))))),Xv),Xv)))))
 
-# Regel 35 nicht uebersetzt: function ArcSec in pattern
+# Regel 35 (162 Varianten):
 #   Int[u_.*(a_. + b_.*ArcSec[c_.*x_])^n_., x_Symbol] := Unintegrable[u*(a + b*ArcSec[c*x])^n, x] /; FreeQ[{a, b, c, n}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n) Int((O_u)*(((O_a)+((O_b)*(arcsec((O_c)*(Xv)))))^(O_n)),Xv) = unintegrable(((O_u)*(((((O_a)+(((O_b)*(arcsec(((O_c)*(Xv))))))))^(O_n)))),Xv)
 
-# Regel 36 nicht uebersetzt: function ArcCsc in pattern
+# Regel 36 (162 Varianten):
 #   Int[u_.*(a_. + b_.*ArcCsc[c_.*x_])^n_., x_Symbol] := Unintegrable[u*(a + b*ArcCsc[c*x])^n, x] /; FreeQ[{a, b, c, n}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n) Int((O_u)*(((O_a)+((O_b)*(arccsc((O_c)*(Xv)))))^(O_n)),Xv) = unintegrable(((O_u)*(((((O_a)+(((O_b)*(arccsc(((O_c)*(Xv))))))))^(O_n)))),Xv)

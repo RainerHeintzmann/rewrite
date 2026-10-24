@@ -14,17 +14,21 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c) Int(sinh((O_a)+((O_b)*(Xv))+((O_c)*((
 #   Int[Cosh[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := 1/2*Int[E^(a + b*x + c*x^2), x] + 1/2*Int[E^(-a - b*x - c*x^2), x] /; FreeQ[{a, b, c}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c) Int(cosh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))),Xv) = (((((1/2))*(Int(exp(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))),Xv))))+((((1/2))*(Int(exp((((((-1))*(O_a)))+((((-1))*(O_b)*(Xv)))+((((-1))*(O_c)*(((Xv)^(2))))))),Xv)))))
 
-# Regel 3 nicht uebersetzt: function ExpandTrigReduce
+# Regel 3 (54 Varianten):
 #   Int[Sinh[a_. + b_.*x_ + c_.*x_^2]^n_, x_Symbol] := Int[ExpandTrigReduce[Sinh[a + b*x + c*x^2]^n, x], x] /; FreeQ[{a, b, c}, x] && IGtQ[n, 1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (igtq(P_n,1)) Int((sinh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))))^(P_n),Xv) = Int(expandtrigreduce(((sinh(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))^(P_n)),Xv),Xv)
 
-# Regel 4 nicht uebersetzt: function ExpandTrigReduce
+# Regel 4 (54 Varianten):
 #   Int[Cosh[a_. + b_.*x_ + c_.*x_^2]^n_, x_Symbol] := Int[ExpandTrigReduce[Cosh[a + b*x + c*x^2]^n, x], x] /; FreeQ[{a, b, c}, x] && IGtQ[n, 1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (igtq(P_n,1)) Int((cosh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))))^(P_n),Xv) = Int(expandtrigreduce(((cosh(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))^(P_n)),Xv),Xv)
 
-# Regel 5 nicht uebersetzt: predicate QuadraticQ
+# Regel 5 (2 Varianten):
 #   Int[Sinh[v_]^n_., x_Symbol] := Int[Sinh[ExpandToSum[v, x]]^n, x] /; IGtQ[n, 0] && QuadraticQ[v, x] && Not[QuadraticMatchQ[v, x]]
+ADDSPEC RubiRules : IF (igtq(O_n,0)), (quadraticq(P_v,Xv)), (not(quadraticmatchq(P_v,Xv))) Int((sinh(P_v))^(O_n),Xv) = Int(((sinh(expandtosum(P_v,Xv)))^(O_n)),Xv)
 
-# Regel 6 nicht uebersetzt: predicate QuadraticQ
+# Regel 6 (2 Varianten):
 #   Int[Cosh[v_]^n_., x_Symbol] := Int[Cosh[ExpandToSum[v, x]]^n, x] /; IGtQ[n, 0] && QuadraticQ[v, x] && Not[QuadraticMatchQ[v, x]]
+ADDSPEC RubiRules : IF (igtq(O_n,0)), (quadraticq(P_v,Xv)), (not(quadraticmatchq(P_v,Xv))) Int((cosh(P_v))^(O_n),Xv) = Int(((cosh(expandtosum(P_v,Xv)))^(O_n)),Xv)
 
 # Regel 7 (972 Varianten):
 #   Int[(d_. + e_.*x_)*Sinh[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := e*Cosh[a + b*x + c*x^2]/(2*c) /; FreeQ[{a, b, c, d, e}, x] && EqQ[b*e - 2*c*d, 0]
@@ -82,14 +86,18 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m) Int((((O_d)+((O_e)*(Xv)))
 #   Int[(d_. + e_.*x_)^m_.*Cosh[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := Unintegrable[(d + e*x)^m*Cosh[a + b*x + c*x^2], x] /; FreeQ[{a, b, c, d, e, m}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m) Int((((O_d)+((O_e)*(Xv)))^(O_m))*(cosh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))),Xv) = unintegrable(((((((O_d)+(((O_e)*(Xv)))))^(O_m)))*(cosh(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))),Xv)
 
-# Regel 21 nicht uebersetzt: function ExpandTrigReduce
+# Regel 21 (1944 Varianten):
 #   Int[(d_. + e_.*x_)^m_.*Sinh[a_. + b_.*x_ + c_.*x_^2]^n_, x_Symbol] := Int[ExpandTrigReduce[(d + e*x)^m, Sinh[a + b*x + c*x^2]^n, x], x] /; FreeQ[{a, b, c, d, e, m}, x] && IGtQ[n, 1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m), (igtq(P_n,1)) Int((((O_d)+((O_e)*(Xv)))^(O_m))*((sinh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))))^(P_n)),Xv) = Int(expandtrigreduce(((((O_d)+(((O_e)*(Xv)))))^(O_m)),((sinh(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))^(P_n)),Xv),Xv)
 
-# Regel 22 nicht uebersetzt: function ExpandTrigReduce
+# Regel 22 (1944 Varianten):
 #   Int[(d_. + e_.*x_)^m_.*Cosh[a_. + b_.*x_ + c_.*x_^2]^n_, x_Symbol] := Int[ExpandTrigReduce[(d + e*x)^m, Cosh[a + b*x + c*x^2]^n, x], x] /; FreeQ[{a, b, c, d, e, m}, x] && IGtQ[n, 1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m), (igtq(P_n,1)) Int((((O_d)+((O_e)*(Xv)))^(O_m))*((cosh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))))^(P_n)),Xv) = Int(expandtrigreduce(((((O_d)+(((O_e)*(Xv)))))^(O_m)),((cosh(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))^(P_n)),Xv),Xv)
 
-# Regel 23 nicht uebersetzt: predicate QuadraticQ
+# Regel 23 (8 Varianten):
 #   Int[u_^m_.*Sinh[v_]^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*Sinh[ExpandToSum[v, x]]^n, x] /; FreeQ[m, x] && IGtQ[n, 0] && LinearQ[u, x] && QuadraticQ[v, x] && Not[LinearMatchQ[u, x] && QuadraticMatchQ[v, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m), (igtq(O_n,0)), (linearq(P_u,Xv)), (quadraticq(P_v,Xv)), (not(((linearmatchq(P_u,Xv)) && (quadraticmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*((sinh(P_v))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sinh(expandtosum(P_v,Xv)))^(O_n)))),Xv)
 
-# Regel 24 nicht uebersetzt: predicate QuadraticQ
+# Regel 24 (8 Varianten):
 #   Int[u_^m_.*Cosh[v_]^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*Cosh[ExpandToSum[v, x]]^n, x] /; FreeQ[m, x] && IGtQ[n, 0] && LinearQ[u, x] && QuadraticQ[v, x] && Not[LinearMatchQ[u, x] && QuadraticMatchQ[v, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_m), (igtq(O_n,0)), (linearq(P_u,Xv)), (quadraticq(P_v,Xv)), (not(((linearmatchq(P_u,Xv)) && (quadraticmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*((cosh(P_v))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((cosh(expandtosum(P_v,Xv)))^(O_n)))),Xv)

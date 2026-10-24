@@ -48,11 +48,13 @@ Paths in `INC` and `DATA` are relative to the current directory, so start
 
 ## Building
 
-You need `gcc`, `flex`, `bison` and `make`.
+You need `gcc`, `flex`, `bison`, `make` and the GMP library (for exact
+numbers; it is linked statically).
 
 **Linux:**
 
 ```text
+sudo apt install gcc flex bison make libgmp-dev    # Debian/Ubuntu
 make
 make test
 ```
@@ -62,7 +64,7 @@ make test
 the tools:
 
 ```text
-pacman -S mingw-w64-ucrt-x86_64-gcc flex bison make diffutils
+pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-gmp flex bison make diffutils
 ```
 
 After that, run `build_windows.bat` in the project folder, or `make` in the
@@ -263,6 +265,45 @@ LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
 LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
 ```
 
+### Exact numbers and subsorts
+
+Each sort has its own representation in C. [inc/exact](inc/exact) adds two
+number sorts implemented with the GMP library ([exact.c](exact.c)):
+`integer` (any size) and `rational` (fractions). Load it after `inc/all`:
+
+```text
+INC "inc/all"
+INC "inc/exact"
+1/3 + 1/6           # prints (1/2)
+2^100               # prints 1267650600228229401496703205376
+(2/3)^-2            # prints (9/4)
+1/3 + 0.5           # prints 0.833333 (a real number is involved)
+sin(1/2)            # prints 0.479426
+```
+
+After `inc/exact`, a number written without a point or exponent is an
+`integer`; `0.5` stays `real`. Sorts are static: the sort of a term is
+known from its parts when it is built, and a value never changes its sort
+at run time. Two statements connect the sorts:
+
+| Command | Meaning |
+| --- | --- |
+| `SUBSORT integer,rational ATT int2rat` | Every `integer` is also a `rational`; the C function converts a value. |
+| `INTNUM integer ATT read_int` | Numbers without point and exponent are of sort `integer`, made by the C function from the text. |
+
+With `integer < rational < real`, a function declared for `real` also
+accepts `integer` and `rational` arguments, and the values are converted
+when it is calculated. If several variants of an operator fit, the one
+with the fewest conversions is used: `1/3+1/6` uses the rational `+`,
+`1/3+0.5` the real one. With `LIFT`, `rational` inherits the rules of
+`real`, and `integer` those of `rational`, so `x*1+0*x+(1/2)*x` simplifies
+to `(3/2) * x`. When a rule is applied, the operators of the new term are
+chosen again for the sorts of their actual arguments, so a rule written
+for `real` gives exact results for exact numbers.
+
+The rule-based integration ([inc/integration](inc/integration)) loads
+`inc/exact` itself; do not load it a second time.
+
 ### Term variables and assignments
 
 ```text
@@ -320,7 +361,8 @@ the files are in German.
 
 | File | Contents |
 | --- | --- |
-| [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), each with a derivative rule. |
+| [inc/exact](inc/exact) | Exact numbers: sorts `integer` and `rational` (GMP), subsorts of `real`. |
+| [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
 | [inc/rvector](inc/rvector) | Real vectors `[1,2,3]`, scalar product, cross product `_x_`, `abs`, element access. |
 | [inc/rmatrix](inc/rmatrix) | Real matrices: `einsmat`, `nullmat`, `chmat`, `trans`, products. Indices start at 0. |
@@ -353,22 +395,44 @@ coefficients:
 ```text
 INC "inc/integration/all"
 REWR Int(x^2*cos(x),x) : Integrate      # prints 2 * cos (x )* x + x ^ 2 * sin (x )- 2 * sin (x )
-REWR Int(1/(2*x+3),x) : Integrate      # prints 0.5 * ln (3 + 2 * x )
+REWR Int(1/(2*x+3),x) : Integrate      # prints (1/2) * ln (3 + 2 * x )
 REWR Int(sin(a*x+b),x) : Integrate     # prints - cos (a * x + b )/ a
 ```
 
-With [inc/integration/rubi](inc/integration/rubi), about three quarters of
+With [inc/integration/rubi](inc/integration/rubi), about 90% of
 all Rubi rules are available. They are translated automatically by
 [tools/rubi2rewrite.py](tools/rubi2rewrite.py):
 
 ```text
 INC "inc/integration/rubi/all"
-REWR Int(x/(1+x^4),x) : RubiIntegrate        # prints 0.5 * arctan (x ^ 2 )
-REWR Int(sqrt(x)/(1+x),x) : RubiIntegrate    # prints 2 * x ^ 0.5 - 2 * arctan (x ^ 0.5 )
+REWR Int(x/(1+x^4),x) : RubiIntegrate        # prints (1/2) * arctan (x ^ 2 )
+REWR Int(sqrt(x)/(1+x),x) : RubiIntegrate    # prints 2 * x ^ (1/2) - 2 * arctan (x ^ (1/2) )
 ```
 
 See [inc/integration/README.md](inc/integration/README.md) for what is
 covered and how the rules are translated.
+
+### Special functions
+
+[inc/alg](inc/alg) declares special functions, implemented in
+[specfun.c](specfun.c) with Mathematica's definitions and parameter
+conventions (so that the translated Rubi rules can use them), each with a
+derivative rule:
+
+| Function | Meaning |
+| --- | --- |
+| `arcsec`, `arccsc`, `arcsech`, `arccsch` | inverse secant, cosecant and their hyperbolic forms |
+| `erf`, `erfc`, `erfi` | error functions |
+| `fresnels`, `fresnelc` | Fresnel integrals of `sin(pi t^2/2)`, `cos(pi t^2/2)` |
+| `sinint`, `cosint`, `sinhint`, `coshint` | sine and cosine integrals Si, Ci, Shi, Chi |
+| `expint(x)`, `expinte(n,x)`, `logint(x)` | exponential integrals Ei, E_n and the logarithmic integral li |
+| `Gamma(a)`, `Gamma(a,x)`, `loggamma`, `polygamma(n,x)` | Gamma function, upper incomplete Gamma function, log and polygamma |
+| `zeta(s)`, `zeta(s,a)` | Riemann and Hurwitz zeta functions |
+| `elliptick(m)`, `ellipticf(phi,m)`, `elliptice(m)`, `elliptice(phi,m)`, `ellipticpi(n,m)`, `ellipticpi(n,phi,m)` | elliptic integrals with the parameter `m` |
+| `hyp2f1(a,b,c,z)`, `appellf1(a,b1,b2,c,x,y)`, `besselj(nu,x)` | hypergeometric functions and the Bessel function |
+
+`Gamma` is written with a capital G because `gamma` is a constant in
+[inc/physik](inc/physik). Outside their real domain the functions give NaN.
 
 ### Symbolic helper functions
 
@@ -400,6 +464,13 @@ loaded by the integration rules and can also be used on their own:
 | `normpoly(u,x)` | every polynomial sum in `u` as `c0+c1*x+...` with collected coefficients |
 | `deriv(u,x)` | derivative of elementary functions (stays unevaluated otherwise) |
 | `collect(u)` | like summands combined, e.g. `2*a+b-a` gives `a+b` |
+| `replaceall(u,x,v)` | `u` with `x` replaced by `v` at once |
+| `expandtrigreduce(u,x)`, `expandtrigreduce(v,u,x)` | products and powers of `sin`, `cos`, `sinh`, `cosh` as sums of multiple angles, e.g. `sin(x)^3` gives `(3/4)*sin(x) - (1/4)*sin(3*x)`; times `v` |
+| `binomialq(u,x)`, `binomialdegree(u,x)`, `trinomialq(u,x)`, `quadraticq(u,x)` | `u` is `a+b*x^n` (and its `n`), `a+b*x^n+c*x^(2n)`, a quadratic |
+| `binomialmatchq`, `quadraticmatchq`, `linearmatchq` | `u` is literally written as `a+b*x^n`, `a+b*x+c*x^2`, `a+b*x` |
+| `rationalfunctionq(u,x)`, `algebraicfunctionq(u,x)`, `inversefunctionfreeq(u,x)` | kind of function of `x` |
+| `leafcount(u)`, `simplerq(u,v)`, `sumsimplerq(u,v)`, `simplersqrtq(u,v)` | size of a term (as Mathematica's `LeafCount`) and Rubi's simplicity comparisons |
+| `knownsineintegrandq(u,x)` (also `tangent`, `cotangent`, `secant`), `piecewiselinearq`, `linearpairq` | Rubi's tests for integrands it knows |
 
 The predicates return true or false and can be used in conditions, also
 combined with `&&` and `||`:
@@ -455,6 +526,8 @@ in the same way.
 | [expand.c](expand.c) | Settings `OPT`, `DEFAULT`, `COMM` and condition lists. |
 | [listmatch.c](listmatch.c) | Rule lists with a backtracking matcher. |
 | [symfkt.c](symfkt.c) | Symbolic helper functions (`expand`, `coeff`, `polyq`, ...). |
+| [numsort.c](numsort.c), [exact.c](exact.c) | Subsorts (`SUBSORT`, `INTNUM`) and the exact number sorts with GMP. |
+| [specfun.c](specfun.c) | Special functions (erf, Fresnel, Ei, Gamma, zeta, elliptic integrals, 2F1, ...). |
 | [tools/rubi2rewrite.py](tools/rubi2rewrite.py) | Translator of Rubi's integration rules. |
 | [tools/rubitest.py](tools/rubitest.py) | Runs Rubi's test suite and checks the results numerically. |
 | [nodes.h](nodes.h) | Named access to the node structures built by the parser. |
@@ -508,11 +581,16 @@ in the same way.
 - Symbolic helper functions in C ([symfkt.c](symfkt.c), [inc/helpers](inc/helpers))
   and further elementary functions (`csc`, `sec`, `cot`, `arccot`, the
   hyperbolic and inverse hyperbolic functions, `polylog`, `productlog`).
+- Special functions ([specfun.c](specfun.c)) with derivative rules, and
+  more of Rubi's helper functions in [symfkt.c](symfkt.c).
+- Exact numbers: sorts `integer` and `rational` with GMP ([inc/exact](inc/exact)),
+  the statements `SUBSORT` and `INTNUM`, and the choice of operator
+  variants by the sorts of their arguments.
 - Rule lists with a backtracking matcher for rules with `OPT`, `DEFAULT`
   and `COMM`, instead of expanding each rule into its variants. Rules that
   make no progress or give NaN are skipped, and `REWR` has a step limit.
-- [tools/rubi2rewrite.py](tools/rubi2rewrite.py) translates about three
-  quarters of Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
+- [tools/rubi2rewrite.py](tools/rubi2rewrite.py) translates about 90% of
+  Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
 - Internal cleanup: named accessors for the node structures

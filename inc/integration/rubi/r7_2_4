@@ -150,10 +150,10 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((
 #   Int[x_^m_*(a_. + b_.*ArcCosh[c_.*x_])^ n_./(Sqrt[d1_ + e1_.*x_]*Sqrt[d2_ + e2_.*x_]), x_Symbol] := 1/c^(m + 1)*Simp[Sqrt[1 + c*x]/Sqrt[d1 + e1*x]]* Simp[Sqrt[-1 + c*x]/Sqrt[d2 + e2*x]]* Subst[Int[(a + b*x)^n*Cosh[x]^m, x], x, ArcCosh[c*x]] /; FreeQ[{a, b, c, d1, e1, d2, e2}, x] && EqQ[e1, c*d1] && EqQ[e2, -c*d2] && IGtQ[n, 0] && IntegerQ[m]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d1,O_e1,P_d2,O_e2), (eqq(O_e1,((O_c)*(P_d1)))), (eqq(O_e2,(((-1))*(O_c)*(P_d2)))), (igtq(O_n,0)), (integerq(P_m)) Int(((Xv)^(P_m))*(((O_a)+((O_b)*(arccosh((O_c)*(Xv)))))^(O_n))*(((((P_d1)+((O_e1)*(Xv)))^(0.5))*(((P_d2)+((O_e2)*(Xv)))^(0.5)))^(K_1)),Xv) = ((((((O_c)^(((P_m)+(1)))))^((-1))))*(simp(((((((1)+(((O_c)*(Xv)))))^((1/2))))*(((((P_d1)+(((O_e1)*(Xv)))))^((-(1/2))))))))*(simp((((((((-1))+(((O_c)*(Xv)))))^((1/2))))*(((((P_d2)+(((O_e2)*(Xv)))))^((-(1/2))))))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(((cosh(Xv))^(P_m)))),Xv),Xv,arccosh(((O_c)*(Xv))))))
 
-# Regel 37 nicht uebersetzt: function Hypergeometric2F1
+# Regel 37 nicht uebersetzt: function HypergeometricPFQ
 #   Int[(f_.*x_)^m_*(a_. + b_.*ArcCosh[c_.*x_])/Sqrt[d_ + e_.*x_^2], x_Symbol] := (f*x)^(m + 1)/(f*(m + 1))*Simp[Sqrt[1 - c^2*x^2]/Sqrt[d + e*x^2]]* (a + b*ArcCosh[c*x])* Hypergeometric2F1[1/2, (1 + m)/2, (3 + m)/2, c^2*x^2] + b*c*(f*x)^(m + 2)/(f^2*(m + 1)*(m + 2))* Simp[Sqrt[1 + c*x]*Sqrt[-1 + c*x]/Sqrt[d + e*x^2]]* HypergeometricPFQ[{1, 1 + m/2, 1 + m/2}, {3/2 + m/2, 2 + m/2}, c^2*x^2] /; FreeQ[{a, b, c, d, e, f, m}, x] && EqQ[c^2*d + e, 0] && Not[IntegerQ[m]]
 
-# Regel 38 nicht uebersetzt: function Hypergeometric2F1
+# Regel 38 nicht uebersetzt: function HypergeometricPFQ
 #   Int[(f_.*x_)^ m_*(a_. + b_.*ArcCosh[c_.*x_])/(Sqrt[d1_ + e1_.*x_]* Sqrt[d2_ + e2_.*x_]), x_Symbol] := (f*x)^(m + 1)/(f*(m + 1))* Simp[Sqrt[1 - c^2*x^2]/(Sqrt[d1 + e1*x]*Sqrt[d2 + e2*x])]* (a + b*ArcCosh[c*x])* Hypergeometric2F1[1/2, (1 + m)/2, (3 + m)/2, c^2*x^2] + b*c*(f*x)^(m + 2)/(f^2*(m + 1)*(m + 2))* Simp[Sqrt[1 + c*x]/Sqrt[d1 + e1*x]]* Simp[Sqrt[-1 + c*x]/Sqrt[d2 + e2*x]]* HypergeometricPFQ[{1, 1 + m/2, 1 + m/2}, {3/2 + m/2, 2 + m/2}, c^2*x^2] /; FreeQ[{a, b, c, d1, e1, d2, e2, f, m}, x] && EqQ[e1, c*d1] && EqQ[e2, -c*d2] && Not[IntegerQ[m]]
 
 # Regel 39 (3888 Varianten):
