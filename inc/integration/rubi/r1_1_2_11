@@ -6,8 +6,9 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: function SubstFor
+# Regel 1 (96 Varianten):
 #   Int[x_^m_.*Pq_*(a_+b_.*x_^2)^p_.,x_Symbol] := 1/2 \[Star] Subst[Int[x^((m-1)/2)*SubstFor[x^2,Pq,x]*(a+b*x)^p,x],x,x^2] /; FreeQ[{a,b,p},x] && PolyQ[Pq,x^2] && IntegerQ[(m-1)/2]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_p), (polyq(P_Pq,((Xv)^(2)))), (integerq(((((O_m)+((-1))))*((1/2))))) Int(((Xv)^(O_m))*(P_Pq)*(((P_a)+((O_b)*((Xv)^(2))))^(O_p)),Xv) = (((1/2))*(intsubst(((((Xv)^(((((O_m)+((-1))))*((1/2))))))*(substfor(((Xv)^(2)),P_Pq,Xv))*(((((P_a)+(((O_b)*(Xv)))))^(O_p)))),Xv,((Xv)^(2)))))
 
 # Regel 2 (288 Varianten):
 #   Int[(c_.*x_)^m_.*P2_*(a_+b_.*x_^2)^p_.,x_Symbol] := With[{f=Coeff[P2,x,0],g=Coeff[P2,x,1],h=Coeff[P2,x,2]}, h*(c*x)^(m+1)*(a+b*x^2)^(p+1)/(b*c*(m+2*p+3)) /; EqQ[g,0] && EqQ[a*h*(m+1)-b*f*(m+2*p+3),0]] /; FreeQ[{a,b,c,m,p},x] && PolyQ[P2,x,2] && NeQ[m,-1]

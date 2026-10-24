@@ -333,6 +333,7 @@ FUNCS = {
 # helper functions on the right-hand side
 RHS_HELPERS = {
     'Int': 'Int', 'Simp': 'simp', 'Simplify': 'simplify', 'Dist': 'dist',
+    'FullSimplify': 'simplify',
     'Subst': 'subst', 'ExpandIntegrand': 'expandintegrand', 'Expand': 'expand',
     'Coeff': 'coeff', 'Coefficient': 'coeff', 'Expon': 'expon', 'Rt': 'rt',
     'IntPart': 'intpart', 'FracPart': 'fracpart', 'IntHide': 'inthide',
@@ -344,18 +345,19 @@ RHS_HELPERS = {
     'SimplifyIntegrand': 'simp',
     'ExpandTrig': 'expandintegrand', 'ExpandTrigReduce': 'expandtrigreduce',
     'LeafCount': 'leafcount', 'BinomialDegree': 'binomialdegree',
-    'Numer': 'numerator',
+    'Numer': 'numerator', 'SubstFor': 'substfor',
 }
 # predicates in conditions
 PREDICATES = {
     'EqQ': 'eqq', 'NeQ': 'neq', 'IntegerQ': 'integerq', 'IntegersQ': 'integersq',
     'RationalQ': 'rationalq', 'PosQ': 'posq', 'NegQ': 'negq', 'IGtQ': 'igtq',
-    'ILtQ': 'iltq', 'PolyQ': 'polyq', 'LinearQ': 'linearq', 'SumQ': 'sumq',
+    'ILtQ': 'iltq', 'PolyQ': 'polyq', 'LinearQ': 'linearq', 'SumQ': 'sumq', 'NonsumQ': 'nonsumq',
     'ProductQ': 'productq', 'PowerQ': 'powerq',
     'FractionQ': 'fractionq', 'HalfIntegerQ': 'halfintegerq',
     'PolynomialQ': 'polyq', 'NiceSqrtQ': 'nicesqrtq',
     'BinomialQ': 'binomialq', 'QuadraticQ': 'quadraticq',
     'RationalFunctionQ': 'rationalfunctionq', 'InverseFunctionFreeQ': 'inversefunctionfreeq',
+    'FunctionOfQ': 'functionofq',
     'SimplerQ': 'simplerq', 'SumSimplerQ': 'sumsimplerq', 'SimplerSqrtQ': 'simplersqrtq',
     'KnownSineIntegrandQ': 'knownsineintegrandq', 'KnownTangentIntegrandQ': 'knowntangentintegrandq',
     'KnownCotangentIntegrandQ': 'knowncotangentintegrandq',
@@ -366,7 +368,7 @@ PREDICATES = {
     'AlgebraicFunctionQ': 'algebraicfunctionq',
 }
 ORDER = {'GtQ': '>', 'LtQ': '<', 'GeQ': '>=', 'LeQ': '<='}
-CONSTANTS = {'Pi': 'pi', 'E': 'eE'}
+CONSTANTS = {'Pi': 'pi', 'E': 'eE', 'True': '1', 'False': '0'}
 
 
 def fmt_num(q):
@@ -668,6 +670,13 @@ def function_sets(conds, fvars):
               and args[0][0] == 'call' and args[0][1] == 'List'
               and all(a[0] == 'sym' for a in args[0][2])):
             sets[args[1][1]] = [a[1] for a in args[0][2]]
+        elif h in ('EqQ', 'Or'):           # EqQ[F, Cos] || EqQ[F, cos]
+            alts = [e] if h == 'EqQ' else args
+            if all(a[0] == 'call' and a[1] == 'EqQ' and len(a[2]) == 2
+                   and a[2][0][0] == 'sym' and a[2][0][1] in fvars
+                   and a[2][1][0] == 'sym' for a in alts) \
+                    and len(set(a[2][0][1] for a in alts)) == 1:
+                sets[alts[0][2][0][1]] = [a[2][1][1] for a in alts]
         if h == 'And':
             for a in args:
                 scan(a)
@@ -690,6 +699,9 @@ def instantiate(e, assign):
     if ((h in FUNCTION_SETS and len(args) == 1 and args[0][0] == 'sym' and args[0][1] in assign)
             or (h == 'MemberQ' and len(args) == 2 and args[1][0] == 'sym' and args[1][1] in assign)):
         return ('sym', 'True')
+    if (h == 'EqQ' and len(args) == 2 and args[0][0] == 'sym' and args[0][1] in assign
+            and args[1][0] == 'sym'):
+        return ('sym', 'True' if assign[args[0][1]] == args[1][1] else 'False')
     return ('call', h, [instantiate(a, assign) for a in args])
 
 
@@ -735,8 +747,10 @@ def translate_rule(text):
     out = []
     for assign in combos:
         try:
-            out.append(translate_parsed(normalize(instantiate(lhs, assign)),
-                                        normalize(instantiate(rhs, assign))))
+            r = translate_parsed(normalize(instantiate(lhs, assign)),
+                                 normalize(instantiate(rhs, assign)))
+            if all(r[0] != o[0] for o in out):     # Cos and cos: the same rule
+                out.append(r)
         except Untranslatable:
             pass                    # e.g. a function rewrite does not have
     if not out:
@@ -883,12 +897,29 @@ def collect_macros(files):
                     MACROS[key] = (params, body)
 
 
+# rules that cannot be translated, but whose work a C helper does: the start
+# of the Mathematica text -> the rule in rewrite (at the same place in the
+# order). The helper stays unevaluated if it does not apply, and the rule
+# list then skips the rule (symfkt.c, term_has_nan).
+HAND_RULES = [
+    # Rubi 2.3: integrand a function of F^(c x): substitute x -> F^(g x)
+    ('Int[u_, x_Symbol] := With[{v = FunctionOfExponential[u, x]}',
+     'ADDSPEC RubiRules : Int(P_u,Xv) = substexp(P_u,Xv)'),
+]
+
+
 def translate_file(path, out_dir, all_vars, stats):
     name = safe_name(path)
     section = os.path.splitext(os.path.basename(path))[0]
     lines = [HEADER % (name, section)]
     ok = 0
     for i, text in enumerate(rules_of(path), 1):
+        hand = [r for key, r in HAND_RULES if text.startswith(key)]
+        if hand:
+            ok += 1
+            all_vars['P'].add('P_u')
+            lines.append('# Regel %d (von Hand, C-Hilfsfunktion):\n#   %s\n%s\n' % (i, text, hand[0]))
+            continue
         try:
             results = translate_rule(text)
         except Untranslatable as err:

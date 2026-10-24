@@ -97,5 +97,6 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_n), (eqq(O_n2,((2)*(O_n)))), (polyq(
 #   Int[Pq_*(a_ + b_.*x_^n_. + c_.*x_^n2_.)^p_., x_Symbol] := Unintegrable[Pq*(a + b*x^n + c*x^(2*n))^p, x] /; FreeQ[{a, b, c, n, p}, x] && EqQ[n2, 2*n] && (PolyQ[Pq, x] || PolyQ[Pq, x^n])
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_n,O_p), (eqq(O_n2,((2)*(O_n)))), (((polyq(P_Pq,Xv)) || (polyq(P_Pq,((Xv)^(O_n)))))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(O_n)))+((O_c)*((Xv)^(O_n2))))^(O_p)),Xv) = unintegrable(((P_Pq)*(((((P_a)+(((O_b)*(((Xv)^(O_n)))))+(((O_c)*(((Xv)^(((2)*(O_n)))))))))^(O_p)))),Xv)
 
-# Regel 25 nicht uebersetzt: function SubstFor
+# Regel 25 (288 Varianten):
 #   Int[Pq_*(a_ + b_.*v_^n_ + c_.*v_^n2_.)^p_., x_Symbol] := 1/Coefficient[v, x, 1]* Subst[Int[SubstFor[v, Pq, x]*(a + b*x^n + c*x^(2*n))^p, x], x, v] /; FreeQ[{a, b, c, n, p}, x] && EqQ[n2, 2*n] && LinearQ[v, x] && PolyQ[Pq, v^n]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_n,O_p), (eqq(O_n2,((2)*(P_n)))), (linearq(P_v,Xv)), (polyq(P_Pq,((P_v)^(P_n)))) Int((P_Pq)*(((P_a)+((O_b)*((P_v)^(P_n)))+((O_c)*((P_v)^(O_n2))))^(O_p)),Xv) = ((((coeff(P_v,Xv,1))^((-1))))*(intsubst(((substfor(P_v,P_Pq,Xv))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))+(((O_c)*(((Xv)^(((2)*(P_n)))))))))^(O_p)))),Xv,P_v)))

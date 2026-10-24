@@ -133,6 +133,8 @@ ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) csc(Uv+Kc) = -(sec(Uv))
 ADDSPEC IntOut : IF (abs(Kf - e) < 1e-9) Kf^Uv = exp(Uv)
 ADDSPEC IntOut : eE^Uv = exp(Uv)
 ADDSPEC IntOut : ln(eE) = 1
+ADDSPEC IntOut : ln(eE^Uv) = Uv          # fuer reelles u
+ADDSPEC IntOut : ln(exp(Uv)) = Uv
 
 # ---------------- Einstellungen fuer die Rubi-Regeln ----------------
 # (werden am Ende von inc/integration/all wieder geloescht)

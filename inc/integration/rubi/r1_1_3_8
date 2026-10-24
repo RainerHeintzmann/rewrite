@@ -18,15 +18,17 @@ ADDSPEC RubiRules : IF (K_1 == (-(3/2))), NIN(Xv,P_a,O_c,P_d,P_e,O_f,O_g,O_h,O_m
 #   Int[(c_.*x_)^m_*Pq_*(a_ + b_.*x_)^p_, x_Symbol] := With[{n = Denominator[p]}, n/b* Subst[Int[ x^(n*p + n - 1)*(-a*c/b + c*x^n/b)^m* ReplaceAll[Pq, x -> -a/b + x^n/b], x], x, (a + b*x)^(1/n)]] /; FreeQ[{a, b, c, m}, x] && PolyQ[Pq, x] && FractionQ[p] && ILtQ[m, -1]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_m), (polyq(P_Pq,Xv)), (fractionq(P_p)), (iltq(P_m,(-1))) Int((((O_c)*(Xv))^(P_m))*(P_Pq)*(((P_a)+((O_b)*(Xv)))^(P_p)),Xv) = ((denominator(P_p))*(((O_b)^((-1))))*(intsubst(((((Xv)^(((((denominator(P_p))*(P_p)))+(denominator(P_p))+((-1))))))*((((((((-1))*(P_a)*(O_c)*(((O_b)^((-1))))))+(((O_c)*(((Xv)^(denominator(P_p))))*(((O_b)^((-1))))))))^(P_m)))*(replaceall(P_Pq,Xv,(((((-1))*(P_a)*(((O_b)^((-1))))))+(((((Xv)^(denominator(P_p))))*(((O_b)^((-1)))))))))),Xv,((((P_a)+(((O_b)*(Xv)))))^(((denominator(P_p))^((-1))))))))
 
-# Regel 4 nicht uebersetzt: function SubstFor
+# Regel 4 (96 Varianten):
 #   Int[x_^m_.*Pq_*(a_ + b_.*x_^n_)^p_., x_Symbol] := 1/(m + 1)* Subst[Int[ SubstFor[x^(m + 1), Pq, x]*(a + b*x^Simplify[n/(m + 1)])^p, x], x, x^(m + 1)] /; FreeQ[{a, b, m, n, p}, x] && NeQ[m, -1] && IGtQ[Simplify[n/(m + 1)], 0] && PolyQ[Pq, x^(m + 1)]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_m,P_n,O_p), (neq(O_m,(-1))), (igtq(simplify(((P_n)*(((((O_m)+(1)))^((-1)))))),0)), (polyq(P_Pq,((Xv)^(((O_m)+(1)))))) Int(((Xv)^(O_m))*(P_Pq)*(((P_a)+((O_b)*((Xv)^(P_n))))^(O_p)),Xv) = ((((((O_m)+(1)))^((-1))))*(intsubst(((substfor(((Xv)^(((O_m)+(1)))),P_Pq,Xv))*(((((P_a)+(((O_b)*(((Xv)^(simplify(((P_n)*(((((O_m)+(1)))^((-1)))))))))))))^(O_p)))),Xv,((Xv)^(((O_m)+(1)))))))
 
 # Regel 5 (576 Varianten):
 #   Int[(c_.*x_)^m_.*Pq_*(a_ + b_.*x_^n_.)^p_., x_Symbol] := Int[ExpandIntegrand[(c*x)^m*Pq*(a + b*x^n)^p, x], x] /; FreeQ[{a, b, c, m, n}, x] && PolyQ[Pq, x] && (IGtQ[p, 0] || EqQ[n, 1])
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_m,O_n), (polyq(P_Pq,Xv)), (((igtq(O_p,0)) || (eqq(O_n,1)))) Int((((O_c)*(Xv))^(O_m))*(P_Pq)*(((P_a)+((O_b)*((Xv)^(O_n))))^(O_p)),Xv) = Int(expandintegrand(((((((O_c)*(Xv)))^(O_m)))*(P_Pq)*(((((P_a)+(((O_b)*(((Xv)^(O_n)))))))^(O_p)))),Xv),Xv)
 
-# Regel 6 nicht uebersetzt: function SubstFor
+# Regel 6 (96 Varianten):
 #   Int[x_^m_.*Pq_*(a_ + b_.*x_^n_)^p_., x_Symbol] := 1/n*Subst[ Int[x^(Simplify[(m + 1)/n] - 1)*SubstFor[x^n, Pq, x]*(a + b*x)^p, x], x, x^n] /; FreeQ[{a, b, m, n, p}, x] && PolyQ[Pq, x^n] && IntegerQ[Simplify[(m + 1)/n]]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_m,P_n,O_p), (polyq(P_Pq,((Xv)^(P_n)))), (integerq(simplify(((((O_m)+(1)))*(((P_n)^((-1)))))))) Int(((Xv)^(O_m))*(P_Pq)*(((P_a)+((O_b)*((Xv)^(P_n))))^(O_p)),Xv) = ((((P_n)^((-1))))*(intsubst(((((Xv)^(((simplify(((((O_m)+(1)))*(((P_n)^((-1)))))))+((-1))))))*(substfor(((Xv)^(P_n)),P_Pq,Xv))*(((((P_a)+(((O_b)*(Xv)))))^(O_p)))),Xv,((Xv)^(P_n)))))
 
 # Regel 7 (192 Varianten):
 #   Int[(c_*x_)^m_.*Pq_*(a_ + b_.*x_^n_)^p_., x_Symbol] := c^IntPart[m]*(c*x)^FracPart[m]/x^FracPart[m]* Int[x^m*Pq*(a + b*x^n)^p, x] /; FreeQ[{a, b, c, m, n, p}, x] && PolyQ[Pq, x^n] && IntegerQ[Simplify[(m + 1)/n]]
@@ -103,8 +105,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_m,P_p), (polyq(P_Pq,Xv)), (fractionq(P_n
 #   Int[(c_*x_)^m_*Pq_*(a_ + b_.*x_^n_)^p_, x_Symbol] := c^IntPart[m]*(c*x)^FracPart[m]/x^FracPart[m]* Int[x^m*Pq*(a + b*x^n)^p, x] /; FreeQ[{a, b, c, m, p}, x] && PolyQ[Pq, x] && FractionQ[n]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,P_m,P_p), (polyq(P_Pq,Xv)), (fractionq(P_n)) Int((((P_c)*(Xv))^(P_m))*(P_Pq)*(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p)),Xv) = ((((P_c)^(intpart(P_m))))*(((((P_c)*(Xv)))^(fracpart(P_m))))*(((((Xv)^(fracpart(P_m))))^((-1))))*(Int(((((Xv)^(P_m)))*(P_Pq)*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)))),Xv)))
 
-# Regel 27 nicht uebersetzt: function SubstFor
+# Regel 27 (48 Varianten):
 #   Int[x_^m_.*Pq_*(a_ + b_.*x_^n_)^p_, x_Symbol] := 1/(m + 1)* Subst[Int[ ReplaceAll[SubstFor[x^n, Pq, x], x -> x^Simplify[n/(m + 1)]]*(a + b*x^Simplify[n/(m + 1)])^p, x], x, x^(m + 1)] /; FreeQ[{a, b, m, n, p}, x] && PolyQ[Pq, x^n] && IntegerQ[Simplify[n/(m + 1)]] && Not[IntegerQ[n]]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_m,P_n,P_p), (polyq(P_Pq,((Xv)^(P_n)))), (integerq(simplify(((P_n)*(((((O_m)+(1)))^((-1)))))))), (not(integerq(P_n))) Int(((Xv)^(O_m))*(P_Pq)*(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p)),Xv) = ((((((O_m)+(1)))^((-1))))*(intsubst(((replaceall(substfor(((Xv)^(P_n)),P_Pq,Xv),Xv,((Xv)^(simplify(((P_n)*(((((O_m)+(1)))^((-1))))))))))*(((((P_a)+(((O_b)*(((Xv)^(simplify(((P_n)*(((((O_m)+(1)))^((-1)))))))))))))^(P_p)))),Xv,((Xv)^(((O_m)+(1)))))))
 
 # Regel 28 (48 Varianten):
 #   Int[(c_*x_)^m_*Pq_*(a_ + b_.*x_^n_)^p_, x_Symbol] := c^IntPart[m]*(c*x)^FracPart[m]/x^FracPart[m]* Int[x^m*Pq*(a + b*x^n)^p, x] /; FreeQ[{a, b, c, m, n, p}, x] && PolyQ[Pq, x^n] && IntegerQ[Simplify[n/(m + 1)]] && Not[IntegerQ[n]]
@@ -114,8 +117,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,P_m,P_n,P_p), (polyq(P_Pq,((Xv)^(P_n))
 #   Int[(c_.*x_)^m_.*Pq_*(a_ + b_.*x_^n_)^p_., x_Symbol] := Int[ExpandIntegrand[(c*x)^m*Pq*(a + b*x^n)^p, x], x] /; FreeQ[{a, b, c, m, n, p}, x] && (PolyQ[Pq, x] || PolyQ[Pq, x^n]) && Not[IGtQ[m, 0]]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_m,P_n,O_p), (((polyq(P_Pq,Xv)) || (polyq(P_Pq,((Xv)^(P_n)))))), (not(igtq(O_m,0))) Int((((O_c)*(Xv))^(O_m))*(P_Pq)*(((P_a)+((O_b)*((Xv)^(P_n))))^(O_p)),Xv) = Int(expandintegrand(((((((O_c)*(Xv)))^(O_m)))*(P_Pq)*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(O_p)))),Xv),Xv)
 
-# Regel 30 nicht uebersetzt: function SubstFor
+# Regel 30 (96 Varianten):
 #   Int[u_^m_.*Pq_*(a_ + b_.*v_^n_.)^p_, x_Symbol] := u^m/(Coeff[v, x, 1]*v^m)* Subst[Int[x^m*SubstFor[v, Pq, x]*(a + b*x^n)^p, x], x, v] /; FreeQ[{a, b, m, n, p}, x] && LinearPairQ[u, v, x] && PolyQ[Pq, v^n]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_m,O_n,P_p), (linearpairq(P_u,P_v,Xv)), (polyq(P_Pq,((P_v)^(O_n)))) Int(((P_u)^(O_m))*(P_Pq)*(((P_a)+((O_b)*((P_v)^(O_n))))^(P_p)),Xv) = ((((P_u)^(O_m)))*(((coeff(P_v,Xv,1))^((-1))))*(((((P_v)^(O_m)))^((-1))))*(intsubst(((((Xv)^(O_m)))*(substfor(P_v,P_Pq,Xv))*(((((P_a)+(((O_b)*(((Xv)^(O_n)))))))^(P_p)))),Xv,P_v)))
 
 # Regel 31 (27648 Varianten):
 #   Int[(c_.*x_)^m_.*Pq_*(a1_ + b1_.*x_^n_.)^p_.*(a2_ + b2_.*x_^n_.)^p_., x_Symbol] := Int[(c*x)^m*Pq*(a1*a2 + b1*b2*x^(2*n))^p, x] /; FreeQ[{a1, b1, a2, b2, c, m, n, p}, x] && PolyQ[Pq, x] && EqQ[a2*b1 + a1*b2, 0] && (IntegerQ[p] || GtQ[a1, 0] && GtQ[a2, 0])

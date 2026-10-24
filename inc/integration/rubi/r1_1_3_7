@@ -180,8 +180,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_n), (polyq(P_P3,((Xv)^(((P_n)*((1/2)))))
 #   Int[Pq_*(a_ + b_.*x_^n_)^p_., x_Symbol] := Int[ExpandIntegrand[Pq*(a + b*x^n)^p, x], x] /; FreeQ[{a, b, n, p}, x] && (PolyQ[Pq, x] || PolyQ[Pq, x^n])
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_n,O_p), (((polyq(P_Pq,Xv)) || (polyq(P_Pq,((Xv)^(P_n)))))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(P_n))))^(O_p)),Xv) = Int(expandintegrand(((P_Pq)*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(O_p)))),Xv),Xv)
 
-# Regel 46 nicht uebersetzt: function SubstFor
+# Regel 46 (24 Varianten):
 #   Int[Pq_*(a_ + b_.*v_^n_.)^p_, x_Symbol] := 1/Coeff[v, x, 1]* Subst[Int[SubstFor[v, Pq, x]*(a + b*x^n)^p, x], x, v] /; FreeQ[{a, b, n, p}, x] && LinearQ[v, x] && PolyQ[Pq, v^n]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_n,P_p), (linearq(P_v,Xv)), (polyq(P_Pq,((P_v)^(O_n)))) Int((P_Pq)*(((P_a)+((O_b)*((P_v)^(O_n))))^(P_p)),Xv) = ((((coeff(P_v,Xv,1))^((-1))))*(intsubst(((substfor(P_v,P_Pq,Xv))*(((((P_a)+(((O_b)*(((Xv)^(O_n)))))))^(P_p)))),Xv,P_v)))
 
 # Regel 47 (2304 Varianten):
 #   Int[Pq_*(a1_ + b1_.*x_^n_.)^p_.*(a2_ + b2_.*x_^n_.)^p_., x_Symbol] := Int[Pq*(a1*a2 + b1*b2*x^(2*n))^p, x] /; FreeQ[{a1, b1, a2, b2, n, p}, x] && PolyQ[Pq, x] && EqQ[a2*b1 + a1*b2, 0] && (IntegerQ[p] || GtQ[a1, 0] && GtQ[a2, 0])

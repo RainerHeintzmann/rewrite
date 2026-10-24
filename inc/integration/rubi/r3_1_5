@@ -122,8 +122,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (rationalfunctionq(P_RFx,Xv)), (
 #   Int[RFx_*(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := With[{u = ExpandIntegrand[RFx*(a + b*Log[c*x^n])^p, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{a, b, c, n}, x] && RationalFunctionQ[RFx, x] && IGtQ[p, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (rationalfunctionq(P_RFx,Xv)), (igtq(O_p,0)), (sumq(expandintegrand(((P_RFx)*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))),Xv))) Int((P_RFx)*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p)),Xv) = Int(expandintegrand(((P_RFx)*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))),Xv),Xv)
 
-# Regel 30 nicht uebersetzt: symbol True
+# Regel 30 (216 Varianten):
 #   Int[AFx_*(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := Unintegrable[AFx*(a + b*Log[c*x^n])^p, x] /; FreeQ[{a, b, c, n, p}, x] && AlgebraicFunctionQ[AFx, x, True]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n,O_p), (algebraicfunctionq(P_AFx,Xv,1)) Int((P_AFx)*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p)),Xv) = unintegrable(((P_AFx)*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))),Xv)
 
 # Regel 31 (15552 Varianten):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_.*(d_ + e_.*Log[c_.*x_^n_.])^q_., x_Symbol] := Int[ExpandIntegrand[(a + b*Log[c*x^n])^p*(d + e*Log[c*x^n])^q, x], x] /; FreeQ[{a, b, c, d, e, n}, x] && IntegerQ[p] && IntegerQ[q]

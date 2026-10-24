@@ -124,6 +124,17 @@ have it, so a few steps are added:
   complex numbers. Instead, the last rule of `RubiRules` writes hyperbolic
   functions for which no rule applies with exponentials (`hyp2exp`):
   `sinh(u) = (e^u-e^-u)/2`, ... The result then contains `exp`.
+- Substitutions. Rubi's `FunctionOfQ[v,u,x]` and `SubstFor[h,v,u,x]`
+  (`functionofq`, `substfor`) decide whether `u` is a function of `v` and
+  write it with `v` replaced by `x`; for `v = sin(w)` also `csc(w) = 1/v`,
+  `cos(w)^(2m) = (1-v^2)^m`, ..., likewise for cos, tan, cot and the
+  hyperbolic functions. So `Int[u*cos(w)]` with `u` a function of
+  `sin(w)` becomes an integral in `sin(w)`. Rubi's substitution
+  `x -> F^(g*x)` for functions of exponentials (`FunctionOfExponential`,
+  section 2.3) is the C function `substexp`; the translator puts it in
+  place of Rubi's rule (`HAND_RULES`). `FullSimplify` becomes `simplify`,
+  which is enough for ratios like `ln(F)/ln(F)`, and `IntOut` writes
+  `ln(e^u)` as `u`.
 - The first rules of `RubiRules` take constant factors out of the integral
   (first, as Mathematica does, so that `-1*x*u` does not become
   `(-1*x)*u`, which rules for `(c*x)^m` would match with `c = -1`), write
@@ -205,16 +216,16 @@ results are:
 
 | Result | Problems | Share of tested |
 | --- | --- | --- |
-| solved and verified | 1221 | 79.3% |
-| no antiderivative found | 294 | 19.1% |
-| wrong | 3 | 0.2% |
-| crash or time-out | 1 | 0.1% |
-| not verifiable | 20 | 1.3% |
+| solved and verified | 1290 | 83.8% |
+| no antiderivative found | 231 | 15.0% |
+| wrong | 2 | 0.1% |
+| crash or time-out | 0 | 0.0% |
+| not verifiable | 16 | 1.0% |
 
 One problem uses a function that rewrite does not have and is not tested.
-The three wrong results contain special functions outside their real
+The two wrong results contain special functions outside their real
 domain, where the check compares different complex branches. A run takes
-about five minutes. The harness needs `mpmath` for the special functions
+about three minutes. The harness needs `mpmath` for the special functions
 (`pacman -S mingw-w64-ucrt-x86_64-python-mpmath` in MSYS2).
 
 ## The hand-translated subset

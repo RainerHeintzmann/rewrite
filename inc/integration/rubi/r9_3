@@ -121,8 +121,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_p,O_q,O_s), (eqq(((((O_p)*(((O_s)+(1
 #   Int[u_*(a_.*v_^p_.+b_.*w_^q_.)^m_.*v_^r_.*w_^s_.,x_Symbol] := With[{c=Simplify[u/(p*w*D[v,x]-q*v*D[w,x])]}, -c*q/(s+1) \[Star] Subst[Int[(a+b*x^(q/(s+1)))^m,x],x,v^(m*p+r+1)*w^(s+1)] /; FreeQ[c,x]] /; FreeQ[{a,b,m,p,q,r,s},x] && EqQ[p*(s+1)+q*(m*p+r+1),0] && NeQ[s,-1] && IntegerQ[q/(s+1)] && IntegerQ[m]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_p,O_q,O_r,O_s), (eqq(((((O_p)*(((O_s)+(1)))))+(((O_q)*(((((O_m)*(O_p)))+(O_r)+(1)))))),0)), (neq(O_s,(-1))), (integerq(((O_q)*(((((O_s)+(1)))^((-1))))))), (integerq(O_m)), NIN(Xv,simplify(((P_u)*(((((((O_p)*(P_w)*(deriv(P_v,Xv))))+((((-1))*(O_q)*(P_v)*(deriv(P_w,Xv))))))^((-1))))))) Int((P_u)*((((O_a)*((P_v)^(O_p)))+((O_b)*((P_w)^(O_q))))^(O_m))*((P_v)^(O_r))*((P_w)^(O_s)),Xv) = (((-1))*(simplify(((P_u)*(((((((O_p)*(P_w)*(deriv(P_v,Xv))))+((((-1))*(O_q)*(P_v)*(deriv(P_w,Xv))))))^((-1)))))))*(O_q)*(((((O_s)+(1)))^((-1))))*(intsubst(((((O_a)+(((O_b)*(((Xv)^(((O_q)*(((((O_s)+(1)))^((-1))))))))))))^(O_m)),Xv,((((P_v)^(((((O_m)*(O_p)))+(O_r)+(1)))))*(((P_w)^(((O_s)+(1)))))))))
 
-# Regel 36 nicht uebersetzt: function SubstFor
+# Regel 36 (4 Varianten):
 #   Int[u_*x_^m_.,x_Symbol] := 1/(m+1) \[Star] Subst[Int[SubstFor[x^(m+1),u,x],x],x,x^(m+1)] /; FreeQ[m,x] && NeQ[m,-1] && FunctionOfQ[x^(m+1),u,x]
+ADDSPEC RubiRules : IF NIN(Xv,O_m), (neq(O_m,(-1))), (functionofq(((Xv)^(((O_m)+(1)))),P_u,Xv)) Int((P_u)*((Xv)^(O_m)),Xv) = ((((((O_m)+(1)))^((-1))))*(intsubst(substfor(((Xv)^(((O_m)+(1)))),P_u,Xv),Xv,((Xv)^(((O_m)+(1)))))))
 
 # Regel 37 nicht uebersetzt: ShowStep
 #   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, ShowStep["","Int[F[(a+b*x)^(1/n),x],x]", "n/b \[Star] Subst[Int[x^(n-1)*F[x,-a/b+x^n/b],x],x,(a+b*x)^(1/n)]",Hold[ lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])]]] /; Not[FalseQ[lst]] && SubstForFractionalPowerQ[u,lst[[3]],x]] /; SimplifyFlag,  Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])] /; Not[FalseQ[lst]] && SubstForFractionalPowerQ[u,lst[[3]],x]]]

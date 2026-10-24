@@ -93,7 +93,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_f), (igtq(O_m,0)), (igtq(O_n,0)) Int
 # Regel 22 nicht uebersetzt: predicate FunctionOfExponentialQ
 #   Int[ArcCosh[u_], x_Symbol] := x*ArcCosh[u] - Int[SimplifyIntegrand[x*D[u, x]/(Sqrt[-1 + u]*Sqrt[1 + u]), x], x] /; InverseFunctionFreeQ[u, x] && Not[FunctionOfExponentialQ[u, x]]
 
-# Regel 23 nicht uebersetzt: predicate FunctionOfQ
+# Regel 23 nicht uebersetzt: predicate FunctionOfExponentialQ
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcCosh[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcCosh[u])/(d*(m + 1)) - b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)* D[u, x]/(Sqrt[-1 + u]*Sqrt[1 + u]), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && Not[FunctionOfExponentialQ[u, x]]
 
 # Regel 24 nicht uebersetzt: predicate MatchQ

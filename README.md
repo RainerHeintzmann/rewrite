@@ -524,6 +524,9 @@ loaded by the integration rules and can also be used on their own:
 | `rationalfunctionq(u,x)`, `algebraicfunctionq(u,x)`, `inversefunctionfreeq(u,x)` | kind of function of `x` |
 | `leafcount(u)`, `simplerq(u,v)`, `sumsimplerq(u,v)`, `simplersqrtq(u,v)` | size of a term (as Mathematica's `LeafCount`) and Rubi's simplicity comparisons |
 | `knownsineintegrandq(u,x)` (also `tangent`, `cotangent`, `secant`), `piecewiselinearq`, `linearpairq` | Rubi's tests for integrands it knows |
+| `functionofq(v,u,x)`, `substfor(h,v,u,x)` | `u` is a function of `v` (also through identities: `cos(w)^2 = 1-sin(w)^2`, ...); `h*u` with `v` replaced by `x` |
+| `substexp(u,x)`, `intsubst(u,x,v)`, `hyp2exp(u,x)` | Rubi's substitution `x -> F^(g x)` for functions of exponentials; `Subst[Int[u,x],x,v]`; hyperbolic functions as exponentials |
+| `nonsumq(u)` | `u` is no sum |
 
 The predicates return true or false and can be used in conditions, also
 combined with `&&` and `||`:

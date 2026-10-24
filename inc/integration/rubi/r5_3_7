@@ -248,10 +248,10 @@ ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)) Int(arctan(P_u),Xv) = ((((
 #   Int[ArcCot[u_], x_Symbol] := x*ArcCot[u] + Int[SimplifyIntegrand[x*D[u, x]/(1 + u^2), x], x] /; InverseFunctionFreeQ[u, x]
 ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)) Int(arccot(P_u),Xv) = ((((Xv)*(arccot(P_u))))+(Int(simp(((Xv)*(deriv(P_u,Xv))*(((((1)+(((P_u)^(2)))))^((-1))))),Xv),Xv)))
 
-# Regel 69 nicht uebersetzt: predicate FunctionOfQ
+# Regel 69 nicht uebersetzt: predicate FalseQ
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcTan[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcTan[u])/(d*(m + 1)) - b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(1 + u^2), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && FalseQ[PowerVariableExpn[u, m + 1, x]]
 
-# Regel 70 nicht uebersetzt: predicate FunctionOfQ
+# Regel 70 nicht uebersetzt: predicate FalseQ
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcCot[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcCot[u])/(d*(m + 1)) + b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(1 + u^2), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && FalseQ[PowerVariableExpn[u, m + 1, x]]
 
 # Regel 71 nicht uebersetzt: predicate MatchQ

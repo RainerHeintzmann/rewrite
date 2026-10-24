@@ -178,5 +178,6 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_m,O_p), (neq(O_m,(-1)
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^ p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := -Subst[ Int[(c*ProductLog[a*x^(-n)])^ p/(x^(m + 2)*(d + d*ProductLog[a*x^(-n)])), x], x, 1/x] /; FreeQ[{a, c, d, p}, x] && NeQ[m, -1] && IntegerQ[m] && LtQ[n, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_p), (neq(O_m,(-1))), (integerq(O_m)), (((O_n < 0))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = (((-1))*(intsubst(((((((O_c)*(productlog(((O_a)*(((Xv)^((((-1))*(O_n))))))))))^(O_p)))*(((((Xv)^(((O_m)+(2)))))^((-1))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^((((-1))*(O_n))))))))))))^((-1))))),Xv,((Xv)^((-1))))))
 
-# Regel 44 nicht uebersetzt: function SubstFor
+# Regel 44 (1 Varianten):
 #   Int[u_, x_Symbol] := Subst[ Int[SimplifyIntegrand[(x + 1)*E^x*SubstFor[ProductLog[x], u, x], x], x], x, ProductLog[x]] /; FunctionOfQ[ProductLog[x], u, x]
+ADDSPEC RubiRules : IF (functionofq(productlog(Xv),P_u,Xv)) Int(P_u,Xv) = intsubst(simp(((((Xv)+(1)))*((eE^(Xv)))*(substfor(productlog(Xv),P_u,Xv))),Xv),Xv,productlog(Xv))

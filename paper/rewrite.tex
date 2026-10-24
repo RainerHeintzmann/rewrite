@@ -38,10 +38,10 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{1221}
-\newcommand{\psolved}{79.3\%}
-\newcommand{\nwrong}{3}
-\newcommand{\nfailed}{1}
+\newcommand{\nsolved}{1290}
+\newcommand{\psolved}{83.8\%}
+\newcommand{\nwrong}{2}
+\newcommand{\nfailed}{0}
 
 \title{\texttt{rewrite}: a programming language that learns its\\
        mathematics from rule files}
@@ -409,7 +409,14 @@ numerators. Rubi's last general rule, $\int u\,dx=\int
 every rational function term by term. A condition like
 \texttt{SumQ[ExpandIntegrand[u,x]]} needs its inner helper evaluated
 first; \texttt{rewrite} calculated conditions from the outside in, so the
-rule never applied until this was changed. Many results of Rubi need special functions; 27 of them,
+rule never applied until this was changed. Rubi's substitutions rest on
+\texttt{FunctionOfQ} and \texttt{SubstFor}, which decide whether the
+integrand is a function of, say, $\sin w$ and write it in a new variable,
+also through identities such as $\cos^2w=1-\sin^2w$; with these two C
+functions, 34 substitution rules for trigonometric and hyperbolic functions
+became translatable. The substitution $x\to F^{gx}$ for functions of
+exponentials is a C function that takes the place of Rubi's rule, which
+uses pattern tests the translator cannot express. Many results of Rubi need special functions; 27 of them,
 from the error function and the Fresnel and exponential integrals to the
 incomplete Gamma function, elliptic integrals in Carlson's
 form~\cite{carlson1995} and the hypergeometric function ${}_2F_1$, were
@@ -472,11 +479,11 @@ where \texttt{RubiCollect} combines like summands of the result and
 
 \subsection{Results}
 
-The translator converts 6748 of Rubi's 7422 rules (91\%), which become
-7160 \texttt{rewrite} rules after the expansion of function variables. The
+The translator converts 6810 of Rubi's 7422 rules (92\%), which become
+7301 \texttt{rewrite} rules after the expansion of function variables. The
 largest group of the remaining rules needs complex numbers (245 rules);
-others use Rubi's substitution machinery (\texttt{SubstFor},
-\texttt{FunctionOfQ}, \texttt{DerivativeDivides}), general pattern tests
+others use the rest of Rubi's substitution machinery
+(\texttt{DerivativeDivides}, \texttt{FunctionOfExponentialQ}), general pattern tests
 (\texttt{MatchQ}), function variables without a finite set of functions,
 or the generalized hypergeometric function. Loading all translated rules takes
 about half a second, and a typical integral a fraction of a second.
@@ -528,10 +535,10 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 294 & 19.1\% \\
-wrong result              & \nwrong  & 0.2\% \\
-crash or time-out         & \nfailed & 0.1\% \\
-not verifiable            & 20 & 1.3\% \\
+no antiderivative found   & 231 & 15.0\% \\
+wrong result              & \nwrong  & 0.1\% \\
+crash or time-out         & \nfailed & 0.0\% \\
+not verifiable            & 16 & 1.0\% \\
 \bottomrule
 \end{tabular}
 \caption{Results on the \ntested{} tested problems of four independent
@@ -545,12 +552,13 @@ matching of optional variables bound to their default, the special
 functions and the missing helpers, raised the share of verified results.
 During a first measurement, 41\% of the problems were solved, 55\% before
 the cosine unification, the hyperbolic fallback and the symbolic $e$, 62\%
-after them, and 79\% after partial fractions, the inside-out evaluation of
-nested helpers and the flat matching of products. The three
+after them, 79\% after partial fractions, the inside-out evaluation of
+nested helpers and the flat matching of products, and 84\% with Rubi's
+substitutions. The two
 results counted as wrong contain special functions evaluated outside their
-real domain (${}_2F_1$ at arguments $e^x>1$, the incomplete Gamma function
-of a negative argument), where the check compares different complex
-branches. A run takes about five minutes.
+real domain (${}_2F_1$ at an argument $e^{7x}/3>1$, the incomplete Gamma
+function of a negative argument), where the check compares different
+complex branches. A run takes about three minutes.
 
 The translation also served as a test of the library itself. It revealed
 two incorrect simplification rules in the standard algebra, which turned
@@ -598,7 +606,7 @@ the tests.
 
 Performance is adequate for interactive use. Loading the standard library
 and computing a derivative takes well below 0.1\,s on a current laptop;
-loading the 7160 integration rules about half a second. A scalar loop
+loading the 7301 integration rules about half a second. A scalar loop
 written in the language itself needs about 0.25\,$\mu$s per iteration
 (measured for $10^7$ iterations of \texttt{s = s + k*k}). We estimate this
 to be about two orders of magnitude slower than an equivalent compiled

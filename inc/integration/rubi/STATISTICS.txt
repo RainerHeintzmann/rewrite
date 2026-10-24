@@ -1,30 +1,30 @@
-translated 6748 of 7422 rules (91%) from 200 files
+translated 6810 of 7422 rules (92%) from 200 files
 
 reasons for rules that were not translated:
    245  symbol I
     41  predicate MatchQ
-    37  function SubstFor
-    28  function variable without a finite set of functions
     25  Module with a local variable without value
     24  function DerivativeDivides
     19  call of a non-symbol
     19  function HypergeometricPFQ
+    16  predicate FunctionOfExponentialQ
     14  function Cancel
-    12  predicate FunctionOfQ
     10  If
     10  ShowStep
      9  function Together
      9  function Complex in pattern
      8  function PolynomialDivide
      8  parse error: expected ']', got ';'
-     8  predicate FunctionOfExponentialQ
      8  function Integral
      7  symbol u
      7  predicate TrinomialMatchQ
      6  predicate FractionalPowerFactorQ
+     6  no instance of the function variable translatable
      6  function ExpandTrigToExp
+     6  function variable without a finite set of functions
      5  function Factor
      5  parse error at '['
+     5  predicate FalseQ
      5  predicate IGeQ
      4  predicate PerfectSquareQ
      4  function Mod
@@ -33,12 +33,9 @@ reasons for rules that were not translated:
      4  function Sum
      4  function NormalizePowerOfLinear
      4  predicate InertTrigFreeQ
-     4  no instance of the function variable translatable
      4  function ExpandExpression
      3  predicate AtomQ
      3  function Sign
-     3  function FullSimplify
-     3  symbol True
      3  predicate ComplexFreeQ
      3  unknown character "'"
      2  function CannotIntegrate
@@ -53,6 +50,7 @@ reasons for rules that were not translated:
      2  function PolyGCD
      2  function Root
      2  function Apart
+     2  predicate TryPureTanSubst
      2  EqQ with 1 arguments (never true in Rubi either)
      1  predicate ILeQ
      1  function FractionalPart
@@ -61,11 +59,9 @@ reasons for rules that were not translated:
      1  predicate MonomialQ
      1  condition is never true
      1  function FunctionExpand
-     1  Function
      1  function NormalizeIntegrand
      1  function Exponent
      1  predicate IntegralFreeQ
-     1  predicate FalseQ
      1  function TrigSimplify
      1  Block
      1  parse error: expected ')', got '!'
@@ -123,20 +119,20 @@ per file (translated / total):
    3 /    3  r1_2_1_8     1.2.1.8 P(x) (d+e x)^m (f+g x)^n (a+b x+c x^2)^p
   32 /   33  r1_2_1_7     1.2.1.7 P(x) (d+e x)^m (a+b x+c x^2)^p
    4 /    5  r1_2_1_6     1.2.1.6 P(x) (a+b x+c x^2)^p
-   7 /    9  r1_2_2_6     1.2.2.6 P(x) (d x)^m (a+b x^2+c x^4)^p
+   8 /    9  r1_2_2_6     1.2.2.6 P(x) (d x)^m (a+b x^2+c x^4)^p
    8 /   10  r1_2_2_5     1.2.2.5 P(x) (a+b x^2+c x^4)^p
   35 /   43  r1_2_2_7     1.2.2.7 P(x) (d+e x^2)^q (a+b x^2+c x^4)^p
   21 /   21  r1_2_2_8     1.2.2.8 P(x) (d+e x)^q (a+b x^2+c x^4)^p
-  22 /   29  r1_2_3_6     1.2.3.6 P(x) (d x)^m (a+b x^n+c x^(2 n))^p
-  19 /   25  r1_2_3_5     1.2.3.5 P(x) (a+b x^n+c x^(2 n))^p
-   9 /   10  r1_1_2_11    1.1.2.11 P(x) (c x)^m (a+b x^2)^p
+  26 /   29  r1_2_3_6     1.2.3.6 P(x) (d x)^m (a+b x^n+c x^(2 n))^p
+  20 /   25  r1_2_3_5     1.2.3.5 P(x) (a+b x^n+c x^(2 n))^p
+  10 /   10  r1_1_2_11    1.1.2.11 P(x) (c x)^m (a+b x^2)^p
    5 /    6  r1_1_2_10    1.1.2.10 P(x) (a+b x^2)^p
    3 /    3  r1_1_2_14    1.1.2.14 P(x) (c+d x)^m (e+f x)^n (a+b x^2)^p
    6 /    6  r1_1_2_13    1.1.2.13 P(x) (e x)^m (c+d x)^n (a+b x^2)^p
   15 /   16  r1_1_2_12    1.1.2.12 P(x) (c+d x)^n (a+b x^2)^p
-  25 /   34  r1_1_3_8     1.1.3.8 P(x) (c x)^m (a+b x^n)^p
-  45 /   52  r1_1_3_7     1.1.3.7 P(x) (a+b x^n)^p
-   6 /   11  r1_1_4_4     1.1.4.4 P(x) (c x)^m (a x^j+b x^n)^p
+  29 /   34  r1_1_3_8     1.1.3.8 P(x) (c x)^m (a+b x^n)^p
+  46 /   52  r1_1_3_7     1.1.3.7 P(x) (a+b x^n)^p
+   9 /   11  r1_1_4_4     1.1.4.4 P(x) (c x)^m (a x^j+b x^n)^p
    9 /   20  r1_3_3       1.3.3 P(x)^p
   20 /   20  r1_3_1       1.3.1 u (a+b x+c x^2+d x^3)^p
   16 /   18  r1_3_2       1.3.2 u (a+b x+c x^2+d x^3+e x^4)^p
@@ -145,13 +141,13 @@ per file (translated / total):
   19 /   19  r9_2         9.2 Piecewise linear functions
   12 /   14  r2_1         2.1 (c+d x)^m (a+b (F^(g (e+f x)))^n)^p
    4 /    4  r2_2         2.2 (c+d x)^m (F^(g (e+f x)))^n (a+b (F^(g (e+f x)))^n)^p
-  93 /  107  r2_3         2.3 Miscellaneous exponentials
+  97 /  107  r2_3         2.3 Miscellaneous exponentials
    6 /    6  r3_1_1       3.1.1 (a+b log(c x^n))^p
   12 /   12  r3_1_2       3.1.2 (d x)^m (a+b log(c x^n))^p
   21 /   21  r3_1_3       3.1.3 (d+e x^r)^q (a+b log(c x^n))^p
   29 /   29  r3_1_4       3.1.4 (f x)^m (d+e x^r)^q (a+b log(c x^n))^p
-  58 /   59  r3_1_5       3.1.5 u (a+b log(c x^n))^p
-  57 /   61  r3_3         3.3 u (a+b log(c (d+e x)^n))^p
+  59 /   59  r3_1_5       3.1.5 u (a+b log(c x^n))^p
+  59 /   61  r3_3         3.3 u (a+b log(c (d+e x)^n))^p
   38 /   39  r3_4         3.4 u (a+b log(c (d+e x^m)^n))^p
   24 /   24  r3_2_1       3.2.1 (f+g x)^m (A+B log(e ((a+b x) over (c+d x))^n))^p
   19 /   19  r3_2_2       3.2.2 (f+g x)^m (h+i x)^q (A+B log(e ((a+b x) over (c+d x))^n))^p
@@ -208,7 +204,7 @@ per file (translated / total):
   19 /   19  r4_7_2       4.7.2 Tangent normalization rules
   24 /   24  r4_7_3       4.7.3 Secant normalization rules
   50 /   50  r4_7_4       4.7.4 (c trig)^m (d trig)^n
-  13 /   66  r4_7_5       4.7.5 Inert trig functions
+  51 /   66  r4_7_5       4.7.5 Inert trig functions
   27 /   28  r4_7_6       4.7.6 (c+d x)^m trig(a+b x)^n trig(a+b x)^p
   32 /   46  r4_7_7       4.7.7 F^(c (a+b x)) trig(d+e x)^n
   28 /   48  r4_7_8       4.7.8 u trig(a+b log(c x^n))^p
@@ -270,7 +266,7 @@ per file (translated / total):
   20 /   24  r8_6         8.6 Gamma functions
    5 /    5  r8_7         8.7 Zeta function
   24 /   26  r8_8         8.8 Polylogarithm function
-  43 /   44  r8_9         8.9 Product logarithm function
+  44 /   44  r8_9         8.9 Product logarithm function
    2 /    3  r8_10        8.10 Bessel functions
    0 /   21  r9_1         9.1 Derivative integration rules
-  23 /   67  r9_3         9.3 Miscellaneous integration rules
+  24 /   67  r9_3         9.3 Miscellaneous integration rules

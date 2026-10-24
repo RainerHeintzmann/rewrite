@@ -34,131 +34,189 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p), (not(integerq(O_n))), (n
 
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p), (not(integerq(O_n))), (not(integerq(P_p))) Int(((O_a)*(((O_b)*(csc((O_c)+((O_d)*(Xv)))))^(P_p)))^(O_n),Xv) = ((((O_a)^(intpart(O_n))))*(((((O_a)*(((((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))^(P_p)))))^(fracpart(O_n))))*(((((((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))^(((P_p)*(fracpart(O_n))))))^((-1))))*(Int(((((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))^(((O_n)*(P_p)))),Xv)))
 
-# Regel 3 nicht uebersetzt: function variable without a finite set of functions
+# Regel 3 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Sin[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Sin[c*(a + b*x)]/d, u, x], x], x, Sin[c*(a + b*x)]/d] /; FunctionOfQ[Sin[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && (EqQ[F, Cos] || EqQ[F, cos])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*(cos((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 4 nicht uebersetzt: function variable without a finite set of functions
+# Regel 4 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Cos[c*(a + b*x)], x]}, -d/(b*c)* Subst[Int[SubstFor[1, Cos[c*(a + b*x)]/d, u, x], x], x, Cos[c*(a + b*x)]/d] /; FunctionOfQ[Cos[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && (EqQ[F, Sin] || EqQ[F, sin])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*(sin((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = (((-1))*(freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 5 nicht uebersetzt: function SubstFor
+# Regel 5 (54 Varianten):
 #   Int[u_*Cosh[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Sinh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Sinh[c*(a + b*x)]/d, u, x], x], x, Sinh[c*(a + b*x)]/d] /; FunctionOfQ[Sinh[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*(cosh((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 6 nicht uebersetzt: function SubstFor
+# Regel 6 (54 Varianten):
 #   Int[u_*Sinh[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Cosh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Cosh[c*(a + b*x)]/d, u, x], x], x, Cosh[c*(a + b*x)]/d] /; FunctionOfQ[Cosh[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*(sinh((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 7 nicht uebersetzt: function variable without a finite set of functions
+# Regel 7 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Sin[c*(a + b*x)], x]}, 1/(b*c)* Subst[Int[SubstFor[1/x, Sin[c*(a + b*x)]/d, u, x], x], x, Sin[c*(a + b*x)]/d] /; FunctionOfQ[Sin[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && (EqQ[F, Cot] || EqQ[F, cot])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*(cot((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((Xv)^((-1))),((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 8 nicht uebersetzt: function variable without a finite set of functions
+# Regel 8 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Cos[c*(a + b*x)], x]}, -1/(b*c)* Subst[Int[SubstFor[1/x, Cos[c*(a + b*x)]/d, u, x], x], x, Cos[c*(a + b*x)]/d] /; FunctionOfQ[Cos[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && (EqQ[F, Tan] || EqQ[F, tan])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*(tan((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = (((-1))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((Xv)^((-1))),((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 9 nicht uebersetzt: function SubstFor
+# Regel 9 (54 Varianten):
 #   Int[u_*Coth[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Sinh[c*(a + b*x)], x]}, 1/(b*c)* Subst[Int[SubstFor[1/x, Sinh[c*(a + b*x)]/d, u, x], x], x, Sinh[c*(a + b*x)]/d] /; FunctionOfQ[Sinh[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*(coth((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((Xv)^((-1))),((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 10 nicht uebersetzt: function SubstFor
+# Regel 10 (54 Varianten):
 #   Int[u_*Tanh[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Cosh[c*(a + b*x)], x]}, 1/(b*c)* Subst[Int[SubstFor[1/x, Cosh[c*(a + b*x)]/d, u, x], x], x, Cosh[c*(a + b*x)]/d] /; FunctionOfQ[Cosh[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*(tanh((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((Xv)^((-1))),((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 11 nicht uebersetzt: function variable without a finite set of functions
+# Regel 11 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^2, x_Symbol] := With[{d = FreeFactors[Tan[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Tan[c*(a + b*x)]/d, u, x], x], x, Tan[c*(a + b*x)]/d] /; FunctionOfQ[Tan[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && NonsumQ[u] && (EqQ[F, Sec] || EqQ[F, sec])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (nonsumq(P_u)), (functionofq(((tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*((sec((O_c)*((O_a)+((O_b)*(Xv)))))^(2)),Xv) = ((freefactors(tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 12 nicht uebersetzt: function SubstFor
+# Regel 12 (54 Varianten):
 #   Int[u_/cos[c_.*(a_. + b_.*x_)]^2, x_Symbol] := With[{d = FreeFactors[Tan[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Tan[c*(a + b*x)]/d, u, x], x], x, Tan[c*(a + b*x)]/d] /; FunctionOfQ[Tan[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && NonsumQ[u]
+ADDSPEC RubiRules : IF (K_1 == (-2)), NIN(Xv,O_a,O_b,O_c), (nonsumq(P_u)), (functionofq(((tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*((cos((O_c)*((O_a)+((O_b)*(Xv)))))^(K_1)),Xv) = ((freefactors(tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tan(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 13 nicht uebersetzt: function variable without a finite set of functions
+# Regel 13 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^2, x_Symbol] := With[{d = FreeFactors[Cot[c*(a + b*x)], x]}, -d/(b*c)* Subst[Int[SubstFor[1, Cot[c*(a + b*x)]/d, u, x], x], x, Cot[c*(a + b*x)]/d] /; FunctionOfQ[Cot[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && NonsumQ[u] && (EqQ[F, Csc] || EqQ[F, csc])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (nonsumq(P_u)), (functionofq(((cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*((csc((O_c)*((O_a)+((O_b)*(Xv)))))^(2)),Xv) = (((-1))*(freefactors(cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 14 nicht uebersetzt: function SubstFor
+# Regel 14 (54 Varianten):
 #   Int[u_/sin[c_.*(a_. + b_.*x_)]^2, x_Symbol] := With[{d = FreeFactors[Cot[c*(a + b*x)], x]}, -d/(b*c)* Subst[Int[SubstFor[1, Cot[c*(a + b*x)]/d, u, x], x], x, Cot[c*(a + b*x)]/d] /; FunctionOfQ[Cot[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && NonsumQ[u]
+ADDSPEC RubiRules : IF (K_1 == (-2)), NIN(Xv,O_a,O_b,O_c), (nonsumq(P_u)), (functionofq(((cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*((sin((O_c)*((O_a)+((O_b)*(Xv)))))^(K_1)),Xv) = (((-1))*(freefactors(cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cot(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 15 nicht uebersetzt: function SubstFor
+# Regel 15 (54 Varianten):
 #   Int[u_*Sech[c_.*(a_. + b_.*x_)]^2, x_Symbol] := With[{d = FreeFactors[Tanh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Tanh[c*(a + b*x)]/d, u, x], x], x, Tanh[c*(a + b*x)]/d] /; FunctionOfQ[Tanh[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && NonsumQ[u]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (nonsumq(P_u)), (functionofq(((tanh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tanh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*((sech((O_c)*((O_a)+((O_b)*(Xv)))))^(2)),Xv) = ((freefactors(tanh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((tanh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tanh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((tanh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(tanh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 16 nicht uebersetzt: function SubstFor
+# Regel 16 (54 Varianten):
 #   Int[u_*Csch[c_.*(a_. + b_.*x_)]^2, x_Symbol] := With[{d = FreeFactors[Coth[c*(a + b*x)], x]}, -d/(b*c)* Subst[Int[SubstFor[1, Coth[c*(a + b*x)]/d, u, x], x], x, Coth[c*(a + b*x)]/d] /; FunctionOfQ[Coth[c*(a + b*x)]/d, u, x, True]] /; FreeQ[{a, b, c}, x] && NonsumQ[u]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (nonsumq(P_u)), (functionofq(((coth(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(coth(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv,1)) Int((P_u)*((csch((O_c)*((O_a)+((O_b)*(Xv)))))^(2)),Xv) = (((-1))*(freefactors(coth(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((coth(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(coth(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((coth(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(coth(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 17 nicht uebersetzt: function variable without a finite set of functions
+# Regel 17 nicht uebersetzt: no instance of the function variable translatable
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^n_., x_Symbol] := With[{d = FreeFactors[Tan[c*(a + b*x)], x]}, 1/(b*c*d^(n - 1))* Subst[Int[ SubstFor[1/(x^n*(1 + d^2*x^2)), Tan[c*(a + b*x)]/d, u, x], x], x, Tan[c*(a + b*x)]/d] /; FunctionOfQ[Tan[c*(a + b*x)]/d, u, x, True] && TryPureTanSubst[ActivateTrig[u]*Cot[c*(a + b*x)]^n, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[n] && (EqQ[F, Cot] || EqQ[F, cot])
 
-# Regel 18 nicht uebersetzt: function variable without a finite set of functions
+# Regel 18 nicht uebersetzt: no instance of the function variable translatable
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^n_., x_Symbol] := With[{d = FreeFactors[Cot[c*(a + b*x)], x]}, -1/(b*c*d^(n - 1))* Subst[Int[ SubstFor[1/(x^n*(1 + d^2*x^2)), Cot[c*(a + b*x)]/d, u, x], x], x, Cot[c*(a + b*x)]/d] /; FunctionOfQ[Cot[c*(a + b*x)]/d, u, x, True] && TryPureTanSubst[ActivateTrig[u]*Tan[c*(a + b*x)]^n, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[n] && (EqQ[F, Tan] || EqQ[F, tan])
 
-# Regel 19 nicht uebersetzt: function SubstFor
+# Regel 19 nicht uebersetzt: predicate TryPureTanSubst
 #   Int[u_*Coth[c_.*(a_. + b_.*x_)]^n_., x_Symbol] := With[{d = FreeFactors[Tanh[c*(a + b*x)], x]}, 1/(b*c*d^(n - 1))* Subst[Int[ SubstFor[1/(x^n*(1 - d^2*x^2)), Tanh[c*(a + b*x)]/d, u, x], x], x, Tanh[c*(a + b*x)]/d] /; FunctionOfQ[Tanh[c*(a + b*x)]/d, u, x, True] && TryPureTanSubst[ActivateTrig[u]*Coth[c*(a + b*x)]^n, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[n]
 
-# Regel 20 nicht uebersetzt: function SubstFor
+# Regel 20 nicht uebersetzt: predicate TryPureTanSubst
 #   Int[u_*Tanh[c_.*(a_. + b_.*x_)]^n_., x_Symbol] := With[{d = FreeFactors[Coth[c*(a + b*x)], x]}, 1/(b*c*d^(n - 1))* Subst[Int[ SubstFor[1/(x^n*(1 - d^2*x^2)), Coth[c*(a + b*x)]/d, u, x], x], x, Coth[c*(a + b*x)]/d] /; FunctionOfQ[Coth[c*(a + b*x)]/d, u, x, True] && TryPureTanSubst[ActivateTrig[u]*Tanh[c*(a + b*x)]^n, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[n]
 
-# Regel 21 nicht uebersetzt: function variable without a finite set of functions
+# Regel 21 (648 Varianten):
 #   Int[F_[a_. + b_.*x_]^p_.*G_[c_. + d_.*x_]^q_., x_Symbol] := Int[ExpandTrigReduce[ActivateTrig[F[a + b*x]^p*G[c + d*x]^q], x], x] /; FreeQ[{a, b, c, d}, x] && (EqQ[F, sin] || EqQ[F, cos]) && (EqQ[G, sin] || EqQ[G, cos]) && IGtQ[p, 0] && IGtQ[q, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_p,0)), (igtq(O_q,0)) Int(((sin((O_a)+((O_b)*(Xv))))^(O_p))*((sin((O_c)+((O_d)*(Xv))))^(O_q)),Xv) = Int(expandtrigreduce(((((sin(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((sin(((O_c)+(((O_d)*(Xv))))))^(O_q)))),Xv),Xv)
 
-# Regel 22 nicht uebersetzt: function variable without a finite set of functions
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_p,0)), (igtq(O_q,0)) Int(((sin((O_a)+((O_b)*(Xv))))^(O_p))*((cos((O_c)+((O_d)*(Xv))))^(O_q)),Xv) = Int(expandtrigreduce(((((sin(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cos(((O_c)+(((O_d)*(Xv))))))^(O_q)))),Xv),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_p,0)), (igtq(O_q,0)) Int(((cos((O_a)+((O_b)*(Xv))))^(O_p))*((sin((O_c)+((O_d)*(Xv))))^(O_q)),Xv) = Int(expandtrigreduce(((((cos(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((sin(((O_c)+(((O_d)*(Xv))))))^(O_q)))),Xv),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_p,0)), (igtq(O_q,0)) Int(((cos((O_a)+((O_b)*(Xv))))^(O_p))*((cos((O_c)+((O_d)*(Xv))))^(O_q)),Xv) = Int(expandtrigreduce(((((cos(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cos(((O_c)+(((O_d)*(Xv))))))^(O_q)))),Xv),Xv)
+
+# Regel 22 (23328 Varianten):
 #   Int[F_[a_. + b_.*x_]^p_.*G_[c_. + d_.*x_]^q_.*H_[e_. + f_.*x_]^r_., x_Symbol] := Int[ExpandTrigReduce[ ActivateTrig[F[a + b*x]^p*G[c + d*x]^q*H[e + f*x]^r], x], x] /; FreeQ[{a, b, c, d, e, f}, x] && (EqQ[F, sin] || EqQ[F, cos]) && (EqQ[G, sin] || EqQ[G, cos]) && (EqQ[H, sin] || EqQ[H, cos]) && IGtQ[p, 0] && IGtQ[q, 0] && IGtQ[r, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (igtq(O_r,0)) Int(((sin((O_a)+((O_b)*(Xv))))^(O_p))*((sin((O_c)+((O_d)*(Xv))))^(O_q))*((sin((O_e)+((O_f)*(Xv))))^(O_r)),Xv) = Int(expandtrigreduce(((((sin(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((sin(((O_c)+(((O_d)*(Xv))))))^(O_q)))*(((sin(((O_e)+(((O_f)*(Xv))))))^(O_r)))),Xv),Xv)
 
-# Regel 23 nicht uebersetzt: function variable without a finite set of functions
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (igtq(O_r,0)) Int(((sin((O_a)+((O_b)*(Xv))))^(O_p))*((sin((O_c)+((O_d)*(Xv))))^(O_q))*((cos((O_e)+((O_f)*(Xv))))^(O_r)),Xv) = Int(expandtrigreduce(((((sin(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((sin(((O_c)+(((O_d)*(Xv))))))^(O_q)))*(((cos(((O_e)+(((O_f)*(Xv))))))^(O_r)))),Xv),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (igtq(O_r,0)) Int(((sin((O_a)+((O_b)*(Xv))))^(O_p))*((cos((O_c)+((O_d)*(Xv))))^(O_q))*((sin((O_e)+((O_f)*(Xv))))^(O_r)),Xv) = Int(expandtrigreduce(((((sin(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cos(((O_c)+(((O_d)*(Xv))))))^(O_q)))*(((sin(((O_e)+(((O_f)*(Xv))))))^(O_r)))),Xv),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (igtq(O_r,0)) Int(((sin((O_a)+((O_b)*(Xv))))^(O_p))*((cos((O_c)+((O_d)*(Xv))))^(O_q))*((cos((O_e)+((O_f)*(Xv))))^(O_r)),Xv) = Int(expandtrigreduce(((((sin(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cos(((O_c)+(((O_d)*(Xv))))))^(O_q)))*(((cos(((O_e)+(((O_f)*(Xv))))))^(O_r)))),Xv),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (igtq(O_r,0)) Int(((cos((O_a)+((O_b)*(Xv))))^(O_p))*((sin((O_c)+((O_d)*(Xv))))^(O_q))*((sin((O_e)+((O_f)*(Xv))))^(O_r)),Xv) = Int(expandtrigreduce(((((cos(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((sin(((O_c)+(((O_d)*(Xv))))))^(O_q)))*(((sin(((O_e)+(((O_f)*(Xv))))))^(O_r)))),Xv),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (igtq(O_r,0)) Int(((cos((O_a)+((O_b)*(Xv))))^(O_p))*((sin((O_c)+((O_d)*(Xv))))^(O_q))*((cos((O_e)+((O_f)*(Xv))))^(O_r)),Xv) = Int(expandtrigreduce(((((cos(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((sin(((O_c)+(((O_d)*(Xv))))))^(O_q)))*(((cos(((O_e)+(((O_f)*(Xv))))))^(O_r)))),Xv),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (igtq(O_r,0)) Int(((cos((O_a)+((O_b)*(Xv))))^(O_p))*((cos((O_c)+((O_d)*(Xv))))^(O_q))*((sin((O_e)+((O_f)*(Xv))))^(O_r)),Xv) = Int(expandtrigreduce(((((cos(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cos(((O_c)+(((O_d)*(Xv))))))^(O_q)))*(((sin(((O_e)+(((O_f)*(Xv))))))^(O_r)))),Xv),Xv)
+
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_p,0)), (igtq(O_q,0)), (igtq(O_r,0)) Int(((cos((O_a)+((O_b)*(Xv))))^(O_p))*((cos((O_c)+((O_d)*(Xv))))^(O_q))*((cos((O_e)+((O_f)*(Xv))))^(O_r)),Xv) = Int(expandtrigreduce(((((cos(((O_a)+(((O_b)*(Xv))))))^(O_p)))*(((cos(((O_c)+(((O_d)*(Xv))))))^(O_q)))*(((cos(((O_e)+(((O_f)*(Xv))))))^(O_r)))),Xv),Xv)
+
+# Regel 23 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Sin[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Sin[c*(a + b*x)]/d, u, x], x], x, Sin[c*(a + b*x)]/d] /; FunctionOfQ[Sin[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && (EqQ[F, Cos] || EqQ[F, cos])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*(cos((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 24 nicht uebersetzt: function variable without a finite set of functions
+# Regel 24 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Cos[c*(a + b*x)], x]}, -d/(b*c)* Subst[Int[SubstFor[1, Cos[c*(a + b*x)]/d, u, x], x], x, Cos[c*(a + b*x)]/d] /; FunctionOfQ[Cos[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && (EqQ[F, Sin] || EqQ[F, sin])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*(sin((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = (((-1))*(freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 25 nicht uebersetzt: function SubstFor
+# Regel 25 (54 Varianten):
 #   Int[u_*Cosh[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Sinh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Sinh[c*(a + b*x)]/d, u, x], x], x, Sinh[c*(a + b*x)]/d] /; FunctionOfQ[Sinh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*(cosh((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 26 nicht uebersetzt: function SubstFor
+# Regel 26 (54 Varianten):
 #   Int[u_*Sinh[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Cosh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[SubstFor[1, Cosh[c*(a + b*x)]/d, u, x], x], x, Cosh[c*(a + b*x)]/d] /; FunctionOfQ[Cosh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*(sinh((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(1,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 27 nicht uebersetzt: function variable without a finite set of functions
+# Regel 27 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Sin[c*(a + b*x)], x]}, 1/(b*c)* Subst[Int[SubstFor[1/x, Sin[c*(a + b*x)]/d, u, x], x], x, Sin[c*(a + b*x)]/d] /; FunctionOfQ[Sin[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && (EqQ[F, Cot] || EqQ[F, cot])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*(cot((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((Xv)^((-1))),((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 28 nicht uebersetzt: function variable without a finite set of functions
+# Regel 28 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Cos[c*(a + b*x)], x]}, -1/(b*c)* Subst[Int[SubstFor[1/x, Cos[c*(a + b*x)]/d, u, x], x], x, Cos[c*(a + b*x)]/d] /; FunctionOfQ[Cos[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && (EqQ[F, Tan] || EqQ[F, tan])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*(tan((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = (((-1))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((Xv)^((-1))),((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 29 nicht uebersetzt: function SubstFor
+# Regel 29 (54 Varianten):
 #   Int[u_*Coth[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Sinh[c*(a + b*x)], x]}, 1/(b*c)* Subst[Int[SubstFor[1/x, Sinh[c*(a + b*x)]/d, u, x], x], x, Sinh[c*(a + b*x)]/d] /; FunctionOfQ[Sinh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*(coth((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((Xv)^((-1))),((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 30 nicht uebersetzt: function SubstFor
+# Regel 30 (54 Varianten):
 #   Int[u_*Tanh[c_.*(a_. + b_.*x_)], x_Symbol] := With[{d = FreeFactors[Cosh[c*(a + b*x)], x]}, 1/(b*c)* Subst[Int[SubstFor[1/x, Cosh[c*(a + b*x)]/d, u, x], x], x, Cosh[c*(a + b*x)]/d] /; FunctionOfQ[Cosh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (functionofq(((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*(tanh((O_c)*((O_a)+((O_b)*(Xv))))),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((Xv)^((-1))),((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 31 nicht uebersetzt: function variable without a finite set of functions
+# Regel 31 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Sin[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[ SubstFor[(1 - d^2*x^2)^((n - 1)/2), Sin[c*(a + b*x)]/d, u, x], x], x, Sin[c*(a + b*x)]/d] /; FunctionOfQ[Sin[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u] && (EqQ[F, Cos] || EqQ[F, cos])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((cos((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((((1)+((((-1))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))),((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 32 nicht uebersetzt: function variable without a finite set of functions
+# Regel 32 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Sin[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[ SubstFor[(1 - d^2*x^2)^((-n - 1)/2), Sin[c*(a + b*x)]/d, u, x], x], x, Sin[c*(a + b*x)]/d] /; FunctionOfQ[Sin[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u] && (EqQ[F, Sec] || EqQ[F, sec])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((sec((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((((1)+((((-1))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^((((((((-1))*(P_n)))+((-1))))*((1/2))))),((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 33 nicht uebersetzt: function variable without a finite set of functions
+# Regel 33 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Cos[c*(a + b*x)], x]}, -d/(b*c)* Subst[Int[ SubstFor[(1 - d^2*x^2)^((n - 1)/2), Cos[c*(a + b*x)]/d, u, x], x], x, Cos[c*(a + b*x)]/d] /; FunctionOfQ[Cos[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u] && (EqQ[F, Sin] || EqQ[F, sin])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((sin((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = (((-1))*(freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((((1)+((((-1))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))),((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 34 nicht uebersetzt: function variable without a finite set of functions
+# Regel 34 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Cos[c*(a + b*x)], x]}, -d/(b*c)* Subst[Int[ SubstFor[(1 - d^2*x^2)^((-n - 1)/2), Cos[c*(a + b*x)]/d, u, x], x], x, Cos[c*(a + b*x)]/d] /; FunctionOfQ[Cos[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u] && (EqQ[F, Csc] || EqQ[F, csc])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((csc((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = (((-1))*(freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((((1)+((((-1))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^((((((((-1))*(P_n)))+((-1))))*((1/2))))),((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 35 nicht uebersetzt: function SubstFor
+# Regel 35 (54 Varianten):
 #   Int[u_*Cosh[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Sinh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[ SubstFor[(1 + d^2*x^2)^((n - 1)/2), Sinh[c*(a + b*x)]/d, u, x], x], x, Sinh[c*(a + b*x)]/d] /; FunctionOfQ[Sinh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((cosh((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((((1)+(((((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))),((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 36 nicht uebersetzt: function SubstFor
+# Regel 36 (54 Varianten):
 #   Int[u_*Sech[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Sinh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[ SubstFor[(1 + d^2*x^2)^((-n - 1)/2), Sinh[c*(a + b*x)]/d, u, x], x], x, Sinh[c*(a + b*x)]/d] /; FunctionOfQ[Sinh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((sech((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor(((((1)+(((((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^((((((((-1))*(P_n)))+((-1))))*((1/2))))),((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 37 nicht uebersetzt: function SubstFor
+# Regel 37 (54 Varianten):
 #   Int[u_*Sinh[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Cosh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[ SubstFor[(-1 + d^2*x^2)^((n - 1)/2), Cosh[c*(a + b*x)]/d, u, x], x], x, Cosh[c*(a + b*x)]/d] /; FunctionOfQ[Cosh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((sinh((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor((((((-1))+(((((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))),((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 38 nicht uebersetzt: function SubstFor
+# Regel 38 (54 Varianten):
 #   Int[u_*Csch[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Cosh[c*(a + b*x)], x]}, d/(b*c)* Subst[Int[ SubstFor[(-1 + d^2*x^2)^((-n - 1)/2), Cosh[c*(a + b*x)]/d, u, x], x], x, Cosh[c*(a + b*x)]/d] /; FunctionOfQ[Cosh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((csch((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))*(((O_b)^((-1))))*(((O_c)^((-1))))*(intsubst(substfor((((((-1))+(((((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^((((((((-1))*(P_n)))+((-1))))*((1/2))))),((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 39 nicht uebersetzt: function variable without a finite set of functions
+# Regel 39 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Sin[c*(a + b*x)], x]}, 1/(b*c*d^(n - 1))* Subst[Int[ SubstFor[(1 - d^2*x^2)^((n - 1)/2)/x^n, Sin[c*(a + b*x)]/d, u, x], x], x, Sin[c*(a + b*x)]/d] /; FunctionOfQ[Sin[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u] && (EqQ[F, Cot] || EqQ[F, cot])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((cot((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(((((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(((P_n)+((-1))))))^((-1))))*(intsubst(substfor(((((((1)+((((-1))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))))*(((((Xv)^(P_n)))^((-1))))),((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 40 nicht uebersetzt: function variable without a finite set of functions
+# Regel 40 (54 Varianten):
 #   Int[u_*F_[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Cos[c*(a + b*x)], x]}, -1/(b*c*d^(n - 1))* Subst[Int[ SubstFor[(1 - d^2*x^2)^((n - 1)/2)/x^n, Cos[c*(a + b*x)]/d, u, x], x], x, Cos[c*(a + b*x)]/d] /; FunctionOfQ[Cos[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u] && (EqQ[F, Tan] || EqQ[F, tan])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((tan((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = (((-1))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(((P_n)+((-1))))))^((-1))))*(intsubst(substfor(((((((1)+((((-1))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))))*(((((Xv)^(P_n)))^((-1))))),((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 41 nicht uebersetzt: function SubstFor
+# Regel 41 (54 Varianten):
 #   Int[u_*Coth[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Sinh[c*(a + b*x)], x]}, 1/(b*c*d^(n - 1))* Subst[Int[ SubstFor[(1 + d^2*x^2)^((n - 1)/2)/x^n, Sinh[c*(a + b*x)]/d, u, x], x], x, Sinh[c*(a + b*x)]/d] /; FunctionOfQ[Sinh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((coth((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(((((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(((P_n)+((-1))))))^((-1))))*(intsubst(substfor(((((((1)+(((((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))))*(((((Xv)^(P_n)))^((-1))))),((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sinh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 42 nicht uebersetzt: function SubstFor
+# Regel 42 (54 Varianten):
 #   Int[u_*Tanh[c_.*(a_. + b_.*x_)]^n_, x_Symbol] := With[{d = FreeFactors[Cosh[c*(a + b*x)], x]}, 1/(b*c*d^(n - 1))* Subst[Int[ SubstFor[(-1 + d^2*x^2)^((n - 1)/2)/x^n, Cosh[c*(a + b*x)]/d, u, x], x], x, Cosh[c*(a + b*x)]/d] /; FunctionOfQ[Cosh[c*(a + b*x)]/d, u, x]] /; FreeQ[{a, b, c}, x] && IntegerQ[(n - 1)/2] && NonsumQ[u]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (integerq(((((P_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((tanh((O_c)*((O_a)+((O_b)*(Xv)))))^(P_n)),Xv) = ((((O_b)^((-1))))*(((O_c)^((-1))))*(((((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(((P_n)+((-1))))))^((-1))))*(intsubst(substfor((((((((-1))+(((((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))))*(((((Xv)^(P_n)))^((-1))))),((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv),Xv,((cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cosh(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))))))
 
-# Regel 43 nicht uebersetzt: function variable without a finite set of functions
+# Regel 43 (648 Varianten):
 #   Int[u_*(v_ + d_.*F_[c_.*(a_. + b_.*x_)]^n_.), x_Symbol] := With[{e = FreeFactors[Sin[c*(a + b*x)], x]}, Int[ActivateTrig[u*v], x] + d*Int[ActivateTrig[u]*Cos[c*(a + b*x)]^n, x] /; FunctionOfQ[Sin[c*(a + b*x)]/e, u, x]] /; FreeQ[{a, b, c, d}, x] && Not[FreeQ[v, x]] && IntegerQ[(n - 1)/2] && NonsumQ[u] && (EqQ[F, Cos] || EqQ[F, cos])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (not((freeq(P_v,Xv)))), (integerq(((((O_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((P_v)+((O_d)*((cos((O_c)*((O_a)+((O_b)*(Xv)))))^(O_n)))),Xv) = ((Int(((P_u)*(P_v)),Xv))+(((O_d)*(Int(((P_u)*(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))^(O_n)))),Xv)))))
 
-# Regel 44 nicht uebersetzt: function variable without a finite set of functions
+# Regel 44 (648 Varianten):
 #   Int[u_*(v_ + d_.*F_[c_.*(a_. + b_.*x_)]^n_.), x_Symbol] := With[{e = FreeFactors[Cos[c*(a + b*x)], x]}, Int[ActivateTrig[u*v], x] + d*Int[ActivateTrig[u]*Sin[c*(a + b*x)]^n, x] /; FunctionOfQ[Cos[c*(a + b*x)]/e, u, x]] /; FreeQ[{a, b, c, d}, x] && Not[FreeQ[v, x]] && IntegerQ[(n - 1)/2] && NonsumQ[u] && (EqQ[F, Sin] || EqQ[F, sin])
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (not((freeq(P_v,Xv)))), (integerq(((((O_n)+((-1))))*((1/2))))), (nonsumq(P_u)), (functionofq(((cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))))*(((freefactors(cos(((O_c)*(((O_a)+(((O_b)*(Xv))))))),Xv))^((-1))))),P_u,Xv)) Int((P_u)*((P_v)+((O_d)*((sin((O_c)*((O_a)+((O_b)*(Xv)))))^(O_n)))),Xv) = ((Int(((P_u)*(P_v)),Xv))+(((O_d)*(Int(((P_u)*(((sin(((O_c)*(((O_a)+(((O_b)*(Xv))))))))^(O_n)))),Xv)))))
 
 # Regel 45 (26244 Varianten):
 #   Int[u_.*(a_. + b_.*cos[d_. + e_.*x_]^2 + c_.*sin[d_. + e_.*x_]^2)^p_., x_Symbol] := (a + c)^p*Int[ActivateTrig[u], x] /; FreeQ[{a, b, c, d, e, p}, x] && EqQ[b - c, 0]

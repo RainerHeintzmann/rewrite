@@ -20,6 +20,7 @@ FUNC polyq     : real,real >> bool        ATT polyq      # Polynom in x
 OTHER polyq    : real,real,real >> bool   ATT polyq      # Polynom vom Grad n
 FUNC linearq   : real,real >> bool        ATT linearq    # Polynom vom Grad 1
 FUNC sumq      : real >> bool             ATT sumq
+FUNC nonsumq   : real >> bool             ATT nonsumq
 FUNC productq  : real >> bool             ATT productq
 FUNC powerq    : real >> bool             ATT powerq
 FUNC fractionq : real++ >> bool           ATT fractionq     # keine ganzen Zahlen
@@ -80,6 +81,9 @@ FUNC binomialmatchq : real,real >> bool   ATT binomialmatchq  # woertlich a+b*x^
 FUNC quadraticmatchq : real,real >> bool  ATT quadraticmatchq # woertlich a+b*x+c*x^2
 FUNC trinomialq : real,real >> bool       ATT trinomialq      # a+b*x^n+c*x^(2n), n > 1
 FUNC linearpairq : real,real,real >> bool ATT linearpairq
-FUNC algebraicfunctionq : real,real >> bool ATT algebraicfunctionq
+FUNC algebraicfunctionq : real++ >> bool ATT algebraicfunctionq
 FUNC intsubst : real,real,real >> real    ATT intsubst     # Subst[Int[u,x],x,v]
 FUNC hyp2exp : real,real >> real         ATT hyp2exp      # sinh, cosh, ... als e^u
+FUNC substexp : real,real >> real        ATT substexp     # Rubi: Substitution x -> F^(g x)
+FUNC functionofq : real++ >> bool       ATT functionofq   # Rubi: FunctionOfQ[v,u,x(,pure)]
+FUNC substfor : real++ >> real           ATT substfor     # Rubi: SubstFor[(h,)v,u,x]
