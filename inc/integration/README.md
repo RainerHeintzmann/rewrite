@@ -148,7 +148,16 @@ have it, so a few steps are added:
   section 2.3) is the C function `substexp`; the translator puts it in
   place of Rubi's rule (`HAND_RULES`). `FullSimplify` becomes `simplify`,
   which is enough for ratios like `ln(F)/ln(F)`, and `IntOut` writes
-  `ln(e^u)` as `u`.
+  `ln(e^u)` as `u`. Likewise, Rubi's substitutions in section 9.3, which
+  pass a list of results (`lst[[2]]`), are C functions in place of the
+  rules: `substfracpow` substitutes `t = (a+b*x)^(1/n)` for fractional
+  powers of a linear function, `substsqrtquad` does Euler's substitutions
+  for functions of `x` and `sqrt(a+b*x+c*x^2)`. Rubi writes these rules
+  twice (with and without `ShowStep`); the translator takes the second.
+- Rubi's `GtQ[u,v]` (also `LtQ`, `GeQ`, `LeQ`) is false unless both are
+  numbers, so that `Not[GtQ[a^2,0]]` is true for a symbol `a`. The
+  translator writes `gtq(u,v)`, ... instead of `u > v`, which cannot be
+  calculated for symbols (and made `Not[...]` fail as well).
 - The first rules of `RubiRules` take constant factors out of the integral
   (first, as Mathematica does, so that `-1*x*u` does not become
   `(-1*x)*u`, which rules for `(c*x)^m` would match with `c = -1`), write
@@ -230,11 +239,11 @@ results are:
 
 | Result | Problems | Share of tested |
 | --- | --- | --- |
-| solved and verified | 1316 | 85.5% |
-| no antiderivative found | 205 | 13.3% |
+| solved and verified | 1355 | 88.0% |
+| no antiderivative found | 164 | 10.7% |
 | wrong | 2 | 0.1% |
 | crash or time-out | 0 | 0.0% |
-| not verifiable | 16 | 1.0% |
+| not verifiable | 18 | 1.2% |
 
 One problem uses a function that rewrite does not have and is not tested.
 The two wrong results contain special functions outside their real

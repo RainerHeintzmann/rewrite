@@ -38,8 +38,8 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{1316}
-\newcommand{\psolved}{85.5\%}
+\newcommand{\nsolved}{1355}
+\newcommand{\psolved}{88.0\%}
 \newcommand{\nwrong}{2}
 \newcommand{\nfailed}{0}
 
@@ -71,7 +71,7 @@ integers and fractions as sorts below the real numbers without changing
 any rule of the library, and sorts of non-negative and positive numbers
 for which rules like $\sqrt{x^2}=x$ hold. As a case study, the rule-based
 integrator Rubi was translated into \texttt{rewrite}. A translator converts
-91\% of Rubi's 7422 rules automatically; for this, the language gained ordered rule lists
+92\% of Rubi's rules automatically; for this, the language gained ordered rule lists
 with a backtracking matcher for optional pattern parts, commutative
 operators and condition lists, symbolic helper functions and special
 functions. On \nproblems{} integration problems from four independent
@@ -420,7 +420,14 @@ unevaluated when it does not apply, and \texttt{FalseQ} tests for exactly
 that, so that 20 rules of the form $\int u\,f(y)\,dx=q\int f(t)\,dt$ with
 $t=y$ could be translated. The substitution $x\to F^{gx}$ for functions of
 exponentials is a C function that takes the place of Rubi's rule, which
-uses pattern tests the translator cannot express. Many results of Rubi need special functions; 27 of them,
+uses pattern tests the translator cannot express; so are the substitution
+$t=(a+bx)^{1/n}$ for fractional powers of a linear function and Euler's
+substitutions for $\sqrt{a+bx+cx^2}$, whose Rubi rules pass a list of
+results. A small difference had a large effect: Rubi's \texttt{GtQ[u,v]} is
+false unless both are numbers, so that \texttt{Not[GtQ[a\^{}2,0]]} holds for
+a symbol~$a$; translated as $u>v$, the comparison could not be calculated,
+and rules such as $\int dx/\sqrt{a^2-x^2}=\arctan(x/\sqrt{a^2-x^2})$ never
+applied. With a helper of Rubi's meaning, 30 more problems were solved. Many results of Rubi need special functions; 27 of them,
 from the error function and the Fresnel and exponential integrals to the
 incomplete Gamma function, elliptic integrals in Carlson's
 form~\cite{carlson1995} and the hypergeometric function ${}_2F_1$, were
@@ -488,8 +495,10 @@ where \texttt{RubiCollect} combines like summands of the result and
 
 \subsection{Results}
 
-The translator converts 6830 of Rubi's 7422 rules (92\%), which become
-7327 \texttt{rewrite} rules after the expansion of function variables. The
+The translator converts 6835 of Rubi's 7432 rules (92\%; rules that Rubi
+writes in two variants, with and without \texttt{ShowStep}, count twice),
+which become 7329 \texttt{rewrite} rules after the expansion of function
+variables. The
 largest group of the remaining rules needs complex numbers (245 rules);
 others use the rest of Rubi's substitution machinery
 (\texttt{FunctionOfExponentialQ}), general pattern tests
@@ -544,10 +553,10 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 205 & 13.3\% \\
+no antiderivative found   & 164 & 10.7\% \\
 wrong result              & \nwrong  & 0.1\% \\
 crash or time-out         & \nfailed & 0.0\% \\
-not verifiable            & 16 & 1.0\% \\
+not verifiable            & 18 & 1.2\% \\
 \bottomrule
 \end{tabular}
 \caption{Results on the \ntested{} tested problems of four independent
@@ -563,7 +572,8 @@ During a first measurement, 41\% of the problems were solved, 55\% before
 the cosine unification, the hyperbolic fallback and the symbolic $e$, 62\%
 after them, 79\% after partial fractions, the inside-out evaluation of
 nested helpers and the flat matching of products, 84\% with Rubi's
-substitutions, and 85.5\% with the normal form of trigonometric products.
+substitutions, 85.5\% with the normal form of trigonometric products, and
+88\% with Rubi's meaning of \texttt{GtQ} and the substitutions for roots.
 The two
 results counted as wrong contain special functions evaluated outside their
 real domain (${}_2F_1$ at an argument $e^{7x}/3>1$, the incomplete Gamma
@@ -616,7 +626,7 @@ the tests.
 
 Performance is adequate for interactive use. Loading the standard library
 and computing a derivative takes well below 0.1\,s on a current laptop;
-loading the 7327 integration rules about half a second. A scalar loop
+loading the 7329 integration rules about half a second. A scalar loop
 written in the language itself needs about 0.25\,$\mu$s per iteration
 (measured for $10^7$ iterations of \texttt{s = s + k*k}). We estimate this
 to be about two orders of magnitude slower than an equivalent compiled

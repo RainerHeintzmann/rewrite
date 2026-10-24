@@ -47,7 +47,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n), (iltq(P_m,0)), (eqq(
 
 # Regel 12 (96 Varianten):
 #   Int[u_^m_.*(a_.*u_^n_+v_)^p_.*w_,x_Symbol] := Int[u^(m+n*p)*(a+u^(-n)*v)^p*w,x] /; FreeQ[{a,m,n},x] && IntegerQ[p] && Not[GtQ[n,0]] && Not[FreeQ[v,x]]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_m,P_n), (integerq(O_p)), (not(((P_n > 0)))), (not((freeq(P_v,Xv)))) Int(((P_u)^(O_m))*((((O_a)*((P_u)^(P_n)))+(P_v))^(O_p))*(P_w),Xv) = Int(((((P_u)^(((O_m)+(((P_n)*(O_p)))))))*(((((O_a)+(((((P_u)^((((-1))*(P_n)))))*(P_v)))))^(O_p)))*(P_w)),Xv)
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_m,P_n), (integerq(O_p)), (not(((gtq(P_n,0))))), (not((freeq(P_v,Xv)))) Int(((P_u)^(O_m))*((((O_a)*((P_u)^(P_n)))+(P_v))^(O_p))*(P_w),Xv) = Int(((((P_u)^(((O_m)+(((P_n)*(O_p)))))))*(((((O_a)+(((((P_u)^((((-1))*(P_n)))))*(P_v)))))^(O_p)))*(P_w)),Xv)
 
 # Regel 13 (1296 Varianten):
 #   Int[u_*(a_.+b_.*y_)^m_.*(c_.+d_.*v_)^n_.,x_Symbol] := With[{q=DerivativeDivides[y,u,x]}, q \[Star] Subst[Int[(a+b*x)^m*(c+d*x)^n,x],x,y] /; Not[FalseQ[q]]] /; FreeQ[{a,b,c,d,m,n},x] && EqQ[v,y]
@@ -142,107 +142,136 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_p,O_q,O_r,O_s), (eqq(((((O_p)*(((O_s
 ADDSPEC RubiRules : IF NIN(Xv,O_m), (neq(O_m,(-1))), (functionofq(((Xv)^(((O_m)+(1)))),P_u,Xv)) Int((P_u)*((Xv)^(O_m)),Xv) = ((((((O_m)+(1)))^((-1))))*(intsubst(substfor(((Xv)^(((O_m)+(1)))),P_u,Xv),Xv,((Xv)^(((O_m)+(1)))))))
 
 # Regel 37 nicht uebersetzt: ShowStep
-#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, ShowStep["","Int[F[(a+b*x)^(1/n),x],x]", "n/b \[Star] Subst[Int[x^(n-1)*F[x,-a/b+x^n/b],x],x,(a+b*x)^(1/n)]",Hold[ lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])]]] /; Not[FalseQ[lst]] && SubstForFractionalPowerQ[u,lst[[3]],x]] /; SimplifyFlag,  Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])] /; Not[FalseQ[lst]] && SubstForFractionalPowerQ[u,lst[[3]],x]]]
+#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, ShowStep["","Int[F[(a+b*x)^(1/n),x],x]", "n/b \[Star] Subst[Int[x^(n-1)*F[x,-a/b+x^n/b],x],x,(a+b*x)^(1/n)]",Hold[ lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])]]] /; Not[FalseQ[lst]] && SubstForFractionalPowerQ[u,lst[[3]],x]] /; SimplifyFlag
 
-# Regel 38 nicht uebersetzt: ShowStep
-#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfQuotientOfLinears[u,x]}, ShowStep["","Int[F[((a+b*x)/(c+d*x))^(1/n),x],x]", "n*(b*c-a*d) \[Star] Subst[Int[x^(n-1)*F[x,(-a+c*x^n)/(b-d*x^n)]/(b-d*x^n)^2,x],x,((a+b*x)/(c+d*x))^(1/n)]",Hold[ lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])]]] /; Not[FalseQ[lst]]] /; SimplifyFlag,  Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfQuotientOfLinears[u,x]}, lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])] /; Not[FalseQ[lst]]]]
+# Regel 38 (von Hand, C-Hilfsfunktion):
+#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])] /; Not[FalseQ[lst]] && SubstForFractionalPowerQ[u,lst[[3]],x]]
+ADDSPEC RubiRules : Int(P_u,Xv) = substfracpow(P_u,Xv)
 
-# Regel 39 (288 Varianten):
+# Regel 39 nicht uebersetzt: ShowStep
+#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfQuotientOfLinears[u,x]}, ShowStep["","Int[F[((a+b*x)/(c+d*x))^(1/n),x],x]", "n*(b*c-a*d) \[Star] Subst[Int[x^(n-1)*F[x,(-a+c*x^n)/(b-d*x^n)]/(b-d*x^n)^2,x],x,((a+b*x)/(c+d*x))^(1/n)]",Hold[ lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])]]] /; Not[FalseQ[lst]]] /; SimplifyFlag
+
+# Regel 40 nicht uebersetzt: parse error at '['
+#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfQuotientOfLinears[u,x]}, lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])] /; Not[FalseQ[lst]]]
+
+# Regel 41 (288 Varianten):
 #   Int[u_.*(a_.*v_^m_.*w_^n_.*z_^q_.)^p_,x_Symbol] := a^IntPart[p]*(a*v^m*w^n*z^q)^FracPart[p]/(v^(m*FracPart[p])*w^(n*FracPart[p])*z^(q*FracPart[p])) \[Star] Int[u*v^(m*p)*w^(n*p)*z^(p*q),x] /; FreeQ[{a,m,n,p,q},x] && Not[IntegerQ[p]] && Not[FreeQ[v,x]] && Not[FreeQ[w,x]] && Not[FreeQ[z,x]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_m,O_n,P_p,O_q), (not(integerq(P_p))), (not((freeq(P_v,Xv)))), (not((freeq(P_w,Xv)))), (not((freeq(P_z,Xv)))) Int((O_u)*(((O_a)*((P_v)^(O_m))*((P_w)^(O_n))*((P_z)^(O_q)))^(P_p)),Xv) = ((((O_a)^(intpart(P_p))))*(((((O_a)*(((P_v)^(O_m)))*(((P_w)^(O_n)))*(((P_z)^(O_q)))))^(fracpart(P_p))))*(((((P_v)^(((O_m)*(fracpart(P_p))))))^((-1))))*(((((P_w)^(((O_n)*(fracpart(P_p))))))^((-1))))*(((((P_z)^(((O_q)*(fracpart(P_p))))))^((-1))))*(Int(((O_u)*(((P_v)^(((O_m)*(P_p)))))*(((P_w)^(((O_n)*(P_p)))))*(((P_z)^(((P_p)*(O_q)))))),Xv)))
 
-# Regel 40 (72 Varianten):
+# Regel 42 (72 Varianten):
 #   Int[u_.*(a_.*v_^m_.*w_^n_.)^p_,x_Symbol] := a^IntPart[p]*(a*v^m*w^n)^FracPart[p]/(v^(m*FracPart[p])*w^(n*FracPart[p])) \[Star] Int[u*v^(m*p)*w^(n*p),x] /; FreeQ[{a,m,n,p},x] && Not[IntegerQ[p]] && Not[FreeQ[v,x]] && Not[FreeQ[w,x]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_m,O_n,P_p), (not(integerq(P_p))), (not((freeq(P_v,Xv)))), (not((freeq(P_w,Xv)))) Int((O_u)*(((O_a)*((P_v)^(O_m))*((P_w)^(O_n)))^(P_p)),Xv) = ((((O_a)^(intpart(P_p))))*(((((O_a)*(((P_v)^(O_m)))*(((P_w)^(O_n)))))^(fracpart(P_p))))*(((((P_v)^(((O_m)*(fracpart(P_p))))))^((-1))))*(((((P_w)^(((O_n)*(fracpart(P_p))))))^((-1))))*(Int(((O_u)*(((P_v)^(((O_m)*(P_p)))))*(((P_w)^(((O_n)*(P_p)))))),Xv)))
 
-# Regel 41 (18 Varianten):
+# Regel 43 (18 Varianten):
 #   Int[u_.*(a_.*v_^m_.)^p_,x_Symbol] := a^IntPart[p]*(a*v^m)^FracPart[p]/v^(m*FracPart[p]) \[Star] Int[u*v^(m*p),x] /; FreeQ[{a,m,p},x] && Not[IntegerQ[p]] && Not[FreeQ[v,x]] && Not[EqQ[a,1] && EqQ[m,1]] && Not[EqQ[v,x] && EqQ[m,1]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_m,P_p), (not(integerq(P_p))), (not((freeq(P_v,Xv)))), (not(((eqq(O_a,1)) && (eqq(O_m,1))))), (not(((eqq(P_v,Xv)) && (eqq(O_m,1))))) Int((O_u)*(((O_a)*((P_v)^(O_m)))^(P_p)),Xv) = ((((O_a)^(intpart(P_p))))*(((((O_a)*(((P_v)^(O_m)))))^(fracpart(P_p))))*(((((P_v)^(((O_m)*(fracpart(P_p))))))^((-1))))*(Int(((O_u)*(((P_v)^(((O_m)*(P_p)))))),Xv)))
 
-# Regel 42 (27 Varianten):
+# Regel 44 (27 Varianten):
 #   Int[u_.*(a_.+b_.*x_^n_)^p_,x_Symbol] := b^IntPart[p]*(a+b*x^n)^FracPart[p]/(x^(n*FracPart[p])*(1+a*x^(-n)/b)^FracPart[p]) \[Star] Int[u*x^(n*p)*(1+a*x^(-n)/b)^p,x] /; FreeQ[{a,b,p},x] && Not[IntegerQ[p]] && ILtQ[n,0] && Not[RationalFunctionQ[u,x]] && IntegerQ[p+1/2]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_p), (not(integerq(P_p))), (iltq(P_n,0)), (not(rationalfunctionq(O_u,Xv))), (integerq(((P_p)+((1/2))))) Int((O_u)*(((O_a)+((O_b)*((Xv)^(P_n))))^(P_p)),Xv) = ((((O_b)^(intpart(P_p))))*(((((O_a)+(((O_b)*(((Xv)^(P_n)))))))^(fracpart(P_p))))*(((((Xv)^(((P_n)*(fracpart(P_p))))))^((-1))))*(((((((1)+(((O_a)*(((Xv)^((((-1))*(P_n)))))*(((O_b)^((-1))))))))^(fracpart(P_p))))^((-1))))*(Int(((O_u)*(((Xv)^(((P_n)*(P_p)))))*(((((1)+(((O_a)*(((Xv)^((((-1))*(P_n)))))*(((O_b)^((-1))))))))^(P_p)))),Xv)))
 
-# Regel 43 (27 Varianten):
+# Regel 45 (27 Varianten):
 #   Int[u_.*(a_.+b_.*v_^n_)^p_,x_Symbol] := (a+b*v^n)^FracPart[p]/(v^(n*FracPart[p])*(b+a*v^(-n))^FracPart[p]) \[Star] Int[u*v^(n*p)*(b+a*v^(-n))^p,x] /; FreeQ[{a,b,p},x] && Not[IntegerQ[p]] && ILtQ[n,0] && BinomialQ[v,x] && Not[LinearQ[v,x]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_p), (not(integerq(P_p))), (iltq(P_n,0)), (binomialq(P_v,Xv)), (not(linearq(P_v,Xv))) Int((O_u)*(((O_a)+((O_b)*((P_v)^(P_n))))^(P_p)),Xv) = ((((((O_a)+(((O_b)*(((P_v)^(P_n)))))))^(fracpart(P_p))))*(((((P_v)^(((P_n)*(fracpart(P_p))))))^((-1))))*(((((((O_b)+(((O_a)*(((P_v)^((((-1))*(P_n)))))))))^(fracpart(P_p))))^((-1))))*(Int(((O_u)*(((P_v)^(((P_n)*(P_p)))))*(((((O_b)+(((O_a)*(((P_v)^((((-1))*(P_n)))))))))^(P_p)))),Xv)))
 
-# Regel 44 (108 Varianten):
+# Regel 46 (108 Varianten):
 #   Int[u_.*(a_.+b_.*x_^m_.*v_^n_)^p_,x_Symbol] := (a+b*x^m*v^n)^FracPart[p]/(v^(n*FracPart[p])*(b*x^m+a*v^(-n))^FracPart[p]) \[Star] Int[u*v^(n*p)*(b*x^m+a*v^(-n))^p,x] /; FreeQ[{a,b,m,p},x] && Not[IntegerQ[p]] && ILtQ[n,0] && BinomialQ[v,x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,P_p), (not(integerq(P_p))), (iltq(P_n,0)), (binomialq(P_v,Xv)) Int((O_u)*(((O_a)+((O_b)*((Xv)^(O_m))*((P_v)^(P_n))))^(P_p)),Xv) = ((((((O_a)+(((O_b)*(((Xv)^(O_m)))*(((P_v)^(P_n)))))))^(fracpart(P_p))))*(((((P_v)^(((P_n)*(fracpart(P_p))))))^((-1))))*(((((((((O_b)*(((Xv)^(O_m)))))+(((O_a)*(((P_v)^((((-1))*(P_n)))))))))^(fracpart(P_p))))^((-1))))*(Int(((O_u)*(((P_v)^(((P_n)*(P_p)))))*(((((((O_b)*(((Xv)^(O_m)))))+(((O_a)*(((P_v)^((((-1))*(P_n)))))))))^(P_p)))),Xv)))
 
-# Regel 45 (216 Varianten):
+# Regel 47 (216 Varianten):
 #   Int[u_.*(a_.*x_^r_.+b_.*x_^s_.)^m_,x_Symbol] := With[{v=(a*x^r+b*x^s)^FracPart[m]/(x^(r*FracPart[m])*(a+b*x^(s-r))^FracPart[m])}, v \[Star] Int[u*x^(m*r)*(a+b*x^(s-r))^m,x] /; NeQ[Simplify[v],1]] /; FreeQ[{a,b,m,r,s},x] && Not[IntegerQ[m]] && PosQ[s-r]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m,O_r,O_s), (not(integerq(P_m))), (posq(((O_s)+((((-1))*(O_r)))))), (neq(simplify(((((((((O_a)*(((Xv)^(O_r)))))+(((O_b)*(((Xv)^(O_s)))))))^(fracpart(P_m))))*(((((Xv)^(((O_r)*(fracpart(P_m))))))^((-1))))*(((((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))))^(fracpart(P_m))))^((-1)))))),1)) Int((O_u)*((((O_a)*((Xv)^(O_r)))+((O_b)*((Xv)^(O_s))))^(P_m)),Xv) = ((((((((O_a)*(((Xv)^(O_r)))))+(((O_b)*(((Xv)^(O_s)))))))^(fracpart(P_m))))*(((((Xv)^(((O_r)*(fracpart(P_m))))))^((-1))))*(((((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))))^(fracpart(P_m))))^((-1))))*(Int(((O_u)*(((Xv)^(((P_m)*(O_r)))))*(((((O_a)+(((O_b)*(((Xv)^(((O_s)+((((-1))*(O_r)))))))))))^(P_m)))),Xv)))
 
-# Regel 46 nicht uebersetzt: function RationalFunctionExpand
+# Regel 48 nicht uebersetzt: function RationalFunctionExpand
 #   Int[u_/(a_+b_.*x_^n_),x_Symbol] := With[{v=RationalFunctionExpand[u/(a+b*x^n),x]}, Int[v,x] /; SumQ[v]] /; FreeQ[{a,b},x] && IGtQ[n,0]
 
-# Regel 47 (864 Varianten):
+# Regel 49 (864 Varianten):
 #   Int[u_*(a_.+b_.*x_^n_.+c_.*x_^n2_.)^p_.,x_Symbol] := 1/(4^p*c^p) \[Star] Int[u*(b+2*c*x^n)^(2*p),x] /; FreeQ[{a,b,c,n},x] && EqQ[n2,2*n] && EqQ[b^2-4*a*c,0] && IntegerQ[p] && Not[AlgebraicFunctionQ[u,x]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (eqq(O_n2,((2)*(O_n)))), (eqq(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),0)), (integerq(O_p)), (not(algebraicfunctionq(P_u,Xv))) Int((P_u)*(((O_a)+((O_b)*((Xv)^(O_n)))+((O_c)*((Xv)^(O_n2))))^(O_p)),Xv) = ((((((4)^(O_p)))^((-1))))*(((((O_c)^(O_p)))^((-1))))*(Int(((P_u)*(((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(O_p)))))),Xv)))
 
-# Regel 48 (432 Varianten):
+# Regel 50 (432 Varianten):
 #   Int[u_*(a_.+b_.*x_^n_.+c_.*x_^n2_.)^p_,x_Symbol] := (a+b*x^n+c*x^(2*n))^p/(b+2*c*x^n)^(2*p) \[Star] Int[u*(b+2*c*x^n)^(2*p),x] /; FreeQ[{a,b,c,n,p},x] && EqQ[n2,2*n] && EqQ[b^2-4*a*c,0] && Not[IntegerQ[p]] && Not[AlgebraicFunctionQ[u,x]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n,P_p), (eqq(O_n2,((2)*(O_n)))), (eqq(((((O_b)^(2)))+((((-4))*(O_a)*(O_c)))),0)), (not(integerq(P_p))), (not(algebraicfunctionq(P_u,Xv))) Int((P_u)*(((O_a)+((O_b)*((Xv)^(O_n)))+((O_c)*((Xv)^(O_n2))))^(P_p)),Xv) = ((((((O_a)+(((O_b)*(((Xv)^(O_n)))))+(((O_c)*(((Xv)^(((2)*(O_n)))))))))^(P_p)))*(((((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(P_p)))))^((-1))))*(Int(((P_u)*(((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(P_p)))))),Xv)))
 
-# Regel 49 nicht uebersetzt: function RationalFunctionExpand
+# Regel 51 nicht uebersetzt: function RationalFunctionExpand
 #   Int[u_/(a_.+b_.*x_^n_.+c_.*x_^n2_.),x_Symbol] := With[{v=RationalFunctionExpand[u/(a+b*x^n+c*x^(2*n)),x]}, Int[v,x] /; SumQ[v]] /; FreeQ[{a,b,c},x] && EqQ[n2,2*n] && IGtQ[n,0]
 
-# Regel 50 (324 Varianten):
+# Regel 52 (324 Varianten):
 #   Int[u_./(a_.*x_^m_.+b_.*Sqrt[c_.*x_^n_]),x_Symbol] := Int[u*(a*x^m-b*Sqrt[c*x^n])/(a^2*x^(2*m)-b^2*c*x^n),x] /; FreeQ[{a,b,c,m,n},x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_m,P_n) Int((O_u)*((((O_a)*((Xv)^(O_m)))+((O_b)*(((O_c)*((Xv)^(P_n)))^(0.5))))^(K_1)),Xv) = Int(((O_u)*(((((O_a)*(((Xv)^(O_m)))))+((((-1))*(O_b)*(((((O_c)*(((Xv)^(P_n)))))^((1/2))))))))*(((((((((O_a)^(2)))*(((Xv)^(((2)*(O_m)))))))+((((-1))*(((O_b)^(2)))*(O_c)*(((Xv)^(P_n)))))))^((-1))))),Xv)
 
-# Regel 51 nicht uebersetzt: ShowStep
-#   Int[u_,x_Symbol] := With[{lst=FunctionOfLinear[u,x]}, ShowStep["","Int[F[a+b*x],x]","Subst[Int[F[x],x],x,a+b*x]/b",Hold[ 1/lst[[3]] \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]+lst[[3]]*x]]] /; Not[FalseQ[lst]]] /; SimplifyFlag,  Int[u_,x_Symbol] := With[{lst=FunctionOfLinear[u,x]}, 1/lst[[3]] \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]+lst[[3]]*x] /; Not[FalseQ[lst]]]]
-
-# Regel 52 nicht uebersetzt: ShowStep
-#   Int[u_/x_,x_Symbol] := With[{lst=PowerVariableExpn[u,0,x]}, ShowStep["","Int[F[(c*x)^n]/x,x]","Subst[Int[F[x]/x,x],x,(c*x)^n]/n",Hold[ 1/lst[[2]] \[Star] Subst[Int[NormalizeIntegrand[Simplify[lst[[1]]/x],x],x],x,(lst[[3]]*x)^lst[[2]]]]] /; Not[FalseQ[lst]] && NeQ[lst[[2]],0]] /; SimplifyFlag && NonsumQ[u] && Not[RationalFunctionQ[u,x]],  Int[u_/x_,x_Symbol] := With[{lst=PowerVariableExpn[u,0,x]}, 1/lst[[2]] \[Star] Subst[Int[NormalizeIntegrand[Simplify[lst[[1]]/x],x],x],x,(lst[[3]]*x)^lst[[2]]] /; Not[FalseQ[lst]] && NeQ[lst[[2]],0]] /; NonsumQ[u] && Not[RationalFunctionQ[u,x]]]
-
 # Regel 53 nicht uebersetzt: ShowStep
-#   Int[u_*x_^m_.,x_Symbol] := With[{lst=PowerVariableExpn[u,m+1,x]}, ShowStep["If g=GCD[m+1,n]>1,","Int[x^m*F[x^n],x]", "1/g \[Star] Subst[Int[x^((m+1)/g-1)*F[x^(n/g)],x],x,x^g]",Hold[ 1/lst[[2]] \[Star] Subst[Int[NormalizeIntegrand[Simplify[lst[[1]]/x],x],x],x,(lst[[3]]*x)^lst[[2]]]]] /; Not[FalseQ[lst]] && NeQ[lst[[2]],m+1]] /; SimplifyFlag && IntegerQ[m] && NeQ[m,-1] && NonsumQ[u] && (GtQ[m,0] || Not[AlgebraicFunctionQ[u,x]]),  Int[u_*x_^m_.,x_Symbol] := With[{lst=PowerVariableExpn[u,m+1,x]}, 1/lst[[2]] \[Star] Subst[Int[NormalizeIntegrand[Simplify[lst[[1]]/x],x],x],x,(lst[[3]]*x)^lst[[2]]] /; Not[FalseQ[lst]] && NeQ[lst[[2]],m+1]] /; IntegerQ[m] && NeQ[m,-1] && NonsumQ[u] && (GtQ[m,0] || Not[AlgebraicFunctionQ[u,x]])]
+#   Int[u_,x_Symbol] := With[{lst=FunctionOfLinear[u,x]}, ShowStep["","Int[F[a+b*x],x]","Subst[Int[F[x],x],x,a+b*x]/b",Hold[ 1/lst[[3]] \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]+lst[[3]]*x]]] /; Not[FalseQ[lst]]] /; SimplifyFlag
 
-# Regel 54 nicht uebersetzt: function SubstPower
-#   Int[x_^m_*Fx_,x_Symbol] := With[{k=Denominator[m]}, k \[Star] Subst[Int[x^(k*(m+1)-1)*SubstPower[Fx,x,k],x],x,x^(1/k)]] /; FractionQ[m]
+# Regel 54 nicht uebersetzt: parse error at '['
+#   Int[u_,x_Symbol] := With[{lst=FunctionOfLinear[u,x]}, 1/lst[[3]] \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]+lst[[3]]*x] /; Not[FalseQ[lst]]]
 
 # Regel 55 nicht uebersetzt: ShowStep
-#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, ShowStep["","Int[F[Sqrt[a+b*x+c*x^2],x],x]", "2 \[Star] Subst[Int[F[(c*Sqrt[a]-b*x+Sqrt[a]*x^2)/(c-x^2),(-b+2*Sqrt[a]*x)/(c-x^2)]* (c*Sqrt[a]-b*x+Sqrt[a]*x^2)/(c-x^2)^2,x],x,(-Sqrt[a]+Sqrt[a+b*x+c*x^2])/x]", Hold[2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],1]] /; SimplifyFlag && EulerIntegrandQ[u,x],  Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],1]] /; EulerIntegrandQ[u,x]]
+#   Int[u_/x_,x_Symbol] := With[{lst=PowerVariableExpn[u,0,x]}, ShowStep["","Int[F[(c*x)^n]/x,x]","Subst[Int[F[x]/x,x],x,(c*x)^n]/n",Hold[ 1/lst[[2]] \[Star] Subst[Int[NormalizeIntegrand[Simplify[lst[[1]]/x],x],x],x,(lst[[3]]*x)^lst[[2]]]]] /; Not[FalseQ[lst]] && NeQ[lst[[2]],0]] /; SimplifyFlag && NonsumQ[u] && Not[RationalFunctionQ[u,x]]
 
-# Regel 56 nicht uebersetzt: ShowStep
-#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, ShowStep["","Int[F[Sqrt[a+b*x+c*x^2],x],x]", "2 \[Star] Subst[Int[F[(a*Sqrt[c]+b*x+Sqrt[c]*x^2)/(b+2*Sqrt[c]*x),(-a+x^2)/(b+2*Sqrt[c]*x)]* (a*Sqrt[c]+b*x+Sqrt[c]*x^2)/(b+2*Sqrt[c]*x)^2,x],x,Sqrt[c]*x+Sqrt[a+b*x+c*x^2]]", Hold[2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],2]] /; SimplifyFlag && EulerIntegrandQ[u,x],  Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],2]] /; EulerIntegrandQ[u,x]]
+# Regel 56 nicht uebersetzt: parse error at '['
+#   Int[u_/x_,x_Symbol] := With[{lst=PowerVariableExpn[u,0,x]}, 1/lst[[2]] \[Star] Subst[Int[NormalizeIntegrand[Simplify[lst[[1]]/x],x],x],x,(lst[[3]]*x)^lst[[2]]] /; Not[FalseQ[lst]] && NeQ[lst[[2]],0]] /; NonsumQ[u] && Not[RationalFunctionQ[u,x]]
 
 # Regel 57 nicht uebersetzt: ShowStep
-#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, ShowStep["","Int[F[Sqrt[a+b*x+c*x^2],x],x]", "-2*Sqrt[b^2-4*a*c] \[Star] Subst[Int[F[-Sqrt[b^2-4*a*c]*x/(c-x^2), (b*c+c*Sqrt[b^2-4*a*c]+(-b+Sqrt[b^2-4*a*c])*x^2)/(-2*c*(c-x^2))]*x/(c-x^2)^2,x], x,2*c*Sqrt[a+b*x+c*x^2]/(b-Sqrt[b^2-4*a*c]+2*c*x)]", Hold[2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],3]] /; SimplifyFlag && EulerIntegrandQ[u,x],  Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],3]] /; EulerIntegrandQ[u,x]]
+#   Int[u_*x_^m_.,x_Symbol] := With[{lst=PowerVariableExpn[u,m+1,x]}, ShowStep["If g=GCD[m+1,n]>1,","Int[x^m*F[x^n],x]", "1/g \[Star] Subst[Int[x^((m+1)/g-1)*F[x^(n/g)],x],x,x^g]",Hold[ 1/lst[[2]] \[Star] Subst[Int[NormalizeIntegrand[Simplify[lst[[1]]/x],x],x],x,(lst[[3]]*x)^lst[[2]]]]] /; Not[FalseQ[lst]] && NeQ[lst[[2]],m+1]] /; SimplifyFlag && IntegerQ[m] && NeQ[m,-1] && NonsumQ[u] && (GtQ[m,0] || Not[AlgebraicFunctionQ[u,x]])
 
-# Regel 58 nicht uebersetzt: function Together
+# Regel 58 nicht uebersetzt: parse error at '['
+#   Int[u_*x_^m_.,x_Symbol] := With[{lst=PowerVariableExpn[u,m+1,x]}, 1/lst[[2]] \[Star] Subst[Int[NormalizeIntegrand[Simplify[lst[[1]]/x],x],x],x,(lst[[3]]*x)^lst[[2]]] /; Not[FalseQ[lst]] && NeQ[lst[[2]],m+1]] /; IntegerQ[m] && NeQ[m,-1] && NonsumQ[u] && (GtQ[m,0] || Not[AlgebraicFunctionQ[u,x]])
+
+# Regel 59 nicht uebersetzt: function SubstPower
+#   Int[x_^m_*Fx_,x_Symbol] := With[{k=Denominator[m]}, k \[Star] Subst[Int[x^(k*(m+1)-1)*SubstPower[Fx,x,k],x],x,x^(1/k)]] /; FractionQ[m]
+
+# Regel 60 nicht uebersetzt: ShowStep
+#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, ShowStep["","Int[F[Sqrt[a+b*x+c*x^2],x],x]", "2 \[Star] Subst[Int[F[(c*Sqrt[a]-b*x+Sqrt[a]*x^2)/(c-x^2),(-b+2*Sqrt[a]*x)/(c-x^2)]* (c*Sqrt[a]-b*x+Sqrt[a]*x^2)/(c-x^2)^2,x],x,(-Sqrt[a]+Sqrt[a+b*x+c*x^2])/x]", Hold[2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],1]] /; SimplifyFlag && EulerIntegrandQ[u,x]
+
+# Regel 61 (von Hand, C-Hilfsfunktion):
+#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],1]] /; EulerIntegrandQ[u,x]
+ADDSPEC RubiRules : Int(P_u,Xv) = substsqrtquad(P_u,Xv)
+
+# Regel 62 nicht uebersetzt: ShowStep
+#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, ShowStep["","Int[F[Sqrt[a+b*x+c*x^2],x],x]", "2 \[Star] Subst[Int[F[(a*Sqrt[c]+b*x+Sqrt[c]*x^2)/(b+2*Sqrt[c]*x),(-a+x^2)/(b+2*Sqrt[c]*x)]* (a*Sqrt[c]+b*x+Sqrt[c]*x^2)/(b+2*Sqrt[c]*x)^2,x],x,Sqrt[c]*x+Sqrt[a+b*x+c*x^2]]", Hold[2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],2]] /; SimplifyFlag && EulerIntegrandQ[u,x]
+
+# Regel 63 (von Hand, wie oben):
+#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],2]] /; EulerIntegrandQ[u,x]
+
+# Regel 64 nicht uebersetzt: ShowStep
+#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, ShowStep["","Int[F[Sqrt[a+b*x+c*x^2],x],x]", "-2*Sqrt[b^2-4*a*c] \[Star] Subst[Int[F[-Sqrt[b^2-4*a*c]*x/(c-x^2), (b*c+c*Sqrt[b^2-4*a*c]+(-b+Sqrt[b^2-4*a*c])*x^2)/(-2*c*(c-x^2))]*x/(c-x^2)^2,x], x,2*c*Sqrt[a+b*x+c*x^2]/(b-Sqrt[b^2-4*a*c]+2*c*x)]", Hold[2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],3]] /; SimplifyFlag && EulerIntegrandQ[u,x]
+
+# Regel 65 (von Hand, wie oben):
+#   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],3]] /; EulerIntegrandQ[u,x]
+
+# Regel 66 nicht uebersetzt: function Together
 #   Int[1/(a_+b_.*v_^2),x_Symbol] :=  1/(2*a) \[Star] Int[Together[1/(1-v/Rt[-a/b,2])],x] + 1/(2*a) \[Star] Int[Together[1/(1+v/Rt[-a/b,2])],x] /; FreeQ[{a,b},x]
 
-# Regel 59 nicht uebersetzt: function Sum
+# Regel 67 nicht uebersetzt: function Sum
 #   Int[1/(a_+b_.*v_^n_),x_Symbol] := 2/(a*n) \[Star] Sum[Int[Together[1/(1-v^2/((-1)^(4*k/n)*Rt[-a/b,n/2]))],x],{k,1,n/2}] /; FreeQ[{a,b},x] && IGtQ[n/2,1]
 
-# Regel 60 nicht uebersetzt: function Sum
+# Regel 68 nicht uebersetzt: function Sum
 #   Int[1/(a_+b_.*v_^n_),x_Symbol] := 1/(a*n) \[Star] Sum[Int[Together[1/(1-v/((-1)^(2*k/n)*Rt[-a/b,n]))],x],{k,1,n}] /; FreeQ[{a,b},x] && IGtQ[(n-1)/2,0]
 
-# Regel 61 nicht uebersetzt: function PolynomialInSubst
+# Regel 69 nicht uebersetzt: function PolynomialInSubst
 #   Int[v_/(a_+b_.*u_^n_.),x_Symbol] := Int[ReplaceAll[ExpandIntegrand[PolynomialInSubst[v,u,x]/(a+b*x^n),x],x->u],x] /; FreeQ[{a,b},x] && IGtQ[n,0] && PolynomialInQ[v,u,x]
 
-# Regel 62 nicht uebersetzt: parse error at '!='
+# Regel 70 nicht uebersetzt: parse error at '!='
 #   Int[u_,x_Symbol] := With[{v=NormalizeIntegrand[u,x]}, Int[v,x] /; v=!=u]
 
-# Regel 63 (1 Varianten):
+# Regel 71 (1 Varianten):
 #   Int[u_,x_Symbol] := With[{v=ExpandIntegrand[u,x]}, Int[v,x] /; SumQ[v]]
 ADDSPEC RubiRules : IF (sumq(expandintegrand(P_u,Xv))) Int(P_u,Xv) = Int(expandintegrand(P_u,Xv),Xv)
 
-# Regel 64 (7776 Varianten):
+# Regel 72 (7776 Varianten):
 #   Int[u_.*(a_.+b_.*x_^m_.)^p_.*(c_.+d_.*x_^n_.)^q_., x_Symbol] := (a+b*x^m)^p*(c+d*x^n)^q/x^(m*p) \[Star] Int[u*x^(m*p),x] /; FreeQ[{a,b,c,d,m,n,p,q},x] && EqQ[a+d,0] && EqQ[b+c,0] && EqQ[m+n,0] && EqQ[p+q,0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n,O_p,O_q), (eqq(((O_a)+(O_d)),0)), (eqq(((O_b)+(O_c)),0)), (eqq(((O_m)+(O_n)),0)), (eqq(((O_p)+(O_q)),0)) Int((O_u)*(((O_a)+((O_b)*((Xv)^(O_m))))^(O_p))*(((O_c)+((O_d)*((Xv)^(O_n))))^(O_q)),Xv) = ((((((O_a)+(((O_b)*(((Xv)^(O_m)))))))^(O_p)))*(((((O_c)+(((O_d)*(((Xv)^(O_n)))))))^(O_q)))*(((((Xv)^(((O_m)*(O_p)))))^((-1))))*(Int(((O_u)*(((Xv)^(((O_m)*(O_p)))))),Xv)))
 
-# Regel 65 (288 Varianten):
+# Regel 73 (288 Varianten):
 #   Int[u_*(a_+b_.*x_^n_.+c_.*x_^n2_.)^p_, x_Symbol] := Sqrt[a+b*x^n+c*x^(2*n)]/((4*c)^(p-1/2)*(b+2*c*x^n)) \[Star] Int[u*(b+2*c*x^n)^(2*p),x] /; FreeQ[{a,b,c,n,p},x] && EqQ[n2,2*n] && EqQ[b^2-4*a*c,0] && IntegerQ[p-1/2]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_n,P_p), (eqq(O_n2,((2)*(O_n)))), (eqq(((((O_b)^(2)))+((((-4))*(P_a)*(O_c)))),0)), (integerq(((P_p)+((-(1/2)))))) Int((P_u)*(((P_a)+((O_b)*((Xv)^(O_n)))+((O_c)*((Xv)^(O_n2))))^(P_p)),Xv) = ((((((P_a)+(((O_b)*(((Xv)^(O_n)))))+(((O_c)*(((Xv)^(((2)*(O_n)))))))))^((1/2))))*(((((((4)*(O_c)))^(((P_p)+((-(1/2)))))))^((-1))))*(((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^((-1))))*(Int(((P_u)*(((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(P_p)))))),Xv)))
 
-# Regel 66 nicht uebersetzt: ShowStep
-#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, ShowStep["","Int[F[(a+b*x)^(1/n),x],x]", "n/b \[Star] Subst[Int[x^(n-1)*F[x,-a/b+x^n/b],x],x,(a+b*x)^(1/n)]",Hold[ lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])]]] /; Not[FalseQ[lst]]] /; SimplifyFlag,  Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])] /; Not[FalseQ[lst]]]]
+# Regel 74 nicht uebersetzt: ShowStep
+#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, ShowStep["","Int[F[(a+b*x)^(1/n),x],x]", "n/b \[Star] Subst[Int[x^(n-1)*F[x,-a/b+x^n/b],x],x,(a+b*x)^(1/n)]",Hold[ lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])]]] /; Not[FalseQ[lst]]] /; SimplifyFlag
 
-# Regel 67 nicht uebersetzt: integration variable is not x_Symbol
+# Regel 75 (von Hand, wie oben):
+#   Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, lst[[2]]*lst[[4]] \[Star] Subst[Int[lst[[1]],x],x,lst[[3]]^(1/lst[[2]])] /; Not[FalseQ[lst]]]
+
+# Regel 76 nicht uebersetzt: integration variable is not x_Symbol
 #   Int[u_,x_] := CannotIntegrate[u,x]

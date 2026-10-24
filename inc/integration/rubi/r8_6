@@ -61,11 +61,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_n) Int(polygamma(P_n,(O_a)+((O_b)*(Xv)))
 
 # Regel 15 (324 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*PolyGamma[n_, a_. + b_.*x_], x_Symbol] := (c + d*x)^m*PolyGamma[n - 1, a + b*x]/b - d*m/b*Int[(c + d*x)^(m - 1)*PolyGamma[n - 1, a + b*x], x] /; FreeQ[{a, b, c, d, n}, x] && GtQ[m, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_n), (((O_m > 0))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(polygamma(P_n,(O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(polygamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(O_d)*(O_m)*(((O_b)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(polygamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_n), (((gtq(O_m,0)))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(polygamma(P_n,(O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(polygamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(O_d)*(O_m)*(((O_b)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(polygamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))),Xv)))))
 
 # Regel 16 (324 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*PolyGamma[n_, a_. + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*PolyGamma[n, a + b*x]/(d*(m + 1)) - b/(d*(m + 1))* Int[(c + d*x)^(m + 1)*PolyGamma[n + 1, a + b*x], x] /; FreeQ[{a, b, c, d, n}, x] && LtQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_n), (((O_m < (-1)))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(polygamma(P_n,(O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(polygamma(P_n,((O_a)+(((O_b)*(Xv))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(polygamma(((P_n)+(1)),((O_a)+(((O_b)*(Xv))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_n), (((ltq(O_m,(-1))))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(polygamma(P_n,(O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(polygamma(P_n,((O_a)+(((O_b)*(Xv))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(polygamma(((P_n)+(1)),((O_a)+(((O_b)*(Xv))))))),Xv)))))
 
 # Regel 17 (324 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*PolyGamma[n_, a_. + b_.*x_], x_Symbol] := Unintegrable[(c + d*x)^m*PolyGamma[n, a + b*x], x] /; FreeQ[{a, b, c, d, m, n}, x]

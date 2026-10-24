@@ -572,35 +572,35 @@ ADDSPEC RubiRules : IF (eqq(P_w,P_v)), (integerq(O_p)) Int((O_u)*((sinh(P_v))^(O
 
 # Regel 64 (4 Varianten):
 #   Int[Sinh[v_]*Tanh[w_]^n_., x_Symbol] := Int[Cosh[v]*Tanh[w]^(n - 1), x] - Cosh[v - w]*Int[Sech[w]*Tanh[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]
-ADDSPEC RubiRules : IF (((O_n > 0))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((sinh(P_v))*((tanh(P_w))^(O_n)),Xv) = ((Int(((cosh(P_v))*(((tanh(P_w))^(((O_n)+((-1))))))),Xv))+((((-1))*(cosh(((P_v)+((((-1))*(P_w))))))*(Int(((sech(P_w))*(((tanh(P_w))^(((O_n)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((sinh(P_v))*((tanh(P_w))^(O_n)),Xv) = ((Int(((cosh(P_v))*(((tanh(P_w))^(((O_n)+((-1))))))),Xv))+((((-1))*(cosh(((P_v)+((((-1))*(P_w))))))*(Int(((sech(P_w))*(((tanh(P_w))^(((O_n)+((-1))))))),Xv)))))
 
 # Regel 65 (4 Varianten):
 #   Int[Cosh[v_]*Coth[w_]^n_., x_Symbol] := Int[Sinh[v]*Coth[w]^(n - 1), x] + Cosh[v - w]*Int[Csch[w]*Coth[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]
-ADDSPEC RubiRules : IF (((O_n > 0))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((cosh(P_v))*((coth(P_w))^(O_n)),Xv) = ((Int(((sinh(P_v))*(((coth(P_w))^(((O_n)+((-1))))))),Xv))+(((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((csch(P_w))*(((coth(P_w))^(((O_n)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((cosh(P_v))*((coth(P_w))^(O_n)),Xv) = ((Int(((sinh(P_v))*(((coth(P_w))^(((O_n)+((-1))))))),Xv))+(((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((csch(P_w))*(((coth(P_w))^(((O_n)+((-1))))))),Xv)))))
 
 # Regel 66 (4 Varianten):
 #   Int[Sinh[v_]*Coth[w_]^n_., x_Symbol] := Int[Cosh[v]*Coth[w]^(n - 1), x] + Sinh[v - w]*Int[Csch[w]*Coth[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]
-ADDSPEC RubiRules : IF (((O_n > 0))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((sinh(P_v))*((coth(P_w))^(O_n)),Xv) = ((Int(((cosh(P_v))*(((coth(P_w))^(((O_n)+((-1))))))),Xv))+(((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((csch(P_w))*(((coth(P_w))^(((O_n)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((sinh(P_v))*((coth(P_w))^(O_n)),Xv) = ((Int(((cosh(P_v))*(((coth(P_w))^(((O_n)+((-1))))))),Xv))+(((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((csch(P_w))*(((coth(P_w))^(((O_n)+((-1))))))),Xv)))))
 
 # Regel 67 (4 Varianten):
 #   Int[Cosh[v_]*Tanh[w_]^n_., x_Symbol] := Int[Sinh[v]*Tanh[w]^(n - 1), x] - Sinh[v - w]*Int[Sech[w]*Tanh[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]
-ADDSPEC RubiRules : IF (((O_n > 0))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((cosh(P_v))*((tanh(P_w))^(O_n)),Xv) = ((Int(((sinh(P_v))*(((tanh(P_w))^(((O_n)+((-1))))))),Xv))+((((-1))*(sinh(((P_v)+((((-1))*(P_w))))))*(Int(((sech(P_w))*(((tanh(P_w))^(((O_n)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((cosh(P_v))*((tanh(P_w))^(O_n)),Xv) = ((Int(((sinh(P_v))*(((tanh(P_w))^(((O_n)+((-1))))))),Xv))+((((-1))*(sinh(((P_v)+((((-1))*(P_w))))))*(Int(((sech(P_w))*(((tanh(P_w))^(((O_n)+((-1))))))),Xv)))))
 
 # Regel 68 (4 Varianten):
 #   Int[Sinh[v_]*Sech[w_]^n_., x_Symbol] := Cosh[v - w]*Int[Tanh[w]*Sech[w]^(n - 1), x] + Sinh[v - w]*Int[Sech[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]
-ADDSPEC RubiRules : IF (((O_n > 0))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((sinh(P_v))*((sech(P_w))^(O_n)),Xv) = ((((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((tanh(P_w))*(((sech(P_w))^(((O_n)+((-1))))))),Xv))))+(((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((sech(P_w))^(((O_n)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((sinh(P_v))*((sech(P_w))^(O_n)),Xv) = ((((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((tanh(P_w))*(((sech(P_w))^(((O_n)+((-1))))))),Xv))))+(((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((sech(P_w))^(((O_n)+((-1))))),Xv)))))
 
 # Regel 69 (4 Varianten):
 #   Int[Cosh[v_]*Csch[w_]^n_., x_Symbol] := Cosh[v - w]*Int[Coth[w]*Csch[w]^(n - 1), x] + Sinh[v - w]*Int[Csch[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]
-ADDSPEC RubiRules : IF (((O_n > 0))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((cosh(P_v))*((csch(P_w))^(O_n)),Xv) = ((((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((coth(P_w))*(((csch(P_w))^(((O_n)+((-1))))))),Xv))))+(((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((csch(P_w))^(((O_n)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((cosh(P_v))*((csch(P_w))^(O_n)),Xv) = ((((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((coth(P_w))*(((csch(P_w))^(((O_n)+((-1))))))),Xv))))+(((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((csch(P_w))^(((O_n)+((-1))))),Xv)))))
 
 # Regel 70 (4 Varianten):
 #   Int[Sinh[v_]*Csch[w_]^n_., x_Symbol] := Sinh[v - w]*Int[Coth[w]*Csch[w]^(n - 1), x] + Cosh[v - w]*Int[Csch[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]
-ADDSPEC RubiRules : IF (((O_n > 0))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((sinh(P_v))*((csch(P_w))^(O_n)),Xv) = ((((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((coth(P_w))*(((csch(P_w))^(((O_n)+((-1))))))),Xv))))+(((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((csch(P_w))^(((O_n)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((sinh(P_v))*((csch(P_w))^(O_n)),Xv) = ((((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((coth(P_w))*(((csch(P_w))^(((O_n)+((-1))))))),Xv))))+(((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((csch(P_w))^(((O_n)+((-1))))),Xv)))))
 
 # Regel 71 (4 Varianten):
 #   Int[Cosh[v_]*Sech[w_]^n_., x_Symbol] := Sinh[v - w]*Int[Tanh[w]*Sech[w]^(n - 1), x] + Cosh[v - w]*Int[Sech[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]
-ADDSPEC RubiRules : IF (((O_n > 0))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((cosh(P_v))*((sech(P_w))^(O_n)),Xv) = ((((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((tanh(P_w))*(((sech(P_w))^(((O_n)+((-1))))))),Xv))))+(((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((sech(P_w))^(((O_n)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), (neq(P_w,P_v)), NIN(Xv,((P_v)+((((-1))*(P_w))))) Int((cosh(P_v))*((sech(P_w))^(O_n)),Xv) = ((((sinh(((P_v)+((((-1))*(P_w))))))*(Int(((tanh(P_w))*(((sech(P_w))^(((O_n)+((-1))))))),Xv))))+(((cosh(((P_v)+((((-1))*(P_w))))))*(Int(((sech(P_w))^(((O_n)+((-1))))),Xv)))))
 
 # Regel 72 (69984 Varianten):
 #   Int[(e_. + f_.*x_)^ m_.*(a_ + b_.*Sinh[c_. + d_.*x_]*Cosh[c_. + d_.*x_])^n_., x_Symbol] := Int[(e + f*x)^m*(a + b*Sinh[2*c + 2*d*x]/2)^n, x] /; FreeQ[{a, b, c, d, e, f, m, n}, x]

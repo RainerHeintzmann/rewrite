@@ -21,6 +21,10 @@ OTHER polyq    : real,real,real >> bool   ATT polyq      # Polynom vom Grad n
 FUNC linearq   : real,real >> bool        ATT linearq    # Polynom vom Grad 1
 FUNC sumq      : real >> bool             ATT sumq
 FUNC nonsumq   : real >> bool             ATT nonsumq
+FUNC gtq : real,real >> bool             ATT gtq    # Rubi: GtQ, falsch wenn keine Zahlen
+FUNC ltq : real,real >> bool             ATT ltq
+FUNC geq : real,real >> bool             ATT geq
+FUNC leq : real,real >> bool             ATT leq
 FUNC productq  : real >> bool             ATT productq
 FUNC powerq    : real >> bool             ATT powerq
 FUNC fractionq : real++ >> bool           ATT fractionq     # keine ganzen Zahlen
@@ -51,6 +55,8 @@ FUNC freefactors : real,real >> real      ATT freefactors     # Faktoren ohne x
 FUNC nonfreefactors : real,real >> real   ATT nonfreefactors  # Faktoren mit x
 FUNC removecontent : real,real >> real    ATT removecontent   # Rubi: RemoveContent[u,x]
 FUNC trignorm : real,real >> real         ATT trignorm        # 1/sin = csc, Rubis FixInertTrigFunction
+FUNC substfracpow : real,real >> real     ATT substfracpow    # Rubi: x -> (a+b*x)^(1/n)
+FUNC substsqrtquad : real,real >> real    ATT substsqrtquad   # Rubi: Eulersche Substitutionen
 FUNC expandtosum : real,real >> real      ATT expandtosum     # Summe c_k*x^k
 OTHER expandtosum : real,real,real >> real ATT expandtosum
 FUNC polyquotient  : real,real,real >> real ATT polyquotient  # Polynomdivision

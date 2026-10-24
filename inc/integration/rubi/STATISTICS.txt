@@ -1,4 +1,4 @@
-translated 6830 of 7422 rules (92%) from 200 files
+translated 6835 of 7432 rules (92%) from 200 files
 
 reasons for rules that were not translated:
    245  symbol I
@@ -11,6 +11,7 @@ reasons for rules that were not translated:
     10  If
     10  ShowStep
      9  function Together
+     9  parse error at '['
      9  function Complex in pattern
      8  function PolynomialDivide
      8  parse error: expected ']', got ';'
@@ -23,7 +24,6 @@ reasons for rules that were not translated:
      6  function ExpandTrigToExp
      6  function variable without a finite set of functions
      5  function Factor
-     5  parse error at '['
      5  predicate IGeQ
      4  predicate PerfectSquareQ
      4  function Mod
@@ -55,6 +55,7 @@ reasons for rules that were not translated:
      1  function FractionalPart
      1  predicate OddQ
      1  NeQ with 1 arguments (never true in Rubi either)
+     1  function IntSum
      1  predicate MonomialQ
      1  condition is never true
      1  function FunctionExpand
@@ -110,7 +111,7 @@ per file (translated / total):
   21 /   21  r1_2_4_2     1.2.4.2 (d x)^m (a x^q+b x^n+c x^(2 n-q))^p
    8 /    8  r1_2_4_3     1.2.4.3 (d+e x^(n-q)) (a x^q+b x^n+c x^(2 n-q))^p
   16 /   16  r1_2_4_4     1.2.4.4 (f x)^m (d+e x^(n-q)) (a x^q+b x^n+c x^(2 n-q))^p
-  59 /   69  r1_4_1       1.4.1 Algebraic function simplification
+  59 /   70  r1_4_1       1.4.1 Algebraic function simplification
   17 /   29  r1_4_2       1.4.2 Algebraic function normalization
   26 /   27  r1_1_1_7     1.1.1.7 P(x) (a+b x)^m (c+d x)^n (e+f x)^p (g+h x)^q
    7 /    7  r1_1_1_6     1.1.1.6 P(x) (a+b x)^m (c+d x)^n (e+f x)^p
@@ -269,4 +270,4 @@ per file (translated / total):
   44 /   44  r8_9         8.9 Product logarithm function
    2 /    3  r8_10        8.10 Bessel functions
    0 /   21  r9_1         9.1 Derivative integration rules
-  40 /   67  r9_3         9.3 Miscellaneous integration rules
+  45 /   76  r9_3         9.3 Miscellaneous integration rules

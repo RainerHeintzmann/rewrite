@@ -430,35 +430,35 @@ ADDSPEC RubiRules : IF (eqq(P_w,P_v)), (integerq(O_p)) Int((O_u)*((sin(P_v))^(O_
 
 # Regel 62 (4 Varianten):
 #   Int[Sin[v_]*Tan[w_]^n_., x_Symbol] := -Int[Cos[v]*Tan[w]^(n - 1), x] + Cos[v - w]*Int[Sec[w]*Tan[w]^(n - 1), x] /; GtQ[n, 0] && FreeQ[v - w, x] && NeQ[w, v]
-ADDSPEC RubiRules : IF (((O_n > 0))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((sin(P_v))*((tan(P_w))^(O_n)),Xv) = (((((-1))*(Int(((cos(P_v))*(((tan(P_w))^(((O_n)+((-1))))))),Xv))))+(((cos(((P_v)+((((-1))*(P_w))))))*(Int(((sec(P_w))*(((tan(P_w))^(((O_n)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((sin(P_v))*((tan(P_w))^(O_n)),Xv) = (((((-1))*(Int(((cos(P_v))*(((tan(P_w))^(((O_n)+((-1))))))),Xv))))+(((cos(((P_v)+((((-1))*(P_w))))))*(Int(((sec(P_w))*(((tan(P_w))^(((O_n)+((-1))))))),Xv)))))
 
 # Regel 63 (4 Varianten):
 #   Int[Cos[v_]*Cot[w_]^n_., x_Symbol] := -Int[Sin[v]*Cot[w]^(n - 1), x] + Cos[v - w]*Int[Csc[w]*Cot[w]^(n - 1), x] /; GtQ[n, 0] && FreeQ[v - w, x] && NeQ[w, v]
-ADDSPEC RubiRules : IF (((O_n > 0))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((cos(P_v))*((cot(P_w))^(O_n)),Xv) = (((((-1))*(Int(((sin(P_v))*(((cot(P_w))^(((O_n)+((-1))))))),Xv))))+(((cos(((P_v)+((((-1))*(P_w))))))*(Int(((csc(P_w))*(((cot(P_w))^(((O_n)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((cos(P_v))*((cot(P_w))^(O_n)),Xv) = (((((-1))*(Int(((sin(P_v))*(((cot(P_w))^(((O_n)+((-1))))))),Xv))))+(((cos(((P_v)+((((-1))*(P_w))))))*(Int(((csc(P_w))*(((cot(P_w))^(((O_n)+((-1))))))),Xv)))))
 
 # Regel 64 (4 Varianten):
 #   Int[Sin[v_]*Cot[w_]^n_., x_Symbol] := Int[Cos[v]*Cot[w]^(n - 1), x] + Sin[v - w]*Int[Csc[w]*Cot[w]^(n - 1), x] /; GtQ[n, 0] && FreeQ[v - w, x] && NeQ[w, v]
-ADDSPEC RubiRules : IF (((O_n > 0))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((sin(P_v))*((cot(P_w))^(O_n)),Xv) = ((Int(((cos(P_v))*(((cot(P_w))^(((O_n)+((-1))))))),Xv))+(((sin(((P_v)+((((-1))*(P_w))))))*(Int(((csc(P_w))*(((cot(P_w))^(((O_n)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((sin(P_v))*((cot(P_w))^(O_n)),Xv) = ((Int(((cos(P_v))*(((cot(P_w))^(((O_n)+((-1))))))),Xv))+(((sin(((P_v)+((((-1))*(P_w))))))*(Int(((csc(P_w))*(((cot(P_w))^(((O_n)+((-1))))))),Xv)))))
 
 # Regel 65 (4 Varianten):
 #   Int[Cos[v_]*Tan[w_]^n_., x_Symbol] := Int[Sin[v]*Tan[w]^(n - 1), x] - Sin[v - w]*Int[Sec[w]*Tan[w]^(n - 1), x] /; GtQ[n, 0] && FreeQ[v - w, x] && NeQ[w, v]
-ADDSPEC RubiRules : IF (((O_n > 0))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((cos(P_v))*((tan(P_w))^(O_n)),Xv) = ((Int(((sin(P_v))*(((tan(P_w))^(((O_n)+((-1))))))),Xv))+((((-1))*(sin(((P_v)+((((-1))*(P_w))))))*(Int(((sec(P_w))*(((tan(P_w))^(((O_n)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((cos(P_v))*((tan(P_w))^(O_n)),Xv) = ((Int(((sin(P_v))*(((tan(P_w))^(((O_n)+((-1))))))),Xv))+((((-1))*(sin(((P_v)+((((-1))*(P_w))))))*(Int(((sec(P_w))*(((tan(P_w))^(((O_n)+((-1))))))),Xv)))))
 
 # Regel 66 (4 Varianten):
 #   Int[Sin[v_]*Sec[w_]^n_., x_Symbol] := Cos[v - w]*Int[Tan[w]*Sec[w]^(n - 1), x] + Sin[v - w]*Int[Sec[w]^(n - 1), x] /; GtQ[n, 0] && FreeQ[v - w, x] && NeQ[w, v]
-ADDSPEC RubiRules : IF (((O_n > 0))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((sin(P_v))*((sec(P_w))^(O_n)),Xv) = ((((cos(((P_v)+((((-1))*(P_w))))))*(Int(((tan(P_w))*(((sec(P_w))^(((O_n)+((-1))))))),Xv))))+(((sin(((P_v)+((((-1))*(P_w))))))*(Int(((sec(P_w))^(((O_n)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((sin(P_v))*((sec(P_w))^(O_n)),Xv) = ((((cos(((P_v)+((((-1))*(P_w))))))*(Int(((tan(P_w))*(((sec(P_w))^(((O_n)+((-1))))))),Xv))))+(((sin(((P_v)+((((-1))*(P_w))))))*(Int(((sec(P_w))^(((O_n)+((-1))))),Xv)))))
 
 # Regel 67 (4 Varianten):
 #   Int[Cos[v_]*Csc[w_]^n_., x_Symbol] := Cos[v - w]*Int[Cot[w]*Csc[w]^(n - 1), x] - Sin[v - w]*Int[Csc[w]^(n - 1), x] /; GtQ[n, 0] && FreeQ[v - w, x] && NeQ[w, v]
-ADDSPEC RubiRules : IF (((O_n > 0))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((cos(P_v))*((csc(P_w))^(O_n)),Xv) = ((((cos(((P_v)+((((-1))*(P_w))))))*(Int(((cot(P_w))*(((csc(P_w))^(((O_n)+((-1))))))),Xv))))+((((-1))*(sin(((P_v)+((((-1))*(P_w))))))*(Int(((csc(P_w))^(((O_n)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((cos(P_v))*((csc(P_w))^(O_n)),Xv) = ((((cos(((P_v)+((((-1))*(P_w))))))*(Int(((cot(P_w))*(((csc(P_w))^(((O_n)+((-1))))))),Xv))))+((((-1))*(sin(((P_v)+((((-1))*(P_w))))))*(Int(((csc(P_w))^(((O_n)+((-1))))),Xv)))))
 
 # Regel 68 (4 Varianten):
 #   Int[Sin[v_]*Csc[w_]^n_., x_Symbol] := Sin[v - w]*Int[Cot[w]*Csc[w]^(n - 1), x] + Cos[v - w]*Int[Csc[w]^(n - 1), x] /; GtQ[n, 0] && FreeQ[v - w, x] && NeQ[w, v]
-ADDSPEC RubiRules : IF (((O_n > 0))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((sin(P_v))*((csc(P_w))^(O_n)),Xv) = ((((sin(((P_v)+((((-1))*(P_w))))))*(Int(((cot(P_w))*(((csc(P_w))^(((O_n)+((-1))))))),Xv))))+(((cos(((P_v)+((((-1))*(P_w))))))*(Int(((csc(P_w))^(((O_n)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((sin(P_v))*((csc(P_w))^(O_n)),Xv) = ((((sin(((P_v)+((((-1))*(P_w))))))*(Int(((cot(P_w))*(((csc(P_w))^(((O_n)+((-1))))))),Xv))))+(((cos(((P_v)+((((-1))*(P_w))))))*(Int(((csc(P_w))^(((O_n)+((-1))))),Xv)))))
 
 # Regel 69 (4 Varianten):
 #   Int[Cos[v_]*Sec[w_]^n_., x_Symbol] := -Sin[v - w]*Int[Tan[w]*Sec[w]^(n - 1), x] + Cos[v - w]*Int[Sec[w]^(n - 1), x] /; GtQ[n, 0] && FreeQ[v - w, x] && NeQ[w, v]
-ADDSPEC RubiRules : IF (((O_n > 0))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((cos(P_v))*((sec(P_w))^(O_n)),Xv) = (((((-1))*(sin(((P_v)+((((-1))*(P_w))))))*(Int(((tan(P_w))*(((sec(P_w))^(((O_n)+((-1))))))),Xv))))+(((cos(((P_v)+((((-1))*(P_w))))))*(Int(((sec(P_w))^(((O_n)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (((gtq(O_n,0)))), NIN(Xv,((P_v)+((((-1))*(P_w))))), (neq(P_w,P_v)) Int((cos(P_v))*((sec(P_w))^(O_n)),Xv) = (((((-1))*(sin(((P_v)+((((-1))*(P_w))))))*(Int(((tan(P_w))*(((sec(P_w))^(((O_n)+((-1))))))),Xv))))+(((cos(((P_v)+((((-1))*(P_w))))))*(Int(((sec(P_w))^(((O_n)+((-1))))),Xv)))))
 
 # Regel 70 (69984 Varianten):
 #   Int[(e_. + f_.*x_)^m_.*(a_ + b_.*Sin[c_. + d_.*x_]*Cos[c_. + d_.*x_])^ n_., x_Symbol] := Int[(e + f*x)^m*(a + b*Sin[2*c + 2*d*x]/2)^n, x] /; FreeQ[{a, b, c, d, e, f, m, n}, x]

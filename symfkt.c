@@ -200,7 +200,8 @@ int term_has_nan (Node * t)	/* contains NaN, infinity or a division by zero */
 	 * of no use */
 	if (is_head(t, "polyquotient", 3) || is_head(t, "polyremainder", 3)
 	    || is_head(t, "expandintegrand", -1) || is_head(t, "substexp", -1)
-	    || is_head(t, "substfor", -1) || is_head(t, "trignorm", -1)) return 1;
+	    || is_head(t, "substfor", -1) || is_head(t, "trignorm", -1)
+	    || is_head(t, "substfracpow", -1) || is_head(t, "substsqrtquad", -1)) return 1;
 	n = term_nargs(t);
 	for (i = 0; i < n; i++)
 		if (term_has_nan(arg(t, i))) return 1;
@@ -768,6 +769,22 @@ static Node * s_nonsumq (Node * a[], int n, Symbol * f)	/* Rubi's NonsumQ */
 	if (n != 1) return NULL;
 	return mk_bool(! is_head(a[0], "+", 2) && ! is_head(a[0], "-", 2), f);
 }
+
+/* Rubi's GtQ, LtQ, GeQ, LeQ: false unless both are numbers (a symbolic
+ * a^2 > 0 is not known, and Not[GtQ[a,0]] is then true) */
+static Node * order_q (Node * a[], int n, Symbol * f, int op)
+{
+	double u, v;
+	int r;
+	if (n != 2) return NULL;
+	if (! num_value(a[0], & u) || ! num_value(a[1], & v)) return mk_bool(0, f);
+	r = op == 0 ? u > v : op == 1 ? u < v : op == 2 ? u >= v : u <= v;
+	return mk_bool(r, f);
+}
+static Node * s_gtq (Node * a[], int n, Symbol * f) { return order_q(a, n, f, 0); }
+static Node * s_ltq (Node * a[], int n, Symbol * f) { return order_q(a, n, f, 1); }
+static Node * s_geq (Node * a[], int n, Symbol * f) { return order_q(a, n, f, 2); }
+static Node * s_leq (Node * a[], int n, Symbol * f) { return order_q(a, n, f, 3); }
 
 static Node * s_productq (Node * a[], int n, Symbol * f)
 {
@@ -3205,6 +3222,218 @@ static Node * quotient_free (Node * u, Node * v, Node * x)	/* u/v if free of x *
 	return NULL;
 }
 
+/* ---- substfracpow(u, x): Rubi's SubstForFractionalPowerOfLinear ----
+ * u contains powers (a+b*x)^(p/q) of one linear function; with n the least
+ * common multiple of the q and t = (a+b*x)^(1/n):
+ *   Int(u, x) = n/b * Subst[Int[t^(n-1)*u(x -> (t^n-a)/b), t], t, (a+b*x)^(1/n)].
+ * NULL if u has no such powers. */
+
+typedef struct {
+	Node * lin;		/* a+b*x, a node of u */
+	long n;			/* lcm of the denominators */
+	int ok;
+	Node * X, * T;		/* replacements of x and of lin^(1/n) */
+} FracPow;
+
+static long lcm_l (long a, long b)
+{
+	long x = a, y = b, t;
+	while (y) { t = x % y; x = y; y = t; }
+	return a / x * b;
+}
+
+static void fp_scan (Node * u, Node * x, FracPow * s)
+{
+	double e, p, q;
+	int k, n;
+	u = deref(u);
+	if (! s->ok || ! contains(u, x) || u->type != Func) return;
+	if (is_head(u, "^", 2) && ! contains(arg(u, 1), x) && num_value(arg(u, 1), & e)
+	    && e != floor(e) && rat_approx(e, & p, & q) && q <= 12)
+		{
+		Node * c[MAXDEG];
+		int deg;
+		if (s->lin)
+			{
+			if (! tequal(s->lin, arg(u, 0))) s->ok = 0;
+			else s->n = lcm_l(s->n, (long) q);
+			return;
+			}
+		if (! poly_coeffs(arg(u, 0), x, c, & deg)) { s->ok = 0; return; }
+		for (k = 0; k <= deg; k++) delete(c[k]);
+		if (deg != 1) { s->ok = 0; return; }
+		s->lin = arg(u, 0);
+		s->n = (long) q;
+		return;
+		}
+	n = term_nargs(u);
+	for (k = 0; k < n; k++) fp_scan(arg(u, k), x, s);
+}
+
+static Node * fp_repl (Node * u, Node * x, FracPow * s)
+{
+	double e;
+	int k, n;
+	u = deref(u);
+	if (! contains(u, x)) return tcpy(u);
+	if (tequal(u, x)) return tcpy(s->X);
+	if (is_head(u, "^", 2) && tequal(arg(u, 0), s->lin) && num_value(arg(u, 1), & e))
+		return mk_pow(tcpy(s->T), mk_int(e * s->n));		/* (a+bx)^(p/q) = t^(p n/q) */
+	if (u->type != Func) return tcpy(u);
+	n = term_nargs(u);
+	{
+	Node * args = NULL, ** tail = & args;
+	for (k = 0; k < n; k++)
+		{
+		Node * c = fp_repl(arg(u, k), x, s);
+		if (k < n - 1) { * tail = mknod(Terms, c, NULL); tail = & (* tail)->r; }
+		else * tail = c;
+		}
+	return mknod(Func, u->l, args);
+	}
+}
+
+static Node * s_substfracpow (Node * a[], int n, Symbol * f)
+{
+	FracPow s = { NULL, 1, 1, NULL, NULL };
+	Node * c[MAXDEG], * w, * r;
+	int deg;
+	if (n != 2) return NULL;
+	fp_scan(a[0], a[1], & s);
+	if (! s.ok || ! s.lin || s.n < 2 || ! poly_coeffs(s.lin, a[1], c, & deg)) return NULL;
+	/* x = (t^n - a)/b with t written as x */
+	s.T = a[1];
+	s.X = mk_mul(mk_add(mk_pow(tcpy(a[1]), mk_int(s.n)), mk_neg(tcpy(c[0]))),
+		mk_pow(tcpy(c[1]), mk_int(-1)));
+	w = mk_mul(mk_pow(tcpy(a[1]), mk_int(s.n - 1)), fp_repl(a[0], a[1], & s));
+	r = mk_mul(mk_mul(mk_int(s.n), mk_pow(c[1], mk_int(-1))),
+		mk_f3("intsubst", w, tcpy(a[1]), mk_pow(tcpy(s.lin), mk_num_ex(1.0 / s.n, 1))));
+	delete(c[0]);
+	delete(s.X);
+	return r;
+}
+
+/* ---- substsqrtquad(u, x): Euler's substitutions (Rubi's
+ * FunctionOfSquareRootOfQuadratic) for u rational in x and sqrt(q),
+ * q = a + b*x + c*x^2 with numbers a, b, c:
+ *   c > 0: t = sqrt(c)*x + sqrt(q), x = (t^2-a)/(b+2 sqrt(c) t),
+ *          sqrt(q) = (a sqrt(c) + b t + sqrt(c) t^2)/(b + 2 sqrt(c) t)
+ *   a > 0: t = (sqrt(q) - sqrt(a))/x, x = (2 sqrt(a) t - b)/(c - t^2),
+ *          sqrt(q) = (c sqrt(a) - b t + sqrt(a) t^2)/(c - t^2)
+ * and Int(u, x) = 2*Subst[Int[u(x, sqrt(q))*sqrt(q)(t)/den(t), t], t, ...]
+ * with den = b + 2 sqrt(c) t, resp. c - t^2. NULL otherwise. */
+
+typedef struct {
+	Node * q;		/* the quadratic under the root, a node of u */
+	int ok;
+	Node * X, * R;		/* replacements of x and of sqrt(q) */
+} SqrtQuad;
+
+static void sq_scan (Node * u, Node * x, SqrtQuad * s)
+{
+	double e;
+	int k, n;
+	u = deref(u);
+	if (! s->ok || ! contains(u, x)) return;
+	if (tequal(u, x)) return;
+	if (u->type != Func) { s->ok = 0; return; }
+	if (is_head(u, "^", 2) && ! contains(arg(u, 1), x) && num_value(arg(u, 1), & e))
+		{
+		if (e == floor(e)) { sq_scan(arg(u, 0), x, s); return; }
+		if (2 * e != floor(2 * e)) { s->ok = 0; return; }	/* only half integers */
+		if (s->q) { if (! tequal(s->q, arg(u, 0))) s->ok = 0; return; }
+		{
+		Node * c[MAXDEG];
+		int deg;
+		if (! poly_coeffs(arg(u, 0), x, c, & deg)) { s->ok = 0; return; }
+		for (k = 0; k <= deg; k++) delete(c[k]);
+		if (deg != 2) { s->ok = 0; return; }
+		}
+		s->q = arg(u, 0);
+		return;
+		}
+	if (! is_head(u, "+", 2) && ! is_head(u, "*", 2) && ! is_head(u, "-", 2)
+	    && ! is_head(u, "/", 2) && ! is_head(u, "-", 1)) { s->ok = 0; return; }
+	n = term_nargs(u);
+	for (k = 0; k < n; k++) sq_scan(arg(u, k), x, s);
+}
+
+static Node * sq_repl (Node * u, Node * x, SqrtQuad * s)
+{
+	double e;
+	int k, n;
+	u = deref(u);
+	if (! contains(u, x)) return tcpy(u);
+	if (tequal(u, x)) return tcpy(s->X);
+	if (is_head(u, "^", 2) && tequal(arg(u, 0), s->q) && num_value(arg(u, 1), & e))
+		return mk_pow(tcpy(s->R), mk_int(2 * e));		/* q^(k/2) = sqrt(q)^k */
+	n = term_nargs(u);
+	{
+	Node * args = NULL, ** tail = & args;
+	for (k = 0; k < n; k++)
+		{
+		Node * c = sq_repl(arg(u, k), x, s);
+		if (k < n - 1) { * tail = mknod(Terms, c, NULL); tail = & (* tail)->r; }
+		else * tail = c;
+		}
+	return mknod(Func, u->l, args);
+	}
+}
+
+static Node * root2 (Node * c)		/* sqrt of a positive number, exact if possible */
+{
+	Symbol * r = num_sym(c) && is_exact(c) ? exact_root(num_sym(c), 2) : NULL;
+	if (r) return mknod(Const, (Node *) r, NULL);
+	return mk_pow(tcpy(c), mk_num_ex(0.5, 1));
+}
+
+static Node * s_substsqrtquad (Node * a[], int n, Symbol * f)
+{
+	SqrtQuad s = { NULL, 1, NULL, NULL };
+	Node * c[MAXDEG], * x, * t, * den, * w, * r;
+	double va, vb, vc;
+	int deg;
+	if (n != 2) return NULL;
+	x = a[1];
+	sq_scan(a[0], x, & s);
+	if (! s.ok || ! s.q || ! poly_coeffs(s.q, x, c, & deg)) return NULL;
+	if (! num_value(c[0], & va) || ! num_value(c[1], & vb) || ! num_value(c[2], & vc))
+		{ delete(c[0]); delete(c[1]); delete(c[2]); return NULL; }
+	if (vc > 0)
+		{
+		Node * sc = root2(c[2]);
+		den = mk_add(tcpy(c[1]), mk_mul(mk_mul(mk_int(2), tcpy(sc)), tcpy(x)));
+		s.X = mk_mul(mk_add(mk_pow(tcpy(x), mk_int(2)), mk_neg(tcpy(c[0]))),
+			mk_pow(tcpy(den), mk_int(-1)));
+		s.R = mk_mul(mk_add(mk_add(mk_mul(tcpy(c[0]), tcpy(sc)), mk_mul(tcpy(c[1]), tcpy(x))),
+				mk_mul(tcpy(sc), mk_pow(tcpy(x), mk_int(2)))),
+			mk_pow(tcpy(den), mk_int(-1)));
+		t = mk_add(mk_mul(tcpy(sc), tcpy(x)), mk_pow(tcpy(s.q), mk_num_ex(0.5, 1)));
+		delete(sc);
+		}
+	else if (va > 0)
+		{
+		Node * sa = root2(c[0]);
+		den = mk_add(tcpy(c[2]), mk_neg(mk_pow(tcpy(x), mk_int(2))));
+		s.X = mk_mul(mk_add(mk_mul(mk_mul(mk_int(2), tcpy(sa)), tcpy(x)), mk_neg(tcpy(c[1]))),
+			mk_pow(tcpy(den), mk_int(-1)));
+		s.R = mk_mul(mk_add(mk_add(mk_mul(tcpy(c[2]), tcpy(sa)), mk_neg(mk_mul(tcpy(c[1]), tcpy(x)))),
+				mk_mul(tcpy(sa), mk_pow(tcpy(x), mk_int(2)))),
+			mk_pow(tcpy(den), mk_int(-1)));
+		t = mk_mul(mk_add(mk_pow(tcpy(s.q), mk_num_ex(0.5, 1)), mk_neg(tcpy(sa))),
+			mk_pow(tcpy(x), mk_int(-1)));
+		delete(sa);
+		}
+	else
+		{ delete(c[0]); delete(c[1]); delete(c[2]); return NULL; }
+	/* integrand in t (written as x): u(X, R) * R / den * 2 */
+	w = mk_mul(mk_mul(sq_repl(a[0], x, & s), tcpy(s.R)), mk_pow(den, mk_int(-1)));
+	r = mk_mul(mk_int(2), mk_f3("intsubst", w, tcpy(x), t));
+	delete(s.X); delete(s.R);
+	delete(c[0]); delete(c[1]); delete(c[2]);
+	return r;
+}
+
 static Node * s_derivdivides (Node * a[], int n, Symbol * f)
 {
 	Node * y, * u, * x, * dy, * q;
@@ -3309,6 +3538,10 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "linearq",         s_linearq },
 	{ "sumq",            s_sumq },
 	{ "nonsumq",         s_nonsumq },
+	{ "gtq",             s_gtq },
+	{ "ltq",             s_ltq },
+	{ "geq",             s_geq },
+	{ "leq",             s_leq },
 	{ "productq",        s_productq },
 	{ "powerq",          s_powerq },
 	{ "expand",          s_expand },
@@ -3333,6 +3566,8 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "nonfreefactors",  s_nonfreefactors },
 	{ "removecontent",   s_removecontent },
 	{ "trignorm",        s_trignorm },
+	{ "substfracpow",    s_substfracpow },
+	{ "substsqrtquad",   s_substsqrtquad },
 	{ "expandtosum",     s_expandtosum },
 	{ "polyquotient",    s_polyquotient },
 	{ "polyremainder",   s_polyremainder },

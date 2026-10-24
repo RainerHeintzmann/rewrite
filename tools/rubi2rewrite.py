@@ -526,9 +526,11 @@ def tr_bool(e, ctx):
     if head in PREDICATES:
         return PREDICATES[head] + paren(','.join(tr_rhs(a, ctx) for a in args))
     if head in ORDER:
-        op = ORDER[head]
+        # gtq(u,v), ...: false unless both are numbers, as Rubi's GtQ
+        # (so that Not[GtQ[a^2,0]] is true for a symbol a)
+        fn = {'GtQ': 'gtq', 'LtQ': 'ltq', 'GeQ': 'geq', 'LeQ': 'leq'}[head]
         parts = [tr_rhs(a, ctx) for a in args]
-        pairs = ['(%s %s %s)' % (parts[i], op, parts[i + 1]) for i in range(len(parts) - 1)]
+        pairs = ['(%s(%s,%s))' % (fn, parts[i], parts[i + 1]) for i in range(len(parts) - 1)]
         return paren(' && '.join(pairs))
     if head in ('Equal', 'Unequal', 'Less', 'Greater', 'LessEqual', 'GreaterEqual'):
         op = {'Equal': '==', 'Unequal': '!=', 'Less': '<', 'Greater': '>',
@@ -847,7 +849,16 @@ def rules_of(path):
             else:
                 stmt += ' ' + line
             depth += sum(line.count(c) for c in '[({') - sum(line.count(c) for c in '])}')
+            # If[TrueQ[$LoadShowSteps], rule with ShowStep, rule without]:
+            # the first rule ends with ',', the second with the ']' of If
+            if depth <= 0 and stmt.rstrip().endswith(',') and 'ShowStep[' in stmt:
+                yield stmt.rstrip()[:-1]
+                stmt = None
+                continue
             if depth <= 0 and not stmt.rstrip().endswith(CONTINUES):
+                while depth < 0 and stmt.rstrip().endswith(']'):
+                    stmt = stmt.rstrip()[:-1]
+                    depth += 1
                 yield stmt
                 stmt = None
         if stmt is not None:
@@ -907,6 +918,12 @@ HAND_RULES = [
     # Rubi 2.3: integrand a function of F^(c x): substitute x -> F^(g x)
     ('Int[u_, x_Symbol] := With[{v = FunctionOfExponential[u, x]}',
      'ADDSPEC RubiRules : Int(P_u,Xv) = substexp(P_u,Xv)'),
+    # Rubi 9.3: x -> (a+b*x)^(1/n) for fractional powers of a linear function
+    ('Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, lst',
+     'ADDSPEC RubiRules : Int(P_u,Xv) = substfracpow(P_u,Xv)'),
+    # Rubi 9.3: Euler's substitutions for functions of x and Sqrt[a+b*x+c*x^2]
+    ('Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2',
+     'ADDSPEC RubiRules : Int(P_u,Xv) = substsqrtquad(P_u,Xv)'),
 ]
 
 
@@ -915,12 +932,17 @@ def translate_file(path, out_dir, all_vars, stats):
     section = os.path.splitext(os.path.basename(path))[0]
     lines = [HEADER % (name, section)]
     ok = 0
+    used = set()
     for i, text in enumerate(rules_of(path), 1):
         hand = [r for key, r in HAND_RULES if text.startswith(key)]
         if hand:
             ok += 1
             all_vars['P'].add('P_u')
-            lines.append('# Regel %d (von Hand, C-Hilfsfunktion):\n#   %s\n%s\n' % (i, text, hand[0]))
+            if hand[0] in used:         # several cases of one helper: once
+                lines.append('# Regel %d (von Hand, wie oben):\n#   %s\n' % (i, text))
+            else:
+                used.add(hand[0])
+                lines.append('# Regel %d (von Hand, C-Hilfsfunktion):\n#   %s\n%s\n' % (i, text, hand[0]))
             continue
         try:
             results = translate_rule(text)
