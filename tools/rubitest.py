@@ -198,6 +198,28 @@ NUMENV = {
     'pi': math.pi, 'E': math.e, 'pw': pw,
 }
 
+def rpw(a, b):
+    """real power; ValueError outside the real domain"""
+    if a < 0 and b != int(b):
+        raise ValueError('negative base')
+    return float(a) ** b
+
+
+# real evaluation: a point is only used if every intermediate value of the
+# integrand is real (math raises ValueError otherwise)
+REALENV = {
+    'sin': math.sin, 'cos': math.cos, 'tan': math.tan,
+    'cot': lambda z: 1 / math.tan(z), 'sec': lambda z: 1 / math.cos(z),
+    'csc': lambda z: 1 / math.sin(z), 'asin': math.asin, 'acos': math.acos,
+    'atan': math.atan, 'acot': lambda z: math.atan(1 / z),
+    'sinh': math.sinh, 'cosh': math.cosh, 'tanh': math.tanh,
+    'coth': lambda z: 1 / math.tanh(z), 'sech': lambda z: 1 / math.cosh(z),
+    'csch': lambda z: 1 / math.sinh(z), 'asinh': math.asinh, 'acosh': math.acosh,
+    'atanh': math.atanh, 'acoth': lambda z: math.atanh(1 / z),
+    'log': math.log, 'sqrt': math.sqrt, 'exp': math.exp, 'abs': abs,
+    'pi': math.pi, 'E': math.e, 'pw': rpw,
+}
+
 # rewrite's output -> Python
 RW_TO_PY = {
     'sin': 'sin', 'cos': 'cos', 'tan': 'tan', 'cot': 'cot', 'sec': 'sec', 'csc': 'csc',
@@ -249,7 +271,11 @@ def check(f_py, F_py, params):
     env = dict(NUMENV)
     for p in params:
         env['P_' + p] = PARAM_VALUES.get(p, 0.77)
+    renv = dict(REALENV)
+    for p in params:
+        renv['P_' + p] = PARAM_VALUES.get(p, 0.77)
     try:
+        f_real = eval('lambda X: ' + f_py, renv)
         f = eval('lambda X: ' + f_py, env)
         F = eval('lambda X: ' + F_py, env)
     except Exception:
@@ -257,7 +283,11 @@ def check(f_py, F_py, params):
     good = bad = 0
     for x0 in (0.31, 0.57, 0.83, 1.37, 2.29, 3.11, -0.43, -1.27):
         verdict = None
-        for h in (1e-3, 2e-4):         # a smaller step near singular points
+        try:
+            f_real(x0)
+        except (ValueError, ZeroDivisionError, OverflowError, TypeError):
+            continue            # integrand not real here (branch cuts may differ)
+        for h in (1e-3, 2e-4, 4e-5):   # smaller steps near singular points
             try:
                 vals = [complex(F(x0 + k * h)) for k in (-2, -1, 1, 2)]
                 d = (vals[0] - 8 * vals[1] + 8 * vals[2] - vals[3]) / (12 * h)

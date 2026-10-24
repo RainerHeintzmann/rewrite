@@ -1166,10 +1166,92 @@ static Node * normpoly (Node * u, Node * x)
 	return tcpy(u);
 }
 
+static void summands_to (Node * t, TList * out, int neg);
+
+/* numeric content of a polynomial: gcd of the numeric factors of all its
+ * monomials (as fractions); 1 if there is none */
+static double poly_content (Node * c[], int deg)
+{
+	double g = 0, gq = 1, p, q, d;
+	int k, i;
+	for (k = 0; k <= deg; k++)
+		{
+		TList l = {0};
+		summands_to(c[k], & l, 0);
+		for (i = 0; i < l.n; i++)
+			{
+			Mono m = { 1.0, NULL, 0, 0 };
+			mono_flatten(l.t[i], & m);
+			free(m.f);
+			if (m.c == 0) continue;
+			if (! rat_approx(m.c, & p, & q)) { tl_free(& l); return 1; }
+			g = gcd2(g * q, p * gq);	/* gcd(g/gq, p/q) */
+			gq = gq * q;
+			d = gcd2(g, gq);
+			if (d > 0) { g /= d; gq /= d; }
+			}
+		tl_free(& l);
+		}
+	return (g > 0) ? g / gq : 1;
+}
+
+static Node * scale_collect (Node * u, double s)	/* s*u, like terms collected */
+{
+	TList l = {0}, out = {0};
+	int i;
+	summands_to(u, & l, 0);
+	for (i = 0; i < l.n; i++)
+		tl_add(& out, mk_mul(mk_num(s), tcpy(l.t[i])));
+	tl_free(& l);
+	return tl_collect(& out);
+}
+
+/* a polynomial factor of the integrand: normal form with the numeric
+ * content in front, 140*a + 70*b*x -> 70*(2*a + b*x). Without this, a rule
+ * that only rescales the integrand would make the coefficients grow forever. */
+static Node * normpoly_factor (Node * u, Node * x)
+{
+	Node * c[MAXDEG];
+	int deg, k;
+	double g;
+	u = deref(u);
+	if ((is_head(u, "+", 2) || is_head(u, "-", 2)) && contains(u, x)
+	    && poly_coeffs(u, x, c, & deg))
+		{
+		if (deg < 1)
+			while (deg >= 0) delete(c[deg--]);
+		else
+			{
+			g = poly_content(c, deg);
+			if (g == 1 || ! isfinite(g)) return poly_build(c, deg, x);
+			for (k = 0; k <= deg; k++)
+				{
+				Node * t = scale_collect(c[k], 1.0 / g);
+				delete(c[k]);
+				c[k] = t;
+				}
+			return mk_mul(mk_num(g), poly_build(c, deg, x));
+			}
+		}
+	return normpoly(u, x);
+}
+
 static Node * s_normpoly (Node * a[], int n, Symbol * f)
 {
+	TList l = {0};
+	Node * r = NULL;
+	int i;
 	if (n != 2) return NULL;
-	return normpoly(a[0], a[1]);
+	if (! is_head(a[0], "*", 2)) return normpoly(a[0], a[1]);
+	factors_to(a[0], & l);
+	for (i = 0; i < l.n; i++)
+		{
+		Node * t = normpoly_factor(l.t[i], a[1]);
+		r = r ? mk_mul(r, t) : t;
+		}
+	l.n = 0;	/* the factors belong to a[0] */
+	tl_free(& l);
+	return r;
 }
 
 /* derivative of u with respect to x, or NULL for unknown functions */

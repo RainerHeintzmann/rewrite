@@ -265,17 +265,20 @@ ADDSPEC Linear : _lFre(A+B,C,X,Y,Z)=_lFre(A,C,X,Y,Z)+_lFre(B,C,X,Y,Z)
 ALG Real
 SPEC    Real : 1^X   = 1              # Regeln des ^ (Potenzieren)
 ADDSPEC Real : 0^X   = 0
-ADDSPEC Real : (A*B)^X=A^X*B^X
+ADDSPEC Real : IF (is_int(X)) (A*B)^X=A^X*B^X   # 2026: nur fuer ganze X oder A > 0
+ADDSPEC Real : IF (A > 0) (A*B)^X=A^X*B^X       # (sonst falsch fuer negative A, B)
 ADDSPEC Real : X^1   = X
 ADDSPEC Real : X^0   = 1
 ADDSPEC Real : X^(-Y)  = mi (X^Y)
-ADDSPEC Real : (X^Y)^Z=X^(Y*Z)        # 2026: war X^Y^Z (= X^(Y^Z), falsch)
+ADDSPEC Real : IF (is_int(Z)) (X^Y)^Z=X^(Y*Z)   # 2026: war X^Y^Z (= X^(Y^Z), falsch);
+ADDSPEC Real : IF (X > 0) (X^Y)^Z=X^(Y*Z)       # (x^2)^0.5 ist nicht x
 ADDSPEC Real : X^(Y+Z)=X^Y*X^Z
 ADDSPEC Real : IF (is_int(N/2)) (-X)^N=X^N
 ADDSPEC Real : IF (is_int((N- 1)/2)) (-X)^N= -(X^N)
 
 ADDSPEC Real : ln e  = 1
-ADDSPEC Real : ln (X*Y)=ln X + ln Y   # 2026: war ln(X+Y)=ln X * ln Y (falsch)
+ADDSPEC Real : IF (X > 0) ln (X*Y)=ln X + ln Y   # 2026: war ln(X+Y)=ln X * ln Y (falsch);
+ADDSPEC Real : IF (Y > 0) ln (X*Y)=ln X + ln Y   # nur mit einem positiven Faktor richtig
 
 ADDSPEC Real : sin(-A) = -sin A
 ADDSPEC Real : cos(-A) =  cos A

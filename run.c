@@ -73,8 +73,9 @@ static BOOLEAN step_limit_hit = FALSE;
 
 /* 2026: die zuletzt von Regellisten ersetzten Terme. Ein Ergebnis, das einem
    davon gleicht, schliesst einen Zyklus (A -> B -> A) und gilt als kein Fortschritt. */
-#define NHIST 8
+#define NHIST 16
 static Node * hist[NHIST];
+static int hist_rule[NHIST];
 static int hist_pos = 0;
 
 static void hist_clear (void)
@@ -88,11 +89,21 @@ static void hist_clear (void)
 	hist_pos = 0;
 }
 
-static void hist_add (Node * t)
+static void hist_add (Node * t, int rule)
 {
 	delete(hist[hist_pos]);
 	hist[hist_pos] = term_copy(t);
+	hist_rule[hist_pos] = rule;
 	hist_pos = (hist_pos + 1) % NHIST;
+}
+
+/* the same rule rewrote this term several times recently: a longer cycle */
+static BOOLEAN hist_revisit (Node * t, int rule)
+{
+	int i, n = 0;
+	for (i = 0; i < NHIST; i++)
+		if (hist[i] && hist_rule[i] == rule && term_equal(hist[i], t)) n++;
+	return n >= 3;
 }
 
 static BOOLEAN hist_has (Node * t)
@@ -159,7 +170,8 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 				/* 2026: in einer Regelliste wird eine Regel ohne Fortschritt
 				   (Ergebnis gleich dem Term) uebersprungen; die naechste wird versucht */
 				if (Baum && Baum->type == RULELIST
-				    && (term_equal(neu, old) || term_has_nan(neu) || hist_has(neu)))
+				    && (term_equal(neu, old) || term_has_nan(neu) || hist_has(neu)
+				        || hist_revisit(old, found)))
 					{
 					DEBG((2,"REWR: rule %d makes no progress or gives NaN, skipped\n", found));
 					delete(neu);
@@ -167,7 +179,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 					continue;
 					}
 				if (Baum && Baum->type == RULELIST)
-					hist_add(old);
+					hist_add(old, found);
 				DEBG((2,"REWR: "));
 				DBFK(2,print(old));
 				* p_term = neu;

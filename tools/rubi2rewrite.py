@@ -657,7 +657,7 @@ def safe_name(path):
     return 'r_' + re.sub(r'[^A-Za-z0-9]+', '_', base).strip('_')[:40]
 
 
-CONTINUES = (':=', '/;', '&&', '||', '+', '-', '*', '/', '^', ',', '=', '->')
+CONTINUES = (':=', '/;', '&&', '||', '+', '-', '*', '/', '^', ',', '=', '->', r'\[Star]')
 
 
 def rules_of(path):
