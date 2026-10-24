@@ -1,0 +1,18 @@
+# inc/integration/1.1.1.2_linear_products
+# Uebersetzung von Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi,
+# Commit 61e9c18), Abschnitt
+#   1 Algebraic functions / 1.1 Binomial products / 1.1.1 Linear /
+#   1.1.1.2 (a+b x)^m (c+d x)^n          (Regel 1 von 30)
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
+# siehe inc/integration/LICENSE.Rubi. Uebersetzung 2026.
+# Schreibweise der Muster: siehe inc/integration/base.
+# Benutzt die Hilfsfunktionen aus inc/helpers (expandintegrand, neq, igtq, ...).
+
+# Int[(a_. + b_.*x_)^m_.*(c_. + d_.*x_)^n_., x_Symbol] :=
+#    Int[ExpandIntegrand[(a + b*x)^m*(c + d*x)^n, x], x] /;
+#    FreeQ[{a, b, c, d, n}, x] && NeQ[b*c - a*d, 0] && IGtQ[m, 0] &&
+#    (Not[IntegerQ[n]] || EqQ[c, 0] && LeQ[7*m + 4*n + 4, 0] || LtQ[9*m + 5*(n + 1), 0] || GtQ[m + n + 2, 0])
+ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb,Qc,Qd,Qn), (neq(Qb*Qc-Qa*Qd,0)), (igtq(Qm,0)), \
+                  ((not(integerq(Qn))) || (eqq(Qc,0) && (7*Qm+4*Qn+4 <= 0)) || (9*Qm+5*(Qn+1) < 0) || (Qm+Qn+2 > 0)) \
+                  Int((Qa+Qb*Xv)^Qm*(Qc+Qd*Xv)^Qn,Xv) = \
+                  Int(expandintegrand((Qa+Qb*Xv)^Qm*(Qc+Qd*Xv)^Qn,Xv),Xv)

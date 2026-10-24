@@ -291,22 +291,47 @@ rules were obtained by working out this shift. The complete integration is
 the rule list \texttt{(IntNorm,IntRubi),IntOut,All}, and the original
 Mathematica form of each rule is kept as a comment in the rule files.
 
+\paragraph{Helper functions.} Many Rubi rules use helper functions in
+their conditions and right-hand sides, such as \texttt{ExpandIntegrand},
+\texttt{PolyQ}, \texttt{IntegerQ} or \texttt{Subst}. They cannot be ordinary
+\texttt{rewrite} functions, which are only evaluated when all arguments are
+numbers. We therefore added symbolic C functions: they receive the argument
+terms and return a new term, or nothing if they do not apply. Predicates
+return true or false and can be combined in conditions, for example
+\texttt{IF (polyq(u,x) \&\& (expon(u,x) == 2))}. The helpers implemented so
+far cover the most frequent ones, together with missing elementary
+functions such as $\csc$, $\mathrm{arctanh}$ or the polylogarithm. Some are
+simplified versions: \texttt{expand} multiplies out and collects like terms
+but does no partial fractions, and \texttt{simp} returns its argument.
+Evaluation order needed care: Rubi's \texttt{Subst[Int[u],x,v]} integrates
+before substituting, so our \texttt{subst} waits while its argument still
+contains an unevaluated integral. A rule of the form
+$\int u \to \int \mathrm{ExpandIntegrand}(u)$ loops if the expansion makes
+no progress, so \texttt{expandintegrand} then stays unevaluated.
+
 \subsection{Results}
 
-The subset consists of 12 Rubi rules from sections 9.1 (integrand
-simplification), 1.1.1.1 ($(a+bx)^m$), 2.1 and 2.3 (exponentials), and
-4.1.1.1 and 4.1.10 (sine), which became 14 \texttt{rewrite} rules. It
-integrates sums of powers of linear expressions, possibly multiplied by one
-exponential, sine or cosine of a linear argument, with numeric or symbolic
-coefficients. Table~\ref{tab:int} shows examples. The test suite checks
-27 integrals by differentiating each result again and comparing the
-derivative numerically with the integrand.
+The subset consists of 13 Rubi rules from sections 9.1 (integrand
+simplification), 1.1.1.1 ($(a+bx)^m$), 1.1.1.2 ($(a+bx)^m(c+dx)^n$), 2.1
+and 2.3 (exponentials), and 4.1.1.1 and 4.1.10 (sine), which became 15
+\texttt{rewrite} rules. It integrates sums of powers and products of powers
+of linear expressions, possibly multiplied by one exponential, sine or
+cosine of a linear argument, with numeric or symbolic coefficients.
+Table~\ref{tab:int} shows examples. The test suite checks 31 integrals by
+differentiating each result again and comparing the derivative numerically
+with the integrand.
 
-When they are defined, the 14 rules expand into 1029 variants. Most rules
+When they are defined, the 15 rules expand into 1676 variants. Most rules
 have between 2 and 9 variants, but the three rules for a power of a linear
 expression times an exponential, sine or cosine have five optional
-parameters and two commutative products, and expand into 324 variants each.
-Loading the integration rules takes well below 0.1\,s.
+parameters and two commutative products, and expand into 324 variants each;
+the rule for products of two powers has 647 variants. Loading the
+integration rules takes about 0.1\,s.
+
+Of Rubi's 8492 rule definitions, 72\% use only functions that are now
+available in \texttt{rewrite}. With a translator that resolves
+Mathematica's local definitions (\texttt{With}, \texttt{Module}), 77\%
+would be translatable.
 
 \begin{table}[ht]
 \centering
@@ -340,8 +365,8 @@ have been corrected.
 
 \section{Implementation and revival}
 
-The interpreter consists of about 7200 lines of C and a grammar of about
-470 lines for the scanner and parser generators flex and bison. Terms are
+The interpreter consists of about 8100 lines of C and a grammar of about
+480 lines for the scanner and parser generators flex and bison. Terms are
 binary trees of nodes taken from memory pools; symbols carry their sort,
 value and the links used by \texttt{LIFT}. The rules of an algebra are
 merged into a single tree, in which rules with a common left-hand-side
@@ -353,8 +378,8 @@ with current tools. The port to 64-bit Linux and Windows (MSYS2) required
 only small changes to the C code itself. The main problems were changed
 semantics in the scanner generator, the release of static memory that old
 C libraries tolerated, and errors in the handling of declarations inside
-loops and included files. A regression test suite with 24 test programs
-now covers the core language, the library, the new pattern features, the
+loops and included files. A regression test suite with 25 test programs
+now covers the core language, the library, the new pattern features and helper functions, the
 integration rules and the original example programs. Memory leaks were
 removed with an instrumented build that counts allocations per source
 line, so that repeated calculations run in constant memory. All parser
@@ -407,9 +432,10 @@ ideas in a small and self-contained system.
 
 \paragraph{Outlook.} Natural next steps are moving optional arguments and
 commutative matching into the matcher, which would avoid the expansion
-into variants, an automatic translator from Rubi's Mathematica syntax for
-the rules that need no further helper functions (about 44\% of them), and
-code generation that turns symbolically derived expressions into compiled
+into variants; an automatic translator from Rubi's Mathematica syntax for
+the rules whose helper functions are now available (about 72\% of them);
+the remaining helper functions such as partial fractions; and code
+generation that turns symbolically derived expressions into compiled
 numerical code.
 
 \section{Conclusion}

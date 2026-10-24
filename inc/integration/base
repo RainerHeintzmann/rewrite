@@ -14,6 +14,8 @@
 # Faktoren und Summanden duerfen in jeder Reihenfolge stehen (COMM +,*).
 
 FUNC Int : real,real >> real
+FUNC inthide      : real,real >> real ATT inthide       # Rubi IntHide = Int
+FUNC unintegrable : real,real >> real ATT unintegrable  # Rubi Unintegrable: Int bleibt stehen
 
 VAR Uv,Vv,Wv,Xv : real                    # beliebige Terme
 VAR Pa,Pb,Pc,Pd,Pe,Pf,Pm,Pn : real        # Rubi a_ , b_ , ...

@@ -19,6 +19,7 @@
 #include "node.h"
 #include "defs.h"
 #include "nodes.h"
+#include "symfkt.h"
 
 #define EQUAL  0	/* wichtig wegen strcmp */
 
@@ -581,6 +582,21 @@ void * realcalk(Node * term,int * perr)
 		return NULL;
 		}
 
+	if (term->type == Func && builtin(term->l))	/* symbolische C-Funktion (symfkt.c) */
+		{
+		Node * res = call_builtin(term);
+		void * v = NULL;
+		if (res)
+			{
+			v = realcalk(res, perr);
+			delete(res);
+			}
+		else
+			* perr = TRUE;
+		lastsym = TERM_HEAD(term);	/* fuer DELNUM: Sorte des Ergebnisses */
+		return * perr ? NULL : v;
+		}
+
   if (!hasval(term->l) || exe_always(term->l))  /* Symbol der Funktion */
 		{
 		if (exe_always(term->l) && (term->type == Func)) /* benutzerdef. Fkt. */
@@ -746,10 +762,21 @@ Node * tcalc (Node * term)   /* Traversiert Baum und berechnet */
 {
 if (! term)
 	return NULL;
-term->l = tcalc(term->l); 
-term->r = tcalc(term->r); 
+term->l = tcalc(term->l);
+term->r = tcalc(term->r);
 
-if  ((term -> type) == Func) /* Rest wird darauf abgebildet */ 
+if ((term -> type) == Func && builtin(term->l))  /* symbolische C-Funktion (symfkt.c) */
+	{
+	Node * res = call_builtin(term);
+	if (res)
+		{
+		delete(term);
+		return tcalc(res);
+		}
+	return term;	/* nicht anwendbar */
+	}
+
+if  ((term -> type) == Func) /* Rest wird darauf abgebildet */
 	{
 	Symbol * sp = (Symbol *) calkulate(term);
 

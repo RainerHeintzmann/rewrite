@@ -102,6 +102,21 @@ FUNC arctan : real >> real        ATT atangens
 FUNC  tanh  : real >> real        ATT tangensh
 FUNC  bessel : real,real >> real  ATT bessel
 
+# 2026: weitere elementare Funktionen (u.a. fuer die Rubi-Regeln)
+FUNC  csc     : real >> real      ATT r_csc        # 1/sin
+FUNC  sec     : real >> real      ATT r_sec        # 1/cos
+FUNC  cot     : real >> real      ATT r_cot        # 1/tan
+FUNC  arccot  : real >> real      ATT r_arccot
+FUNC  coth    : real >> real      ATT r_coth
+FUNC  sech    : real >> real      ATT r_sech
+FUNC  csch    : real >> real      ATT r_csch
+FUNC  arcsinh : real >> real      ATT r_arcsinh
+FUNC  arccosh : real >> real      ATT r_arccosh
+FUNC  arctanh : real >> real      ATT r_arctanh
+FUNC  arccoth : real >> real      ATT r_arccoth
+FUNC  polylog : real,real >> real ATT r_polylog    # polylog(n,x), |x| <= 1
+FUNC  productlog : real >> real   ATT r_productlog # Lambert W
+
 FUNC  -      : group,group >> group LA2
 OTHER -      : agroup,agroup >> agroup
 OTHER -      : ring,ring >> ring
@@ -339,6 +354,19 @@ ADDSPEC     diff : D(sinh X,Z)  = D(X,Z)*cosh X                 # 2026 ergaenzt
 ADDSPEC     diff : D(cosh X,Z)  = D(X,Z)*sinh X                 # 2026 ergaenzt
 ADDSPEC     diff : D(tanh X,Z)  = D(X,Z)*mi(cosh(X)^2)          # 2026 ergaenzt
 ADDSPEC     diff : D(abs X,Z)   = D(X,Z)*X*mi(abs X)            # 2026 ergaenzt (X ungleich 0)
+ADDSPEC     diff : D(csc X,Z)     = - D(X,Z)*cot(X)*csc(X)      # 2026 ergaenzt
+ADDSPEC     diff : D(sec X,Z)     = D(X,Z)*tan(X)*sec(X)        # 2026 ergaenzt
+ADDSPEC     diff : D(cot X,Z)     = - D(X,Z)*csc(X)^2           # 2026 ergaenzt
+ADDSPEC     diff : D(arccot X,Z)  = - D(X,Z)*mi(1+X^2)          # 2026 ergaenzt
+ADDSPEC     diff : D(coth X,Z)    = - D(X,Z)*csch(X)^2          # 2026 ergaenzt
+ADDSPEC     diff : D(sech X,Z)    = - D(X,Z)*tanh(X)*sech(X)    # 2026 ergaenzt
+ADDSPEC     diff : D(csch X,Z)    = - D(X,Z)*coth(X)*csch(X)    # 2026 ergaenzt
+ADDSPEC     diff : D(arcsinh X,Z) = D(X,Z)*mi((1+X^2)^.5)       # 2026 ergaenzt
+ADDSPEC     diff : D(arccosh X,Z) = D(X,Z)*mi((X^2+(-1))^.5)    # 2026 ergaenzt
+ADDSPEC     diff : D(arctanh X,Z) = D(X,Z)*mi(1+(-(X^2)))       # 2026 ergaenzt
+ADDSPEC     diff : D(arccoth X,Z) = D(X,Z)*mi(1+(-(X^2)))       # 2026 ergaenzt
+ADDSPEC     diff : D(polylog(N,X),Z)  = D(X,Z)*polylog(N+(-1),X)*mi(X)                  # 2026 ergaenzt
+ADDSPEC     diff : D(productlog X,Z)  = D(X,Z)*productlog(X)*mi(X*(1+productlog(X)))  # 2026 ergaenzt
 
 ADDSPEC     diff : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # Allg. Differenziationsregeln
 ADDSPEC     diff : IF NIN (Z,X) D(_Fre(X),Z)=D(X,Z)*D(_Fre(X),X)  # Kettenregel

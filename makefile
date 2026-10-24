@@ -8,7 +8,7 @@ L	= -lm
 O	= scan.o sym.o sync.o defs.o syn.o run.o stack.o \
 userfkt.o forms.o node.o inout.o \
 real.o bool.o complex.o matrix.o vector.o \
-fatal.o strsave.o expand.o
+fatal.o strsave.o expand.o symfkt.o
 
 T	= rewrite
 

@@ -32,6 +32,7 @@ do not contain `x`.
 | --- | --- |
 | constants, sums, constant factors | 9.1 Integrand simplification rules |
 | `L^m`, including `1/L` and `sqrt(L)` | 1.1.1.1 (a+b x)^m |
+| `L1^m*L2^n` for an integer `m > 0` (multiplied out) | 1.1.1.2 (a+b x)^m (c+d x)^n |
 | `exp(L)`, `F^L` for a number `F` | 2.3 Miscellaneous exponentials |
 | `L^m*exp(L)` for `m = 1/2, 1, 3/2, 2, ...` | 2.1 (c+d x)^m (a+b (F^(g (e+f x)))^n)^p |
 | `sin(L)`, `cos(L)` | 4.1.1.1 (a+b sin)^n |
@@ -95,6 +96,7 @@ defined later.
 | [all](all) | Loads all files and defines `Integrate`. |
 | [base](base) | Declarations, normal form, settings and linearity rules. |
 | [1.1.1.1_linear_power](1.1.1.1_linear_power) | Powers of linear expressions. |
+| [1.1.1.2_linear_products](1.1.1.2_linear_products) | Products of powers of linear expressions. |
 | [2_exponentials](2_exponentials) | Exponentials, and polynomials times exponentials. |
 | [4.1_sine](4.1_sine) | Sine and cosine, and polynomials times them. |
 | [LICENSE.Rubi](LICENSE.Rubi) | License of the original rules. |
@@ -108,10 +110,25 @@ defined later.
    of `all`.
 4. Add a line to the test and check it with the derivative test.
 
-This folder translates 12 Rubi rules into 14 rewrite rules. When they are
+The helper functions of Rubi that appear in the conditions and right-hand
+sides, such as `ExpandIntegrand`, `PolyQ`, `IntegerQ` or `Subst`, are
+available in lower case from [inc/helpers](../helpers) (see the main
+README). For example, the rule in
+[1.1.1.2_linear_products](1.1.1.2_linear_products) translates
+
+```text
+Int[(a_. + b_.*x_)^m_.*(c_. + d_.*x_)^n_., x_Symbol] := Int[ExpandIntegrand[(a + b*x)^m*(c + d*x)^n, x], x] /;
+    FreeQ[{a, b, c, d, n}, x] && NeQ[b*c - a*d, 0] && IGtQ[m, 0] && (Not[IntegerQ[n]] || ...)
+```
+
+into a rule with `neq(Qb*Qc-Qa*Qd,0)`, `igtq(Qm,0)` and
+`expandintegrand(...)`.
+
+This folder translates 13 Rubi rules into 15 rewrite rules. When they are
 defined, the optional parts and commutative operators expand them into
-about 1000 variants. Rubi's rule files contain about 8500 rule definitions,
-and many of them use helper functions like `ExpandIntegrand`, `Subst` or
-special functions like `ExpIntegralEi`, which rewrite does not have yet.
-Translating all of them will need optional parts and commutative matching
-inside the matcher, instead of the expansion into variants.
+about 1700 variants. Rubi's rule files contain about 8500 rule definitions.
+About 72% of them use only functions that rewrite now has; with a
+translator that resolves Mathematica's local definitions (`With`, `Module`)
+it would be about 77%. Translating all of them will need optional parts and
+commutative matching inside the matcher, instead of the expansion into
+variants.

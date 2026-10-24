@@ -5,8 +5,10 @@
 #   INC "inc/integration/all"
 #   REWR Int(x*exp(2*x),x) : Integrate
 
+INC "inc/helpers"
 INC "inc/integration/base"
 INC "inc/integration/1.1.1.1_linear_power"
+INC "inc/integration/1.1.1.2_linear_products"
 INC "inc/integration/2_exponentials"
 INC "inc/integration/4.1_sine"
 

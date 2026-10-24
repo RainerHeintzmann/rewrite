@@ -165,7 +165,11 @@ t_funct (userfunction [])  = {
 	FKT(epow_vec),
 	FKT(emul_vec),
 	FKT(ediv_vec),
-	FKT(plttest)
+	FKT(plttest),
+	FKT(r_csc), FKT(r_sec), FKT(r_cot), FKT(r_arccot),
+	FKT(r_coth), FKT(r_sech), FKT(r_csch),
+	FKT(r_arcsinh), FKT(r_arccosh), FKT(r_arctanh), FKT(r_arccoth),
+	FKT(r_polylog), FKT(r_productlog)
 	} ;
 
 int LASTFUNC = sizeof(userfunction)/sizeof(userfunction[0]);
@@ -178,5 +182,14 @@ u_function * give_ufkt (char * name)
      	 return userfunction[i].function;
   }
 	printfErr(" --ERROR ATT : C-Function %s not Implemented \n",name);
+	return NULL;
+}
+
+/* 2026: wie give_ufkt, aber ohne Fehlermeldung (NULL, wenn unbekannt) */
+u_function * give_ufkt_quiet (char * name)
+{	int i;
+	for (i=0;i<LASTFUNC;i++)
+		if (strcmp(name,userfunction[i].name)==0)
+			return userfunction[i].function;
 	return NULL;
 }

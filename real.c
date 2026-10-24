@@ -137,3 +137,54 @@ double * bessel   (double * arg[])
 	return mkreal(result);
 	}
 
+
+/* ---- 2026: weitere elementare Funktionen (fuer die Rubi-Regeln) ---- */
+double * r_csc     (double * arg[])	{return mkreal(1.0/sin(* arg[0]));}
+double * r_sec     (double * arg[])	{return mkreal(1.0/cos(* arg[0]));}
+double * r_cot     (double * arg[])	{return mkreal(1.0/tan(* arg[0]));}
+double * r_arccot  (double * arg[])	{return mkreal(atan(1.0/(* arg[0])));}
+double * r_coth    (double * arg[])	{return mkreal(1.0/tanh(* arg[0]));}
+double * r_sech    (double * arg[])	{return mkreal(1.0/cosh(* arg[0]));}
+double * r_csch    (double * arg[])	{return mkreal(1.0/sinh(* arg[0]));}
+double * r_arcsinh (double * arg[])	{return mkreal(asinh(* arg[0]));}
+double * r_arccosh (double * arg[])	{return mkreal(acosh(* arg[0]));}
+double * r_arctanh (double * arg[])	{return mkreal(atanh(* arg[0]));}
+double * r_arccoth (double * arg[])	{return mkreal(atanh(1.0/(* arg[0])));}
+
+/* polylog(n,x) = sum x^k/k^n fuer ganzzahliges n und |x| <= 1 (Reihe) */
+double * r_polylog (double * arg[])
+{
+	double n = * arg[0], x = * arg[1], sum = 0.0, term, xk = 1.0;
+	int k;
+	if (fabs(x) > 1.0 || n != floor(n))
+		return mkreal(NAN);
+	if (n <= 0 && fabs(x) < 1.0)
+		{	/* geschlossene Formen: Li_0 = x/(1-x), Li_-1 = x/(1-x)^2 */
+		if (n == 0)  return mkreal(x/(1.0-x));
+		if (n == -1) return mkreal(x/((1.0-x)*(1.0-x)));
+		}
+	for (k = 1; k < 1000000; k++)
+		{
+		xk *= x;
+		term = xk/pow((double) k, n);
+		sum += term;
+		if (fabs(term) < 1e-17*fabs(sum)) break;
+		}
+	return mkreal(sum);
+}
+
+/* productlog(x) = Lambertsche W-Funktion (Hauptzweig), w*exp(w) = x */
+double * r_productlog (double * arg[])
+{
+	double x = * arg[0], w;
+	int i;
+	if (x < -exp(-1.0)) return mkreal(NAN);
+	w = (x < 1.0) ? 0.0 : log(x);
+	for (i = 0; i < 100; i++)
+		{
+		double ew = exp(w), f = w*ew - x, wn = w - f/(ew*(w+1.0));
+		if (fabs(wn - w) < 1e-15*(1.0+fabs(wn))) { w = wn; break; }
+		w = wn;
+		}
+	return mkreal(w);
+}

@@ -1,0 +1,131 @@
+# Symbolic helper functions (inc/helpers, symfkt.c) and the elementary
+# functions added in 2026 (inc/alg).
+INC "inc/all"
+INC "inc/helpers"
+FUNC never : real >> real
+ALG raw
+SPEC raw : never(X) = X
+# ---- elementary functions: values
+csc(1), sec(1), cot(1), arccot(2)
+coth(1), sech(1), csch(1)
+arcsinh(1), arccosh(2), arctanh(0.5), arccoth(2)
+polylog(2,0.5), polylog(1,0.5), productlog(1)
+# ---- derivatives, checked against a difference quotient at x = 0.6
+TERM FF : real
+CONST yy,zz,hh : real
+hh = 1e-6
+x = yy
+FF = REWR D(csc(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D csc(x): "
+abs(FF - (csc((zz+hh))-csc((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(sec(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D sec(x): "
+abs(FF - (sec((zz+hh))-sec((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(cot(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D cot(x): "
+abs(FF - (cot((zz+hh))-cot((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(arccot(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D arccot(x): "
+abs(FF - (arccot((zz+hh))-arccot((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(coth(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D coth(x): "
+abs(FF - (coth((zz+hh))-coth((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(sech(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D sech(x): "
+abs(FF - (sech((zz+hh))-sech((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(csch(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D csch(x): "
+abs(FF - (csch((zz+hh))-csch((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(arcsinh(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D arcsinh(x): "
+abs(FF - (arcsinh((zz+hh))-arcsinh((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(arccosh(x+1),x) : All
+x = 0.6
+zz = 0.6
+PRT "D arccosh(x+1): "
+abs(FF - (arccosh((zz+hh)+1)-arccosh((zz-hh)+1))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(arctanh(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D arctanh(x): "
+abs(FF - (arctanh((zz+hh))-arctanh((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(arccoth(x+1),x) : All
+x = 0.6
+zz = 0.6
+PRT "D arccoth(x+1): "
+abs(FF - (arccoth((zz+hh)+1)-arccoth((zz-hh)+1))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(polylog(3,x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D polylog(3,x): "
+abs(FF - (polylog(3,(zz+hh))-polylog(3,(zz-hh)))/(2*hh)) < 1e-5
+x = yy
+FF = REWR D(productlog(x),x) : All
+x = 0.6
+zz = 0.6
+PRT "D productlog(x): "
+abs(FF - (productlog((zz+hh))-productlog((zz-hh)))/(2*hh)) < 1e-5
+x = yy
+# ---- predicates
+freeq(a*x+b,x), freeq(a+b,x)
+integerq(3), integerq(2.5), integerq(a), integersq(1,2,3), integersq(1,a)
+posq(3), posq(-2), posq(a), posq(-a), negq(-a), negq(a)
+eqq(2*3,6), eqq(a,a), eqq(a,b), neq(a,b)
+igtq(3,0), igtq(-3,0), iltq(-3,0)
+polyq(3*x^2+a*x+1,x), polyq(sin(x),x), polyq((x+1)^3,x,3), polyq(x^2+1,x,3)
+linearq(a+b*x,x), linearq(x^2,x)
+sumq(a+b), productq(a*b), powerq(a^b)
+# ---- term functions (applied during rewriting)
+REWR expand((x+1)^3) : raw
+REWR expand((x+a)^2-(x-a)^2) : raw
+REWR expand((x+1)*(x-1)) : raw
+REWR expandintegrand(x^2*(a+b*x)^2,x) : raw
+REWR expandintegrand(x,x+1,x) : raw
+# no progress: stays unevaluated (prevents endless rule loops)
+REWR expandintegrand(x^2+1,x) : raw
+REWR coeff((x+a)^3,x,1) : raw
+REWR coeff(a+b*x,x) : raw
+REWR expon((x+1)^3,x) : raw
+REWR subst(x^2+x,x,y+1) : raw
+REWR simp(a+b,x) : raw
+REWR dist(a,b+x,x) : raw
+REWR rt(8,3) : raw
+REWR rt(-8,3) : raw
+REWR rt(a,2) : raw
+REWR intpart(a+2.5) : raw
+REWR fracpart(a+2.5) : raw
+# a helper used in a rule condition
+VAR Uu,Xx : real
+FUNC qq : real,real >> real
+ALG tq
+SPEC tq : IF (polyq(Uu,Xx) && (expon(Uu,Xx) == 2)) qq(Uu,Xx) = coeff(Uu,Xx,2)
+REWR qq(3*x^2+1,x) : tq
+REWR qq(x^3,x) : tq
+REWR qq(sin(x),x) : tq

@@ -397,6 +397,9 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    dabei in alle ihre Varianten erweitert (expand.c). Nicht berechenbare
    Bedingungen fuehren nicht mehr zum Absturz.
  - Interne Aufraeumarbeit: benannte Zugriffe auf die Knotenstrukturen (nodes.h).
+ - Symbolische Hilfsfunktionen in C (symfkt.c, inc/helpers) wie expand, coeff,
+   polyq, freeq, subst, und weitere elementare Funktionen (csc, sec, cot,
+   arccot, hyperbolische und Area-Funktionen, polylog, productlog).
 
 Maengel des Systems:
 Wuenschend waehre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie

@@ -303,7 +303,7 @@ the files are in German.
 
 | File | Contents |
 | --- | --- |
-| [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. |
+| [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
 | [inc/rvector](inc/rvector) | Real vectors `[1,2,3]`, scalar product, cross product `_x_`, `abs`, element access. |
 | [inc/rmatrix](inc/rmatrix) | Real matrices: `einsmat`, `nullmat`, `chmat`, `trans`, products. Indices start at 0. |
@@ -343,6 +343,46 @@ REWR Int(sin(a*x+b),x) : Integrate     # prints - cos (a * x + b )/ a
 See [inc/integration/README.md](inc/integration/README.md) for what is
 covered and how the rules are translated.
 
+### Symbolic helper functions
+
+[inc/helpers](inc/helpers) declares helper functions written in C
+([symfkt.c](symfkt.c)). Unlike numerical functions, they work on the terms
+themselves. Their names follow the helpers of Rubi in lower case. They are
+loaded by the integration rules and can also be used on their own:
+
+| Function | Meaning |
+| --- | --- |
+| `freeq(u,x)` | `x` does not occur in `u` |
+| `integerq(u)`, `integersq(u,v,..)`, `rationalq(u,..)` | `u` is an integer, all are integers, all are numbers |
+| `posq(u)`, `negq(u)` | `u` has a positive or negative form (a symbol counts as positive) |
+| `eqq(u,v)`, `neq(u,v)` | `u` equals `v`, numerically or as the same term |
+| `igtq(u,n)`, `iltq(u,n)` | `u` is an integer greater or less than `n` |
+| `polyq(u,x)`, `polyq(u,x,n)`, `linearq(u,x)` | `u` is a polynomial in `x`, of degree `n`, of degree 1 |
+| `sumq(u)`, `productq(u)`, `powerq(u)` | form of the top level of `u` |
+| `expand(u)` | multiply out products and integer powers of sums, collect like terms |
+| `expandintegrand(u,x)`, `expandintegrand(u,v,x)` | `expand(u)`, `expand(u*v)`; stays unevaluated if nothing changes |
+| `coeff(u,x,n)`, `coeff(u,x)`, `expon(u,x)` | coefficient of `x^n` or `x`, degree in `x` |
+| `subst(u,x,v)` | `u` with `x` replaced by `v` (waits while `u` contains `Int`) |
+| `simp(u,x)`, `simplify(u)`, `dist(u,v,x)`, `rt(u,n)` | `u`, `u`, `u*v`, `n`-th root |
+| `intpart(u)`, `fracpart(u)` | integer and non-integer parts of numbers |
+
+The predicates return true or false and can be used in conditions, also
+combined with `&&` and `||`:
+
+```text
+INC "inc/helpers"
+FUNC sq : real,real >> real
+ALG t2
+SPEC t2 : IF (polyq(A,X) && (expon(A,X) == 2)) sq(A,X) = coeff(A,X,2)
+REWR sq(3*x^2+1,x) : t2              # prints 3
+REWR expand((x+1)^3) : t2            # prints x ^ 3 + 3 * x ^ 2 + 3 * x + 1
+```
+
+The term functions are applied during rewriting, so they are used with
+`REWR`. Some are simpler than their Rubi counterparts: `expand` does no
+partial fractions, `eqq` compares terms without simplifying them, and
+`simp` returns its argument unchanged.
+
 Larger example programs are [LiNbO3/abso1](LiNbO3/abso1) and
 [LiNbO3/compute](LiNbO3/compute) (X-ray absorption and structure factors
 of LiNbO3), [inc/chaos](inc/chaos), [inc/molekuel](inc/molekuel) and
@@ -362,6 +402,11 @@ Examples are in [real.c](real.c), [complex.c](complex.c),
 [vector.c](vector.c) and [matrix.c](matrix.c). The function is then
 connected with `ATT` in a `FUNC` or `OTHER` declaration.
 
+Symbolic functions, which work on terms instead of numbers, are entered in
+the list `symfunction` in [symfkt.c](symfkt.c). They get the argument terms
+and return a new term, or `NULL` if they do not apply. `ATT name` finds them
+in the same way.
+
 ## Source files
 
 | File | Purpose |
@@ -372,6 +417,7 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
 | [defs.c](defs.c) | Declarations, blocks and local symbols. |
 | [run.c](run.c), [forms.c](forms.c) | Rewriting engine and numerical evaluation. |
 | [expand.c](expand.c) | Optional pattern parts, commutative operators and condition lists. |
+| [symfkt.c](symfkt.c) | Symbolic helper functions (`expand`, `coeff`, `polyq`, ...). |
 | [nodes.h](nodes.h) | Named access to the node structures built by the parser. |
 | [sym.c](sym.c), [node.c](node.c), [stack.c](stack.c) | Symbol table and memory for nodes and symbols. |
 | [userfkt.c](userfkt.c), [real.c](real.c), [bool.c](bool.c), [complex.c](complex.c), [vector.c](vector.c), [matrix.c](matrix.c) | Built-in numerical functions. |
@@ -418,6 +464,9 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
 - New pattern features: optional parts (`OPT`, `DEFAULT`), commutative
   operators (`COMM`) and lists of conditions (`IF c1, c2`). A condition
   that cannot be calculated no longer crashes the interpreter.
+- Symbolic helper functions in C ([symfkt.c](symfkt.c), [inc/helpers](inc/helpers))
+  and further elementary functions (`csc`, `sec`, `cot`, `arccot`, the
+  hyperbolic and inverse hyperbolic functions, `polylog`, `productlog`).
 - Internal cleanup: named accessors for the node structures
   ([nodes.h](nodes.h)) instead of chains like `np->r->r->l`.
 - [LiNbO3/abso1](LiNbO3/abso1) runs again, and the test suite was added.

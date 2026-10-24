@@ -143,7 +143,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 50 "syn.y"
+#line 51 "syn.y"
 
 	Symbol 	* y_sym;
 	Node 	* y_nod;

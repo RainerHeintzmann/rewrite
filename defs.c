@@ -334,6 +334,7 @@ void other_fkt (Node * np)
 			{
 			hasval(newsym) = TRUE;
 			value(newsym)  = ATT_CFUNC(att);
+			builtin(newsym) = (att->r != NULL);	/* symbolische C-Funktion */
 			}
 		else /* PARAM */
 			{
@@ -357,7 +358,8 @@ void att_fkt (Node * np)
 	if (ufk)
 		if (ufk->type == ATT) /* USERfkt. */
 			{value(sp)  = ATT_CFUNC(ufk);
-			hasval(sp) = TRUE;}
+			hasval(sp) = TRUE;
+			builtin(sp) = (ufk->r != NULL);}	/* symbolische C-Funktion */
 		else /* PARAM */
 			{
 			value(sp) =ufk;

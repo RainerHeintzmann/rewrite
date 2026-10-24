@@ -32,6 +32,7 @@ struct Symbol{            /* ACHTUNG: Instanzen in node.c und sync.c */
   Symbol * IS_kette;      /* verkettet Funktionen,Constanten gleichen Resultattyps miteinander (Sort ist Anker) */
   Symbol * IS_Verbindung; /* verkettet Funktionen und Constanten, die mit 'term IS term' zugewiesen wurden, miteinander  */
 	int		def_in_blk;       /* Blockstufe in der es definiert wurde */
+	int		builtin;          /* 2026: symbolische C-Funktion (symfkt.c), bekommt Terme statt Zahlen */
 };
 
 #define NOFLAG		0
@@ -73,6 +74,7 @@ struct Symbol{            /* ACHTUNG: Instanzen in node.c und sync.c */
 #define IS_Verbindung(p_sym)	(((Symbol *) (p_sym)) -> IS_Verbindung) /* Benutzt von Funktion,Const,Sort */
 #define urs_fkt(p_sym)	(((Symbol *) (p_sym)) -> urs_fkt) /* Nur fuer Funktionen */
 #define defined_in_block(p_sym)	(((Symbol *) (p_sym)) -> def_in_blk) /* Nur fuer Terme,Constanten,Functionen */
+#define builtin(p_sym)	(((Symbol *) (p_sym)) -> builtin) /* symbolische C-Funktion */
 
 #define show(p_sym)	(((Symbol *) (p_sym)) -> value) /* ueberdefinier fuer SORT (showfkt.) */
 #define cmp(p_sym)	(((Symbol *) (p_sym)) -> rtypes) /* ueberdefinier fuer SORT (comparefkt.) */
@@ -87,6 +89,7 @@ struct Symbol{            /* ACHTUNG: Instanzen in node.c und sync.c */
 #define CALLFUNCT(term)							(((void (*) (Node *)) term->l) (term))
 
 int lookup _1p (const char *);		/* liefert yylex() Wert */
+Symbol * find_symbol (const char * name);  /* 2026: Symbol suchen, NULL wenn unbekannt */
 void focus (Symbol * sp);
 void restore _1p (Node *);
 

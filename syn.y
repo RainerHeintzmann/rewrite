@@ -19,6 +19,7 @@
 #include "userfkt.h"
 #include "nodes.h"
 #include "expand.h"
+#include "symfkt.h"
 
 #ifdef BISON
 #include "unix.h"
@@ -136,7 +137,17 @@ l_list	: l_thing			     {$$ = mknod(PARAM,(Node *) $1,NULL);}
 			| l_thing ',' l_list {$$ = mknod(PARAM,(Node *) $1,$3);};
 
 att 		: /* NULL */		{ $$ = NULL;}
-			  | ATT namedId		{ $$ = mknod(ATT,(Node *) give_ufkt(name((Symbol *) $2)),NULL);}
+			  | ATT namedId		{ /* numerische C-Funktion (userfkt.c), sonst symbolische (symfkt.c) */
+			                  u_function * u = give_ufkt_quiet(name((Symbol *) $2));
+			                  s_function * s = u ? NULL : give_sfkt(name((Symbol *) $2));
+			                  if (u)
+			                    $$ = mknod(ATT,(Node *) u,NULL);
+			                  else if (s)
+			                    $$ = mknod(ATT,(Node *) s,mknod(PARAM,NULL,NULL)); /* r: symbolisch */
+			                  else
+			                    { printfErr(" --ERROR ATT : C-Function %s not Implemented \n",name((Symbol *) $2));
+			                      $$ = mknod(ATT,NULL,NULL); }
+			                }
 				| ATT '(' {block_begin();no_protect();}
 								 d_list ')' instruction {protect();block_end();$$ =mknod(PARAM,$4,$6);};
 

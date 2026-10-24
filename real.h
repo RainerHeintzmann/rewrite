@@ -44,4 +44,19 @@ double * signum   (double * arg[]);
 double * integer  (double * arg[]);
 double * plttest  (double * arg[]);
 
+/* 2026 */
+double * r_csc (double * arg[]);
+double * r_sec (double * arg[]);
+double * r_cot (double * arg[]);
+double * r_arccot (double * arg[]);
+double * r_coth (double * arg[]);
+double * r_sech (double * arg[]);
+double * r_csch (double * arg[]);
+double * r_arcsinh (double * arg[]);
+double * r_arccosh (double * arg[]);
+double * r_arctanh (double * arg[]);
+double * r_arccoth (double * arg[]);
+double * r_polylog (double * arg[]);
+double * r_productlog (double * arg[]);
+
 #endif

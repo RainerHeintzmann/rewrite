@@ -119,6 +119,15 @@ int lookup _1a ((name), const char * name)
 	return lexval(* pp);
 }
 
+/* 2026: Symbol zu einem Namen suchen, ohne es anzulegen (NULL, wenn unbekannt) */
+Symbol * find_symbol (const char * name)
+{
+	Symbol s, ** pp;
+	name(& s) = (char *) name;
+	pp = (Symbol **) tfind(& s, (const void * const *) & root, scmp);
+	return pp ? * pp : (Symbol *) NULL;
+}
+
 void focus (Symbol * sp)
 {
 	Symbol ** pp;
