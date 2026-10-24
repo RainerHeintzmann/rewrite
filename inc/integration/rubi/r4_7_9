@@ -378,19 +378,19 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f), (integers
 
 # Regel 47 (54 Varianten):
 #   Int[Sin[a_./(c_. + d_.*x_)]^n_., x_Symbol] := -1/d*Subst[Int[Sin[a*x]^n/x^2, x], x, 1/(c + d*x)] /; FreeQ[{a, c, d}, x] && IGtQ[n, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,O_d), (igtq(O_n,0)) Int((sin((O_a)*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(subst(Int(((((sin(((O_a)*(Xv))))^(O_n)))*(((Xv)^((-2))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,O_d), (igtq(O_n,0)) Int((sin((O_a)*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(((((sin(((O_a)*(Xv))))^(O_n)))*(((Xv)^((-2))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
 
 # Regel 48 (54 Varianten):
 #   Int[Cos[a_./(c_. + d_.*x_)]^n_., x_Symbol] := -1/d*Subst[Int[Cos[a*x]^n/x^2, x], x, 1/(c + d*x)] /; FreeQ[{a, c, d}, x] && IGtQ[n, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,O_d), (igtq(O_n,0)) Int((cos((O_a)*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(subst(Int(((((cos(((O_a)*(Xv))))^(O_n)))*(((Xv)^((-2))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,O_d), (igtq(O_n,0)) Int((cos((O_a)*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(((((cos(((O_a)*(Xv))))^(O_n)))*(((Xv)^((-2))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
 
 # Regel 49 (972 Varianten):
 #   Int[Sin[e_.*(a_. + b_.*x_)/(c_. + d_.*x_)]^n_., x_Symbol] := -1/d*Subst[Int[Sin[b*e/d - e*(b*c - a*d)*x/d]^n/x^2, x], x, 1/(c + d*x)] /; FreeQ[{a, b, c, d}, x] && IGtQ[n, 0] && NeQ[b*c - a*d, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_n,0)), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)) Int((sin((O_e)*((O_a)+((O_b)*(Xv)))*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(subst(Int(((((sin(((((O_b)*(O_e)*(((O_d)^((-1))))))+((((-1))*(O_e)*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(Xv)*(((O_d)^((-1)))))))))^(O_n)))*(((Xv)^((-2))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_n,0)), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)) Int((sin((O_e)*((O_a)+((O_b)*(Xv)))*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(((((sin(((((O_b)*(O_e)*(((O_d)^((-1))))))+((((-1))*(O_e)*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(Xv)*(((O_d)^((-1)))))))))^(O_n)))*(((Xv)^((-2))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
 
 # Regel 50 (972 Varianten):
 #   Int[Cos[e_.*(a_. + b_.*x_)/(c_. + d_.*x_)]^n_., x_Symbol] := -1/d*Subst[Int[Cos[b*e/d - e*(b*c - a*d)*x/d]^n/x^2, x], x, 1/(c + d*x)] /; FreeQ[{a, b, c, d}, x] && IGtQ[n, 0] && NeQ[b*c - a*d, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_n,0)), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)) Int((cos((O_e)*((O_a)+((O_b)*(Xv)))*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(subst(Int(((((cos(((((O_b)*(O_e)*(((O_d)^((-1))))))+((((-1))*(O_e)*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(Xv)*(((O_d)^((-1)))))))))^(O_n)))*(((Xv)^((-2))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_n,0)), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)) Int((cos((O_e)*((O_a)+((O_b)*(Xv)))*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(((((cos(((((O_b)*(O_e)*(((O_d)^((-1))))))+((((-1))*(O_e)*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(Xv)*(((O_d)^((-1)))))))))^(O_n)))*(((Xv)^((-2))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
 
 # Regel 51 nicht uebersetzt: parse error at '['
 #   Int[Sin[u_]^n_., x_Symbol] := Module[{lst = QuotientOfLinearsParts[u, x]}, Int[Sin[(lst[[1]] + lst[[2]]*x)/(lst[[3]] + lst[[4]]*x)]^n, x]] /; IGtQ[n, 0] && QuotientOfLinearsQ[u, x]

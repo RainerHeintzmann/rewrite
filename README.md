@@ -21,8 +21,8 @@ an English summary of it.
 
 ```text
 $ rewrite
-INC "inc/all"
-REWR D(sin cos x,x) : All
+> INC "inc/all"
+> REWR D(sin cos x,x) : All
 - cos (cos (x ))* sin (x )
 REWR D(x^2*sin x,x) : All
 2 * x * sin (x )+ x ^ 2 * cos (x )
@@ -37,11 +37,22 @@ QUIT
 
 `INC "inc/all"` loads the standard library. `REWR term : All` rewrites the
 term with the rule list `All`, here computing the derivative of
-`sin(cos(x))`. A program can also be read from a file:
+`sin(cos(x))`.
 
-```text
-rewrite < myprogram
-```
+There are an interactive and a non-interactive way to run rewrite:
+
+| Command | Mode |
+| --- | --- |
+| `rewrite` | Interactive: a welcome message, then a `>` prompt for each statement (`-->` inside an open block). |
+| `rewrite file ...` | Runs the files one after the other (like `INC "file"`), then exits. |
+| `rewrite -i file ...` | Runs the files, then continues interactively, e.g. with a library already loaded. |
+| `rewrite < file` | Reads the program from a pipe or file, without welcome message and prompts (for scripts and the tests). |
+| `rewrite -h` | Shows these options. |
+
+`QUIT` or the end-of-file key (Ctrl-D, on Windows Ctrl-Z and Enter) ends an
+interactive session. Whether the input is interactive is decided by the
+terminal: in the MSYS2 terminal (mintty), standard input is a pipe for
+Windows programs, so use `rewrite -i` there to get the prompts.
 
 Paths in `INC` and `DATA` are relative to the current directory, so start
 `rewrite` in the project folder when you use the standard library.
@@ -288,7 +299,7 @@ at run time. Two statements connect the sorts:
 
 | Command | Meaning |
 | --- | --- |
-| `SUBSORT integer,rational ATT int2rat` | Every `integer` is also a `rational`; the C function converts a value. |
+| `SUBSORT integer,rational ATT int2rat` | Every `integer` is also a `rational`; the C function converts a value. A sort may have several wider sorts. |
 | `INTNUM integer ATT read_int` | Numbers without point and exponent are of sort `integer`, made by the C function from the text. |
 
 With `integer < rational < real`, a function declared for `real` also
@@ -300,6 +311,28 @@ with the fewest conversions is used: `1/3+1/6` uses the rational `+`,
 to `(3/2) * x`. When a rule is applied, the operators of the new term are
 chosen again for the sorts of their actual arguments, so a rule written
 for `real` gives exact results for exact numbers.
+
+**Sorts with a known sign.** A sort can have several wider sorts.
+`inc/exact` declares
+
+```text
+natural < integer < rational < real
+natural < nonneg < real          positive < nonneg
+```
+
+Numbers written without a point are `natural`; `2-5` is the `integer` -3.
+`nonneg` (values >= 0) and `positive` (> 0) are real numbers whose sign is
+known. A meta variable of such a sort only matches terms of that sort or
+below it (a variable of sort `real` still matches any term). Rules that are
+wrong for negative numbers are written for these sorts:
+
+```text
+CONST t : nonneg
+CONST p : positive
+REWR sqrt(t^2) : All       # prints t
+REWR sqrt(x^2) : All       # stays sqrt (x ^ 2 ) for a real x
+REWR ln(p*x) : All         # prints ln (p )+ ln (x )
+```
 
 The rule-based integration ([inc/integration](inc/integration)) loads
 `inc/exact` itself; do not load it a second time.

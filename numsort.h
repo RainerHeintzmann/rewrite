@@ -50,6 +50,11 @@ Symbol * make_exact (long long p, long long q);
 BOOLEAN num_exact (Symbol * s);			/* integer or rational value */
 Symbol * exact_root (Symbol * s, long k);	/* exact k-th root, or NULL */
 
+/* may a meta variable of sort vsort match term? Only checked for sorts that
+ * are subsorts of another (nonneg, integer, ...); a variable of sort real
+ * matches any term, as before. */
+BOOLEAN var_sort_ok (Node * vsort, Node * term);
+
 /* sort of an argument node (as eq_rtypes sees it) */
 Node * arg_sort (Node * a);
 

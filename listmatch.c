@@ -23,6 +23,7 @@
 #include "sync.h"		/* IS_follows */
 #include "listmatch.h"
 #include "symfkt.h"		/* term_equal */
+#include "numsort.h"		/* var_sort_ok */
 
 extern Node var_chain;		/* run.c */
 extern Node * chain_pos;	/* run.c */
@@ -163,6 +164,7 @@ static BOOLEAN lm_solve (Goal * g)
 		if (lexval(ps) == Var)			/* unbound meta variable */
 			{
 			if (t->type != Const && t->type != Func) return FALSE;
+			if (! var_sort_ok(rtypes(ps), t)) return FALSE;	/* subsorts (nonneg, ...) */
 			if (hasval(ps))			/* NUM: only numbers */
 				if (t->type != Const || ! hasval(t->l) || lexval((Symbol *) t->l) != Const)
 					return FALSE;

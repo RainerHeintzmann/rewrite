@@ -8,7 +8,7 @@
 
 # Regel 1 (144 Varianten):
 #   Int[x_*(a_ + b_.*x_^2 + c_.*x_^4)^p_., x_Symbol] := 1/2*Subst[Int[(a + b*x + c*x^2)^p, x], x, x^2] /; FreeQ[{a, b, c, p}, x]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_p) Int((Xv)*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(O_p)),Xv) = (((1/2))*(subst(Int(((((P_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)),Xv),Xv,((Xv)^(2)))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_p) Int((Xv)*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(O_p)),Xv) = (((1/2))*(intsubst(((((P_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)),Xv,((Xv)^(2)))))
 
 # Regel 2 (864 Varianten):
 #   Int[(d_.*x_)^m_.*(a_ + b_.*x_^2 + c_.*x_^4)^p_., x_Symbol] := Int[ExpandIntegrand[(d*x)^m*(a + b*x^2 + c*x^4)^p, x], x] /; FreeQ[{a, b, c, d, m}, x] && IGtQ[p, 0] && Not[IntegerQ[(m + 1)/2]]
@@ -24,7 +24,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_m,P_p), (eqq(((((O_b)^(2)))+((((
 
 # Regel 5 (144 Varianten):
 #   Int[x_^m_.*(a_ + b_.*x_^2 + c_.*x_^4)^p_, x_Symbol] := 1/2*Subst[Int[x^((m - 1)/2)*(a + b*x + c*x^2)^p, x], x, x^2] /; FreeQ[{a, b, c, p}, x] && EqQ[b^2 - 4*a*c, 0] && IntegerQ[p - 1/2] && IntegerQ[(m - 1)/2] && (GtQ[m, 0] || LtQ[0, 4*p, -m - 1])
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (eqq(((((O_b)^(2)))+((((-4))*(P_a)*(O_c)))),0)), (integerq(((P_p)+((-(1/2)))))), (integerq(((((O_m)+((-1))))*((1/2))))), (((((O_m > 0))) || (((0 < ((4)*(P_p))) && (((4)*(P_p)) < (((((-1))*(O_m)))+((-1)))))))) Int(((Xv)^(O_m))*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(P_p)),Xv) = (((1/2))*(subst(Int(((((Xv)^(((((O_m)+((-1))))*((1/2))))))*(((((P_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(P_p)))),Xv),Xv,((Xv)^(2)))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (eqq(((((O_b)^(2)))+((((-4))*(P_a)*(O_c)))),0)), (integerq(((P_p)+((-(1/2)))))), (integerq(((((O_m)+((-1))))*((1/2))))), (((((O_m > 0))) || (((0 < ((4)*(P_p))) && (((4)*(P_p)) < (((((-1))*(O_m)))+((-1)))))))) Int(((Xv)^(O_m))*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(P_p)),Xv) = (((1/2))*(intsubst(((((Xv)^(((((O_m)+((-1))))*((1/2))))))*(((((P_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(P_p)))),Xv,((Xv)^(2)))))
 
 # Regel 6 (432 Varianten):
 #   Int[(d_.*x_)^m_.*(a_ + b_.*x_^2 + c_.*x_^4)^p_, x_Symbol] := (a + b*x^2 + c*x^4)^ FracPart[p]/(c^IntPart[p]*(b/2 + c*x^2)^(2*FracPart[p]))* Int[(d*x)^m*(b/2 + c*x^2)^(2*p), x] /; FreeQ[{a, b, c, d, m, p}, x] && EqQ[b^2 - 4*a*c, 0] && IntegerQ[p - 1/2]
@@ -36,11 +36,11 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_m,P_p), (eqq(((((O_b)^(2)))+((((
 
 # Regel 8 (288 Varianten):
 #   Int[x_^m_.*(a_ + b_.*x_^2 + c_.*x_^4)^p_., x_Symbol] := 1/2*Subst[Int[x^((m - 1)/2)*(a + b*x + c*x^2)^p, x], x, x^2] /; FreeQ[{a, b, c, p}, x] && IntegerQ[(m - 1)/2]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_p), (integerq(((((O_m)+((-1))))*((1/2))))) Int(((Xv)^(O_m))*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(O_p)),Xv) = (((1/2))*(subst(Int(((((Xv)^(((((O_m)+((-1))))*((1/2))))))*(((((P_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)))),Xv),Xv,((Xv)^(2)))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_p), (integerq(((((O_m)+((-1))))*((1/2))))) Int(((Xv)^(O_m))*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(O_p)),Xv) = (((1/2))*(intsubst(((((Xv)^(((((O_m)+((-1))))*((1/2))))))*(((((P_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)))),Xv,((Xv)^(2)))))
 
 # Regel 9 (216 Varianten):
 #   Int[(d_.*x_)^m_*(a_ + b_.*x_^2 + c_.*x_^4)^p_, x_Symbol] := With[{k = Denominator[m]}, k/d* Subst[Int[x^(k*(m + 1) - 1)*(a + b*x^(2*k)/d^2 + c*x^(4*k)/d^4)^p, x], x, (d*x)^(1/k)]] /; FreeQ[{a, b, c, d, p}, x] && NeQ[b^2 - 4*a*c, 0] && FractionQ[m] && IntegerQ[p]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_p), (neq(((((O_b)^(2)))+((((-4))*(P_a)*(O_c)))),0)), (fractionq(P_m)), (integerq(P_p)) Int((((O_d)*(Xv))^(P_m))*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(P_p)),Xv) = ((denominator(P_m))*(((O_d)^((-1))))*(subst(Int(((((Xv)^(((((denominator(P_m))*(((P_m)+(1)))))+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(((2)*(denominator(P_m))))))*(((O_d)^((-2))))))+(((O_c)*(((Xv)^(((4)*(denominator(P_m))))))*(((O_d)^((-4))))))))^(P_p)))),Xv),Xv,((((O_d)*(Xv)))^(((denominator(P_m))^((-1))))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_p), (neq(((((O_b)^(2)))+((((-4))*(P_a)*(O_c)))),0)), (fractionq(P_m)), (integerq(P_p)) Int((((O_d)*(Xv))^(P_m))*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(P_p)),Xv) = ((denominator(P_m))*(((O_d)^((-1))))*(intsubst(((((Xv)^(((((denominator(P_m))*(((P_m)+(1)))))+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(((2)*(denominator(P_m))))))*(((O_d)^((-2))))))+(((O_c)*(((Xv)^(((4)*(denominator(P_m))))))*(((O_d)^((-4))))))))^(P_p)))),Xv,((((O_d)*(Xv)))^(((denominator(P_m))^((-1))))))))
 
 # Regel 10 (432 Varianten):
 #   Int[(d_.*x_)^m_.*(a_ + b_.*x_^2 + c_.*x_^4)^p_, x_Symbol] := d*(d*x)^(m - 1)*(a + b*x^2 + c*x^4)^ p*(2*b*p + c*(m + 4*p - 1)*x^2)/(c*(m + 4*p + 1)*(m + 4*p - 1)) - 2*p*d^2/(c*(m + 4*p + 1)*(m + 4*p - 1))* Int[(d*x)^(m - 2)*(a + b*x^2 + c*x^4)^(p - 1)* Simp[a*b*(m - 1) - (2*a*c*(m + 4*p - 1) - b^2*(m + 2*p - 1))* x^2, x], x] /; FreeQ[{a, b, c, d}, x] && NeQ[b^2 - 4*a*c, 0] && GtQ[p, 0] && GtQ[m, 1] && IntegerQ[2*p] && (IntegerQ[p] || IntegerQ[m])
@@ -147,4 +147,4 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_m,P_p) Int((((O_d)*(Xv))^(O_m))*
 
 # Regel 36 (432 Varianten):
 #   Int[u_^m_.*(a_. + b_.*v_^2 + c_.*v_^4)^p_., x_Symbol] := u^m/(Coefficient[v, x, 1]*v^m)* Subst[Int[x^m*(a + b*x^2 + c*x^(2*2))^p, x], x, v] /; FreeQ[{a, b, c, m, p}, x] && LinearPairQ[u, v, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m,O_p), (linearpairq(P_u,P_v,Xv)) Int(((P_u)^(O_m))*(((O_a)+((O_b)*((P_v)^(2)))+((O_c)*((P_v)^(4))))^(O_p)),Xv) = ((((P_u)^(O_m)))*(((((coeff(P_v,Xv,1))*(((P_v)^(O_m)))))^((-1))))*(subst(Int(((((Xv)^(O_m)))*(((((O_a)+(((O_b)*(((Xv)^(2)))))+(((O_c)*(((Xv)^(4)))))))^(O_p)))),Xv),Xv,P_v)))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m,O_p), (linearpairq(P_u,P_v,Xv)) Int(((P_u)^(O_m))*(((O_a)+((O_b)*((P_v)^(2)))+((O_c)*((P_v)^(4))))^(O_p)),Xv) = ((((P_u)^(O_m)))*(((((coeff(P_v,Xv,1))*(((P_v)^(O_m)))))^((-1))))*(intsubst(((((Xv)^(O_m)))*(((((O_a)+(((O_b)*(((Xv)^(2)))))+(((O_c)*(((Xv)^(4)))))))^(O_p)))),Xv,P_v)))

@@ -81,3 +81,4 @@ FUNC quadraticmatchq : real,real >> bool  ATT quadraticmatchq # woertlich a+b*x+
 FUNC trinomialq : real,real >> bool       ATT trinomialq      # a+b*x^n+c*x^(2n), n > 1
 FUNC linearpairq : real,real,real >> bool ATT linearpairq
 FUNC algebraicfunctionq : real,real >> bool ATT algebraicfunctionq
+FUNC intsubst : real,real,real >> real    ATT intsubst     # Subst[Int[u,x],x,v]

@@ -238,6 +238,21 @@ void * int_pow (void * arg[])		/* integer ^ integer -> rational (2^-1 = 1/2) */
 	return r;
 }
 
+/* conversions for the subsorts natural < integer, natural < nonneg,
+ * positive < nonneg < real */
+void * int2int (void * arg[]) { return cpy_int(I(0)); }		/* natural -> integer */
+void * int2real (void * arg[]) { return mkreal(mpz_get_d(I(0))); }	/* natural -> nonneg */
+void * real2real (void * arg[]) { return mkreal(* (double *) arg[0]); }	/* nonneg -> real */
+
+void * nat_pow (void * arg[])		/* natural ^ natural -> natural */
+{
+	mpz_ptr z;
+	if (! mpz_fits_ulong_p(I(1)) || mpz_get_ui(I(1)) > MAXEXP) return NULL;
+	z = new_int();
+	mpz_pow_ui(z, I(0), mpz_get_ui(I(1)));
+	return z;
+}
+
 /* for C code (numsort.c): exact numbers from machine integers */
 void * int_from_ll (long long v)
 {

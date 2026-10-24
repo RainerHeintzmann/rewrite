@@ -12,7 +12,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_b,P_n,P_p) Int(((O_b)*((Xv)^(P_n)))^(P_p),Xv) = 
 
 # Regel 2 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := 1/n*Subst[Int[x^(1/n - 1)*(a + b*x)^p, x], x, x^n] /; FreeQ[{a, b, p}, x] && FractionQ[n] && IntegerQ[1/n]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (fractionq(P_n)), (integerq(((P_n)^((-1))))) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((((P_n)^((-1))))*(subst(Int(((((Xv)^(((((P_n)^((-1))))+((-1))))))*(((((P_a)+(((O_b)*(Xv)))))^(P_p)))),Xv),Xv,((Xv)^(P_n)))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (fractionq(P_n)), (integerq(((P_n)^((-1))))) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((((P_n)^((-1))))*(intsubst(((((Xv)^(((((P_n)^((-1))))+((-1))))))*(((((P_a)+(((O_b)*(Xv)))))^(P_p)))),Xv,((Xv)^(P_n)))))
 
 # Regel 3 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := x*(a + b*x^n)^(p + 1)/a /; FreeQ[{a, b, n, p}, x] && EqQ[1/n + p + 1, 0]
@@ -44,7 +44,7 @@ ADDSPEC RubiRules : IF (K_1 == (-(5/4))), NIN(Xv,P_a,O_b), (posq(P_a)), (posq(((
 
 # Regel 10 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(7/6), x_Symbol] := 1/((a + b*x^2)^(2/3)*(a/(a + b*x^2))^(2/3))* Subst[Int[1/(1 - b*x^2)^(1/3), x], x, x/Sqrt[a + b*x^2]] /; FreeQ[{a, b}, x]
-ADDSPEC RubiRules : IF (K_1 == (-(7/6))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((((((((((P_a)+(((O_b)*(((Xv)^(2)))))))^((2/3))))*(((((P_a)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-1))))))^((2/3))))))^((-1))))*(subst(Int(((((1)+((((-1))*(O_b)*(((Xv)^(2)))))))^((-(1/3)))),Xv),Xv,((Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(1/2)))))))))
+ADDSPEC RubiRules : IF (K_1 == (-(7/6))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((((((((((P_a)+(((O_b)*(((Xv)^(2)))))))^((2/3))))*(((((P_a)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-1))))))^((2/3))))))^((-1))))*(intsubst(((((1)+((((-1))*(O_b)*(((Xv)^(2)))))))^((-(1/3)))),Xv,((Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(1/2)))))))))
 
 # Regel 11 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := -x*(a + b*x^n)^(p + 1)/(a*n*(p + 1)) + (n*(p + 1) + 1)/(a*n*(p + 1))*Int[(a + b*x^n)^(p + 1), x] /; FreeQ[{a, b}, x] && IGtQ[n, 0] && LtQ[p, -1] && (IntegerQ[2*p] || n == 2 && IntegerQ[4*p] || n == 2 && IntegerQ[3*p] || Denominator[p + 1/n] < Denominator[p])
@@ -115,7 +115,7 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (((P_a > 0))), (negq(
 
 # Regel 29 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^2], x_Symbol] := Subst[Int[1/(1 - b*x^2), x], x, x/Sqrt[a + b*x^2]] /; FreeQ[{a, b}, x] && Not[GtQ[a, 0]]
-ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (not(((P_a > 0)))) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = subst(Int(((((1)+((((-1))*(O_b)*(((Xv)^(2)))))))^((-1))),Xv),Xv,((Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(1/2)))))))
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b), (not(((P_a > 0)))) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = intsubst(((((1)+((((-1))*(O_b)*(((Xv)^(2)))))))^((-1))),Xv,((Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(1/2)))))))
 
 # Regel 30 (6 Varianten):
 #   Int[1/Sqrt[a_ + b_.*x_^3], x_Symbol] := With[{r = Numer[Rt[b/a, 3]], s = Denom[Rt[b/a, 3]]}, 2*Sqrt[2 + Sqrt[3]]*(s + r*x)* Sqrt[(s^2 - r*s*x + r^2*x^2)/((1 + Sqrt[3])*s + r*x)^2]/ (3^(1/4)*r*Sqrt[a + b*x^3]* Sqrt[s*(s + r*x)/((1 + Sqrt[3])*s + r*x)^2])* EllipticF[ ArcSin[((1 - Sqrt[3])*s + r*x)/((1 + Sqrt[3])*s + r*x)], -7 - 4*Sqrt[3]]] /; FreeQ[{a, b}, x] && PosQ[a]
@@ -167,7 +167,7 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/4))), NIN(Xv,P_a,O_b), (posq(P_a)) Int(((P_a
 
 # Regel 42 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(1/4), x_Symbol] := 2*Sqrt[-b*x^2/a]/(b*x)* Subst[Int[x^2/Sqrt[1 - x^4/a], x], x, (a + b*x^2)^(1/4)] /; FreeQ[{a, b}, x] && NegQ[a]
-ADDSPEC RubiRules : IF (K_1 == (-(1/4))), NIN(Xv,P_a,O_b), (negq(P_a)) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((((O_b)*(Xv)))^((-1))))*(subst(Int(((((Xv)^(2)))*(((((1)+((((-1))*(((Xv)^(4)))*(((P_a)^((-1))))))))^((-(1/2)))))),Xv),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/4))))))
+ADDSPEC RubiRules : IF (K_1 == (-(1/4))), NIN(Xv,P_a,O_b), (negq(P_a)) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((((O_b)*(Xv)))^((-1))))*(intsubst(((((Xv)^(2)))*(((((1)+((((-1))*(((Xv)^(4)))*(((P_a)^((-1))))))))^((-(1/2)))))),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/4))))))
 
 # Regel 43 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(3/4), x_Symbol] := 2/(a^(3/4)*Rt[b/a, 2])*EllipticF[1/2*ArcTan[Rt[b/a, 2]*x], 2] /; FreeQ[{a, b}, x] && GtQ[a, 0] && PosQ[b/a]
@@ -183,15 +183,15 @@ ADDSPEC RubiRules : IF (K_1 == (-(3/4))), NIN(Xv,P_a,O_b), (posq(P_a)) Int(((P_a
 
 # Regel 46 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(3/4), x_Symbol] := 2*Sqrt[-b*x^2/a]/(b*x)* Subst[Int[1/Sqrt[1 - x^4/a], x], x, (a + b*x^2)^(1/4)] /; FreeQ[{a, b}, x] && NegQ[a]
-ADDSPEC RubiRules : IF (K_1 == (-(3/4))), NIN(Xv,P_a,O_b), (negq(P_a)) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((((O_b)*(Xv)))^((-1))))*(subst(Int(((((1)+((((-1))*(((Xv)^(4)))*(((P_a)^((-1))))))))^((-(1/2)))),Xv),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/4))))))
+ADDSPEC RubiRules : IF (K_1 == (-(3/4))), NIN(Xv,P_a,O_b), (negq(P_a)) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((2)*((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((((O_b)*(Xv)))^((-1))))*(intsubst(((((1)+((((-1))*(((Xv)^(4)))*(((P_a)^((-1))))))))^((-(1/2)))),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/4))))))
 
 # Regel 47 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(1/3), x_Symbol] := 3*Sqrt[b*x^2]/(2*b*x)* Subst[Int[x/Sqrt[-a + x^3], x], x, (a + b*x^2)^(1/3)] /; FreeQ[{a, b}, x]
-ADDSPEC RubiRules : IF (K_1 == (-(1/3))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((3)*(((((O_b)*(((Xv)^(2)))))^((1/2))))*(((((2)*(O_b)*(Xv)))^((-1))))*(subst(Int(((Xv)*((((((((-1))*(P_a)))+(((Xv)^(3)))))^((-(1/2)))))),Xv),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/3))))))
+ADDSPEC RubiRules : IF (K_1 == (-(1/3))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((3)*(((((O_b)*(((Xv)^(2)))))^((1/2))))*(((((2)*(O_b)*(Xv)))^((-1))))*(intsubst(((Xv)*((((((((-1))*(P_a)))+(((Xv)^(3)))))^((-(1/2)))))),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/3))))))
 
 # Regel 48 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^2)^(2/3), x_Symbol] := 3*Sqrt[b*x^2]/(2*b*x)* Subst[Int[1/Sqrt[-a + x^3], x], x, (a + b*x^2)^(1/3)] /; FreeQ[{a, b}, x]
-ADDSPEC RubiRules : IF (K_1 == (-(2/3))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((3)*(((((O_b)*(((Xv)^(2)))))^((1/2))))*(((((2)*(O_b)*(Xv)))^((-1))))*(subst(Int((((((((-1))*(P_a)))+(((Xv)^(3)))))^((-(1/2)))),Xv),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/3))))))
+ADDSPEC RubiRules : IF (K_1 == (-(2/3))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv)^(2))))^(K_1),Xv) = ((3)*(((((O_b)*(((Xv)^(2)))))^((1/2))))*(((((2)*(O_b)*(Xv)))^((-1))))*(intsubst((((((((-1))*(P_a)))+(((Xv)^(3)))))^((-(1/2)))),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/3))))))
 
 # Regel 49 (6 Varianten):
 #   Int[1/(a_ + b_.*x_^4)^(3/4), x_Symbol] := x^3*(1 + a/(b*x^4))^(3/4)/(a + b*x^4)^(3/4)* Int[1/(x^3*(1 + a/(b*x^4))^(3/4)), x] /; FreeQ[{a, b}, x]
@@ -207,19 +207,19 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/3))), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((Xv
 
 # Regel 52 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := a^(p + 1/n)* Subst[Int[1/(1 - b*x^n)^(p + 1/n + 1), x], x, x/(a + b*x^n)^(1/n)] /; FreeQ[{a, b}, x] && IGtQ[n, 0] && LtQ[-1, p, 0] && NeQ[p, -1/2] && IntegerQ[p + 1/n]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (igtq(P_n,0)), ((((-1) < P_p) && (P_p < 0))), (neq(P_p,(-(1/2)))), (integerq(((P_p)+(((P_n)^((-1))))))) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((((P_a)^(((P_p)+(((P_n)^((-1))))))))*(subst(Int(((((((1)+((((-1))*(O_b)*(((Xv)^(P_n)))))))^(((P_p)+(((P_n)^((-1))))+(1)))))^((-1))),Xv),Xv,((Xv)*(((((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_n)^((-1))))))^((-1))))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (igtq(P_n,0)), ((((-1) < P_p) && (P_p < 0))), (neq(P_p,(-(1/2)))), (integerq(((P_p)+(((P_n)^((-1))))))) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((((P_a)^(((P_p)+(((P_n)^((-1))))))))*(intsubst(((((((1)+((((-1))*(O_b)*(((Xv)^(P_n)))))))^(((P_p)+(((P_n)^((-1))))+(1)))))^((-1))),Xv,((Xv)*(((((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_n)^((-1))))))^((-1))))))))
 
 # Regel 53 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := (a/(a + b*x^n))^(p + 1/n)*(a + b*x^n)^(p + 1/n)* Subst[Int[1/(1 - b*x^n)^(p + 1/n + 1), x], x, x/(a + b*x^n)^(1/n)] /; FreeQ[{a, b}, x] && IGtQ[n, 0] && LtQ[-1, p, 0] && NeQ[p, -1/2] && LtQ[Denominator[p + 1/n], Denominator[p]]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (igtq(P_n,0)), ((((-1) < P_p) && (P_p < 0))), (neq(P_p,(-(1/2)))), (((denominator(((P_p)+(((P_n)^((-1)))))) < denominator(P_p)))) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((((((P_a)*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^((-1))))))^(((P_p)+(((P_n)^((-1))))))))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_p)+(((P_n)^((-1))))))))*(subst(Int(((((((1)+((((-1))*(O_b)*(((Xv)^(P_n)))))))^(((P_p)+(((P_n)^((-1))))+(1)))))^((-1))),Xv),Xv,((Xv)*(((((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_n)^((-1))))))^((-1))))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (igtq(P_n,0)), ((((-1) < P_p) && (P_p < 0))), (neq(P_p,(-(1/2)))), (((denominator(((P_p)+(((P_n)^((-1)))))) < denominator(P_p)))) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((((((P_a)*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^((-1))))))^(((P_p)+(((P_n)^((-1))))))))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_p)+(((P_n)^((-1))))))))*(intsubst(((((((1)+((((-1))*(O_b)*(((Xv)^(P_n)))))))^(((P_p)+(((P_n)^((-1))))+(1)))))^((-1))),Xv,((Xv)*(((((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_n)^((-1))))))^((-1))))))))
 
 # Regel 54 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := -Subst[Int[(a + b*x^(-n))^p/x^2, x], x, 1/x] /; FreeQ[{a, b, p}, x] && ILtQ[n, 0]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (iltq(P_n,0)) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = (((-1))*(subst(Int(((((((P_a)+(((O_b)*(((Xv)^((((-1))*(P_n)))))))))^(P_p)))*(((Xv)^((-2))))),Xv),Xv,((Xv)^((-1))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (iltq(P_n,0)) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = (((-1))*(intsubst(((((((P_a)+(((O_b)*(((Xv)^((((-1))*(P_n)))))))))^(P_p)))*(((Xv)^((-2))))),Xv,((Xv)^((-1))))))
 
 # Regel 55 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := With[{k = Denominator[n]}, k*Subst[Int[x^(k - 1)*(a + b*x^(k*n))^p, x], x, x^(1/k)]] /; FreeQ[{a, b, p}, x] && FractionQ[n]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (fractionq(P_n)) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((denominator(P_n))*(subst(Int(((((Xv)^(((denominator(P_n))+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(((denominator(P_n))*(P_n)))))))))^(P_p)))),Xv),Xv,((Xv)^(((denominator(P_n))^((-1))))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (fractionq(P_n)) Int(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p),Xv) = ((denominator(P_n))*(intsubst(((((Xv)^(((denominator(P_n))+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(((denominator(P_n))*(P_n)))))))))^(P_p)))),Xv,((Xv)^(((denominator(P_n))^((-1))))))))
 
 # Regel 56 (6 Varianten):
 #   Int[(a_ + b_.*x_^n_)^p_, x_Symbol] := Int[ExpandIntegrand[(a + b*x^n)^p, x], x] /; FreeQ[{a, b, n}, x] && IGtQ[p, 0]
@@ -235,7 +235,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_n,P_p), (not(igtq(P_p,0))), (not(integer
 
 # Regel 59 (9 Varianten):
 #   Int[(a_. + b_.*v_^n_)^p_, x_Symbol] := 1/Coefficient[v, x, 1]*Subst[Int[(a + b*x^n)^p, x], x, v] /; FreeQ[{a, b, n, p}, x] && LinearQ[v, x] && NeQ[v, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_n,P_p), (linearq(P_v,Xv)), (neq(P_v,Xv)) Int(((O_a)+((O_b)*((P_v)^(P_n))))^(P_p),Xv) = ((((coeff(P_v,Xv,1))^((-1))))*(subst(Int(((((O_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)),Xv),Xv,P_v)))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_n,P_p), (linearq(P_v,Xv)), (neq(P_v,Xv)) Int(((O_a)+((O_b)*((P_v)^(P_n))))^(P_p),Xv) = ((((coeff(P_v,Xv,1))^((-1))))*(intsubst(((((O_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)),Xv,P_v)))
 
 # Regel 60 (648 Varianten):
 #   Int[(a1_. + b1_.*x_^n_)^p_.*(a2_. + b2_.*x_^n_)^p_., x_Symbol] := Int[(a1*a2 + b1*b2*x^(2*n))^p, x] /; FreeQ[{a1, b1, a2, b2, n, p}, x] && EqQ[a2*b1 + a1*b2, 0] && (IntegerQ[p] || GtQ[a1, 0] && GtQ[a2, 0])
@@ -251,11 +251,11 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a1,O_b1,P_a2,O_b2), (eqq(((((P_a2)*(O_b1)))+(((P
 
 # Regel 63 (72 Varianten):
 #   Int[(a1_ + b1_.*x_^n_)^p_*(a2_ + b2_.*x_^n_)^p_, x_Symbol] := -Subst[Int[(a1 + b1*x^(-n))^p*(a2 + b2*x^(-n))^p/x^2, x], x, 1/x] /; FreeQ[{a1, b1, a2, b2, p}, x] && EqQ[a2*b1 + a1*b2, 0] && ILtQ[2*n, 0]
-ADDSPEC RubiRules : IF NIN(Xv,P_a1,O_b1,P_a2,O_b2,P_p), (eqq(((((P_a2)*(O_b1)))+(((P_a1)*(O_b2)))),0)), (iltq(((2)*(P_n)),0)) Int((((P_a1)+((O_b1)*((Xv)^(P_n))))^(P_p))*(((P_a2)+((O_b2)*((Xv)^(P_n))))^(P_p)),Xv) = (((-1))*(subst(Int(((((((P_a1)+(((O_b1)*(((Xv)^((((-1))*(P_n)))))))))^(P_p)))*(((((P_a2)+(((O_b2)*(((Xv)^((((-1))*(P_n)))))))))^(P_p)))*(((Xv)^((-2))))),Xv),Xv,((Xv)^((-1))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a1,O_b1,P_a2,O_b2,P_p), (eqq(((((P_a2)*(O_b1)))+(((P_a1)*(O_b2)))),0)), (iltq(((2)*(P_n)),0)) Int((((P_a1)+((O_b1)*((Xv)^(P_n))))^(P_p))*(((P_a2)+((O_b2)*((Xv)^(P_n))))^(P_p)),Xv) = (((-1))*(intsubst(((((((P_a1)+(((O_b1)*(((Xv)^((((-1))*(P_n)))))))))^(P_p)))*(((((P_a2)+(((O_b2)*(((Xv)^((((-1))*(P_n)))))))))^(P_p)))*(((Xv)^((-2))))),Xv,((Xv)^((-1))))))
 
 # Regel 64 (72 Varianten):
 #   Int[(a1_ + b1_.*x_^n_)^p_*(a2_ + b2_.*x_^n_)^p_, x_Symbol] := With[{k = Denominator[2*n]}, k*Subst[ Int[x^(k - 1)*(a1 + b1*x^(k*n))^p*(a2 + b2*x^(k*n))^p, x], x, x^(1/k)]] /; FreeQ[{a1, b1, a2, b2, p}, x] && EqQ[a2*b1 + a1*b2, 0] && FractionQ[2*n]
-ADDSPEC RubiRules : IF NIN(Xv,P_a1,O_b1,P_a2,O_b2,P_p), (eqq(((((P_a2)*(O_b1)))+(((P_a1)*(O_b2)))),0)), (fractionq(((2)*(P_n)))) Int((((P_a1)+((O_b1)*((Xv)^(P_n))))^(P_p))*(((P_a2)+((O_b2)*((Xv)^(P_n))))^(P_p)),Xv) = ((denominator(((2)*(P_n))))*(subst(Int(((((Xv)^(((denominator(((2)*(P_n))))+((-1))))))*(((((P_a1)+(((O_b1)*(((Xv)^(((denominator(((2)*(P_n))))*(P_n)))))))))^(P_p)))*(((((P_a2)+(((O_b2)*(((Xv)^(((denominator(((2)*(P_n))))*(P_n)))))))))^(P_p)))),Xv),Xv,((Xv)^(((denominator(((2)*(P_n))))^((-1))))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a1,O_b1,P_a2,O_b2,P_p), (eqq(((((P_a2)*(O_b1)))+(((P_a1)*(O_b2)))),0)), (fractionq(((2)*(P_n)))) Int((((P_a1)+((O_b1)*((Xv)^(P_n))))^(P_p))*(((P_a2)+((O_b2)*((Xv)^(P_n))))^(P_p)),Xv) = ((denominator(((2)*(P_n))))*(intsubst(((((Xv)^(((denominator(((2)*(P_n))))+((-1))))))*(((((P_a1)+(((O_b1)*(((Xv)^(((denominator(((2)*(P_n))))*(P_n)))))))))^(P_p)))*(((((P_a2)+(((O_b2)*(((Xv)^(((denominator(((2)*(P_n))))*(P_n)))))))))^(P_p)))),Xv,((Xv)^(((denominator(((2)*(P_n))))^((-1))))))))
 
 # Regel 65 (162 Varianten):
 #   Int[(a1_. + b1_.*x_^n_)^p_*(a2_. + b2_.*x_^n_)^p_, x_Symbol] := (a1 + b1*x^n)^ FracPart[p]*(a2 + b2*x^n)^FracPart[p]/(a1*a2 + b1*b2*x^(2*n))^ FracPart[p]*Int[(a1*a2 + b1*b2*x^(2*n))^p, x] /; FreeQ[{a1, b1, a2, b2, n, p}, x] && EqQ[a2*b1 + a1*b2, 0] && Not[IntegerQ[p]]
@@ -263,7 +263,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a1,O_b1,O_a2,O_b2,P_n,P_p), (eqq(((((O_a2)*(O_b1
 
 # Regel 66 (72 Varianten):
 #   Int[(a_ + b_.*(c_.*x_^q_.)^n_)^p_., x_Symbol] := x/(c*x^q)^(1/q)* Subst[Int[(a + b*x^(n*q))^p, x], x, (c*x^q)^(1/q)] /; FreeQ[{a, b, c, n, p, q}, x] && IntegerQ[n*q] && NeQ[x, (c*x^q)^(1/q)]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_n,O_p,O_q), (integerq(((P_n)*(O_q)))), (neq(Xv,((((O_c)*(((Xv)^(O_q)))))^(((O_q)^((-1))))))) Int(((P_a)+((O_b)*(((O_c)*((Xv)^(O_q)))^(P_n))))^(O_p),Xv) = ((Xv)*(((((((O_c)*(((Xv)^(O_q)))))^(((O_q)^((-1))))))^((-1))))*(subst(Int(((((P_a)+(((O_b)*(((Xv)^(((P_n)*(O_q)))))))))^(O_p)),Xv),Xv,((((O_c)*(((Xv)^(O_q)))))^(((O_q)^((-1))))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_n,O_p,O_q), (integerq(((P_n)*(O_q)))), (neq(Xv,((((O_c)*(((Xv)^(O_q)))))^(((O_q)^((-1))))))) Int(((P_a)+((O_b)*(((O_c)*((Xv)^(O_q)))^(P_n))))^(O_p),Xv) = ((Xv)*(((((((O_c)*(((Xv)^(O_q)))))^(((O_q)^((-1))))))^((-1))))*(intsubst(((((P_a)+(((O_b)*(((Xv)^(((P_n)*(O_q)))))))))^(O_p)),Xv,((((O_c)*(((Xv)^(O_q)))))^(((O_q)^((-1))))))))
 
 # Regel 67 (72 Varianten):
 #   Int[(a_ + b_.*(c_.*x_^q_.)^n_)^p_., x_Symbol] := With[{k = Denominator[n]}, Subst[Int[(a + b*c^n*x^(n*q))^p, x], x^(1/k), (c*x^q)^(1/k)/(c^(1/k)*(x^(1/k))^(q - 1))]] /; FreeQ[{a, b, c, p, q}, x] && FractionQ[n]
@@ -275,8 +275,8 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_n,O_p,O_q), (not(rationalq(P_n))) In
 
 # Regel 69 (72 Varianten):
 #   Int[(a_ + b_.*(d_.*x_^q_.)^n_)^p_., x_Symbol] := -Subst[Int[(a + b*(d*x^(-q))^n)^p/x^2, x], x, 1/x] /; FreeQ[{a, b, d, n, p}, x] && ILtQ[q, 0]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_d,P_n,O_p), (iltq(O_q,0)) Int(((P_a)+((O_b)*(((O_d)*((Xv)^(O_q)))^(P_n))))^(O_p),Xv) = (((-1))*(subst(Int(((((((P_a)+(((O_b)*(((((O_d)*(((Xv)^((((-1))*(O_q)))))))^(P_n)))))))^(O_p)))*(((Xv)^((-2))))),Xv),Xv,((Xv)^((-1))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_d,P_n,O_p), (iltq(O_q,0)) Int(((P_a)+((O_b)*(((O_d)*((Xv)^(O_q)))^(P_n))))^(O_p),Xv) = (((-1))*(intsubst(((((((P_a)+(((O_b)*(((((O_d)*(((Xv)^((((-1))*(O_q)))))))^(P_n)))))))^(O_p)))*(((Xv)^((-2))))),Xv,((Xv)^((-1))))))
 
 # Regel 70 (72 Varianten):
 #   Int[(a_ + b_.*(d_.*x_^q_.)^n_)^p_., x_Symbol] := With[{s = Denominator[q]}, s*Subst[Int[x^(s - 1)*(a + b*(d*x^(q*s))^n)^p, x], x, x^(1/s)]] /; FreeQ[{a, b, d, n, p}, x] && FractionQ[q]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_d,P_n,O_p), (fractionq(O_q)) Int(((P_a)+((O_b)*(((O_d)*((Xv)^(O_q)))^(P_n))))^(O_p),Xv) = ((denominator(O_q))*(subst(Int(((((Xv)^(((denominator(O_q))+((-1))))))*(((((P_a)+(((O_b)*(((((O_d)*(((Xv)^(((O_q)*(denominator(O_q))))))))^(P_n)))))))^(O_p)))),Xv),Xv,((Xv)^(((denominator(O_q))^((-1))))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_d,P_n,O_p), (fractionq(O_q)) Int(((P_a)+((O_b)*(((O_d)*((Xv)^(O_q)))^(P_n))))^(O_p),Xv) = ((denominator(O_q))*(intsubst(((((Xv)^(((denominator(O_q))+((-1))))))*(((((P_a)+(((O_b)*(((((O_d)*(((Xv)^(((O_q)*(denominator(O_q))))))))^(P_n)))))))^(O_p)))),Xv,((Xv)^(((denominator(O_q))^((-1))))))))

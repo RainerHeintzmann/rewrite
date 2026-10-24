@@ -31,11 +31,11 @@ static int nsub = 0;
 static Symbol * intsort = NULL;		/* sort of integer literals */
 static u_function * intread = NULL;	/* text -> value */
 
-static int find_sub (Node * from)	/* index of the widening of 'from', or -1 */
+static int find_pair (Node * from, Node * to)	/* index of from < to, or -1 */
 {
 	int i;
 	for (i = 0; i < nsub; i++)
-		if (sub[i].from == from) return i;
+		if (sub[i].from == from && sub[i].to == to) return i;
 	return -1;
 }
 
@@ -44,14 +44,14 @@ void subsort_def (Node * np)		/* FUNC(subsort_def, PARAM(from, PARAM(to, conv)))
 	Node * p = np->r;
 	Node * from = p->l, * to = p->r->l;
 	u_function * conv = (u_function *) p->r->r;
-	int i = find_sub(from);
+	int i = find_pair(from, to);
 	p->r->r = NULL;				/* not a node: must not be deleted */
 	if (! conv)
 		{
 		ErrorMsg("SUBSORT needs a C conversion function (ATT name)\n");
 		return;
 		}
-	if (sort_dist(to, from) >= 0)
+	if (from == to || sort_dist(to, from) >= 0)
 		{
 		ErrorMsg("SUBSORT would make a cycle of sorts\n");
 		return;
@@ -79,37 +79,66 @@ void intnum_def (Node * np)		/* FUNC(intnum_def, PARAM(sort, read function)) */
 		}
 }
 
-int sort_dist (Node * from, Node * to)
+/* shortest path from 'from' to 'to' in the graph of subsorts (a sort may
+ * have several wider sorts): number of steps, and the first edge of each
+ * node on the path in via[] (index into sub[]) */
+static int shortest (Node * from, Node * to, int * via)
 {
-	int d = 0, i;
-	while (from)
+	Node * queue[MAXSUB + 1];
+	int dist[MAXSUB + 1], prev[MAXSUB + 1], head = 0, tail = 0, i, k;
+	if (! from || ! to) return -1;
+	if (from == to) return 0;
+	queue[tail] = from; dist[tail] = 0; prev[tail] = -1; tail++;
+	while (head < tail)
 		{
-		if (from == to) return d;
-		if ((i = find_sub(from)) < 0) return -1;
-		from = sub[i].to;
-		if (++d > MAXSUB) return -1;
+		Node * s = queue[head];
+		for (i = 0; i < nsub; i++)
+			{
+			if (sub[i].from != s) continue;
+			for (k = 0; k < tail; k++)
+				if (queue[k] == sub[i].to) break;
+			if (k < tail) continue;		/* already reached */
+			if (tail > MAXSUB) return -1;
+			queue[tail] = sub[i].to; dist[tail] = dist[head] + 1; prev[tail] = head;
+			if (via) via[tail] = i;
+			if (sub[i].to == to)
+				{
+				if (via)			/* path: edges in order, end with -1 */
+					{
+					int path[MAXSUB + 1], n = 0, j = tail;
+					while (prev[j] >= 0) { path[n++] = via[j]; j = prev[j]; }
+					for (j = 0; j < n; j++) via[j] = path[n - 1 - j];
+					via[n] = -1;
+					}
+				return dist[tail];
+				}
+			tail++;
+			}
+		head++;
 		}
 	return -1;
+}
+
+int sort_dist (Node * from, Node * to)
+{
+	return shortest(from, to, NULL);
 }
 
 void * sort_convert (void * value, Node * from, Node * to)
 {
 	void * v = value, * arg[2];
-	Node * s = from;
-	int i;
-	if (sort_dist(from, to) < 0) return NULL;
+	int via[MAXSUB + 2], j;
 	if (from == to) return ((void * (*) (void *)) cpy(from)) (value);
-	while (s != to)
+	if (shortest(from, to, via) < 0) return NULL;
+	for (j = 0; via[j] >= 0; j++)
 		{
-		i = find_sub(s);
+		int i = via[j];
+		void * w;
 		arg[0] = v; arg[1] = NULL;
-		{
-		void * w = (sub[i].conv)(arg);
-		if (v != value && del(s))		/* intermediate value */
-			((void (*) (void *)) del(s)) (v);
+		w = (sub[i].conv)(arg);
+		if (v != value && del(sub[i].from))	/* intermediate value */
+			((void (*) (void *)) del(sub[i].from)) (v);
 		v = w;
-		}
-		s = sub[i].to;
 		}
 	return v;
 }
@@ -124,12 +153,21 @@ Symbol * int_literal (const char * text)
 	return mknum(v, (Node *) intsort);
 }
 
-static Node * ratsort (void)		/* the sort above the integer sort */
+static Node * named_sort (const char * n)	/* a declared sort of that name */
 {
-	int i;
-	if (! intsort) return NULL;
-	i = find_sub((Node *) intsort);
-	return (i < 0) ? NULL : sub[i].to;
+	Symbol * s = find_symbol(n);
+	return (s && lexval(s) == Sort) ? (Node *) s : NULL;
+}
+
+static Node * ratsort (void)		/* the sort of fractions */
+{
+	return intsort ? named_sort("rational") : NULL;
+}
+
+static Node * integersort (void)	/* the sort of all integers (negative too) */
+{
+	Node * z = named_sort("integer");
+	return z ? z : (Node *) intsort;
 }
 
 BOOLEAN exact_numbers (void)
@@ -140,14 +178,18 @@ BOOLEAN exact_numbers (void)
 Symbol * make_exact (long long p, long long q)
 {
 	if (! exact_numbers() || q == 0) return NULL;
-	if (q == 1) return mknum(int_from_ll(p), (Node *) intsort);
+	if (q == 1)	/* literal sort (natural) for p >= 0 if it holds them */
+		{
+		Node * s = (p >= 0) ? (Node *) intsort : integersort();
+		return mknum(int_from_ll(p), s);	/* natural and integer: both mpz */
+		}
 	return mknum(rat_from_ll(p, q), ratsort());
 }
 
-BOOLEAN num_exact (Symbol * s)
+BOOLEAN num_exact (Symbol * s)		/* natural, integer, rational: below rational */
 {
-	Node * nt = get_numbertype();
-	return s && rtypes(s) != nt && sort_dist(rtypes(s), nt) > 0;
+	Node * r = ratsort();
+	return s && r && sort_dist(rtypes(s), r) >= 0;
 }
 
 Symbol * exact_root (Symbol * s, long k)
@@ -178,6 +220,17 @@ BOOLEAN num_to_double (Symbol * num, double * v)
 	* v = * (double *) w;
 	((void (*) (void *)) del(nt)) (w);
 	return TRUE;
+}
+
+BOOLEAN var_sort_ok (Node * vsort, Node * term)
+{
+	int i;
+	Node * s;
+	for (i = 0; i < nsub; i++)		/* only sorts that are subsorts of another */
+		if (sub[i].from == vsort) break;
+	if (i == nsub) return TRUE;
+	s = arg_sort(term);
+	return s == NULL || sort_dist(s, vsort) >= 0;
 }
 
 Node * arg_sort (Node * a)

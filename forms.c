@@ -7,7 +7,8 @@
 #include "syn.h"
 #include "forms.h"
 #include "node.h" /* auch symeq */
-#include "sync.h"  /* Fuer IS_follows, lock_rtypes */
+#include "sync.h"
+#include "numsort.h"	/* 2026: var_sort_ok */  /* Fuer IS_follows, lock_rtypes */
 #include "nodes.h"
 
 extern Node * chain_pos;
@@ -385,6 +386,12 @@ BOOLEAN match2 (Node * term,Node * Baum)
 				}
 
 			/* Verschiedene Sorts werden auch zugeordnet, ehemals: if (! eq_sorts(rtypes((Symbol *) Baum),rtypes(tsym))) return FALSE;*/
+			/* 2026: ausser fuer Untersorten (VAR X : nonneg passt nur zu nonneg) */
+			if (! var_sort_ok(rtypes((Symbol *) Baum), term))
+				{
+				RESTORE
+				return FALSE;
+				}
 
                        /* Typen (auch Fkt.resultate) stimmen nun */
 

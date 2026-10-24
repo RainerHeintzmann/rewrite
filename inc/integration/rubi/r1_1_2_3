@@ -52,7 +52,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(
 
 # Regel 12 (72 Varianten):
 #   Int[1/(Sqrt[a_+b_.*x_^2]*(c_+d_.*x_^2)),x_Symbol] := Subst[Int[1/(c-(b*c-a*d)*x^2),x],x,x/Sqrt[a+b*x^2]] /; FreeQ[{a,b,c,d},x] && NeQ[b*c-a*d,0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)) Int(((((P_a)+((O_b)*((Xv)^(2))))^(0.5))*((P_c)+((O_d)*((Xv)^(2)))))^(K_1),Xv) = subst(Int(((((P_c)+((((-1))*(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))))*(((Xv)^(2)))))))^((-1))),Xv),Xv,((Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(1/2)))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)) Int(((((P_a)+((O_b)*((Xv)^(2))))^(0.5))*((P_c)+((O_d)*((Xv)^(2)))))^(K_1),Xv) = intsubst(((((P_c)+((((-1))*(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))))*(((Xv)^(2)))))))^((-1))),Xv,((Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^((-(1/2)))))))
 
 # Regel 13 (144 Varianten):
 #   Int[(a_+b_.*x_^2)^p_*(c_+d_.*x_^2)^q_.,x_Symbol] := -x*(a+b*x^2)^(p+1)*(c+d*x^2)^q/(2*a*(p+1)) - c*q/(a*(p+1)) \[Star] Int[(a+b*x^2)^(p+1)*(c+d*x^2)^(q-1),x] /; FreeQ[{a,b,c,d,p},x] && NeQ[b*c-a*d,0] && EqQ[2*(p+q+1)+1,0] && GtQ[q,0] && NeQ[p,-1]
@@ -127,7 +127,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (eqq(((((O_b)*(P_
 
 # Regel 31 (72 Varianten):
 #   Int[1/((a_+b_.*x_^2)^(1/4)*(c_+d_.*x_^2)),x_Symbol] := 2*Sqrt[-b*x^2/a]/x \[Star] Subst[Int[x^2/(Sqrt[1-x^4/a]*(b*c-a*d+d*x^4)),x],x,(a+b*x^2)^(1/4)] /; FreeQ[{a,b,c,d},x] && NeQ[b*c-a*d,0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)) Int(((((P_a)+((O_b)*((Xv)^(2))))^(0.25))*((P_c)+((O_d)*((Xv)^(2)))))^(K_1),Xv) = ((2)*((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((Xv)^((-1))))*(subst(Int(((((Xv)^(2)))*(((((((((1)+((((-1))*(((Xv)^(4)))*(((P_a)^((-1))))))))^((1/2))))*(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))+(((O_d)*(((Xv)^(4)))))))))^((-1))))),Xv),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/4))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)) Int(((((P_a)+((O_b)*((Xv)^(2))))^(0.25))*((P_c)+((O_d)*((Xv)^(2)))))^(K_1),Xv) = ((2)*((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((Xv)^((-1))))*(intsubst(((((Xv)^(2)))*(((((((((1)+((((-1))*(((Xv)^(4)))*(((P_a)^((-1))))))))^((1/2))))*(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))+(((O_d)*(((Xv)^(4)))))))))^((-1))))),Xv,((((P_a)+(((O_b)*(((Xv)^(2)))))))^((1/4))))))
 
 # Regel 32 (72 Varianten):
 #   Int[1/((a_+b_.*x_^2)^(3/4)*(c_+d_.*x_^2)),x_Symbol] := 1/c \[Star] Int[1/(a+b*x^2)^(3/4),x] - d/c \[Star] Int[x^2/((a+b*x^2)^(3/4)*(c+d*x^2)),x] /; FreeQ[{a,b,c,d},x] && EqQ[b*c-2*a*d,0]
@@ -135,7 +135,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (eqq(((((O_b)*(P_
 
 # Regel 33 (72 Varianten):
 #   Int[1/((a_+b_.*x_^2)^(3/4)*(c_+d_.*x_^2)),x_Symbol] := Sqrt[-b*x^2/a]/(2*x) \[Star] Subst[Int[1/(Sqrt[-b*x/a]*(a+b*x)^(3/4)*(c+d*x)),x],x,x^2] /; FreeQ[{a,b,c,d},x] && NeQ[b*c-a*d,0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)) Int(((((P_a)+((O_b)*((Xv)^(2))))^(0.75))*((P_c)+((O_d)*((Xv)^(2)))))^(K_1),Xv) = (((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((((2)*(Xv)))^((-1))))*(subst(Int((((((((((-1))*(O_b)*(Xv)*(((P_a)^((-1))))))^((1/2))))*(((((P_a)+(((O_b)*(Xv)))))^((3/4))))*(((P_c)+(((O_d)*(Xv)))))))^((-1))),Xv),Xv,((Xv)^(2)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)) Int(((((P_a)+((O_b)*((Xv)^(2))))^(0.75))*((P_c)+((O_d)*((Xv)^(2)))))^(K_1),Xv) = (((((((-1))*(O_b)*(((Xv)^(2)))*(((P_a)^((-1))))))^((1/2))))*(((((2)*(Xv)))^((-1))))*(intsubst((((((((((-1))*(O_b)*(Xv)*(((P_a)^((-1))))))^((1/2))))*(((((P_a)+(((O_b)*(Xv)))))^((3/4))))*(((P_c)+(((O_d)*(Xv)))))))^((-1))),Xv,((Xv)^(2)))))
 
 # Regel 34 (72 Varianten):
 #   Int[Sqrt[a_+b_.*x_^2]/(c_+d_.*x_^2)^(3/2),x_Symbol] := Sqrt[a+b*x^2]/(c*Rt[d/c,2]*Sqrt[c+d*x^2]*Sqrt[c*(a+b*x^2)/(a*(c+d*x^2))])*EllipticE[ArcTan[Rt[d/c,2]*x],1-b*c/(a*d)] /; FreeQ[{a,b,c,d},x] && PosQ[b/a] && PosQ[d/c]

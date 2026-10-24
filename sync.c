@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>  /* fuer ReadInput */
+#include <unistd.h> /* isatty (2026) */
 
 #include "sym.h"
 #include "syn.h"
@@ -832,6 +833,8 @@ Symbol * getsymbol (Symbol * symbol,Node * termlist) /* sucht aus gleinamigen Sy
 }
 
 
+static int interactive = 0;	/* 2026: Eingabe von der Tastatur: Begruessung, Eingabeaufforderung */
+
 int read_input _1a ((fp), FILE * fp)
 {	
 	char buf[BUFFSIZE], * bp;
@@ -841,7 +844,12 @@ int read_input _1a ((fp), FILE * fp)
 
 
 	do
-	{	for (bp = buf; bp < ep && fgets(bp, ep - bp, fp); ) /* Zeilenweises Aufrufen des Yacc */
+	{	if (fp == stdin && interactive)		/* 2026: Eingabeaufforderung */
+			{
+			fputs("> ", stdout);
+			fflush(stdout);
+			}
+		for (bp = buf; bp < ep && fgets(bp, ep - bp, fp); ) /* Zeilenweises Aufrufen des Yacc */
 		{	
 			if (fp != stdin)
 				DEBG((1,bp));  /* Text aus Datei auf den Bildschirm */
@@ -857,8 +865,11 @@ int read_input _1a ((fp), FILE * fp)
 				continue;
 				}
 			if (klammerbalance > 0)
-				{if (fp == stdin)
-					printfOut("--> ");
+				{if (fp == stdin && interactive)	/* 2026: nur im Dialog */
+					{
+					fputs("--> ", stdout);
+					fflush(stdout);
+					}
 				 continue;
 				}
 			if (klammerbalance < 0) klammerbalance=0;
@@ -887,10 +898,43 @@ return 0;
 }
 
 
+static void usage (void)
+{
+	printf("Usage: rewrite [-i] [file ...]\n"
+	       "  rewrite              read statements from the keyboard (or a pipe)\n"
+	       "  rewrite file ...     run the files, then exit\n"
+	       "  rewrite -i file ...  run the files, then continue interactively\n"
+	       "  rewrite < file       run a file without prompts (as in scripts)\n");
+}
+
+static void welcome (void)
+{
+	printf("rewrite - a language for symbolic and numerical mathematics\n"
+	       "(c) 1992-1996, 2026 Rainer Heintzmann, MIT license\n"
+	       "Load the standard library with   INC \"inc/all\"   (paths are relative to\n"
+	       "the current folder), then try   REWR D(sin(x)^2,x) : All\n"
+	       "End with QUIT or the end-of-file key (Ctrl-D, on Windows Ctrl-Z Enter).\n\n");
+}
+
 int main(int argc, char * argv []) /* Kein Leerzeichen zw. main und '(' ! */
 {
+	int i, files = 0, force = 0;
 	inc_level=0;
+	for (i = 1; i < argc; i++)		/* 2026: Optionen und Dateien */
+		{
+		if (! strcmp(argv[i], "-h") || ! strcmp(argv[i], "--help")) { usage(); return 0; }
+		else if (! strcmp(argv[i], "-i")) force = 1;
+		else files++;
+		}
+	for (i = 1; i < argc; i++)
+		if (strcmp(argv[i], "-i"))
+			include(argv[i]);	/* wie INC "datei" */
+	if (files && ! force) return 0;
+	interactive = force || isatty(fileno(stdin));
+	if (interactive && files) putchar(10);	/* Ausgabe der Dateien abschliessen */
+	if (interactive) welcome();
 	read_input(stdin);
+	if (interactive) putchar(10);
 	return 0;
 }
 

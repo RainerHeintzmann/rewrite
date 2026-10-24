@@ -8,7 +8,7 @@
 
 # Regel 1 (2 Varianten):
 #   Int[u_^m_.,x_Symbol] := With[{c=Simplify[D[u,x]]}, 1/c \[Star] Subst[Int[x^m,x],x,u]] /; FreeQ[m,x] && PiecewiseLinearQ[u,x]
-ADDSPEC RubiRules : IF NIN(Xv,O_m), (piecewiselinearq(P_u,Xv)) Int((P_u)^(O_m),Xv) = ((((simplify(deriv(P_u,Xv)))^((-1))))*(subst(Int(((Xv)^(O_m)),Xv),Xv,P_u)))
+ADDSPEC RubiRules : IF NIN(Xv,O_m), (piecewiselinearq(P_u,Xv)) Int((P_u)^(O_m),Xv) = ((((simplify(deriv(P_u,Xv)))^((-1))))*(intsubst(((Xv)^(O_m)),Xv,P_u)))
 
 # Regel 2 (2 Varianten):
 #   Int[v_/u_,x_Symbol] := With[{a=Simplify[D[u,x]],b=Simplify[D[v,x]]}, b*x/a - (b*u-a*v)/a \[Star] Int[1/u,x] /; NeQ[b*u-a*v,0]] /; PiecewiseLinearQ[u,v,x]

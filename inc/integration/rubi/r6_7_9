@@ -520,19 +520,19 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_b)^(2)))+((((-1))*(((
 
 # Regel 49 (54 Varianten):
 #   Int[Sinh[a_./(c_. + d_.*x_)]^n_., x_Symbol] := -1/d*Subst[Int[Sinh[a*x]^n/x^2, x], x, 1/(c + d*x)] /; FreeQ[{a, c, d}, x] && IGtQ[n, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,O_d), (igtq(O_n,0)) Int((sinh((O_a)*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(subst(Int(((((sinh(((O_a)*(Xv))))^(O_n)))*(((Xv)^((-2))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,O_d), (igtq(O_n,0)) Int((sinh((O_a)*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(((((sinh(((O_a)*(Xv))))^(O_n)))*(((Xv)^((-2))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
 
 # Regel 50 (54 Varianten):
 #   Int[Cosh[a_./(c_. + d_.*x_)]^n_., x_Symbol] := -1/d*Subst[Int[Cosh[a*x]^n/x^2, x], x, 1/(c + d*x)] /; FreeQ[{a, c, d}, x] && IGtQ[n, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,O_d), (igtq(O_n,0)) Int((cosh((O_a)*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(subst(Int(((((cosh(((O_a)*(Xv))))^(O_n)))*(((Xv)^((-2))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,O_d), (igtq(O_n,0)) Int((cosh((O_a)*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(((((cosh(((O_a)*(Xv))))^(O_n)))*(((Xv)^((-2))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
 
 # Regel 51 (972 Varianten):
 #   Int[Sinh[e_.*(a_. + b_.*x_)/(c_. + d_.*x_)]^n_., x_Symbol] := -1/d*Subst[Int[Sinh[b*e/d - e*(b*c - a*d)*x/d]^n/x^2, x], x, 1/(c + d*x)] /; FreeQ[{a, b, c, d}, x] && IGtQ[n, 0] && NeQ[b*c - a*d, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_n,0)), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)) Int((sinh((O_e)*((O_a)+((O_b)*(Xv)))*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(subst(Int(((((sinh(((((O_b)*(O_e)*(((O_d)^((-1))))))+((((-1))*(O_e)*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(Xv)*(((O_d)^((-1)))))))))^(O_n)))*(((Xv)^((-2))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_n,0)), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)) Int((sinh((O_e)*((O_a)+((O_b)*(Xv)))*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(((((sinh(((((O_b)*(O_e)*(((O_d)^((-1))))))+((((-1))*(O_e)*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(Xv)*(((O_d)^((-1)))))))))^(O_n)))*(((Xv)^((-2))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
 
 # Regel 52 (972 Varianten):
 #   Int[Cosh[e_.*(a_. + b_.*x_)/(c_. + d_.*x_)]^n_., x_Symbol] := -1/d*Subst[Int[Cosh[b*e/d - e*(b*c - a*d)*x/d]^n/x^2, x], x, 1/(c + d*x)] /; FreeQ[{a, b, c, d}, x] && IGtQ[n, 0] && NeQ[b*c - a*d, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_n,0)), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)) Int((cosh((O_e)*((O_a)+((O_b)*(Xv)))*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(subst(Int(((((cosh(((((O_b)*(O_e)*(((O_d)^((-1))))))+((((-1))*(O_e)*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(Xv)*(((O_d)^((-1)))))))))^(O_n)))*(((Xv)^((-2))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_n,0)), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)) Int((cosh((O_e)*((O_a)+((O_b)*(Xv)))*(((O_c)+((O_d)*(Xv)))^(K_1))))^(O_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(((((cosh(((((O_b)*(O_e)*(((O_d)^((-1))))))+((((-1))*(O_e)*(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))))*(Xv)*(((O_d)^((-1)))))))))^(O_n)))*(((Xv)^((-2))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((-1))))))
 
 # Regel 53 nicht uebersetzt: parse error at '['
 #   Int[Sinh[u_]^n_., x_Symbol] := With[{lst = QuotientOfLinearsParts[u, x]}, Int[Sinh[(lst[[1]] + lst[[2]]*x)/(lst[[3]] + lst[[4]]*x)]^n, x]] /; IGtQ[n, 0] && QuotientOfLinearsQ[u, x]
@@ -644,11 +644,11 @@ ADDSPEC RubiRules : IF (K_1 == (-2)), NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,P_A,O_B), (
 
 # Regel 82 (3888 Varianten):
 #   Int[(e_. + f_.*x_)^m_.*Sinh[a_. + b_.*(c_ + d_.*x_)^n_]^p_., x_Symbol] := 1/d^(m + 1)* Subst[Int[(d*e - c*f + f*x)^m*Sinh[a + b*x^n]^p, x], x, c + d*x] /; FreeQ[{a, b, c, d, e, f, n}, x] && IGtQ[m, 0] && RationalQ[p]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,O_e,O_f,P_n), (igtq(O_m,0)), (rationalq(O_p)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*((sinh((O_a)+((O_b)*(((P_c)+((O_d)*(Xv)))^(P_n)))))^(O_p)),Xv) = ((((((O_d)^(((O_m)+(1)))))^((-1))))*(subst(Int(((((((((O_d)*(O_e)))+((((-1))*(P_c)*(O_f)))+(((O_f)*(Xv)))))^(O_m)))*(((sinh(((O_a)+(((O_b)*(((Xv)^(P_n))))))))^(O_p)))),Xv),Xv,((P_c)+(((O_d)*(Xv)))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,O_e,O_f,P_n), (igtq(O_m,0)), (rationalq(O_p)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*((sinh((O_a)+((O_b)*(((P_c)+((O_d)*(Xv)))^(P_n)))))^(O_p)),Xv) = ((((((O_d)^(((O_m)+(1)))))^((-1))))*(intsubst(((((((((O_d)*(O_e)))+((((-1))*(P_c)*(O_f)))+(((O_f)*(Xv)))))^(O_m)))*(((sinh(((O_a)+(((O_b)*(((Xv)^(P_n))))))))^(O_p)))),Xv,((P_c)+(((O_d)*(Xv)))))))
 
 # Regel 83 (3888 Varianten):
 #   Int[(e_. + f_.*x_)^m_.*Cosh[a_. + b_.*(c_ + d_.*x_)^n_]^p_., x_Symbol] := 1/d^(m + 1)* Subst[Int[(d*e - c*f + f*x)^m*Cosh[a + b*x^n]^p, x], x, c + d*x] /; FreeQ[{a, b, c, d, e, f, n}, x] && IGtQ[m, 0] && RationalQ[p]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,O_e,O_f,P_n), (igtq(O_m,0)), (rationalq(O_p)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*((cosh((O_a)+((O_b)*(((P_c)+((O_d)*(Xv)))^(P_n)))))^(O_p)),Xv) = ((((((O_d)^(((O_m)+(1)))))^((-1))))*(subst(Int(((((((((O_d)*(O_e)))+((((-1))*(P_c)*(O_f)))+(((O_f)*(Xv)))))^(O_m)))*(((cosh(((O_a)+(((O_b)*(((Xv)^(P_n))))))))^(O_p)))),Xv),Xv,((P_c)+(((O_d)*(Xv)))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,O_e,O_f,P_n), (igtq(O_m,0)), (rationalq(O_p)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*((cosh((O_a)+((O_b)*(((P_c)+((O_d)*(Xv)))^(P_n)))))^(O_p)),Xv) = ((((((O_d)^(((O_m)+(1)))))^((-1))))*(intsubst(((((((((O_d)*(O_e)))+((((-1))*(P_c)*(O_f)))+(((O_f)*(Xv)))))^(O_m)))*(((cosh(((O_a)+(((O_b)*(((Xv)^(P_n))))))))^(O_p)))),Xv,((P_c)+(((O_d)*(Xv)))))))
 
 # Regel 84 (48 Varianten):
 #   Int[Sech[v_]^m_.*(a_ + b_.*Tanh[v_])^n_., x_Symbol] := Int[(a*Cosh[v] + b*Sinh[v])^n, x] /; FreeQ[{a, b}, x] && IntegerQ[(m - 1)/2] && EqQ[m + n, 0]

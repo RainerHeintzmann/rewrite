@@ -28,7 +28,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_m,O_n,P_q,O_r), (eqq(((O
 
 # Regel 6 (15552 Varianten):
 #   Int[(f_.*x_)^m_.*(d_ + e_.*x_^r_)^q_.*(a_. + b_.*Log[c_.*x_^n_])^p_., x_Symbol] := f^m/n*Subst[Int[(d + e*x)^q*(a + b*Log[c*x])^p, x], x, x^n] /; FreeQ[{a, b, c, d, e, f, m, n, q, r}, x] && EqQ[m, r - 1] && IGtQ[p, 0] && (IntegerQ[m] || GtQ[f, 0]) && EqQ[r, n]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_m,P_n,O_q,P_r), (eqq(O_m,((P_r)+((-1))))), (igtq(O_p,0)), (((integerq(O_m)) || (((O_f > 0))))), (eqq(P_r,P_n)) Int((((O_f)*(Xv))^(O_m))*(((P_d)+((O_e)*((Xv)^(P_r))))^(O_q))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(P_n))))))^(O_p)),Xv) = ((((O_f)^(O_m)))*(((P_n)^((-1))))*(subst(Int(((((((P_d)+(((O_e)*(Xv)))))^(O_q)))*(((((O_a)+(((O_b)*(ln(((O_c)*(Xv))))))))^(O_p)))),Xv),Xv,((Xv)^(P_n)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_m,P_n,O_q,P_r), (eqq(O_m,((P_r)+((-1))))), (igtq(O_p,0)), (((integerq(O_m)) || (((O_f > 0))))), (eqq(P_r,P_n)) Int((((O_f)*(Xv))^(O_m))*(((P_d)+((O_e)*((Xv)^(P_r))))^(O_q))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(P_n))))))^(O_p)),Xv) = ((((O_f)^(O_m)))*(((P_n)^((-1))))*(intsubst(((((((P_d)+(((O_e)*(Xv)))))^(O_q)))*(((((O_a)+(((O_b)*(ln(((O_c)*(Xv))))))))^(O_p)))),Xv,((Xv)^(P_n)))))
 
 # Regel 7 (15552 Varianten):
 #   Int[(f_.*x_)^m_.*(a_. + b_.*Log[c_.*x_^n_.])^p_./(d_ + e_.*x_^r_), x_Symbol] := f^m*Log[1 + e*x^r/d]*(a + b*Log[c*x^n])^p/(e*r) - b*f^m*n*p/(e*r)* Int[Log[1 + e*x^r/d]*(a + b*Log[c*x^n])^(p - 1)/x, x] /; FreeQ[{a, b, c, d, e, f, m, n, r}, x] && EqQ[m, r - 1] && IGtQ[p, 0] && (IntegerQ[m] || GtQ[f, 0]) && NeQ[r, n]
@@ -60,7 +60,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d1,O_e1,P_d2,O_e2,O_n), (eqq(((((P_d
 
 # Regel 14 (1296 Varianten):
 #   Int[(a_. + b_.*Log[c_.*x_^n_])/(x_*(d_ + e_.*x_^r_.)), x_Symbol] := 1/n*Subst[Int[(a + b*Log[c*x])/(x*(d + e*x^(r/n))), x], x, x^n] /; FreeQ[{a, b, c, d, e, n, r}, x] && IntegerQ[r/n]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e,P_n,O_r), (integerq(((O_r)*(((P_n)^((-1))))))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(P_n))))))*(((Xv)*((P_d)+((O_e)*((Xv)^(O_r)))))^(K_1)),Xv) = ((((P_n)^((-1))))*(subst(Int(((((O_a)+(((O_b)*(ln(((O_c)*(Xv))))))))*(((((Xv)*(((P_d)+(((O_e)*(((Xv)^(((O_r)*(((P_n)^((-1))))))))))))))^((-1))))),Xv),Xv,((Xv)^(P_n)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e,P_n,O_r), (integerq(((O_r)*(((P_n)^((-1))))))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(P_n))))))*(((Xv)*((P_d)+((O_e)*((Xv)^(O_r)))))^(K_1)),Xv) = ((((P_n)^((-1))))*(intsubst(((((O_a)+(((O_b)*(ln(((O_c)*(Xv))))))))*(((((Xv)*(((P_d)+(((O_e)*(((Xv)^(((O_r)*(((P_n)^((-1))))))))))))))^((-1))))),Xv,((Xv)^(P_n)))))
 
 # Regel 15 (2592 Varianten):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_./(x_*(d_ + e_.*x_)), x_Symbol] := 1/d*Int[(a + b*Log[c*x^n])^p/x, x] - e/d*Int[(a + b*Log[c*x^n])^p/(d + e*x), x] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[p, 0]
@@ -96,7 +96,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_m,O_n,O_q,O_r), (integer
 
 # Regel 23 (10368 Varianten):
 #   Int[x_^m_.*(d_ + e_.*x_^r_.)^q_.*(a_. + b_.*Log[c_.*x_^n_])^p_., x_Symbol] := 1/n*Subst[ Int[x^(Simplify[(m + 1)/n] - 1)*(d + e*x^(r/n))^ q*(a + b*Log[c*x])^p, x], x, x^n] /; FreeQ[{a, b, c, d, e, m, n, p, q, r}, x] && IntegerQ[q] && IntegerQ[r/n] && IntegerQ[Simplify[(m + 1)/n]] && (GtQ[(m + 1)/n, 0] || IGtQ[p, 0])
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_m,P_n,O_p,O_q,O_r), (integerq(O_q)), (integerq(((O_r)*(((P_n)^((-1))))))), (integerq(simplify(((((O_m)+(1)))*(((P_n)^((-1)))))))), (((((((((O_m)+(1)))*(((P_n)^((-1))))) > 0))) || (igtq(O_p,0)))) Int(((Xv)^(O_m))*(((P_d)+((O_e)*((Xv)^(O_r))))^(O_q))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(P_n))))))^(O_p)),Xv) = ((((P_n)^((-1))))*(subst(Int(((((Xv)^(((simplify(((((O_m)+(1)))*(((P_n)^((-1)))))))+((-1))))))*(((((P_d)+(((O_e)*(((Xv)^(((O_r)*(((P_n)^((-1))))))))))))^(O_q)))*(((((O_a)+(((O_b)*(ln(((O_c)*(Xv))))))))^(O_p)))),Xv),Xv,((Xv)^(P_n)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_m,P_n,O_p,O_q,O_r), (integerq(O_q)), (integerq(((O_r)*(((P_n)^((-1))))))), (integerq(simplify(((((O_m)+(1)))*(((P_n)^((-1)))))))), (((((((((O_m)+(1)))*(((P_n)^((-1))))) > 0))) || (igtq(O_p,0)))) Int(((Xv)^(O_m))*(((P_d)+((O_e)*((Xv)^(O_r))))^(O_q))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(P_n))))))^(O_p)),Xv) = ((((P_n)^((-1))))*(intsubst(((((Xv)^(((simplify(((((O_m)+(1)))*(((P_n)^((-1)))))))+((-1))))))*(((((P_d)+(((O_e)*(((Xv)^(((O_r)*(((P_n)^((-1))))))))))))^(O_q)))*(((((O_a)+(((O_b)*(ln(((O_c)*(Xv))))))))^(O_p)))),Xv,((Xv)^(P_n)))))
 
 # Regel 24 (62208 Varianten):
 #   Int[(f_.*x_)^m_.*(d_ + e_.*x_^r_.)^q_.*(a_. + b_.*Log[c_.*x_^n_.])^ p_., x_Symbol] := With[{u = ExpandIntegrand[(a + b*Log[c*x^n])^p, (f*x)^m*(d + e*x^r)^q, x]}, Int[u, x] /; SumQ[u]] /; FreeQ[{a, b, c, d, e, f, m, n, p, q, r}, x] && IntegerQ[ q] && (GtQ[q, 0] || IGtQ[p, 0] && IntegerQ[m] && IntegerQ[r])
@@ -143,11 +143,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_n,O_p,O_q,O_r) Int((((O_
 
 # Regel 35 (648 Varianten):
 #   Int[(a_. + b_.*Log[v_])^p_.*(c_. + d_.*Log[v_])^q_., x_Symbol] := 1/Coeff[v, x, 1]* Subst[Int[(a + b*Log[x])^p*(c + d*Log[x])^q, x], x, v] /; FreeQ[{a, b, c, d, p, q}, x] && LinearQ[v, x] && NeQ[Coeff[v, x, 0], 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_p,O_q), (linearq(P_v,Xv)), (neq(coeff(P_v,Xv,0),0)) Int((((O_a)+((O_b)*(ln(P_v))))^(O_p))*(((O_c)+((O_d)*(ln(P_v))))^(O_q)),Xv) = ((((coeff(P_v,Xv,1))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(ln(Xv))))))^(O_p)))*(((((O_c)+(((O_d)*(ln(Xv))))))^(O_q)))),Xv),Xv,P_v)))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_p,O_q), (linearq(P_v,Xv)), (neq(coeff(P_v,Xv,0),0)) Int((((O_a)+((O_b)*(ln(P_v))))^(O_p))*(((O_c)+((O_d)*(ln(P_v))))^(O_q)),Xv) = ((((coeff(P_v,Xv,1))^((-1))))*(intsubst(((((((O_a)+(((O_b)*(ln(Xv))))))^(O_p)))*(((((O_c)+(((O_d)*(ln(Xv))))))^(O_q)))),Xv,P_v)))
 
 # Regel 36 (46656 Varianten):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_.*(d_. + e_.*Log[c_.*x_^n_.])^q_./ x_, x_Symbol] := 1/n*Subst[Int[(a + b*x)^p*(d + e*x)^q, x], x, Log[c*x^n]] /; FreeQ[{a, b, c, d, e, n, p, q}, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n,O_p,O_q) Int((((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p))*(((O_d)+((O_e)*(ln((O_c)*((Xv)^(O_n))))))^(O_q))*((Xv)^(K_1)),Xv) = ((((O_n)^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))))^(O_q)))),Xv),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n,O_p,O_q) Int((((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p))*(((O_d)+((O_e)*(ln((O_c)*((Xv)^(O_n))))))^(O_q))*((Xv)^(K_1)),Xv) = ((((O_n)^((-1))))*(intsubst(((((((O_a)+(((O_b)*(Xv)))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))))^(O_q)))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
 
 # Regel 37 (139968 Varianten):
 #   Int[(g_.*x_)^m_.*(a_. + b_.*Log[c_.*x_^n_.])^ p_.*(d_. + e_.*Log[f_.*x_^r_.]), x_Symbol] := With[{u = IntHide[(g*x)^m*(a + b*Log[c*x^n])^p, x]}, Dist[(d + e*Log[f*x^r]), u, x] - e*r*Int[SimplifyIntegrand[u/x, x], x]] /; FreeQ[{a, b, c, d, e, f, g, m, n, p, r}, x] && Not[EqQ[p, 1] && EqQ[a, 0] && NeQ[d, 0]]
@@ -163,7 +163,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_g,O_m,O_n,O_p,O_q,O_r) I
 
 # Regel 40 (2592 Varianten):
 #   Int[u_^m_.*(a_. + b_.*Log[v_])^p_.*(c_. + d_.*Log[v_])^q_., x_Symbol] := With[{e = Coeff[u, x, 0], f = Coeff[u, x, 1], g = Coeff[v, x, 0], h = Coeff[v, x, 1]}, 1/h* Subst[Int[(f*x/h)^m*(a + b*Log[x])^p*(c + d*Log[x])^q, x], x, v] /; EqQ[f*g - e*h, 0] && NeQ[g, 0]] /; FreeQ[{a, b, c, d, m, p, q}, x] && LinearQ[{u, v}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_p,O_q), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (eqq(((((coeff(P_u,Xv,1))*(coeff(P_v,Xv,0))))+((((-1))*(coeff(P_u,Xv,0))*(coeff(P_v,Xv,1))))),0)), (neq(coeff(P_v,Xv,0),0)) Int(((P_u)^(O_m))*(((O_a)+((O_b)*(ln(P_v))))^(O_p))*(((O_c)+((O_d)*(ln(P_v))))^(O_q)),Xv) = ((((coeff(P_v,Xv,1))^((-1))))*(subst(Int(((((((coeff(P_u,Xv,1))*(Xv)*(((coeff(P_v,Xv,1))^((-1))))))^(O_m)))*(((((O_a)+(((O_b)*(ln(Xv))))))^(O_p)))*(((((O_c)+(((O_d)*(ln(Xv))))))^(O_q)))),Xv),Xv,P_v)))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_p,O_q), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (eqq(((((coeff(P_u,Xv,1))*(coeff(P_v,Xv,0))))+((((-1))*(coeff(P_u,Xv,0))*(coeff(P_v,Xv,1))))),0)), (neq(coeff(P_v,Xv,0),0)) Int(((P_u)^(O_m))*(((O_a)+((O_b)*(ln(P_v))))^(O_p))*(((O_c)+((O_d)*(ln(P_v))))^(O_q)),Xv) = ((((coeff(P_v,Xv,1))^((-1))))*(intsubst(((((((coeff(P_u,Xv,1))*(Xv)*(((coeff(P_v,Xv,1))^((-1))))))^(O_m)))*(((((O_a)+(((O_b)*(ln(Xv))))))^(O_p)))*(((((O_c)+(((O_d)*(ln(Xv))))))^(O_q)))),Xv,P_v)))
 
 # Regel 41 (15552 Varianten):
 #   Int[Log[d_.*(e_ + f_.*x_^m_.)^r_.]*(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := With[{u = IntHide[Log[d*(e + f*x^m)^r], x]}, Dist[(a + b*Log[c*x^n])^p, u, x] - b*n*p*Int[Dist[(a + b*Log[c*x^n])^(p - 1)/x, u, x], x]] /; FreeQ[{a, b, c, d, e, f, r, m, n}, x] && IGtQ[p, 0] && RationalQ[ m] && (EqQ[p, 1] || FractionQ[m] && IntegerQ[1/m] || EqQ[r, 1] && EqQ[m, 1] && EqQ[d*e, 1])

@@ -36,7 +36,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(O_e,((((O_c)^(2)))*(P_d
 
 # Regel 8 (648 Varianten):
 #   Int[(a_. + b_.*ArcSinh[c_.*x_])^n_./(d_ + e_.*x_^2), x_Symbol] := 1/(c*d)*Subst[Int[(a + b*x)^n*Sech[x], x], x, ArcSinh[c*x]] /; FreeQ[{a, b, c, d, e}, x] && EqQ[e, c^2*d] && IGtQ[n, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(O_e,((((O_c)^(2)))*(P_d)))), (igtq(O_n,0)) Int((((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = ((((((O_c)*(P_d)))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(sech(Xv))),Xv),Xv,arcsinh(((O_c)*(Xv))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(O_e,((((O_c)^(2)))*(P_d)))), (igtq(O_n,0)) Int((((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = ((((((O_c)*(P_d)))^((-1))))*(intsubst(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(sech(Xv))),Xv,arcsinh(((O_c)*(Xv))))))
 
 # Regel 9 (648 Varianten):
 #   Int[(d_ + e_.*x_^2)^p_.*(a_. + b_.*ArcSinh[c_.*x_])^n_, x_Symbol] := Simp[Sqrt[1 + c^2*x^2]*(d + e*x^2)^ p]*(a + b*ArcSinh[c*x])^(n + 1)/(b*c*(n + 1)) - c*(2*p + 1)/(b*(n + 1))*Simp[(d + e*x^2)^p/(1 + c^2*x^2)^p]* Int[x*(1 + c^2*x^2)^(p - 1/2)*(a + b*ArcSinh[c*x])^(n + 1), x] /; FreeQ[{a, b, c, d, e, p}, x] && EqQ[e, c^2*d] && LtQ[n, -1]
@@ -44,7 +44,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_p), (eqq(O_e,((((O_c)^(2)))*
 
 # Regel 10 (1296 Varianten):
 #   Int[(d_ + e_.*x_^2)^p_.*(a_. + b_.*ArcSinh[c_.*x_])^n_., x_Symbol] := 1/(b*c)*Simp[(d + e*x^2)^p/(1 + c^2*x^2)^p]* Subst[Int[x^n*Cosh[-a/b + x/b]^(2*p + 1), x], x, a + b*ArcSinh[c*x]] /; FreeQ[{a, b, c, d, e, n}, x] && EqQ[e, c^2*d] && IGtQ[2*p, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_n), (eqq(O_e,((((O_c)^(2)))*(P_d)))), (igtq(((2)*(O_p)),0)) Int((((P_d)+((O_e)*((Xv)^(2))))^(O_p))*(((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n)),Xv) = ((((((O_b)*(O_c)))^((-1))))*(simp(((((((P_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)))*(((((((1)+(((((O_c)^(2)))*(((Xv)^(2)))))))^(O_p)))^((-1)))))))*(subst(Int(((((Xv)^(O_n)))*(((cosh((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))^(((((2)*(O_p)))+(1)))))),Xv),Xv,((O_a)+(((O_b)*(arcsinh(((O_c)*(Xv))))))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_n), (eqq(O_e,((((O_c)^(2)))*(P_d)))), (igtq(((2)*(O_p)),0)) Int((((P_d)+((O_e)*((Xv)^(2))))^(O_p))*(((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n)),Xv) = ((((((O_b)*(O_c)))^((-1))))*(simp(((((((P_d)+(((O_e)*(((Xv)^(2)))))))^(O_p)))*(((((((1)+(((((O_c)^(2)))*(((Xv)^(2)))))))^(O_p)))^((-1)))))))*(intsubst(((((Xv)^(O_n)))*(((cosh((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))^(((((2)*(O_p)))+(1)))))),Xv,((O_a)+(((O_b)*(arcsinh(((O_c)*(Xv))))))))))
 
 # Regel 11 (648 Varianten):
 #   Int[(d_ + e_.*x_^2)^p_.*(a_. + b_.*ArcSinh[c_.*x_]), x_Symbol] := With[{u = IntHide[(d + e*x^2)^p, x]}, Dist[a + b*ArcSinh[c*x], u, x] - b*c*Int[SimplifyIntegrand[u/Sqrt[1 + c^2*x^2], x], x]] /; FreeQ[{a, b, c, d, e}, x] && NeQ[e, c^2*d] && (IGtQ[p, 0] || ILtQ[p + 1/2, 0])

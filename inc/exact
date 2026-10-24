@@ -6,20 +6,37 @@
 # Danach sind ganze Zahlen ohne Punkt (3, 12) vom Typ integer, 1/3 ist der
 # Bruch (1/3), und 0.5 bleibt eine reelle Zahl.
 #
-# Untersorten: integer < rational < real. Eine Funktion fuer real nimmt auch
-# integer und rational (die Werte werden beim Rechnen umgewandelt), und die
-# Regeln fuer real gelten auch fuer rational und integer (LIFT).
+# Untersorten (eine Sorte kann mehrere Obersorten haben):
+#     natural < integer < rational < real
+#     natural < nonneg < real,   positive < nonneg
+# Eine Funktion fuer real nimmt auch die Untersorten (die Werte werden beim
+# Rechnen umgewandelt), und die Regeln fuer real gelten auch fuer sie (LIFT).
+# nonneg (>= 0) und positive (> 0) sind reelle Zahlen mit bekanntem
+# Vorzeichen; fuer sie gelten Regeln wie sqrt(x^2) = x.
 
+SORT natural
 SORT integer
 SORT rational
+SORT nonneg
+SORT positive
+ATT natural  show_int,cmp_int,cpy_int,del_int
 ATT integer  show_int,cmp_int,cpy_int,del_int
 ATT rational show_rat,cmp_rat,cpy_rat,del_rat
+ATT nonneg   show_real,cmp_real,cpy_real,del_real
+ATT positive show_real,cmp_real,cpy_real,del_real
 
+SUBSORT natural,integer ATT int2int
+SUBSORT natural,nonneg ATT int2real
 SUBSORT integer,rational ATT int2rat
 SUBSORT rational,real ATT rat2real
+SUBSORT positive,nonneg ATT real2real
+SUBSORT nonneg,real ATT real2real
 
+VAR Anat,Bnat : natural
 VAR Az,Bz : integer
 VAR Aq,Bq : rational
+VAR An,Bn : nonneg
+VAR Ap,Bp : positive
 
 # ---------------- integer ----------------
 OTHER +  : integer,integer >> integer   ATT int_plus
@@ -58,10 +75,46 @@ OTHER != : rational,rational >> bool     ATT rat_ne
 FUNC  numer : rational >> integer        ATT rat_num   # Zaehler
 FUNC  denom : rational >> integer        ATT rat_den   # Nenner
 
+# ---------------- natural ----------------
+OTHER +  : natural,natural >> natural   ATT int_plus
+OTHER *  : natural,natural >> natural   ATT int_mal
+OTHER ^  : natural,natural >> natural   ATT nat_pow
+
+# ---------------- nonneg, positive ----------------
+OTHER +  : nonneg,nonneg >> nonneg      ATT plus
+OTHER *  : nonneg,nonneg >> nonneg      ATT mal
+OTHER /  : nonneg,nonneg >> nonneg      ATT geteilt
+OTHER ^  : nonneg,real >> nonneg        ATT hoch
+OTHER mi : nonneg >> nonneg             ATT mi
+OTHER sqrt : nonneg >> nonneg           ATT r_sqrt
+OTHER +  : positive,positive >> positive ATT plus
+OTHER +  : positive,nonneg >> positive  ATT plus
+OTHER +  : nonneg,positive >> positive  ATT plus
+OTHER *  : positive,positive >> positive ATT mal
+OTHER /  : positive,positive >> positive ATT geteilt
+OTHER ^  : positive,real >> positive    ATT hoch
+OTHER mi : positive >> positive         ATT mi
+OTHER sqrt : positive >> positive       ATT r_sqrt
+
 # ---------------- Regeln uebernehmen ----------------
 # rational erbt die Regeln von real, integer die von rational
 LIFT (A+A,A-A,A*A,A/A,-A,mi(A),A^A) TO (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,mi(Aq),Aq^Az)
 LIFT (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,Aq^Az) TO (Az+Az,Az-Az,Az*Az,Az/Az,-Az,Az^Az)
+LIFT (Az+Az,Az*Az,Az^Az) TO (Anat+Anat,Anat*Anat,Anat^Anat)
+LIFT (A+A,A*A,A/A,mi(A),A^A,sqrt(A)) TO (An+An,An*An,An/An,mi(An),An^A,sqrt(An))
+LIFT (An+An,An*An,An/An,mi(An),An^A,sqrt(An)) TO (Ap+Ap,Ap*Ap,Ap/Ap,mi(Ap),Ap^A,sqrt(Ap))
+LIFT (Ap+Ap,Ap+Ap) TO (Ap+An,An+Ap)
 
-# ganze Zahlen ohne Punkt sind ab hier integer
-INTNUM integer ATT read_int
+# ---------------- Regeln, die ein Vorzeichen brauchen ----------------
+# Fuer beliebige reelle Zahlen sind sie falsch (sqrt((-2)^2) ist nicht -2);
+# hier gelten sie fuer Terme der Sorten nonneg und positive.
+ADDSPEC Real : (An^Y)^Z = An^(Y*Z)
+ADDSPEC Real : (An*Bn)^Z = An^Z*Bn^Z
+ADDSPEC Real : sqrt(An^2) = An
+ADDSPEC Real : abs(An) = An
+ADDSPEC Real : ln(Ap*Y) = ln(Ap) + ln(Y)
+ADDSPEC Real : ln(Y*Ap) = ln(Y) + ln(Ap)
+
+# Zahlen ohne Punkt sind ab hier natuerliche Zahlen (natural); -3 ist
+# -(3) und damit integer
+INTNUM natural ATT read_int

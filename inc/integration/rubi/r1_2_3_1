@@ -12,11 +12,11 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c), (eqq(O_n2,((2)*(P_n)))), (((P_n < 0)
 
 # Regel 2 (72 Varianten):
 #   Int[(a_ + b_.*x_^n_ + c_.*x_^n2_.)^p_, x_Symbol] := With[{k = Denominator[n]}, k*Subst[Int[x^(k - 1)*(a + b*x^(k*n) + c*x^(2*k*n))^p, x], x, x^(1/k)]] /; FreeQ[{a, b, c, p}, x] && EqQ[n2, 2*n] && FractionQ[n]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (eqq(O_n2,((2)*(P_n)))), (fractionq(P_n)) Int(((P_a)+((O_b)*((Xv)^(P_n)))+((O_c)*((Xv)^(O_n2))))^(P_p),Xv) = ((denominator(P_n))*(subst(Int(((((Xv)^(((denominator(P_n))+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(((denominator(P_n))*(P_n)))))))+(((O_c)*(((Xv)^(((2)*(denominator(P_n))*(P_n)))))))))^(P_p)))),Xv),Xv,((Xv)^(((denominator(P_n))^((-1))))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (eqq(O_n2,((2)*(P_n)))), (fractionq(P_n)) Int(((P_a)+((O_b)*((Xv)^(P_n)))+((O_c)*((Xv)^(O_n2))))^(P_p),Xv) = ((denominator(P_n))*(intsubst(((((Xv)^(((denominator(P_n))+((-1))))))*(((((P_a)+(((O_b)*(((Xv)^(((denominator(P_n))*(P_n)))))))+(((O_c)*(((Xv)^(((2)*(denominator(P_n))*(P_n)))))))))^(P_p)))),Xv,((Xv)^(((denominator(P_n))^((-1))))))))
 
 # Regel 3 (72 Varianten):
 #   Int[(a_ + b_.*x_^n_ + c_.*x_^n2_.)^p_, x_Symbol] := -Subst[Int[(a + b*x^(-n) + c*x^(-2*n))^p/x^2, x], x, 1/x] /; FreeQ[{a, b, c, p}, x] && EqQ[n2, 2*n] && ILtQ[n, 0]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (eqq(O_n2,((2)*(P_n)))), (iltq(P_n,0)) Int(((P_a)+((O_b)*((Xv)^(P_n)))+((O_c)*((Xv)^(O_n2))))^(P_p),Xv) = (((-1))*(subst(Int(((((((P_a)+(((O_b)*(((Xv)^((((-1))*(P_n)))))))+(((O_c)*(((Xv)^((((-2))*(P_n)))))))))^(P_p)))*(((Xv)^((-2))))),Xv),Xv,((Xv)^((-1))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (eqq(O_n2,((2)*(P_n)))), (iltq(P_n,0)) Int(((P_a)+((O_b)*((Xv)^(P_n)))+((O_c)*((Xv)^(O_n2))))^(P_p),Xv) = (((-1))*(intsubst(((((((P_a)+(((O_b)*(((Xv)^((((-1))*(P_n)))))))+(((O_c)*(((Xv)^((((-2))*(P_n)))))))))^(P_p)))*(((Xv)^((-2))))),Xv,((Xv)^((-1))))))
 
 # Regel 4 (144 Varianten):
 #   Int[(a_ + b_.*x_^n_. + c_.*x_^n2_.)^p_, x_Symbol] := (a + b*x^n + c*x^(2*n))^p/(b + 2*c*x^n)^(2*p)* Int[(b + 2*c*x^n)^(2*p), x] /; FreeQ[{a, b, c, n, p}, x] && EqQ[n2, 2*n] && EqQ[b^2 - 4*a*c, 0]
@@ -44,7 +44,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_n,P_p), (eqq(O_n2,((2)*(P_n)))), (ne
 
 # Regel 10 (72 Varianten):
 #   Int[(a_ + b_.*u_^n_ + c_.*u_^n2_.)^p_, x_Symbol] := 1/Coefficient[u, x, 1]* Subst[Int[(a + b*x^n + c*x^(2*n))^p, x], x, u] /; FreeQ[{a, b, c, n, p}, x] && EqQ[n2, 2*n] && LinearQ[u, x] && NeQ[u, x]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_n,P_p), (eqq(O_n2,((2)*(P_n)))), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int(((P_a)+((O_b)*((P_u)^(P_n)))+((O_c)*((P_u)^(O_n2))))^(P_p),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(subst(Int(((((P_a)+(((O_b)*(((Xv)^(P_n)))))+(((O_c)*(((Xv)^(((2)*(P_n)))))))))^(P_p)),Xv),Xv,P_u)))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_n,P_p), (eqq(O_n2,((2)*(P_n)))), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int(((P_a)+((O_b)*((P_u)^(P_n)))+((O_c)*((P_u)^(O_n2))))^(P_p),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(intsubst(((((P_a)+(((O_b)*(((Xv)^(P_n)))))+(((O_c)*(((Xv)^(((2)*(P_n)))))))))^(P_p)),Xv,P_u)))
 
 # Regel 11 (144 Varianten):
 #   Int[(a_ + b_.*x_^mn_ + c_.*x_^n_.)^p_., x_Symbol] := Int[(b + a*x^n + c*x^(2*n))^p/x^(n*p), x] /; FreeQ[{a, b, c, n}, x] && EqQ[mn, -n] && IntegerQ[p] && PosQ[n]

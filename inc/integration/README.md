@@ -121,6 +121,12 @@ have it, so a few steps are added:
 - An optional variable that occurs twice, like `e.` in
   `(c+d*tan(e.+f.*x))/(a+b*tan(e.+f.*x))`, may be missing in both places.
 - `RubiCollect` combines like summands of the result (`collect`).
+- `Subst[Int[u,x],x,v]` becomes `intsubst(u,x,v)`: `u` is integrated in a
+  fresh variable, which has the sort `nonneg` when `v` is a square root or
+  another non-negative expression. Then `sqrt(x^2) = x` holds inside, as
+  Rubi assumes.
+- Rules with a function variable (`F_[...]` with `TrigQ[F]`,
+  `MemberQ[{Sin,Cos},F]`, ...) become one rule per admissible function.
 
 The algebra list is
 

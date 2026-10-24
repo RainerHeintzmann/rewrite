@@ -24,7 +24,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_F,O_c,O_d,O_e,O_f,O_g), (integerq(O_m)) Int((((O
 
 # Regel 5 (486 Varianten):
 #   Int[F_^(g_.*(e_. + f_.*x_))/Sqrt[c_. + d_.*x_], x_Symbol] := 2/d*Subst[Int[F^(g*(e - c*f/d) + f*g*x^2/d), x], x, Sqrt[c + d*x]] /; FreeQ[{F, c, d, e, f, g}, x] && Not[TrueQ[$UseGamma]]
-ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_F,O_c,O_d,O_e,O_f,O_g) Int(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = ((2)*(((O_d)^((-1))))*(subst(Int(((P_F)^(((((O_g)*(((O_e)+((((-1))*(O_c)*(O_f)*(((O_d)^((-1))))))))))+(((O_f)*(O_g)*(((Xv)^(2)))*(((O_d)^((-1))))))))),Xv),Xv,((((O_c)+(((O_d)*(Xv)))))^((1/2))))))
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_F,O_c,O_d,O_e,O_f,O_g) Int(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = ((2)*(((O_d)^((-1))))*(intsubst(((P_F)^(((((O_g)*(((O_e)+((((-1))*(O_c)*(O_f)*(((O_d)^((-1))))))))))+(((O_f)*(O_g)*(((Xv)^(2)))*(((O_d)^((-1))))))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((1/2))))))
 
 # Regel 6 (486 Varianten):
 #   Int[(c_. + d_.*x_)^m_*F_^(g_.*(e_. + f_.*x_)), x_Symbol] := -F^(g*(e - c*f/d))*(c + d*x)^ FracPart[ m]/(d*(-f*g*Log[F]/d)^(IntPart[m] + 1)*(-f*g* Log[F]*(c + d*x)/d)^FracPart[m])* Gamma[m + 1, (-f*g*Log[F]/d)*(c + d*x)] /; FreeQ[{F, c, d, e, f, g, m}, x] && Not[IntegerQ[m]]

@@ -47,6 +47,10 @@ void * rat_mi (void * arg[]);
 void * rat_pow (void * arg[]);
 void * int_pow (void * arg[]);
 void * rat_num (void * arg[]);
+void * int2int (void * arg[]);
+void * int2real (void * arg[]);
+void * real2real (void * arg[]);
+void * nat_pow (void * arg[]);
 void * int_from_ll (long long v);
 void * rat_from_ll (long long p, long long q);
 void * rat_root_exact (void * q, long k);    /* NULL if not exact */

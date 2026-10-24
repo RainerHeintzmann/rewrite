@@ -24,8 +24,8 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (((P_n < (-1)))) Int(((O_a)+((O_b)*(
 
 # Regel 5 (27 Varianten):
 #   Int[(a_. + b_.*ArcSin[c_.*x_])^n_, x_Symbol] := 1/(b*c)*Subst[Int[x^n*Cos[-a/b + x/b], x], x, a + b*ArcSin[c*x]] /; FreeQ[{a, b, c, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_n) Int(((O_a)+((O_b)*(arcsin((O_c)*(Xv)))))^(P_n),Xv) = ((((((O_b)*(O_c)))^((-1))))*(subst(Int(((((Xv)^(P_n)))*(cos((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))),Xv),Xv,((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_n) Int(((O_a)+((O_b)*(arcsin((O_c)*(Xv)))))^(P_n),Xv) = ((((((O_b)*(O_c)))^((-1))))*(intsubst(((((Xv)^(P_n)))*(cos((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))),Xv,((O_a)+(((O_b)*(arcsin(((O_c)*(Xv))))))))))
 
 # Regel 6 (27 Varianten):
 #   Int[(a_. + b_.*ArcCos[c_.*x_])^n_, x_Symbol] := -1/(b*c)*Subst[Int[x^n*Sin[-a/b + x/b], x], x, a + b*ArcCos[c*x]] /; FreeQ[{a, b, c, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_n) Int(((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(P_n),Xv) = (((-1))*(((((O_b)*(O_c)))^((-1))))*(subst(Int(((((Xv)^(P_n)))*(sin((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))),Xv),Xv,((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_n) Int(((O_a)+((O_b)*(arccos((O_c)*(Xv)))))^(P_n),Xv) = (((-1))*(((((O_b)*(O_c)))^((-1))))*(intsubst(((((Xv)^(P_n)))*(sin((((((-1))*(O_a)*(((O_b)^((-1))))))+(((Xv)*(((O_b)^((-1)))))))))),Xv,((O_a)+(((O_b)*(arccos(((O_c)*(Xv))))))))))

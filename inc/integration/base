@@ -87,6 +87,13 @@ ADDSPEC RubiNorm : Uv*(Kc*Vv) = Kc*(Uv*Vv)
 # negative Zahlen als Minuszeichen und Kehrwerte als Bruch, damit All die
 # gewohnte Form ausgibt
 
+# 2026: Integrationsvariablen fuer Substitutionen (intsubst): Xnn steht fuer
+# einen nicht negativen Ausdruck wie sqrt(a+b*x), Xre fuer einen beliebigen
+CONST Xnn : nonneg
+CONST Xre : real
+VAR Un : nonneg
+ADDSPEC RubiNorm : (Un^Vv)^Wv = Un^(Vv*Wv)   # nur fuer nonneg (sqrt(x^2) = x)
+
 ALG IntOut
 SPEC    IntOut : IF (Kc < 0) Uv^Kc = mi(Uv^(-Kc))
 ADDSPEC IntOut : IF (Kc == -1) Kc*Uv = -Uv

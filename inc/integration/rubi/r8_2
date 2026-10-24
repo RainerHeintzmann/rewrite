@@ -62,11 +62,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_b), (integerq(O_m)), (neq(O_m,(-1))) Int(((Xv)^(
 
 # Regel 15 (216 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*FresnelS[a_ + b_.*x_]^2, x_Symbol] := 1/b^(m + 1)* Subst[Int[ExpandIntegrand[FresnelS[x]^2, (b*c - a*d + d*x)^m, x], x], x, a + b*x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((fresnels((P_a)+((O_b)*(Xv))))^(2)),Xv) = ((((((O_b)^(((O_m)+(1)))))^((-1))))*(subst(Int(expandintegrand(((fresnels(Xv))^(2)),((((((O_b)*(O_c)))+((((-1))*(P_a)*(O_d)))+(((O_d)*(Xv)))))^(O_m)),Xv),Xv),Xv,((P_a)+(((O_b)*(Xv)))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((fresnels((P_a)+((O_b)*(Xv))))^(2)),Xv) = ((((((O_b)^(((O_m)+(1)))))^((-1))))*(intsubst(expandintegrand(((fresnels(Xv))^(2)),((((((O_b)*(O_c)))+((((-1))*(P_a)*(O_d)))+(((O_d)*(Xv)))))^(O_m)),Xv),Xv,((P_a)+(((O_b)*(Xv)))))))
 
 # Regel 16 (216 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*FresnelC[a_ + b_.*x_]^2, x_Symbol] := 1/b^(m + 1)* Subst[Int[ExpandIntegrand[FresnelC[x]^2, (b*c - a*d + d*x)^m, x], x], x, a + b*x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((fresnelc((P_a)+((O_b)*(Xv))))^(2)),Xv) = ((((((O_b)^(((O_m)+(1)))))^((-1))))*(subst(Int(expandintegrand(((fresnelc(Xv))^(2)),((((((O_b)*(O_c)))+((((-1))*(P_a)*(O_d)))+(((O_d)*(Xv)))))^(O_m)),Xv),Xv),Xv,((P_a)+(((O_b)*(Xv)))))))
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((fresnelc((P_a)+((O_b)*(Xv))))^(2)),Xv) = ((((((O_b)^(((O_m)+(1)))))^((-1))))*(intsubst(expandintegrand(((fresnelc(Xv))^(2)),((((((O_b)*(O_c)))+((((-1))*(P_a)*(O_d)))+(((O_d)*(Xv)))))^(O_m)),Xv),Xv,((P_a)+(((O_b)*(Xv)))))))
 
 # Regel 17 (648 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*FresnelS[a_. + b_.*x_]^n_., x_Symbol] := Unintegrable[(c + d*x)^m*FresnelS[a + b*x]^n, x] /; FreeQ[{a, b, c, d, m, n}, x]
@@ -92,11 +92,11 @@ ADDSPEC RubiRules : IF (abs(K_1 - e) < 1e-9), NIN(Xv,O_a,O_b,O_c,O_d,O_n) Int(((
 
 # Regel 23 (36 Varianten):
 #   Int[Sin[d_.*x_^2]*FresnelS[b_.*x_]^n_., x_Symbol] := Pi*b/(2*d)*Subst[Int[x^n, x], x, FresnelS[b*x]] /; FreeQ[{b, d, n}, x] && EqQ[d^2, Pi^2/4*b^4]
-ADDSPEC RubiRules : IF NIN(Xv,O_b,O_d,O_n), (eqq(((O_d)^(2)),((((pi)^(2)))*((1/4))*(((O_b)^(4)))))) Int((sin((O_d)*((Xv)^(2))))*((fresnels((O_b)*(Xv)))^(O_n)),Xv) = ((pi)*(O_b)*(((((2)*(O_d)))^((-1))))*(subst(Int(((Xv)^(O_n)),Xv),Xv,fresnels(((O_b)*(Xv))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_d,O_n), (eqq(((O_d)^(2)),((((pi)^(2)))*((1/4))*(((O_b)^(4)))))) Int((sin((O_d)*((Xv)^(2))))*((fresnels((O_b)*(Xv)))^(O_n)),Xv) = ((pi)*(O_b)*(((((2)*(O_d)))^((-1))))*(intsubst(((Xv)^(O_n)),Xv,fresnels(((O_b)*(Xv))))))
 
 # Regel 24 (36 Varianten):
 #   Int[Cos[d_.*x_^2]*FresnelC[b_.*x_]^n_., x_Symbol] := Pi*b/(2*d)*Subst[Int[x^n, x], x, FresnelC[b*x]] /; FreeQ[{b, d, n}, x] && EqQ[d^2, Pi^2/4*b^4]
-ADDSPEC RubiRules : IF NIN(Xv,O_b,O_d,O_n), (eqq(((O_d)^(2)),((((pi)^(2)))*((1/4))*(((O_b)^(4)))))) Int((cos((O_d)*((Xv)^(2))))*((fresnelc((O_b)*(Xv)))^(O_n)),Xv) = ((pi)*(O_b)*(((((2)*(O_d)))^((-1))))*(subst(Int(((Xv)^(O_n)),Xv),Xv,fresnelc(((O_b)*(Xv))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_d,O_n), (eqq(((O_d)^(2)),((((pi)^(2)))*((1/4))*(((O_b)^(4)))))) Int((cos((O_d)*((Xv)^(2))))*((fresnelc((O_b)*(Xv)))^(O_n)),Xv) = ((pi)*(O_b)*(((((2)*(O_d)))^((-1))))*(intsubst(((Xv)^(O_n)),Xv,fresnelc(((O_b)*(Xv))))))
 
 # Regel 25 (36 Varianten):
 #   Int[Sin[c_ + d_.*x_^2]*FresnelS[b_.*x_], x_Symbol] := Sin[c]*Int[Cos[d*x^2]*FresnelS[b*x], x] + Cos[c]*Int[Sin[d*x^2]*FresnelS[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, Pi^2/4*b^4]

@@ -2185,6 +2185,53 @@ static Node * s_algebraicfunctionq (Node * a[], int n, Symbol * f)
 	return mk_bool(algfunq(a[0], a[1], fl != 0), f);
 }
 
+/* ---- intsubst(u, x, v): Rubi's Subst[Int[u, x], x, v] ----
+ * u is integrated in a fresh variable w, which then is replaced by v. If v
+ * is known to be non-negative (a square root, an even root, exp, abs, a
+ * term of sort nonneg), w is the constant Xnn of sort nonneg, so that rules
+ * like sqrt(w^2) = w apply. Otherwise x itself is used (or the real
+ * constant Xre, if x is Xnn: its sign is not known any more). */
+
+static int nonnegq (Node * v)
+{
+	double e, p, q;
+	Node * s;
+	v = deref(v);
+	if (! v) return 0;
+	if (num_value(v, & e)) return e >= 0;
+	s = arg_sort(v);
+	if (s && find_symbol("nonneg") && sort_dist(s, (Node *) find_symbol("nonneg")) >= 0) return 1;
+	if (is_head(v, "sqrt", 1) || is_head(v, "exp", 1) || is_head(v, "abs", 1)) return 1;
+	if (is_head(v, "^", 2) && num_value(arg(v, 1), & e))
+		{
+		if (e == floor(e)) return fmod(e, 2.0) == 0 || nonnegq(arg(v, 0));
+		if (rat_approx(e, & p, & q) && fmod(q, 2.0) == 0) return 1;	/* even root */
+		return nonnegq(arg(v, 0));
+		}
+	if (is_head(v, "^", 2) && num_value(arg(v, 0), & e) && e > 0) return 1;	/* e^u, 2^u */
+	if (is_head(v, "*", 2) || is_head(v, "+", 2) || is_head(v, "/", 2))
+		return nonnegq(arg(v, 0)) && nonnegq(arg(v, 1));
+	return 0;
+}
+
+static Node * mk_f3 (const char * f, Node * a, Node * b, Node * c)
+{
+	Node * t = mknod(Terms, a, mknod(Terms, b, c));
+	return mknod(Func, (Node *) getsymbol(fsym(f), t), t);
+}
+
+static Node * s_substint (Node * a[], int n, Symbol * f)
+{
+	Symbol * xnn = find_symbol("Xnn"), * xre = find_symbol("Xre"), * ws = NULL;
+	Node * w, * u;
+	if (n != 3) return NULL;
+	if (xnn && nonnegq(a[2])) ws = xnn;
+	else if (xre && xnn && atom_sym(a[1]) == xnn) ws = xre;
+	w = ws ? mknod(Const, (Node *) ws, NULL) : tcpy(a[1]);
+	u = ws ? replace(a[0], a[1], w) : tcpy(a[0]);
+	return mk_f3("subst", mk_f2("Int", u, w), tcpy(w), tcpy(a[2]));
+}
+
 /* ================= trivial simplification of rule results ================= */
 
 static int num_is (Node * t, double v)
@@ -2273,6 +2320,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "normpoly",        s_normpoly },
 	{ "deriv",           s_deriv },
 	{ "collect",         s_collect },
+	{ "intsubst", s_substint },
 	{ "binomialmatchq", s_binomialmatchq },
 	{ "quadraticmatchq", s_quadraticmatchq },
 	{ "trinomialq", s_trinomialq },

@@ -7,11 +7,11 @@
 a + b 
 a + b + 1 
 (a + b + 1 )* 2 
---> --> --> --> 6 
+6 
 sq2 (a + b )
 9 
 1 4 9 
 # numbers used by 10_data_input
 this text is skipped
 42 
---> 0 1 2 
+0 1 2 

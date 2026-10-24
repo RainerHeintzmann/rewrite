@@ -88,22 +88,22 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_f), (polyq(P_Px,X
 
 # Regel 21 (2519424 Varianten):
 #   Int[(a_.+b_.*u_+c_.*u_^2)^p_.*(d_.+e_.*u_+f_.*u_^2)^q_.*(A_.+B_.*u_+C_.*u_^2),x_Symbol] := 1/Coefficient[u,x,1] \[Star] Subst[Int[(a+b*x+c*x^2)^p*(d+e*x+f*x^2)^q*(A+B*x+C*x^2),x],x,u] /; FreeQ[{a,b,c,d,e,f,A,B,C,p,q},x] && LinearQ[u,x] && NeQ[u,x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_A,O_B,O_C,O_p,O_q), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int((((O_a)+((O_b)*(P_u))+((O_c)*((P_u)^(2))))^(O_p))*(((O_d)+((O_e)*(P_u))+((O_f)*((P_u)^(2))))^(O_q))*((O_A)+((O_B)*(P_u))+((O_C)*((P_u)^(2)))),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(O_q)))*(((O_A)+(((O_B)*(Xv)))+(((O_C)*(((Xv)^(2)))))))),Xv),Xv,P_u)))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_A,O_B,O_C,O_p,O_q), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int((((O_a)+((O_b)*(P_u))+((O_c)*((P_u)^(2))))^(O_p))*(((O_d)+((O_e)*(P_u))+((O_f)*((P_u)^(2))))^(O_q))*((O_A)+((O_B)*(P_u))+((O_C)*((P_u)^(2)))),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(intsubst(((((((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(O_q)))*(((O_A)+(((O_B)*(Xv)))+(((O_C)*(((Xv)^(2)))))))),Xv,P_u)))
 
 # Regel 22 nicht uebersetzt: symbol C
 #   Int[(a_.+b_.*u_+c_.*u_^2)^p_.*(d_.+e_.*u_+f_.*u_^2)^q_.*(A_.+B_.*u_),x_Symbol] := 1/Coefficient[u,x,1] \[Star] Subst[Int[(a+b*x+c*x^2)^p*(d+e*x+f*x^2)^q*(A+B*x),x],x,u] /; FreeQ[{a,b,c,d,e,f,A,B,C,p,q},x] && LinearQ[u,x] && NeQ[u,x]
 
 # Regel 23 (419904 Varianten):
 #   Int[(a_.+b_.*u_+c_.*u_^2)^p_.*(d_.+e_.*u_+f_.*u_^2)^q_.*(A_.+C_.*u_^2),x_Symbol] := 1/Coefficient[u,x,1] \[Star] Subst[Int[(a+b*x+c*x^2)^p*(d+e*x+f*x^2)^q*(A+C*x^2),x],x,u] /; FreeQ[{a,b,c,d,e,f,A,C,p,q},x] && LinearQ[u,x] && NeQ[u,x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_A,O_C,O_p,O_q), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int((((O_a)+((O_b)*(P_u))+((O_c)*((P_u)^(2))))^(O_p))*(((O_d)+((O_e)*(P_u))+((O_f)*((P_u)^(2))))^(O_q))*((O_A)+((O_C)*((P_u)^(2)))),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(O_q)))*(((O_A)+(((O_C)*(((Xv)^(2)))))))),Xv),Xv,P_u)))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_A,O_C,O_p,O_q), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int((((O_a)+((O_b)*(P_u))+((O_c)*((P_u)^(2))))^(O_p))*(((O_d)+((O_e)*(P_u))+((O_f)*((P_u)^(2))))^(O_q))*((O_A)+((O_C)*((P_u)^(2)))),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(intsubst(((((((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(O_q)))*(((O_A)+(((O_C)*(((Xv)^(2)))))))),Xv,P_u)))
 
 # Regel 24 (419904 Varianten):
 #   Int[(a_.+c_.*u_^2)^p_.*(d_.+e_.*u_+f_.*u_^2)^q_.*(A_.+B_.*u_+C_.*u_^2),x_Symbol] := 1/Coefficient[u,x,1] \[Star] Subst[Int[(a+c*x^2)^p*(d+e*x+f*x^2)^q*(A+B*x+C*x^2),x],x,u] /; FreeQ[{a,c,d,e,f,A,B,C,p,q},x] && LinearQ[u,x] && NeQ[u,x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_d,O_e,O_f,O_A,O_B,O_C,O_p,O_q), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int((((O_a)+((O_c)*((P_u)^(2))))^(O_p))*(((O_d)+((O_e)*(P_u))+((O_f)*((P_u)^(2))))^(O_q))*((O_A)+((O_B)*(P_u))+((O_C)*((P_u)^(2)))),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(subst(Int(((((((O_a)+(((O_c)*(((Xv)^(2)))))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(O_q)))*(((O_A)+(((O_B)*(Xv)))+(((O_C)*(((Xv)^(2)))))))),Xv),Xv,P_u)))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_d,O_e,O_f,O_A,O_B,O_C,O_p,O_q), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int((((O_a)+((O_c)*((P_u)^(2))))^(O_p))*(((O_d)+((O_e)*(P_u))+((O_f)*((P_u)^(2))))^(O_q))*((O_A)+((O_B)*(P_u))+((O_C)*((P_u)^(2)))),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(intsubst(((((((O_a)+(((O_c)*(((Xv)^(2)))))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(O_q)))*(((O_A)+(((O_B)*(Xv)))+(((O_C)*(((Xv)^(2)))))))),Xv,P_u)))
 
 # Regel 25 nicht uebersetzt: symbol C
 #   Int[(a_.+c_.*u_^2)^p_.*(d_.+e_.*u_+f_.*u_^2)^q_.*(A_.+B_.*u_),x_Symbol] := 1/Coefficient[u,x,1] \[Star] Subst[Int[(a+c*x^2)^p*(d+e*x+f*x^2)^q*(A+B*x),x],x,u] /; FreeQ[{a,c,d,e,f,A,B,C,p,q},x] && LinearQ[u,x] && NeQ[u,x]
 
 # Regel 26 (69984 Varianten):
 #   Int[(a_.+c_.*u_^2)^p_.*(d_.+e_.*u_+f_.*u_^2)^q_.*(A_.+C_.*u_^2),x_Symbol] := 1/Coefficient[u,x,1] \[Star] Subst[Int[(a+c*x^2)^p*(d+e*x+f*x^2)^q*(A+C*x^2),x],x,u] /; FreeQ[{a,c,d,e,f,A,C,p,q},x] && LinearQ[u,x] && NeQ[u,x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_d,O_e,O_f,O_A,O_C,O_p,O_q), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int((((O_a)+((O_c)*((P_u)^(2))))^(O_p))*(((O_d)+((O_e)*(P_u))+((O_f)*((P_u)^(2))))^(O_q))*((O_A)+((O_C)*((P_u)^(2)))),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(subst(Int(((((((O_a)+(((O_c)*(((Xv)^(2)))))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(O_q)))*(((O_A)+(((O_C)*(((Xv)^(2)))))))),Xv),Xv,P_u)))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_d,O_e,O_f,O_A,O_C,O_p,O_q), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int((((O_a)+((O_c)*((P_u)^(2))))^(O_p))*(((O_d)+((O_e)*(P_u))+((O_f)*((P_u)^(2))))^(O_q))*((O_A)+((O_C)*((P_u)^(2)))),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(intsubst(((((((O_a)+(((O_c)*(((Xv)^(2)))))))^(O_p)))*(((((O_d)+(((O_e)*(Xv)))+(((O_f)*(((Xv)^(2)))))))^(O_q)))*(((O_A)+(((O_C)*(((Xv)^(2)))))))),Xv,P_u)))

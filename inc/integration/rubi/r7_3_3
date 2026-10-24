@@ -64,11 +64,11 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e,P_n), (integerq
 
 # Regel 15 (324 Varianten):
 #   Int[(a_. + b_.*ArcTanh[c_.*x_^n_])/(d_ + e_.*x_), x_Symbol] := With[{k = Denominator[n]}, k*Subst[Int[x^(k - 1)*(a + b*ArcTanh[c*x^(k*n)])/(d + e*x^k), x], x, x^(1/k)]] /; FreeQ[{a, b, c, d, e}, x] && FractionQ[n]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (fractionq(P_n)) Int(((O_a)+((O_b)*(arctanh((O_c)*((Xv)^(P_n))))))*(((P_d)+((O_e)*(Xv)))^(K_1)),Xv) = ((denominator(P_n))*(subst(Int(((((Xv)^(((denominator(P_n))+((-1))))))*(((O_a)+(((O_b)*(arctanh(((O_c)*(((Xv)^(((denominator(P_n))*(P_n))))))))))))*(((((P_d)+(((O_e)*(((Xv)^(denominator(P_n))))))))^((-1))))),Xv),Xv,((Xv)^(((denominator(P_n))^((-1))))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (fractionq(P_n)) Int(((O_a)+((O_b)*(arctanh((O_c)*((Xv)^(P_n))))))*(((P_d)+((O_e)*(Xv)))^(K_1)),Xv) = ((denominator(P_n))*(intsubst(((((Xv)^(((denominator(P_n))+((-1))))))*(((O_a)+(((O_b)*(arctanh(((O_c)*(((Xv)^(((denominator(P_n))*(P_n))))))))))))*(((((P_d)+(((O_e)*(((Xv)^(denominator(P_n))))))))^((-1))))),Xv,((Xv)^(((denominator(P_n))^((-1))))))))
 
 # Regel 16 (324 Varianten):
 #   Int[(a_. + b_.*ArcCoth[c_.*x_^n_])/(d_ + e_.*x_), x_Symbol] := With[{k = Denominator[n]}, k*Subst[Int[x^(k - 1)*(a + b*ArcCoth[c*x^(k*n)])/(d + e*x^k), x], x, x^(1/k)]] /; FreeQ[{a, b, c, d, e}, x] && FractionQ[n]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (fractionq(P_n)) Int(((O_a)+((O_b)*(arccoth((O_c)*((Xv)^(P_n))))))*(((P_d)+((O_e)*(Xv)))^(K_1)),Xv) = ((denominator(P_n))*(subst(Int(((((Xv)^(((denominator(P_n))+((-1))))))*(((O_a)+(((O_b)*(arccoth(((O_c)*(((Xv)^(((denominator(P_n))*(P_n))))))))))))*(((((P_d)+(((O_e)*(((Xv)^(denominator(P_n))))))))^((-1))))),Xv),Xv,((Xv)^(((denominator(P_n))^((-1))))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (fractionq(P_n)) Int(((O_a)+((O_b)*(arccoth((O_c)*((Xv)^(P_n))))))*(((P_d)+((O_e)*(Xv)))^(K_1)),Xv) = ((denominator(P_n))*(intsubst(((((Xv)^(((denominator(P_n))+((-1))))))*(((O_a)+(((O_b)*(arccoth(((O_c)*(((Xv)^(((denominator(P_n))*(P_n))))))))))))*(((((P_d)+(((O_e)*(((Xv)^(denominator(P_n))))))))^((-1))))),Xv,((Xv)^(((denominator(P_n))^((-1))))))))
 
 # Regel 17 (972 Varianten):
 #   Int[(d_. + e_.*x_)^m_.*(a_. + b_.*ArcTanh[c_.*x_^n_]), x_Symbol] := (d + e*x)^(m + 1)*(a + b*ArcTanh[c*x^n])/(e*(m + 1)) - b*c*n/(e*(m + 1))* Int[x^(n - 1)*(d + e*x)^(m + 1)/(1 - c^2*x^(2*n)), x] /; FreeQ[{a, b, c, d, e, m, n}, x] && NeQ[m, -1]

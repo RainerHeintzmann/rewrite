@@ -8,7 +8,7 @@
 
 # Regel 1 (972 Varianten):
 #   Int[(a_. + b_.*ArcSinh[c_.*x_])^n_./(d_. + e_.*x_), x_Symbol] := Subst[Int[(a + b*x)^n*Cosh[x]/(c*d + e*Sinh[x]), x], x, ArcSinh[c*x]] /; FreeQ[{a, b, c, d, e}, x] && IGtQ[n, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e), (igtq(O_n,0)) Int((((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n))*(((O_d)+((O_e)*(Xv)))^(K_1)),Xv) = subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(cosh(Xv))*(((((((O_c)*(O_d)))+(((O_e)*(sinh(Xv))))))^((-1))))),Xv),Xv,arcsinh(((O_c)*(Xv))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_e), (igtq(O_n,0)) Int((((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n))*(((O_d)+((O_e)*(Xv)))^(K_1)),Xv) = intsubst(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(cosh(Xv))*(((((((O_c)*(O_d)))+(((O_e)*(sinh(Xv))))))^((-1))))),Xv,arcsinh(((O_c)*(Xv))))
 
 # Regel 2 (1944 Varianten):
 #   Int[(d_. + e_.*x_)^m_.*(a_. + b_.*ArcSinh[c_.*x_])^n_., x_Symbol] := (d + e*x)^(m + 1)*(a + b*ArcSinh[c*x])^n/(e*(m + 1)) - b*c*n/(e*(m + 1))* Int[(d + e*x)^(m + 1)*(a + b*ArcSinh[c*x])^(n - 1)/ Sqrt[1 + c^2*x^2], x] /; FreeQ[{a, b, c, d, e, m}, x] && IGtQ[n, 0] && NeQ[m, -1]
@@ -20,7 +20,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e), (igtq(O_m,0)), (((P_n < (-1)
 
 # Regel 4 (1944 Varianten):
 #   Int[(d_. + e_.*x_)^m_.*(a_. + b_.*ArcSinh[c_.*x_])^n_., x_Symbol] := 1/c^(m + 1)* Subst[Int[(a + b*x)^n*Cosh[x]*(c*d + e*Sinh[x])^m, x], x, ArcSinh[c*x]] /; FreeQ[{a, b, c, d, e, n}, x] && IGtQ[m, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_m,0)) Int((((O_d)+((O_e)*(Xv)))^(O_m))*(((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n)),Xv) = ((((((O_c)^(((O_m)+(1)))))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(cosh(Xv))*(((((((O_c)*(O_d)))+(((O_e)*(sinh(Xv))))))^(O_m)))),Xv),Xv,arcsinh(((O_c)*(Xv))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_n), (igtq(O_m,0)) Int((((O_d)+((O_e)*(Xv)))^(O_m))*(((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n)),Xv) = ((((((O_c)^(((O_m)+(1)))))^((-1))))*(intsubst(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(cosh(Xv))*(((((((O_c)*(O_d)))+(((O_e)*(sinh(Xv))))))^(O_m)))),Xv,arcsinh(((O_c)*(Xv))))))
 
 # Regel 5 nicht uebersetzt: function ExpandExpression
 #   Int[Px_*(a_. + b_.*ArcSinh[c_.*x_]), x_Symbol] := With[{u = IntHide[ExpandExpression[Px, x], x]}, Dist[a + b*ArcSinh[c*x], u, x] - b*c*Int[SimplifyIntegrand[u/Sqrt[1 + c^2*x^2], x], x]] /; FreeQ[{a, b, c}, x] && PolynomialQ[Px, x]
@@ -71,7 +71,7 @@ ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_a,O_b,O_c,P_d,O_e,P_f,O_g), (
 
 # Regel 17 (15552 Varianten):
 #   Int[(f_ + g_.*x_)^m_.*(a_. + b_.*ArcSinh[c_.*x_])^n_./ Sqrt[d_ + e_.*x_^2], x_Symbol] := 1/(c^(m + 1)*Sqrt[d])* Subst[Int[(a + b*x)^n*(c*f + g*Sinh[x])^m, x], x, ArcSinh[c*x]] /; FreeQ[{a, b, c, d, e, f, g, n}, x] && EqQ[e, c^2*d] && IntegerQ[m] && GtQ[d, 0] && (GtQ[m, 0] || IGtQ[n, 0])
-ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_a,O_b,O_c,P_d,O_e,P_f,O_g,O_n), (eqq(O_e,((((O_c)^(2)))*(P_d)))), (integerq(O_m)), (((P_d > 0))), (((((O_m > 0))) || (igtq(O_n,0)))) Int((((P_f)+((O_g)*(Xv)))^(O_m))*(((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = ((((((((O_c)^(((O_m)+(1)))))*(((P_d)^((1/2))))))^((-1))))*(subst(Int(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(((((((O_c)*(P_f)))+(((O_g)*(sinh(Xv))))))^(O_m)))),Xv),Xv,arcsinh(((O_c)*(Xv))))))
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_a,O_b,O_c,P_d,O_e,P_f,O_g,O_n), (eqq(O_e,((((O_c)^(2)))*(P_d)))), (integerq(O_m)), (((P_d > 0))), (((((O_m > 0))) || (igtq(O_n,0)))) Int((((P_f)+((O_g)*(Xv)))^(O_m))*(((O_a)+((O_b)*(arcsinh((O_c)*(Xv)))))^(O_n))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = ((((((((O_c)^(((O_m)+(1)))))*(((P_d)^((1/2))))))^((-1))))*(intsubst(((((((O_a)+(((O_b)*(Xv)))))^(O_n)))*(((((((O_c)*(P_f)))+(((O_g)*(sinh(Xv))))))^(O_m)))),Xv,arcsinh(((O_c)*(Xv))))))
 
 # Regel 18 (15552 Varianten):
 #   Int[(f_ + g_.*x_)^m_.*(d_ + e_.*x_^2)^p_*(a_. + b_.*ArcSinh[c_.*x_])^ n_., x_Symbol] := Int[ExpandIntegrand[(a + b*ArcSinh[c*x])^n/ Sqrt[d + e*x^2], (f + g*x)^m*(d + e*x^2)^(p + 1/2), x], x] /; FreeQ[{a, b, c, d, e, f, g}, x] && EqQ[e, c^2*d] && IntegerQ[m] && ILtQ[p + 1/2, 0] && GtQ[d, 0] && IGtQ[n, 0]

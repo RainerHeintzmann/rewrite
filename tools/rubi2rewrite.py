@@ -478,6 +478,10 @@ def tr_rhs(e, ctx):
         return FUNCS[head] + paren(','.join(tr_rhs(a, ctx) for a in args))
     if head == 'Subst' and len(args) == 2 and args[1][0] == 'call' and args[1][1] == 'Rule':
         args = [args[0]] + args[1][2]
+    if (head == 'Subst' and len(args) == 3 and args[0][0] == 'call' and args[0][1] == 'Int'
+            and len(args[0][2]) == 2 and args[0][2][1] == args[1]):
+        # Subst[Int[u, x], x, v]: integrate in a fresh variable (nonneg for roots)
+        return 'intsubst' + paren(','.join(tr_rhs(a, ctx) for a in [args[0][2][0], args[1], args[2]]))
     if head == 'ReplaceAll' and len(args) == 2 and args[1][0] == 'call' and args[1][1] == 'Rule':
         return 'replaceall' + paren(','.join(tr_rhs(a, ctx) for a in [args[0]] + args[1][2]))
     if head == 'RemoveContent' and len(args) == 2:
