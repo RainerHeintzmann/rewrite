@@ -296,32 +296,64 @@ static int hs_has (HeadSet * s, const char * h)
 }
 
 #define MAXCACHE 8
-static struct { Node * list; int count; RuleInfo * info; } cache[MAXCACHE];
 
-static RuleInfo * rule_info (Node * list)	/* uses cur_settings of the list */
+/* candidate rules for one combination of term head and first-argument head */
+typedef struct {
+	const char * top, * first;	/* head names (NULL: none) */
+	int n;
+	int * idx;			/* indices of the candidate rules, ascending */
+} Cand;
+
+static long generation = 0;		/* counts rulelist_add calls */
+
+static struct {
+	Node * list;
+	long gen;			/* generation when built */
+	int count;
+	RuleInfo * info;
+	Node ** items;			/* the rules of the list in order */
+	Cand * cand;
+	int ncand, capcand;
+} cache[MAXCACHE];
+
+static void cache_clear (int k)
+{
+	int j;
+	for (j = 0; j < cache[k].ncand; j++) free(cache[k].cand[j].idx);
+	free(cache[k].cand);
+	free(cache[k].info);
+	free(cache[k].items);
+	cache[k].cand = NULL; cache[k].ncand = cache[k].capcand = 0;
+	cache[k].info = NULL; cache[k].items = NULL;
+}
+
+static int rule_info (Node * list)	/* cache entry of the list; uses cur_settings */
 {
 	Node * it;
 	int count = 0, i, k;
-	for (it = list->l; it; it = it->r) count++;
 	for (k = 0; k < MAXCACHE; k++)
 		if (cache[k].list == list) break;
-	if (k < MAXCACHE && cache[k].count == count) return cache[k].info;
+	if (k < MAXCACHE && cache[k].gen == generation) return k;
 	if (k == MAXCACHE)		/* new entry (replace the first one if full) */
 		{
 		for (k = 0; k < MAXCACHE && cache[k].list; k++)
 			;
 		if (k == MAXCACHE) k = 0;
 		}
-	free(cache[k].info);
+	cache_clear(k);
+	for (it = list->l; it; it = it->r) count++;
 	cache[k].list = list;
+	cache[k].gen = generation;
 	cache[k].count = count;
 	cache[k].info = (RuleInfo *) calloc(count ? count : 1, sizeof(RuleInfo));
-	if (! cache[k].info) fatal("listmatch : no room");
+	cache[k].items = (Node **) calloc(count ? count : 1, sizeof(Node *));
+	if (! cache[k].info || ! cache[k].items) fatal("listmatch : no room");
 	for (i = 0, it = list->l; it; it = it->r, i++)
 		{
 		Node * lhs = FORM_LHS(it->l);
 		RuleInfo * r = & cache[k].info[i];
 		BOOLEAN ro;
+		cache[k].items[i] = it;
 		heads_of(lhs, & r->top);
 		/* first argument only if the head itself cannot change or swap */
 		if (lhs && lhs->type == Func && term_nargs(lhs) >= 1
@@ -331,29 +363,63 @@ static RuleInfo * rule_info (Node * list)	/* uses cur_settings of the list */
 			heads_of(term_arg(lhs, 0), & r->first);
 			}
 		}
-	return cache[k].info;
+	return k;
+}
+
+static int same_name (const char * a, const char * b)
+{
+	return a == b || (a && b && strcmp(a, b) == 0);
+}
+
+/* the candidate rules for a term with head th and first-argument head fh:
+ * computed once per combination, then taken from the cache */
+static Cand * candidates (int k, const char * th, const char * fh)
+{
+	Cand * c;
+	int j, i;
+	for (j = 0; j < cache[k].ncand; j++)
+		if (same_name(cache[k].cand[j].top, th) && same_name(cache[k].cand[j].first, fh))
+			return & cache[k].cand[j];
+	if (cache[k].ncand == cache[k].capcand)
+		{
+		cache[k].capcand = cache[k].capcand ? 2 * cache[k].capcand : 16;
+		cache[k].cand = (Cand *) realloc(cache[k].cand, cache[k].capcand * sizeof(Cand));
+		if (! cache[k].cand) fatal("listmatch : no room");
+		}
+	c = & cache[k].cand[cache[k].ncand++];
+	c->top = th; c->first = fh; c->n = 0;
+	c->idx = (int *) malloc((cache[k].count ? cache[k].count : 1) * sizeof(int));
+	if (! c->idx) fatal("listmatch : no room");
+	for (i = 0; i < cache[k].count; i++)
+		{
+		RuleInfo * r = & cache[k].info[i];
+		if (! hs_has(& r->top, th)) continue;
+		if (r->use_first && fh && ! hs_has(& r->first, fh)) continue;
+		c->idx[c->n++] = i;
+		}
+	return c;
 }
 
 int lm_start = 0, lm_last = -1;
 
 Node * match_list (Node * term, Node * list)
 {
-	Node * it;
-	RuleInfo * info;
+	Cand * c;
 	const char * th, * fh = NULL;
-	int i, start = lm_start;
+	int k, j, start = lm_start;
 	lm_start = 0;			/* nested calls (conditions) start at 0 */
 	cur_settings = list->r;
-	info = rule_info(list);
+	k = rule_info(list);
 	th = head_name(term);
 	if (term && term->type == Func && term_nargs(term) >= 1)
 		fh = head_name(term_arg(term, 0));
-	for (i = 0, it = list->l; it; it = it->r, i++)
+	c = candidates(k, th, fh);
+	for (j = 0; j < c->n; j++)
 		{
-		Node * cp;
+		int i = c->idx[j];
+		Node * cp, * it;
 		if (i < start) continue;
-		if (! hs_has(& info[i].top, th)) continue;
-		if (info[i].use_first && fh && ! hs_has(& info[i].first, fh)) continue;
+		it = cache[k].items[i];
 		cp = chain_pos;
 		cur_res = FORM_RES(it->l);
 		if (goal(FORM_LHS(it->l), term, NULL))
@@ -371,23 +437,46 @@ Node * match_list (Node * term, Node * list)
 	return NULL;
 }
 
+/* last element of each rule list, so that adding a rule does not walk the list */
+#define MAXTAILS 32
+static struct { Node * list, * tail; } tails[MAXTAILS];
+
 Node * rulelist_add (Node * list, Node * lhs, Node * res, Node * settings)
 {
-	Node * item = mknod(PARAM, mknod(Form, lhs, res), NULL), * l;
+	Node * item = mknod(PARAM, mknod(Form, lhs, res), NULL), * l = NULL;
+	int t;
+	generation++;
 	if (! list)
+		{
 		list = mknod(RULELIST, NULL, NULL);
+		for (t = 0; t < MAXTAILS; t++)	/* a freed list may have had this address */
+			if (tails[t].list == list) tails[t].tail = NULL;
+		}
 	if (settings)
 		{
 		delete(list->r);		/* latest settings apply to the whole list */
 		list->r = settings;
 		}
+	for (t = 0; t < MAXTAILS; t++)
+		if (tails[t].list == list) break;
 	if (! list->l)
 		list->l = item;
 	else
 		{
-		for (l = list->l; l->r; l = l->r)
-			;
+		if (t < MAXTAILS && tails[t].tail && ! tails[t].tail->r)
+			l = tails[t].tail;
+		else
+			for (l = list->l; l->r; l = l->r)
+				;
 		l->r = item;
 		}
+	if (t == MAXTAILS)			/* new entry (replace the first one if full) */
+		{
+		for (t = 0; t < MAXTAILS && tails[t].list; t++)
+			;
+		if (t == MAXTAILS) t = 0;
+		tails[t].list = list;
+		}
+	tails[t].tail = item;
 	return list;
 }
