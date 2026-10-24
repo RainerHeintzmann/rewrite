@@ -8,11 +8,11 @@
 
 # Regel 1 (9 Varianten):
 #   Int[Sinh[c_. + d_.*x_^n_], x_Symbol] := 1/2*Int[E^(c + d*x^n), x] - 1/2*Int[E^(-c - d*x^n), x] /; FreeQ[{c, d}, x] && IGtQ[n, 1]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d), (igtq(P_n,1)) Int(sinh((O_c)+((O_d)*((Xv)^(P_n)))),Xv) = (((((1/2))*(Int(exp(((O_c)+(((O_d)*(((Xv)^(P_n))))))),Xv))))+((((-(1/2)))*(Int(exp((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d), (igtq(P_n,1)) Int(sinh((O_c)+((O_d)*((Xv)^(P_n)))),Xv) = (((((1/2))*(Int((eE^(((O_c)+(((O_d)*(((Xv)^(P_n)))))))),Xv))))+((((-(1/2)))*(Int((eE^((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n)))))))),Xv)))))
 
 # Regel 2 (9 Varianten):
 #   Int[Cosh[c_. + d_.*x_^n_], x_Symbol] := 1/2*Int[E^(c + d*x^n), x] + 1/2*Int[E^(-c - d*x^n), x] /; FreeQ[{c, d}, x] && IGtQ[n, 1]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d), (igtq(P_n,1)) Int(cosh((O_c)+((O_d)*((Xv)^(P_n)))),Xv) = (((((1/2))*(Int(exp(((O_c)+(((O_d)*(((Xv)^(P_n))))))),Xv))))+((((1/2))*(Int(exp((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d), (igtq(P_n,1)) Int(cosh((O_c)+((O_d)*((Xv)^(P_n)))),Xv) = (((((1/2))*(Int((eE^(((O_c)+(((O_d)*(((Xv)^(P_n)))))))),Xv))))+((((1/2))*(Int((eE^((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n)))))))),Xv)))))
 
 # Regel 3 (81 Varianten):
 #   Int[(a_. + b_.*Sinh[c_. + d_.*x_^n_])^p_, x_Symbol] := Int[ExpandTrigReduce[(a + b*Sinh[c + d*x^n])^p, x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[n, 1] && IGtQ[p, 1]
@@ -40,11 +40,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (fractionq(P_n)), (integerq(O_p)
 
 # Regel 9 (9 Varianten):
 #   Int[Sinh[c_. + d_.*x_^n_], x_Symbol] := 1/2*Int[E^(c + d*x^n), x] - 1/2*Int[E^(-c - d*x^n), x] /; FreeQ[{c, d, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,P_n) Int(sinh((O_c)+((O_d)*((Xv)^(P_n)))),Xv) = (((((1/2))*(Int(exp(((O_c)+(((O_d)*(((Xv)^(P_n))))))),Xv))))+((((-(1/2)))*(Int(exp((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,P_n) Int(sinh((O_c)+((O_d)*((Xv)^(P_n)))),Xv) = (((((1/2))*(Int((eE^(((O_c)+(((O_d)*(((Xv)^(P_n)))))))),Xv))))+((((-(1/2)))*(Int((eE^((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n)))))))),Xv)))))
 
 # Regel 10 (9 Varianten):
 #   Int[Cosh[c_. + d_.*x_^n_], x_Symbol] := 1/2*Int[E^(c + d*x^n), x] + 1/2*Int[E^(-c - d*x^n), x] /; FreeQ[{c, d, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,P_n) Int(cosh((O_c)+((O_d)*((Xv)^(P_n)))),Xv) = (((((1/2))*(Int(exp(((O_c)+(((O_d)*(((Xv)^(P_n))))))),Xv))))+((((1/2))*(Int(exp((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,P_n) Int(cosh((O_c)+((O_d)*((Xv)^(P_n)))),Xv) = (((((1/2))*(Int((eE^(((O_c)+(((O_d)*(((Xv)^(P_n)))))))),Xv))))+((((1/2))*(Int((eE^((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n)))))))),Xv)))))
 
 # Regel 11 (81 Varianten):
 #   Int[(a_. + b_.*Sinh[c_. + d_.*x_^n_])^p_, x_Symbol] := Int[ExpandTrigReduce[(a + b*Sinh[c + d*x^n])^p, x], x] /; FreeQ[{a, b, c, d, n}, x] && IGtQ[p, 0]
@@ -128,11 +128,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e), (igtq(P_n,0)), (((P_m < (-1)))) Int(
 
 # Regel 31 (108 Varianten):
 #   Int[(e_.*x_)^m_.*Sinh[c_. + d_.*x_^n_], x_Symbol] := 1/2*Int[(e*x)^m*E^(c + d*x^n), x] - 1/2*Int[(e*x)^m*E^(-c - d*x^n), x] /; FreeQ[{c, d, e, m}, x] && IGtQ[n, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_m), (igtq(P_n,0)) Int((((O_e)*(Xv))^(O_m))*(sinh((O_c)+((O_d)*((Xv)^(P_n))))),Xv) = (((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*(exp(((O_c)+(((O_d)*(((Xv)^(P_n))))))))),Xv))))+((((-(1/2)))*(Int(((((((O_e)*(Xv)))^(O_m)))*(exp((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n))))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_m), (igtq(P_n,0)) Int((((O_e)*(Xv))^(O_m))*(sinh((O_c)+((O_d)*((Xv)^(P_n))))),Xv) = (((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^(((O_c)+(((O_d)*(((Xv)^(P_n)))))))))),Xv))))+((((-(1/2)))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n)))))))))),Xv)))))
 
 # Regel 32 (108 Varianten):
 #   Int[(e_.*x_)^m_.*Cosh[c_. + d_.*x_^n_], x_Symbol] := 1/2*Int[(e*x)^m*E^(c + d*x^n), x] + 1/2*Int[(e*x)^m*E^(-c - d*x^n), x] /; FreeQ[{c, d, e, m}, x] && IGtQ[n, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_m), (igtq(P_n,0)) Int((((O_e)*(Xv))^(O_m))*(cosh((O_c)+((O_d)*((Xv)^(P_n))))),Xv) = (((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*(exp(((O_c)+(((O_d)*(((Xv)^(P_n))))))))),Xv))))+((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*(exp((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n))))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_m), (igtq(P_n,0)) Int((((O_e)*(Xv))^(O_m))*(cosh((O_c)+((O_d)*((Xv)^(P_n))))),Xv) = (((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^(((O_c)+(((O_d)*(((Xv)^(P_n)))))))))),Xv))))+((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n)))))))))),Xv)))))
 
 # Regel 33 (36 Varianten):
 #   Int[x_^m_.*Sinh[a_. + b_.*x_^n_]^p_, x_Symbol] := -Sinh[a + b*x^n]^p/((n - 1)*x^(n - 1)) + b*n*p/(n - 1)*Int[Sinh[a + b*x^n]^(p - 1)*Cosh[a + b*x^n], x] /; FreeQ[{a, b}, x] && IntegersQ[n, p] && EqQ[m + n, 0] && GtQ[p, 1] && NeQ[n, 1]
@@ -254,11 +254,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_e,P_m,P_n), (integerq(O_p)), (ne
 
 # Regel 63 (108 Varianten):
 #   Int[(e_.*x_)^m_.*Sinh[c_. + d_.*x_^n_], x_Symbol] := 1/2*Int[(e*x)^m*E^(c + d*x^n), x] - 1/2*Int[(e*x)^m*E^(-c - d*x^n), x] /; FreeQ[{c, d, e, m, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_m,P_n) Int((((O_e)*(Xv))^(O_m))*(sinh((O_c)+((O_d)*((Xv)^(P_n))))),Xv) = (((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*(exp(((O_c)+(((O_d)*(((Xv)^(P_n))))))))),Xv))))+((((-(1/2)))*(Int(((((((O_e)*(Xv)))^(O_m)))*(exp((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n))))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_m,P_n) Int((((O_e)*(Xv))^(O_m))*(sinh((O_c)+((O_d)*((Xv)^(P_n))))),Xv) = (((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^(((O_c)+(((O_d)*(((Xv)^(P_n)))))))))),Xv))))+((((-(1/2)))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n)))))))))),Xv)))))
 
 # Regel 64 (108 Varianten):
 #   Int[(e_.*x_)^m_.*Cosh[c_. + d_.*x_^n_], x_Symbol] := 1/2*Int[(e*x)^m*E^(c + d*x^n), x] + 1/2*Int[(e*x)^m*E^(-c - d*x^n), x] /; FreeQ[{c, d, e, m, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_m,P_n) Int((((O_e)*(Xv))^(O_m))*(cosh((O_c)+((O_d)*((Xv)^(P_n))))),Xv) = (((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*(exp(((O_c)+(((O_d)*(((Xv)^(P_n))))))))),Xv))))+((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*(exp((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n))))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_m,P_n) Int((((O_e)*(Xv))^(O_m))*(cosh((O_c)+((O_d)*((Xv)^(P_n))))),Xv) = (((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^(((O_c)+(((O_d)*(((Xv)^(P_n)))))))))),Xv))))+((((1/2))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^((((((-1))*(O_c)))+((((-1))*(O_d)*(((Xv)^(P_n)))))))))),Xv)))))
 
 # Regel 65 (972 Varianten):
 #   Int[(e_.*x_)^m_.*(a_. + b_.*Sinh[c_. + d_.*x_^n_])^p_, x_Symbol] := Int[ExpandTrigReduce[(e*x)^m, (a + b*Sinh[c + d*x^n])^p, x], x] /; FreeQ[{a, b, c, d, e, m, n}, x] && IGtQ[p, 0]

@@ -197,3 +197,52 @@ HH = (3*x^2+2*x)^3
 x = 0.7
 abs(GG-HH) < 1e-7
 x = yy
+FF = REWR Int(cos(x)^2,x) : RubiIntegrate
+FF
+GG = REWR D(FF,x) : All
+HH = cos(x)^2
+x = 0.7
+abs(GG-HH) < 1e-7
+x = yy
+FF = REWR Int(cos(x)^3,x) : RubiIntegrate
+FF
+GG = REWR D(FF,x) : All
+HH = cos(x)^3
+x = 0.7
+abs(GG-HH) < 1e-7
+x = yy
+FF = REWR Int(1/(2+cos(x)),x) : RubiIntegrate
+FF
+GG = REWR D(FF,x) : All
+HH = 1/(2+cos(x))
+x = 0.7
+abs(GG-HH) < 1e-7
+x = yy
+FF = REWR Int(sec(x)^3,x) : RubiIntegrate
+FF
+GG = REWR D(FF,x) : All
+HH = sec(x)^3
+x = 0.7
+abs(GG-HH) < 1e-7
+x = yy
+FF = REWR Int(x*sinh(x),x) : RubiIntegrate
+FF
+GG = REWR D(FF,x) : All
+HH = x*sinh(x)
+x = 0.7
+abs(GG-HH) < 1e-7
+x = yy
+FF = REWR Int(cosh(x)^2,x) : RubiIntegrate
+FF
+GG = REWR D(FF,x) : All
+HH = cosh(x)^2
+x = 0.7
+abs(GG-HH) < 1e-7
+x = yy
+FF = REWR Int(sin(sqrt(1+x))/sqrt(1+x),x) : RubiIntegrate
+FF
+GG = REWR D(FF,x) : All
+HH = sin(sqrt(1+x))/sqrt(1+x)
+x = 0.7
+abs(GG-HH) < 1e-7
+x = yy

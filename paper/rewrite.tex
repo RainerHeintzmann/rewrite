@@ -382,8 +382,10 @@ numbers in patterns become \texttt{NUM} variables with a condition, local
 definitions (\texttt{With}, and \texttt{Module} with values only) are
 substituted, helper predicates that Rubi defines inside its rule files are
 inlined, and a predicate applied to a list, like \texttt{LinearQ[\{u,v\},x]},
-becomes a conjunction. $e^u$ is matched as a power with base $e$, so that
-the rules for $F^u$ apply to it, as in Mathematica. Some rules have a
+becomes a conjunction. As in Mathematica, $e^u$ is a power whose base is a
+symbolic constant $e$ of sort \texttt{positive} without a numerical value,
+so that the rules for $F^u$ apply to it and $\ln e=1$ stays exact. Some
+rules have a
 function variable, \texttt{F\_[c\_.*(a\_.+b\_.*x\_)]} with a condition such
 as \texttt{TrigQ[F]} or \texttt{MemberQ[\{Sinh,Cosh\},F]}; they are expanded
 into one rule per admissible function.
@@ -428,6 +430,22 @@ treating the new variable as non-negative. \texttt{Subst[Int[u,x],x,v]}
 therefore integrates in a fresh constant of sort \texttt{nonneg} when $v$ is
 a square root or otherwise non-negative, so that $\sqrt{x^2}=x$ holds
 inside; with this, $\int\sin\sqrt{1+x}/\sqrt{1+x}\,dx=-2\cos\sqrt{1+x}$.
+Mathematica also writes $(b\tan u)^3$ as $b^3\tan^3u$, so a pattern
+$(b\,\tan u)^n$ with integer $n$ always sees $b=1$ there, and some rules
+silently drop $b$. The translator adds the condition $b=1$ (or $b=0$ in a
+sum) to every rule whose optional variable appears neither in a condition
+nor in the result.
+
+Two parts of Rubi lie outside its rule files. Most trigonometric rules exist
+only for sine, secant and tangent; Rubi's utility function
+\texttt{UnifyInertTrigFunction} first rewrites cosine forms, such as
+$a+b\cos(e+fx)$ as $a+b\sin(e+\pi/2+fx)$. Its 69 definitions are translated
+by the same program into rules that run before the trigonometric ones, and
+the output rules turn $\sin(\pi/2+u)$ back into $\cos u$. For hyperbolic
+functions, Rubi uses $\sinh u=-i\sin(iu)$, which needs complex numbers.
+Instead, a last rule writes hyperbolic functions for which no other rule
+applies with exponentials, $\sinh u=(e^u-e^{-u})/2$, so that
+$\int x\sinh x\,dx$ and $\int\cosh^2x\,dx$ are found.
 
 The complete integration is the algebra list
 \begin{lstlisting}

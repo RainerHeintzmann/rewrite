@@ -48,7 +48,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f), (eqq(((((
 
 # Regel 12 (972 Varianten):
 #   Int[(c_. + d_.*x_)^m_/(a_ + b_.*tan[e_. + f_.*x_]), x_Symbol] := (c + d*x)^(m + 1)/(2*a*d*(m + 1)) + 1/(2*a)*Int[(c + d*x)^m*E^(2*a/b*(e + f*x)), x] /; FreeQ[{a, b, c, d, e, f, m}, x] && EqQ[a^2 + b^2, 0] && Not[IntegerQ[m]]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,P_m), (eqq(((((P_a)^(2)))+(((O_b)^(2)))),0)), (not(integerq(P_m))) Int((((O_c)+((O_d)*(Xv)))^(P_m))*(((P_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((P_m)+(1)))))*(((((2)*(P_a)*(O_d)*(((P_m)+(1)))))^((-1))))))+(((((((2)*(P_a)))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(P_m)))*(exp(((2)*(P_a)*(((O_b)^((-1))))*(((O_e)+(((O_f)*(Xv))))))))),Xv)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,P_m), (eqq(((((P_a)^(2)))+(((O_b)^(2)))),0)), (not(integerq(P_m))) Int((((O_c)+((O_d)*(Xv)))^(P_m))*(((P_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((P_m)+(1)))))*(((((2)*(P_a)*(O_d)*(((P_m)+(1)))))^((-1))))))+(((((((2)*(P_a)))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(P_m)))*((eE^(((2)*(P_a)*(((O_b)^((-1))))*(((O_e)+(((O_f)*(Xv)))))))))),Xv)))))
 
 # Regel 13 (972 Varianten):
 #   Int[(c_. + d_.*x_)^m_*(a_ + b_.*tan[e_. + f_.*x_])^n_, x_Symbol] := Int[ExpandIntegrand[(c + d*x)^ m, (1/(2*a) + Cos[2*e + 2*f*x]/(2*a) + Sin[2*e + 2*f*x]/(2*b))^(-n), x], x] /; FreeQ[{a, b, c, d, e, f}, x] && EqQ[a^2 + b^2, 0] && ILtQ[m, 0] && ILtQ[n, 0]
@@ -56,7 +56,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f), (eqq(((((P_a)^(2)))+(((O
 
 # Regel 14 (972 Varianten):
 #   Int[(c_. + d_.*x_)^m_*(a_ + b_.*tan[e_. + f_.*x_])^n_, x_Symbol] := Int[ExpandIntegrand[(c + d*x)^ m, (1/(2*a) + E^(2*a/b*(e + f*x))/(2*a))^(-n), x], x] /; FreeQ[{a, b, c, d, e, f, m}, x] && EqQ[a^2 + b^2, 0] && ILtQ[n, 0]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,P_m), (eqq(((((P_a)^(2)))+(((O_b)^(2)))),0)), (iltq(P_n,0)) Int((((O_c)+((O_d)*(Xv)))^(P_m))*(((P_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(P_n)),Xv) = Int(expandintegrand(((((O_c)+(((O_d)*(Xv)))))^(P_m)),((((((((2)*(P_a)))^((-1))))+(((exp(((2)*(P_a)*(((O_b)^((-1))))*(((O_e)+(((O_f)*(Xv))))))))*(((((2)*(P_a)))^((-1))))))))^((((-1))*(P_n)))),Xv),Xv)
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,P_m), (eqq(((((P_a)^(2)))+(((O_b)^(2)))),0)), (iltq(P_n,0)) Int((((O_c)+((O_d)*(Xv)))^(P_m))*(((P_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(P_n)),Xv) = Int(expandintegrand(((((O_c)+(((O_d)*(Xv)))))^(P_m)),((((((((2)*(P_a)))^((-1))))+((((eE^(((2)*(P_a)*(((O_b)^((-1))))*(((O_e)+(((O_f)*(Xv)))))))))*(((((2)*(P_a)))^((-1))))))))^((((-1))*(P_n)))),Xv),Xv)
 
 # Regel 15 (1944 Varianten):
 #   Int[(c_. + d_.*x_)^m_.*(a_ + b_.*tan[e_. + f_.*x_])^n_, x_Symbol] := With[{u = IntHide[(a + b*Tan[e + f*x])^n, x]}, Dist[(c + d*x)^m, u, x] - d*m*Int[Dist[(c + d*x)^(m - 1), u, x], x]] /; FreeQ[{a, b, c, d, e, f}, x] && EqQ[a^2 + b^2, 0] && ILtQ[n, -1] && GtQ[m, 0]

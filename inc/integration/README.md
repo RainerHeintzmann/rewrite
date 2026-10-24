@@ -58,11 +58,12 @@ belong in the script.
 
 ```text
 python3 tools/rubi2rewrite.py RUBI/Rubi/IntegrationRules inc/integration/rubi \
-        --order RUBI/Rubi/Rubi.m [--stats]
+        --order RUBI/Rubi/Rubi.m --util RUBI/Rubi/RubiUtilityFunctions.m [--stats]
 ```
 
 `--order` loads the files in the order of Rubi's loader, which matters
-because the first applicable rule wins.
+because the first applicable rule wins. `--util` reads Rubi's utility
+functions, from which the cosine unification rules are translated.
 
 A Rubi rule translates almost one to one:
 
@@ -107,9 +108,20 @@ have it, so a few steps are added:
   `x^0.5`, numeric factors move to the front. Unlike `IntNorm` of the
   hand-translated subset, it does not multiply out products with sums,
   because Mathematica does not do that either.
-- `exp(u)` is written as `e^u` with the number `e`, as Mathematica writes
-  `E^u`, so that rules for `F^u` apply to it. `IntOut` turns it back into
-  `exp(u)`.
+- `exp(u)` is written as `eE^u` with the symbolic constant `eE` (sort
+  `positive`, no numerical value), as Mathematica writes `E^u`, so that
+  rules for `F^u` apply to it and `ln(eE) = 1` stays exact. `IntOut` turns
+  it back into `exp(u)`.
+- Cosine forms: Rubi has most of its rules only for sine and rewrites
+  cosine forms first (`UnifyInertTrigFunction`: `a+b*cos(e+f*x)` becomes
+  `a+b*sin(e+pi/2+f*x)`, `sec` becomes `csc`, ...). These 69 definitions
+  are translated from Rubi's utility file into the rules of
+  [rubi/r4_0_unify](rubi/r4_0_unify), loaded before the trigonometric rules;
+  `IntOut` turns `sin(pi/2+u)` back into `cos(u)`.
+- Hyperbolic functions: Rubi turns `sinh(u)` into `-i*sin(i*u)`, which needs
+  complex numbers. Instead, the last rule of `RubiRules` writes hyperbolic
+  functions for which no rule applies with exponentials (`hyp2exp`):
+  `sinh(u) = (e^u-e^-u)/2`, ... The result then contains `exp`.
 - The first rules of `RubiRules` write polynomials in the integrand as
   `c0 + c1*x + c2*x^2 + ...` with collected coefficients (`normpoly`), and
   split integrals of sums and constant factors.
@@ -125,6 +137,11 @@ have it, so a few steps are added:
   fresh variable, which has the sort `nonneg` when `v` is a square root or
   another non-negative expression. Then `sqrt(x^2) = x` holds inside, as
   Rubi assumes.
+- Mathematica writes `(b*tan(u))^3` as `b^3*tan(u)^3`, so in a Rubi pattern
+  like `(b_.*tan[u])^n_` with integer `n`, `b` is always 1, and some rules
+  ignore it. Rewrite keeps `(-tan(u))^3`. The translator therefore adds the
+  condition `eqq(b,1)` (or `eqq(b,0)` in a sum) to every rule whose optional
+  variable occurs neither in the conditions nor in the result (20 rules).
 - Rules with a function variable (`F_[...]` with `TrigQ[F]`,
   `MemberQ[{Sin,Cos},F]`, ...) become one rule per admissible function.
 

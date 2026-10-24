@@ -101,8 +101,8 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_f), (igtq(O_m,0)), (igtq(O_n,0)) Int
 
 # Regel 25 (3 Varianten):
 #   Int[E^(n_.*ArcCosh[u_]), x_Symbol] := Int[(u + Sqrt[-1 + u]*Sqrt[1 + u])^n, x] /; IntegerQ[n] && PolyQ[u, x]
-ADDSPEC RubiRules : IF (abs(K_1 - e) < 1e-9), (integerq(O_n)), (polyq(P_u,Xv)) Int((K_1)^((O_n)*(arccosh(P_u))),Xv) = Int(((((P_u)+((((((((-1))+(P_u)))^((1/2))))*(((((1)+(P_u)))^((1/2))))))))^(O_n)),Xv)
+ADDSPEC RubiRules : IF (integerq(O_n)), (polyq(P_u,Xv)) Int(eE^((O_n)*(arccosh(P_u))),Xv) = Int(((((P_u)+((((((((-1))+(P_u)))^((1/2))))*(((((1)+(P_u)))^((1/2))))))))^(O_n)),Xv)
 
 # Regel 26 (12 Varianten):
 #   Int[x_^m_.*E^(n_.*ArcCosh[u_]), x_Symbol] := Int[x^m*(u + Sqrt[-1 + u]*Sqrt[1 + u])^n, x] /; RationalQ[m] && IntegerQ[n] && PolyQ[u, x]
-ADDSPEC RubiRules : IF (abs(K_1 - e) < 1e-9), (rationalq(O_m)), (integerq(O_n)), (polyq(P_u,Xv)) Int(((Xv)^(O_m))*((K_1)^((O_n)*(arccosh(P_u)))),Xv) = Int(((((Xv)^(O_m)))*(((((P_u)+((((((((-1))+(P_u)))^((1/2))))*(((((1)+(P_u)))^((1/2))))))))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF (rationalq(O_m)), (integerq(O_n)), (polyq(P_u,Xv)) Int(((Xv)^(O_m))*(eE^((O_n)*(arccosh(P_u)))),Xv) = Int(((((Xv)^(O_m)))*(((((P_u)+((((((((-1))+(P_u)))^((1/2))))*(((((1)+(P_u)))^((1/2))))))))^(O_n)))),Xv)

@@ -267,7 +267,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_p,O_q), (integerq(O_n)), (ne
 
 # Regel 60 (8748 Varianten):
 #   Int[u_.*(a_.*cos[c_. + d_.*x_] + b_.*sin[c_. + d_.*x_])^n_., x_Symbol] := Int[ActivateTrig[u]*(a*E^(-a/b*(c + d*x)))^n, x] /; FreeQ[{a, b, c, d, n}, x] && EqQ[a^2 + b^2, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n), (eqq(((((O_a)^(2)))+(((O_b)^(2)))),0)) Int((O_u)*((((O_a)*(cos((O_c)+((O_d)*(Xv)))))+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(O_n)),Xv) = Int(((O_u)*(((((O_a)*(exp((((-1))*(O_a)*(((O_b)^((-1))))*(((O_c)+(((O_d)*(Xv))))))))))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n), (eqq(((((O_a)^(2)))+(((O_b)^(2)))),0)) Int((O_u)*((((O_a)*(cos((O_c)+((O_d)*(Xv)))))+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(O_n)),Xv) = Int(((O_u)*(((((O_a)*((eE^((((-1))*(O_a)*(((O_b)^((-1))))*(((O_c)+(((O_d)*(Xv)))))))))))^(O_n)))),Xv)
 
 # Regel 61 nicht uebersetzt: function TrigSimplify
 #   Int[u_, x_Symbol] := Int[TrigSimplify[u], x] /; TrigSimplifyQ[u]

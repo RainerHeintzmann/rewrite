@@ -103,6 +103,7 @@ INC "inc/integration/rubi/r3_2_1"
 INC "inc/integration/rubi/r3_2_2"
 INC "inc/integration/rubi/r3_2_3"
 INC "inc/integration/rubi/r3_5"
+INC "inc/integration/rubi/r4_0_unify"
 INC "inc/integration/rubi/r4_1_0_1"
 INC "inc/integration/rubi/r4_1_0_2"
 INC "inc/integration/rubi/r4_1_0_3"
@@ -220,6 +221,9 @@ INC "inc/integration/rubi/r8_9"
 INC "inc/integration/rubi/r8_10"
 INC "inc/integration/rubi/r9_1"
 INC "inc/integration/rubi/r9_3"
+# zuletzt: Hyperbelfunktionen, fuer die keine Regel passt, als e^u schreiben
+# (Rubi nimmt dafuer sin, cos mit imaginaerem Argument)
+ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
 
 # am Ende: gleiche Summanden des Ergebnisses zusammenfassen
 ALG RubiCollect

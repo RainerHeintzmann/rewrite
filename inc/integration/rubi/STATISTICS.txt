@@ -1,4 +1,4 @@
-translated 6748 of 7422 rules (91%) from 199 files
+translated 6748 of 7422 rules (91%) from 200 files
 
 reasons for rules that were not translated:
    245  symbol I

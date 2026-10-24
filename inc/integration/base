@@ -59,13 +59,18 @@ ADDSPEC IntNorm : (Vv+Wv)*Uv = Vv*Uv+Wv*Uv
 # Normalform fuer die automatisch uebersetzten Rubi-Regeln (rubi/all):
 # wie IntNorm, aber ohne Ausmultiplizieren (Mathematica multipliziert
 # Produkte mit Summen nicht von selbst aus).
+# 2026: e als Symbol ohne Zahlenwert (wie E in Mathematica); ln(eE) = 1
+CONST eE : positive
+
 ALG RubiNorm
 SPEC    RubiNorm : Uv-Vv   = Uv+(-1)*Vv
 ADDSPEC RubiNorm : -Uv     = (-1)*Uv
 ADDSPEC RubiNorm : Uv/Vv   = Uv*Vv^(-1)
 ADDSPEC RubiNorm : mi Uv   = Uv^(-1)
 ADDSPEC RubiNorm : sqrt Uv = Uv^(1/2)
-ADDSPEC RubiNorm : exp(Uv) = e^Uv   # wie Mathematica: E^u, damit F^u-Muster passen
+ADDSPEC RubiNorm : exp(Uv) = eE^Uv   # wie Mathematica: E^u, damit F^u-Muster passen
+ADDSPEC RubiNorm : IF (abs(Kf - e) < 1e-9) Kf^Uv = eE^Uv
+ADDSPEC RubiNorm : ln(eE) = 1        # exakt, fuer Rubis Log[E]
 ADDSPEC RubiNorm : IF (Kc == 0) Uv^Kc = 1
 ADDSPEC RubiNorm : IF (Kc == 1) Uv^Kc = Uv
 ADDSPEC RubiNorm : IF (Kc == 1) Kc*Uv = Uv
@@ -99,7 +104,34 @@ SPEC    IntOut : IF (Kc < 0) Uv^Kc = mi(Uv^(-Kc))
 ADDSPEC IntOut : IF (Kc == -1) Kc*Uv = -Uv
 ADDSPEC IntOut : IF (Kc < 0), (Kc != -1) Kc*Uv = -((-Kc)*Uv)
 ADDSPEC IntOut : unintegrable(Uv,Vv) = Int(Uv,Vv)
+# 2026: Argumente mit pi/2 (aus r4_0_unify) wieder zurueck: sin(pi/2+u) = cos(u) ...
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sin(Kc+Uv) = cos(Uv)
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sin(Uv+Kc) = cos(Uv)
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cos(Kc+Uv) = -(sin(Uv))
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cos(Uv+Kc) = -(sin(Uv))
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) tan(Kc+Uv) = -(cot(Uv))
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) tan(Uv+Kc) = -(cot(Uv))
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cot(Kc+Uv) = -(tan(Uv))
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cot(Uv+Kc) = -(tan(Uv))
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sec(Kc+Uv) = -(csc(Uv))
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sec(Uv+Kc) = -(csc(Uv))
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) csc(Kc+Uv) = sec(Uv)
+ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) csc(Uv+Kc) = sec(Uv)
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sin(Kc+Uv) = -(cos(Uv))
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sin(Uv+Kc) = -(cos(Uv))
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) cos(Kc+Uv) = sin(Uv)
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) cos(Uv+Kc) = sin(Uv)
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) tan(Kc+Uv) = -(cot(Uv))
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) tan(Uv+Kc) = -(cot(Uv))
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) cot(Kc+Uv) = -(tan(Uv))
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) cot(Uv+Kc) = -(tan(Uv))
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sec(Kc+Uv) = csc(Uv)
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sec(Uv+Kc) = csc(Uv)
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) csc(Kc+Uv) = -(sec(Uv))
+ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) csc(Uv+Kc) = -(sec(Uv))
 ADDSPEC IntOut : IF (abs(Kf - e) < 1e-9) Kf^Uv = exp(Uv)
+ADDSPEC IntOut : eE^Uv = exp(Uv)
+ADDSPEC IntOut : ln(eE) = 1
 
 # ---------------- Einstellungen fuer die Rubi-Regeln ----------------
 # (werden am Ende von inc/integration/all wieder geloescht)

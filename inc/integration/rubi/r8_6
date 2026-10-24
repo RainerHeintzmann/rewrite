@@ -34,7 +34,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d,O_m,P_n), (eqq(((((O_b)*(P_c)))+((
 
 # Regel 8 (162 Varianten):
 #   Int[Gamma[n_, a_. + b_.*x_]/(c_. + d_.*x_), x_Symbol] := Int[(a + b*x)^(n - 1)/((c + d*x)*E^(a + b*x)), x] + (n - 1)* Int[Gamma[n - 1, a + b*x]/(c + d*x), x] /; FreeQ[{a, b, c, d}, x] && IGtQ[n, 1]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(P_n,1)) Int((Gamma(P_n,(O_a)+((O_b)*(Xv))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = ((Int(((((((O_a)+(((O_b)*(Xv)))))^(((P_n)+((-1))))))*(((((((O_c)+(((O_d)*(Xv)))))*(exp(((O_a)+(((O_b)*(Xv))))))))^((-1))))),Xv))+(((((P_n)+((-1))))*(Int(((Gamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(P_n,1)) Int((Gamma(P_n,(O_a)+((O_b)*(Xv))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = ((Int(((((((O_a)+(((O_b)*(Xv)))))^(((P_n)+((-1))))))*(((((((O_c)+(((O_d)*(Xv)))))*((eE^(((O_a)+(((O_b)*(Xv)))))))))^((-1))))),Xv))+(((((P_n)+((-1))))*(Int(((Gamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))),Xv)))))
 
 # Regel 9 nicht uebersetzt: Block
 #   Int[(c_. + d_.*x_)^m_.*Gamma[n_, a_. + b_.*x_], x_Symbol] := Block[{$UseGamma = True}, (c + d*x)^(m + 1)*Gamma[n, a + b*x]/(d*(m + 1)) + b/(d*(m + 1))* Int[(c + d*x)^(m + 1)*(a + b*x)^(n - 1)/E^(a + b*x), x]] /; FreeQ[{a, b, c, d, m, n}, x] && (IGtQ[m, 0] || IGtQ[n, 0] || IntegersQ[m, n]) && NeQ[m, -1]
@@ -80,7 +80,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_n) Int(((Gamma((O_a)+((O_b)*(Xv))))^(O_n
 
 # Regel 20 (162 Varianten):
 #   Int[Gamma[p_, d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := x*Gamma[p, d*(a + b*Log[c*x^n])] + b*d*n*E^(-a*d)* Int[(d*(a + b*Log[c*x^n]))^(p - 1)/(c*x^n)^(b*d), x] /; FreeQ[{a, b, c, d, n, p}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p) Int(Gamma(P_p,(O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))),Xv) = ((((Xv)*(Gamma(P_p,((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))))+(((O_b)*(O_d)*(O_n)*(exp((((-1))*(O_a)*(O_d))))*(Int(((((((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))^(((P_p)+((-1))))))*(((((((O_c)*(((Xv)^(O_n)))))^(((O_b)*(O_d)))))^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p) Int(Gamma(P_p,(O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))),Xv) = ((((Xv)*(Gamma(P_p,((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))))+(((O_b)*(O_d)*(O_n)*((eE^((((-1))*(O_a)*(O_d)))))*(Int(((((((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))^(((P_p)+((-1))))))*(((((((O_c)*(((Xv)^(O_n)))))^(((O_b)*(O_d)))))^((-1))))),Xv)))))
 
 # Regel 21 (324 Varianten):
 #   Int[Gamma[p_, d_.*(a_. + b_.*Log[c_.*x_^n_.])]/x_, x_Symbol] := 1/n*Subst[Gamma[p, d*(a + b*x)], x, Log[c*x^n]] /; FreeQ[{a, b, c, d, n, p}, x]
@@ -88,7 +88,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p) Int((Gamma
 
 # Regel 22 (1944 Varianten):
 #   Int[(e_.*x_)^m_.*Gamma[p_, d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := (e*x)^(m + 1)*Gamma[p, d*(a + b*Log[c*x^n])]/(e*(m + 1)) + b*d*n*E^(-a*d)*(e*x)^(b*d*n)/((m + 1)*(c*x^n)^(b*d))* Int[(e*x)^(m - b*d*n)*(d*(a + b*Log[c*x^n]))^(p - 1), x] /; FreeQ[{a, b, c, d, e, m, n, p}, x] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n,P_p), (neq(O_m,(-1))) Int((((O_e)*(Xv))^(O_m))*(Gamma(P_p,(O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))))),Xv) = ((((((((O_e)*(Xv)))^(((O_m)+(1)))))*(Gamma(P_p,((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))*(((((O_e)*(((O_m)+(1)))))^((-1))))))+(((O_b)*(O_d)*(O_n)*(exp((((-1))*(O_a)*(O_d))))*(((((O_e)*(Xv)))^(((O_b)*(O_d)*(O_n)))))*(((((((O_m)+(1)))*(((((O_c)*(((Xv)^(O_n)))))^(((O_b)*(O_d)))))))^((-1))))*(Int(((((((O_e)*(Xv)))^(((O_m)+((((-1))*(O_b)*(O_d)*(O_n)))))))*(((((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))^(((P_p)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n,P_p), (neq(O_m,(-1))) Int((((O_e)*(Xv))^(O_m))*(Gamma(P_p,(O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))))),Xv) = ((((((((O_e)*(Xv)))^(((O_m)+(1)))))*(Gamma(P_p,((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))*(((((O_e)*(((O_m)+(1)))))^((-1))))))+(((O_b)*(O_d)*(O_n)*((eE^((((-1))*(O_a)*(O_d)))))*(((((O_e)*(Xv)))^(((O_b)*(O_d)*(O_n)))))*(((((((O_m)+(1)))*(((((O_c)*(((Xv)^(O_n)))))^(((O_b)*(O_d)))))))^((-1))))*(Int(((((((O_e)*(Xv)))^(((O_m)+((((-1))*(O_b)*(O_d)*(O_n)))))))*(((((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))^(((P_p)+((-1))))))),Xv)))))
 
 # Regel 23 (972 Varianten):
 #   Int[Gamma[p_, f_.*(a_. + b_.*Log[c_.*(d_ + e_.*x_)^n_.])], x_Symbol] := 1/e*Subst[Int[Gamma[p, f*(a + b*Log[c*x^n])], x], x, d + e*x] /; FreeQ[{a, b, c, d, e, f, n, p}, x]

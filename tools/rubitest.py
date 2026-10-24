@@ -502,7 +502,7 @@ def main():
             status, info = (p[5], p[6]) if p[5] else results[p[0]]
             counts[status] = counts.get(status, 0) + 1
             totals[status] = totals.get(status, 0) + 1
-            line = '%-10s %s  %s  ->  %s' % (status, p[0], p[1][:200], (info or '')[:300])
+            line = '%-10s %s  %s  ->  %s' % (status, p[0], p[1][:200], (info or ''))
             if report:
                 report.write(line + '\n')
             if opts['verbose']:

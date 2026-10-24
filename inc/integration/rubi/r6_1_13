@@ -8,11 +8,11 @@
 
 # Regel 1 (54 Varianten):
 #   Int[Sinh[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := 1/2*Int[E^(a + b*x + c*x^2), x] - 1/2*Int[E^(-a - b*x - c*x^2), x] /; FreeQ[{a, b, c}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c) Int(sinh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))),Xv) = (((((1/2))*(Int(exp(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))),Xv))))+((((-(1/2)))*(Int(exp((((((-1))*(O_a)))+((((-1))*(O_b)*(Xv)))+((((-1))*(O_c)*(((Xv)^(2))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c) Int(sinh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))),Xv) = (((((1/2))*(Int((eE^(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))),Xv))))+((((-(1/2)))*(Int((eE^((((((-1))*(O_a)))+((((-1))*(O_b)*(Xv)))+((((-1))*(O_c)*(((Xv)^(2)))))))),Xv)))))
 
 # Regel 2 (54 Varianten):
 #   Int[Cosh[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := 1/2*Int[E^(a + b*x + c*x^2), x] + 1/2*Int[E^(-a - b*x - c*x^2), x] /; FreeQ[{a, b, c}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c) Int(cosh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))),Xv) = (((((1/2))*(Int(exp(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))),Xv))))+((((1/2))*(Int(exp((((((-1))*(O_a)))+((((-1))*(O_b)*(Xv)))+((((-1))*(O_c)*(((Xv)^(2))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c) Int(cosh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))),Xv) = (((((1/2))*(Int((eE^(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))),Xv))))+((((1/2))*(Int((eE^((((((-1))*(O_a)))+((((-1))*(O_b)*(Xv)))+((((-1))*(O_c)*(((Xv)^(2)))))))),Xv)))))
 
 # Regel 3 (54 Varianten):
 #   Int[Sinh[a_. + b_.*x_ + c_.*x_^2]^n_, x_Symbol] := Int[ExpandTrigReduce[Sinh[a + b*x + c*x^2]^n, x], x] /; FreeQ[{a, b, c}, x] && IGtQ[n, 1]

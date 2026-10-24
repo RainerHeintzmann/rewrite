@@ -2232,6 +2232,81 @@ static Node * s_substint (Node * a[], int n, Symbol * f)
 	return mk_f3("subst", mk_f2("Int", u, w), tcpy(w), tcpy(a[2]));
 }
 
+/* ---- hyp2exp(u, x): hyperbolic functions of x as exponentials ----
+ * Rubi integrates sinh, cosh, ... by turning them into sin, cos of an
+ * imaginary argument, which needs complex numbers. Instead, the last rule
+ * of the rule list writes them with e^u (sinh u = (e^u - e^-u)/2, ...) and
+ * multiplies out, so that the rules for exponentials apply. */
+
+static Node * ex_pow (Node * u, int k)		/* e^(k u) */
+{
+	Node * arg = (k == 1) ? tcpy(u) : mk_mul(mk_int(k), tcpy(u));
+	Symbol * es = find_symbol("eE");	/* symbolic e of the integration */
+	return mk_pow(es ? mknod(Const, (Node *) es, NULL) : mk_num(M_E), arg);
+}
+
+static Node * hyp2exp (Node * u, Node * x, int * changed)
+{
+	Node * a;
+	int k, n;
+	u = deref(u);
+	if (! u || u->type != Func || ! contains(u, x)) return tcpy(u);
+	if (term_nargs(u) == 1 && contains(arg(u, 0), x))
+		{
+		const char * h = name(TERM_HEAD(u));
+		Node * inner = hyp2exp(arg(u, 0), x, changed), * r = NULL;
+		if (! strcmp(h, "sinh"))
+			r = mk_mul(mk_num_ex(0.5, 1), mk_add(ex_pow(inner, 1), mk_neg(ex_pow(inner, -1))));
+		else if (! strcmp(h, "cosh"))
+			r = mk_mul(mk_num_ex(0.5, 1), mk_add(ex_pow(inner, 1), ex_pow(inner, -1)));
+		else if (! strcmp(h, "tanh"))
+			r = mk_mul(mk_add(ex_pow(inner, 2), mk_int(-1)), mk_pow(mk_add(ex_pow(inner, 2), mk_int(1)), mk_int(-1)));
+		else if (! strcmp(h, "coth"))
+			r = mk_mul(mk_add(ex_pow(inner, 2), mk_int(1)), mk_pow(mk_add(ex_pow(inner, 2), mk_int(-1)), mk_int(-1)));
+		else if (! strcmp(h, "sech"))
+			r = mk_mul(mk_int(2), mk_pow(mk_add(ex_pow(inner, 1), ex_pow(inner, -1)), mk_int(-1)));
+		else if (! strcmp(h, "csch"))
+			r = mk_mul(mk_int(2), mk_pow(mk_add(ex_pow(inner, 1), mk_neg(ex_pow(inner, -1))), mk_int(-1)));
+		if (r)
+			{
+			delete(inner);
+			* changed = 1;
+			return r;
+			}
+		a = mknod(Func, u->l, inner);		/* other function: keep */
+		return a;
+		}
+	n = term_nargs(u);
+	{
+	Node * args = NULL, ** tail = & args;
+	for (k = 0; k < n; k++)
+		{
+		Node * c = hyp2exp(arg(u, k), x, changed);
+		if (k < n - 1)
+			{
+			* tail = mknod(Terms, c, NULL);
+			tail = & (* tail)->r;
+			}
+		else
+			* tail = c;
+		}
+	return mknod(Func, u->l, args);
+	}
+}
+
+static Node * s_hyp2exp (Node * a[], int n, Symbol * f)
+{
+	int changed = 0;
+	Node * r;
+	TList l = {0};
+	if (n != 2) return NULL;
+	r = hyp2exp(a[0], a[1], & changed);
+	if (! changed) return r;		/* no hyperbolic function: unchanged */
+	expand_to(r, & l);			/* multiply out */
+	delete(r);
+	return tl_collect(& l);
+}
+
 /* ================= trivial simplification of rule results ================= */
 
 static int num_is (Node * t, double v)
@@ -2320,6 +2395,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "normpoly",        s_normpoly },
 	{ "deriv",           s_deriv },
 	{ "collect",         s_collect },
+	{ "hyp2exp", s_hyp2exp },
 	{ "intsubst", s_substint },
 	{ "binomialmatchq", s_binomialmatchq },
 	{ "quadraticmatchq", s_quadraticmatchq },

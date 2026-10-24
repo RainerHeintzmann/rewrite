@@ -580,7 +580,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d), (eqq(((((O_b)^(2)))+((((-1))*(((
 
 # Regel 100 (108 Varianten):
 #   Int[u_.*(a_.*Cos[v_] + b_.*Sin[v_])^n_., x_Symbol] := Int[u*(a*E^(-a/b*v))^n, x] /; FreeQ[{a, b, n}, x] && EqQ[a^2 + b^2, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_n), (eqq(((((O_a)^(2)))+(((O_b)^(2)))),0)) Int((O_u)*((((O_a)*(cos(P_v)))+((O_b)*(sin(P_v))))^(O_n)),Xv) = Int(((O_u)*(((((O_a)*(exp((((-1))*(O_a)*(((O_b)^((-1))))*(P_v))))))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_n), (eqq(((((O_a)^(2)))+(((O_b)^(2)))),0)) Int((O_u)*((((O_a)*(cos(P_v)))+((O_b)*(sin(P_v))))^(O_n)),Xv) = Int(((O_u)*(((((O_a)*((eE^((((-1))*(O_a)*(((O_b)^((-1))))*(P_v)))))))^(O_n)))),Xv)
 
 # Regel 101 nicht uebersetzt: symbol I
 #   Int[Sin[d_.*(a_. + b_.*Log[c_.*x_^n_.])^2], x_Symbol] := I/2*Int[E^(-I*d*(a + b*Log[c*x^n])^2), x] - I/2*Int[E^(I*d*(a + b*Log[c*x^n])^2), x] /; FreeQ[{a, b, c, d, n}, x]

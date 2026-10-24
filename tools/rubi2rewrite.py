@@ -360,7 +360,7 @@ PREDICATES = {
     'AlgebraicFunctionQ': 'algebraicfunctionq',
 }
 ORDER = {'GtQ': '>', 'LtQ': '<', 'GeQ': '>=', 'LeQ': '<='}
-CONSTANTS = {'Pi': 'pi', 'E': 'e'}
+CONSTANTS = {'Pi': 'pi', 'E': 'eE'}
 
 
 def fmt_num(q):
@@ -426,10 +426,7 @@ def tr_lhs(e, ctx):
         if e[1] == 'Pi':
             return repr(3.141592653589793)
         if e[1] == 'E':
-            k = 'K_%d' % (len(ctx.kvars) + 1)
-            ctx.kvars.append(k)
-            ctx.extra.append('(abs(%s - e) < 1e-9)' % k)
-            return k
+            return 'eE'                  # symbolic e (inc/integration/base)
         raise Untranslatable("symbol %s in pattern" % e[1])
     head, args = e[1], e[2]
     if head == 'Plus':
@@ -438,11 +435,8 @@ def tr_lhs(e, ctx):
         return '*'.join(paren(tr_lhs(a, ctx)) for a in args)
     if head == 'Power':
         if args[0] == ('sym', 'E'):
-            # E^u: e is a number in rewrite terms; matched by a NUM placeholder
-            k = 'K_%d' % (len(ctx.kvars) + 1)
-            ctx.kvars.append(k)
-            ctx.extra.append('(abs(%s - e) < 1e-9)' % k)
-            return paren(k) + '^' + paren(tr_lhs(args[1], ctx))
+            # E^u: the symbolic constant eE, as Mathematica's E
+            return 'eE^' + paren(tr_lhs(args[1], ctx))
         return paren(tr_lhs(args[0], ctx)) + '^' + paren(tr_lhs(args[1], ctx))
     if head in FUNCS:
         return FUNCS[head] + paren(','.join(tr_lhs(a, ctx) for a in args))
@@ -472,7 +466,7 @@ def tr_rhs(e, ctx):
         return paren('*'.join(paren(tr_rhs(a, ctx)) for a in args))
     if head == 'Power':
         if args[0] == ('sym', 'E'):
-            return 'exp' + paren(tr_rhs(args[1], ctx))
+            return paren('eE^' + paren(tr_rhs(args[1], ctx)))
         return paren(paren(tr_rhs(args[0], ctx)) + '^' + paren(tr_rhs(args[1], ctx)))
     if head in FUNCS:
         return FUNCS[head] + paren(','.join(tr_rhs(a, ctx) for a in args))
@@ -733,6 +727,24 @@ def translate_rule(text):
     return out
 
 
+def default_guards(pattern, result, conds, ctx):
+    """An optional variable b_. that occurs neither in the conditions nor in
+    the result can only have its default value: Mathematica writes
+    (b*tan[u])^3 as b^3*tan[u]^3, so Rubi's pattern (b_.*tan[u])^n_ sees
+    b = 1 there. rewrite keeps (-tan(u))^3, so the rule must check it."""
+    out = []
+    used = result + ' ' + ' '.join(conds)
+    for v in sorted(set(ctx.pvars.values())):
+        if not v.startswith('O_') or re.search(r'\b%s\b' % v, used):
+            continue
+        r = re.escape('(%s)' % v)
+        if re.search(r'\+' + r + '|' + r + r'\+', pattern):
+            out.append('(eqq(%s,0))' % v)
+        elif re.search(r'[*^]' + r + '|' + r + r'\*', pattern):
+            out.append('(eqq(%s,1))' % v)
+    return out
+
+
 def translate_parsed(lhs, rhs):
 
     conds_ast = []
@@ -753,6 +765,7 @@ def translate_parsed(lhs, rhs):
     for c in conds_ast:
         conds.extend(tr_conditions(normalize(c), ctx))
     conds = ctx.extra + conds
+    conds += default_guards(pattern, result, conds, ctx)
     rule = 'ADDSPEC RubiRules : '
     if conds:
         rule += 'IF ' + ', '.join(conds) + ' '
@@ -911,6 +924,9 @@ ADDSPEC RubiRules : Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)
 ADDSPEC RubiRules : Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)
 ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
 %s
+# zuletzt: Hyperbelfunktionen, fuer die keine Regel passt, als e^u schreiben
+# (Rubi nimmt dafuer sin, cos mit imaginaerem Argument)
+ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
 
 # am Ende: gleiche Summanden des Ergebnisses zusammenfassen
 ALG RubiCollect
@@ -943,12 +959,82 @@ def ordered_files(rule_dir, order_file):
     return files
 
 
+UNIFY_HEADER = """# r4_0_unify
+# Automatisch erzeugt von tools/rubi2rewrite.py aus Rubis Hilfsfunktion
+# UnifyInertTrigFunction (Rubi 4.17.3, MIT-Lizenz, siehe LICENSE.Rubi).
+# Rubi hat seine Regeln fuer Potenzen meist nur fuer sin, csc, tan; vor den
+# Trigonometrie-Regeln schreibt es cos(e+f x) als sin(e+pi/2+f x) usw.
+# Jede Definition UnifyInertTrigFunction[P, x] := R /; C wird hier zur Regel
+# Int(P, x) = Int(R, x) mit der Bedingung C. IntOut macht aus
+# sin(pi/2 + u) am Ende wieder cos(u).
+"""
+
+
+def translate_unify(util_path, out_dir, all_vars, stats):
+    """Rubi's UnifyInertTrigFunction definitions as Int rules (file r4_0_unify)"""
+    with open(util_path, encoding='utf-8', errors='replace') as f:
+        text = f.read()
+    text = re.sub(r'\(\*.*?\*\)', ' ', text, flags=re.S)
+    stmts, stmt, depth = [], None, 0
+    for line in text.split('\n'):
+        line = line.strip()
+        if stmt is None:
+            if not line.startswith('UnifyInertTrigFunction['):
+                continue
+            stmt, depth = line, 0
+        else:
+            stmt += ' ' + line
+        depth += sum(line.count(c) for c in '[({') - sum(line.count(c) for c in '])}')
+        if depth <= 0 and not stmt.rstrip().endswith(CONTINUES):
+            stmts.append(stmt)
+            stmt = None
+    lines = [UNIFY_HEADER]
+    ok = 0
+    for i, st in enumerate(stmts, 1):
+        lhs_s, rhs_s = split_top(st, ':=')
+        if rhs_s is None:
+            continue
+        inner = lhs_s.strip()[len('UnifyInertTrigFunction['):].rstrip()
+        if not inner.endswith(']'):
+            continue
+        u_s, x_s = split_top(inner[:-1], ',')
+        while x_s is not None and ',' in x_s:      # the last argument is x_
+            more, x_s = split_top(x_s, ',')
+            u_s = u_s + ',' + more
+        if x_s is None or x_s.strip() != 'x_' or u_s.strip() in ('u_', 'a_*u_'):
+            continue
+        body, cond = split_top(rhs_s, '/;')
+        rule = 'Int[%s, x_Symbol] := Int[%s, x]' % (u_s, body)
+        if cond is not None:
+            rule += ' /; ' + cond
+        try:
+            results = translate_rule(rule)
+        except (Untranslatable, RecursionError, IndexError) as err:
+            lines.append('# Definition %d nicht uebersetzt: %s\n#   %s\n' % (i, err, st))
+            continue
+        ok += 1
+        for k, (r, nvar, ctx) in enumerate(results):
+            all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('P_'))
+            all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('O_'))
+            all_vars['K'].update(ctx.kvars)
+            lines.append(('# Definition %d:\n#   %s\n' % (i, st) if k == 0 else '') + r + '\n')
+    with open(os.path.join(out_dir, 'r4_0_unify'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write('\n'.join(lines))
+    stats['unify'] = (ok, len(stmts))
+    return 'r4_0_unify'
+
+
 def main():
     args = [a for a in sys.argv[1:] if a != '--stats']
     order_file = None
     if '--order' in args:
         i = args.index('--order')
         order_file = args[i + 1]
+        del args[i:i + 2]
+    util_file = None
+    if '--util' in args:
+        i = args.index('--util')
+        util_file = args[i + 1]
         del args[i:i + 2]
     if len(args) != 2:
         print(__doc__)
@@ -966,6 +1052,8 @@ def main():
         name = translate_file(p, out_dir, all_vars, stats)
         if name in names:
             raise SystemExit('two rule files give the same name %s' % name)
+        if util_file and name.startswith('r4_') and 'r4_0_unify' not in names:
+            names.append(translate_unify(util_file, out_dir, all_vars, stats))
         names.append(name)
 
     with open(os.path.join(out_dir, 'declarations'), 'w', newline='\n') as f:
