@@ -240,3 +240,24 @@ Node * arg_sort (Node * a)
 	if (a->type == Terms) return NULL;
 	return rtypes((Symbol *) a->l);
 }
+
+void * exact_to_rat (Symbol * s)
+{
+	Node * rs = ratsort();
+	if (! num_exact(s) || ! rs) return NULL;
+	return sort_convert(value(s), rtypes(s), rs);
+}
+
+Symbol * make_exact_rat (void * q)
+{
+	Node * rs = ratsort();
+	if (! rs) { del_rat(q); return NULL; }
+	if (rat_is_integer(q))
+		{
+		Node * s = (rat_sgn(q) >= 0) ? (Node *) intsort : integersort();
+		void * z = rat_numer(q);
+		del_rat(q);
+		return mknum(z, s);
+		}
+	return mknum(q, rs);
+}

@@ -17,11 +17,12 @@
  *	  sumq(u), productq(u), powerq(u)  form of the top level of u
  *	Term functions:
  *	  expand(u)            multiply out products and integer powers of sums
- *	  expandintegrand(u,x), expandintegrand(u,v,x)   expand(u), expand(u*v)
+ *	  expandintegrand(u,x), expandintegrand(u,v,x)   expand(u), expand(u*v);
+ *	                       partial fractions of a rational function
  *	  coeff(u,x,n)         coefficient of x^n in u
  *	  expon(u,x)           degree of u in x
  *	  subst(u,x,v)         u with x replaced by v
- *	  simp(u,x), simplify(u)  u (simplification is left to the rule sets)
+ *	  simp(u,x), simplify(u)  u with like powers in a product combined
  *	  dist(u,v,x)          u*v
  *	  rt(u,n)              n-th root of u
  *	  intpart(u), fracpart(u)  integer / non-integer part of numbers
@@ -52,6 +53,8 @@
 #include "userfkt.h"  /* MAXARGS */
 #include "symfkt.h"
 #include "numsort.h"	/* 2026: integer, rational */
+#include "exact.h"
+#include "apart.h"	/* partial fractions */
 
 /* ================= basic term helpers ================= */
 
@@ -191,6 +194,12 @@ int term_has_nan (Node * t)	/* contains NaN, infinity or a division by zero */
 	if (is_head(t, "^", 2) && is_num(arg(t, 0), & v) && v == 0
 	    && is_num(arg(t, 1), & v) && v < 0) return 1;
 	if (is_head(t, "mi", 1) && is_num(arg(t, 0), & v) && v == 0) return 1;
+	/* a polynomial division that was not possible (no polynomial), or an
+	 * expansion that did not apply (partial fractions with symbolic
+	 * coefficients): the rule assumed Mathematica's semantics, its result is
+	 * of no use */
+	if (is_head(t, "polyquotient", 3) || is_head(t, "polyremainder", 3)
+	    || is_head(t, "expandintegrand", -1)) return 1;
 	n = term_nargs(t);
 	for (i = 0; i < n; i++)
 		if (term_has_nan(arg(t, i))) return 1;
@@ -707,11 +716,30 @@ static Node * s_iltq (Node * a[], int n, Symbol * f)
 	return mk_bool(num_value(a[0], & u) && u == floor(u) && num_value(a[1], & m) && u < m, f);
 }
 
+static int poly_coeffs (Node * u, Node * x, Node * c[], int * deg);
+
+/* polynomial in x^k: a polynomial in x with only the powers k*j */
+static int poly_in_power (Node * u, Node * x, int k)
+{
+	Node * c[64];
+	int deg, j, ok = 1;
+	if (! poly_coeffs(u, x, c, & deg)) return 0;
+	for (j = 0; j <= deg; j++)
+		{
+		if (j % k != 0 && ! is_zero(c[j])) ok = 0;
+		delete(c[j]);
+		}
+	return ok;
+}
+
 static Node * s_polyq (Node * a[], int n, Symbol * f)
 {
-	double deg, want;
+	double deg, want, k;
 	Node * c = NULL;
 	int ok;
+	if (n == 2 && is_head(a[1], "^", 2) && ! is_head(arg(a[1], 0), "+", -1)
+	    && num_value(arg(a[1], 1), & k) && k == floor(k) && k >= 1)	/* PolyQ[u, x^n] */
+		return mk_bool(poly_in_power(a[0], arg(a[1], 0), (int) k), f);
 	if (n == 2)
 		return mk_bool(poly_info(a[0], a[1], & deg, -1, NULL), f);
 	if (n != 3 || ! num_value(a[2], & want)) return NULL;
@@ -757,6 +785,7 @@ static Node * s_expand (Node * a[], int n, Symbol * f)
 }
 
 static Node * expand_linear_product (Node * u, Node * x);
+static Node * apart_term (Node * u, Node * x);
 
 static Node * s_expandintegrand (Node * a[], int n, Symbol * f)
 {
@@ -770,6 +799,11 @@ static Node * s_expandintegrand (Node * a[], int n, Symbol * f)
 		in = mk_mul(tcpy(a[0]), tcpy(a[1]));
 	else
 		return NULL;
+	if ((r = apart_term(in, a[n - 1])) != NULL)	/* rational function */
+		{
+		delete(in);
+		return r;
+		}
 	expand_to(in, & l);
 	r = tl_collect(& l);
 	/* Rubi rules like Int[u] := Int[ExpandIntegrand[u,x],x] loop if the
@@ -833,9 +867,74 @@ static Node * s_subst (Node * a[], int n, Symbol * f)
 	return replace(a[0], a[1], a[2]);
 }
 
+/* a product of powers with like bases combined, as Mathematica's automatic
+ * simplification does: (a*b)^k = a^k*b^k and (a^m)^k = a^(m*k) for integer
+ * k, a^m*a^n = a^(m+n); numbers are multiplied */
+#define MAXPF 64
+typedef struct { Node * base; double e; } PowFac;
+
+static int pf_collect (Node * u, double k, PowFac * pf, int * n, Node ** coef)
+{
+	double e;
+	int i;
+	u = deref(u);
+	if (is_head(u, "*", 2))
+		return pf_collect(arg(u, 0), k, pf, n, coef)
+		    && pf_collect(arg(u, 1), k, pf, n, coef);
+	if (is_head(u, "/", 2))
+		return pf_collect(arg(u, 0), k, pf, n, coef)
+		    && pf_collect(arg(u, 1), -k, pf, n, coef);
+	if (is_head(u, "mi", 1))
+		return pf_collect(arg(u, 0), -k, pf, n, coef);
+	if (is_head(u, "^", 2) && num_value(arg(u, 1), & e) && e == floor(e))
+		return pf_collect(arg(u, 0), k * e, pf, n, coef);
+	if (num_sym(u))
+		{
+		* coef = mk_mul(* coef, mk_pow(tcpy(u), mk_int(k)));
+		return 1;
+		}
+	for (i = 0; i < * n; i++)
+		if (tequal(pf[i].base, u))
+			{
+			pf[i].e += k;
+			return 1;
+			}
+	if (* n == MAXPF) return 0;
+	pf[* n].base = u;
+	pf[(* n)++].e = k;
+	return 1;
+}
+
+static Node * simp_product (Node * u)
+{
+	PowFac pf[MAXPF];
+	Node * coef = mk_int(1), * r = NULL;
+	double c;
+	int n = 0, i, pass;
+	if (! pf_collect(u, 1, pf, & n, & coef)) { delete(coef); return tcpy(u); }
+	/* powers and atoms first, other functions (ln, arcsec, ...) last: the
+	 * matcher does not regroup products, and Rubi's patterns u*(a+b*f(x))
+	 * need the function at the top level */
+	for (pass = 0; pass < 2; pass++)
+		for (i = 0; i < n; i++)
+			{
+			Node * t;
+			int fn = pf[i].e == 1 && deref(pf[i].base)->type == Func
+			         && ! is_head(pf[i].base, "+", -1) && ! is_head(pf[i].base, "^", -1);
+			if (pf[i].e == 0 || fn != pass) continue;
+			t = pf[i].e == 1 ? tcpy(pf[i].base) : mk_pow(tcpy(pf[i].base), mk_int(pf[i].e));
+			r = r ? mk_mul(r, t) : t;
+			}
+	if (! r) return coef;
+	if (num_value(coef, & c) && c == 1) { delete(coef); return r; }
+	return mk_mul(coef, r);
+}
+
 static Node * s_simp (Node * a[], int n, Symbol * f)	/* simp(u,x), simplify(u) */
 {
 	if (n < 1 || n > 2) return NULL;
+	if (is_head(a[0], "*", 2) || is_head(a[0], "^", 2) || is_head(a[0], "/", 2))
+		return simp_product(a[0]);
 	return tcpy(a[0]);
 }
 
@@ -1079,8 +1178,21 @@ static Node * poly_build (Node * c[], int deg, Node * x)	/* takes the c[k] */
 	int k;
 	for (k = 0; k <= deg; k++)
 		{
+		Node * t;
 		if (is_zero(c[k])) { delete(c[k]); continue; }
-		s = mk_add(s, k == 0 ? c[k] : mk_mul(c[k], mk_pow(tcpy(x), mk_int(k))));
+		if (k == 0)
+			t = c[k];
+		else if (is_head(c[k], "*", 2) && num_sym(arg(c[k], 0)))
+			{
+			/* (n*b)*x^k as n*(b*x^k), the form of RubiNorm (else the two
+			 * rule sets turn it back and forth) */
+			t = mk_mul(tcpy(arg(c[k], 0)),
+				mk_mul(tcpy(arg(c[k], 1)), mk_pow(tcpy(x), mk_int(k))));
+			delete(c[k]);
+			}
+		else
+			t = mk_mul(c[k], mk_pow(tcpy(x), mk_int(k)));
+		s = mk_add(s, t);
 		}
 	return s ? s : mk_int(0);
 }
@@ -1161,15 +1273,18 @@ static Node * expand_linear_product (Node * u, Node * x)
 		double e;
 		if (! lin && is_head(t, "^", 2) && contains(arg(t, 0), x)
 		    && ! contains(arg(t, 1), x)
-		    && ! (num_value(arg(t, 1), & e) && e >= 0 && e == floor(e)))
+		    && ! (num_value(arg(t, 1), & e) && e >= 0 && e == floor(e))
+		    && poly_coeffs(arg(t, 0), x, lc, & dl))
 			{
-			if (! poly_coeffs(arg(t, 0), x, lc, & dl)) continue;
-			if (dl != 1) { delete(lc[0]); delete(lc[1]); continue; }
-			lin = arg(t, 0);
-			expo = arg(t, 1);
-			continue;
+			if (dl == 1)
+				{
+				lin = arg(t, 0);
+				expo = arg(t, 1);
+				continue;
+				}
+			for (k = 0; k <= dl; k++) delete(lc[k]);
 			}
-		rest = rest ? mk_mul(rest, tcpy(t)) : tcpy(t);
+		rest = rest ? mk_mul(rest, tcpy(t)) : tcpy(t);	/* also other powers */
 		}
 	l.n = 0;
 	tl_free(& l);
@@ -1201,6 +1316,85 @@ static Node * expand_linear_product (Node * u, Node * x)
 		}
 	for (j = 0; j <= deg; j++) delete(p[j]);
 	delete(lc[0]); delete(lc[1]);
+	return r;
+}
+
+/* ---- partial fractions (Mathematica's Apart, see apart.c) ---- */
+
+/* u as a rational function of x with exact coefficients, or NULL */
+static RatFun * to_ratfun (Node * u, Node * x)
+{
+	Symbol * s;
+	Node * r;
+	void * q;
+	double e;
+	u = deref(u);
+	if (! u) return NULL;
+	if (tequal(u, x)) return rf_var();
+	if ((s = num_sym(u)) != NULL)
+		return (q = exact_to_rat(s)) != NULL ? rf_const(q) : NULL;
+	if (u->type != Func) return NULL;
+	if (! contains(u, x))			/* a calculable number like 1/3 */
+		{
+		if (! (r = calkulate(u))) return NULL;
+		q = exact_to_rat((Symbol *) r);
+		delnum((Symbol *) r, TRUE);
+		return q ? rf_const(q) : NULL;
+		}
+	if (is_head(u, "+", 2))
+		return rf_add(to_ratfun(arg(u, 0), x), to_ratfun(arg(u, 1), x));
+	if (is_head(u, "-", 2))
+		return rf_add(to_ratfun(arg(u, 0), x),
+			rf_mul(rf_const(rat_from_ll(-1, 1)), to_ratfun(arg(u, 1), x)));
+	if (is_head(u, "-", 1))
+		return rf_mul(rf_const(rat_from_ll(-1, 1)), to_ratfun(arg(u, 0), x));
+	if (is_head(u, "*", 2))
+		return rf_mul(to_ratfun(arg(u, 0), x), to_ratfun(arg(u, 1), x));
+	if (is_head(u, "/", 2))
+		return rf_mul(to_ratfun(arg(u, 0), x), rf_pow(to_ratfun(arg(u, 1), x), -1));
+	if (is_head(u, "mi", 1))
+		return rf_pow(to_ratfun(arg(u, 0), x), -1);
+	if (is_head(u, "^", 2) && ! contains(arg(u, 1), x) && num_value(arg(u, 1), & e)
+	    && e == floor(e) && fabs(e) <= MAXDEG)
+		return rf_pow(to_ratfun(arg(u, 0), x), (int) e);
+	return NULL;
+}
+
+static Node * qpoly_term (QPoly * p, Node * x)
+{
+	Node * c[MAXDEG];
+	int k;
+	if (p->deg < 0) return mk_int(0);
+	for (k = 0; k <= p->deg; k++)
+		c[k] = mknod(Const, (Node *) make_exact_rat(cpy_rat(p->c[k])), NULL);
+	return poly_build(c, p->deg, x);
+}
+
+/* the partial fractions of the rational function u, if they are a sum;
+ * else NULL */
+static Node * apart_term (Node * u, Node * x)
+{
+	RatFun * f;
+	QPoly quot;
+	ApartTerm * t;
+	Node * r = NULL;
+	int n, i;
+	if (! exact_numbers() || ! (f = to_ratfun(u, x))) return NULL;
+	if ((n = rf_apart(f, & quot, & t)) < 0) return NULL;
+	if (n + (quot.deg >= 0) >= 2)
+		{
+		if (quot.deg >= 0) r = qpoly_term(& quot, x);
+		for (i = 0; i < n; i++)		/* coef * (num * base^-k), flat as in Mathematica */
+			{
+			Node * s = mk_pow(qpoly_term(& t[i].base, x), mk_int(-t[i].k));
+			Node * c = mknod(Const, (Node *) make_exact_rat(cpy_rat(t[i].coef)), NULL);
+			if (t[i].num.deg > 0) s = mk_mul(qpoly_term(& t[i].num, x), s);
+			if (! mpq_is_one(t[i].coef)) s = mk_mul(c, s); else delete(c);
+			r = mk_add(r, s);
+			}
+		}
+	qpoly_clear(& quot);
+	apart_free(t, n);
 	return r;
 }
 
@@ -1330,16 +1524,41 @@ static Node * s_normpoly (Node * a[], int n, Symbol * f)
 	Node * r = NULL;
 	int i;
 	if (n != 2) return NULL;
+	Node * coef = NULL;
+	double c;
 	if (! is_head(a[0], "*", 2)) return normpoly(a[0], a[1]);
 	factors_to(a[0], & l);
 	for (i = 0; i < l.n; i++)
 		{
 		Node * t = normpoly_factor(l.t[i], a[1]);
+		/* numbers to the front, also the content of a polynomial factor:
+		 * c*(p*u), not (c*p)*u, so that rules for constant factors match */
+		if (num_sym(t))
+			{
+			coef = coef ? mk_mul(coef, t) : t;
+			continue;
+			}
+		if (is_head(t, "*", 2) && num_sym(arg(t, 0)))
+			{
+			Node * p = tcpy(arg(t, 1));
+			coef = coef ? mk_mul(coef, tcpy(arg(t, 0))) : tcpy(arg(t, 0));
+			delete(t);
+			t = p;
+			}
 		r = r ? mk_mul(r, t) : t;
 		}
 	l.n = 0;	/* the factors belong to a[0] */
 	tl_free(& l);
-	return r;
+	if (is_head(r, "*", 2))		/* x*x^-1 = 1, as Mathematica simplifies */
+		{
+		Node * s = simp_product(r);
+		delete(r);
+		r = s;
+		}
+	if (! coef) return r;
+	if (! r) return coef;
+	if (num_value(coef, & c) && c == 1) { delete(coef); return r; }
+	return mk_mul(coef, r);
 }
 
 /* derivative of u with respect to x, or NULL for unknown functions */
@@ -1635,6 +1854,27 @@ static Node * s_rationalfunctionq (Node * a[], int n, Symbol * f)
 	return mk_bool(ratfunq(a[0], a[1]), f);
 }
 
+/* has u (in x) an antiderivative without inverse functions? Rubi's IntHide
+ * integrates, inthide leaves Int(u,x). For a rational function the partial
+ * fractions tell: c/b^1 gives ln or arctan, and so does p/b^k with b of
+ * degree 2 or more unless p has the degree of b' (x/(1+x^2)^2). Other
+ * integrands count as free, as Rubi's integration by parts is valid anyway. */
+static int int_invfree (Node * u, Node * x)
+{
+	RatFun * f;
+	QPoly quot;
+	ApartTerm * t;
+	int n, i, ok = 1;
+	if (! exact_numbers() || ! (f = to_ratfun(u, x))) return 1;
+	if ((n = rf_apart(f, & quot, & t)) < 0) return 1;	/* a polynomial */
+	for (i = 0; i < n; i++)
+		if (t[i].k == 1 || (t[i].base.deg >= 2 && t[i].num.deg != t[i].base.deg - 1))
+			ok = 0;
+	qpoly_clear(& quot);
+	apart_free(t, n);
+	return ok;
+}
+
 static int invfunfreeq (Node * u, Node * x)
 {
 	static const char * inv[] = { "ln", "arcsin", "arccos", "arctan", "arccot", "arcsec",
@@ -1643,6 +1883,8 @@ static int invfunfreeq (Node * u, Node * x)
 	int i, k, n;
 	u = deref(u);
 	if (! u || u->type != Func) return 1;
+	if (is_head(u, "Int", 2) && tequal(arg(u, 1), x))
+		return int_invfree(arg(u, 0), x);
 	for (i = 0; inv[i]; i++)
 		if (is_head(u, inv[i], -1)) return is_free(u, x);
 	n = term_nargs(u);
@@ -2330,8 +2572,19 @@ void term_simplify_trivial (Node ** p)
 	keep = NULL;
 	if (is_head(t, "^", 2))
 		{
+		double m, k;
 		if (num_is(b, 0)) { delete(t); * p = mk_int(1); return; }
 		if (num_is(b, 1)) keep = a;
+		/* (u^m)^k = u^(m*k) for integers m, k, e.g. (b^-1)^-1 = b */
+		else if (is_head(a, "^", 2) && num_value(arg(a, 1), & m) && m == floor(m)
+		         && num_value(b, & k) && k == floor(k))
+			{
+			Node * r = mk_pow(tcpy(arg(a, 0)), mk_int(m * k));
+			delete(t);
+			* p = r;
+			term_simplify_trivial(p);
+			return;
+			}
 		}
 	else if (is_head(t, "*", 2))
 		{
@@ -2430,15 +2683,31 @@ s_function * give_sfkt (const char * name)
 	return NULL;
 }
 
+static int has_builtin (Node * t)	/* is a builtin call somewhere in t? */
+{
+	t = deref(t);
+	if (! t || t->type == SYM_TYPE || t->type == Const) return 0;
+	if (t->type == Func && builtin(t->l)) return 1;
+	return has_builtin(t->l) || has_builtin(t->r);
+}
+
 Node * call_builtin (Node * term)
 {
 	Symbol * f = TERM_HEAD(term);
-	Node * args[MAXARGS], * a;
-	int n = 0;
+	Node * args[MAXARGS], * own[MAXARGS], * a;
+	int n = 0, i;
 	Node * res;
+	/* nested calls first, as in sumq(expandintegrand(u,x)): a condition is
+	 * calculated top-down (realcalk), which passes them unevaluated */
 	for (a = TERM_ARGS(term); a && n < MAXARGS; a = ARGS_NEXT(a))
-		args[n++] = deref(ARGS_ITEM(a));
+		{
+		Node * t = deref(ARGS_ITEM(a));
+		own[n] = has_builtin(t) ? tcalc(tcpy(t)) : NULL;
+		args[n] = own[n] ? deref(own[n]) : t;
+		n++;
+		}
 	res = ((s_function *) value(f))(args, n, f);
+	for (i = 0; i < n; i++) delete(own[i]);
 	retype_term(res);	/* function variants matching the sorts of the new arguments */
 	return res;
 }

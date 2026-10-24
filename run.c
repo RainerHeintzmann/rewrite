@@ -72,10 +72,11 @@ static long rewrite_steps = 0;
 static int  rewrite_depth = 0;
 static BOOLEAN step_limit_hit = FALSE;
 
-/* 2026: die zuletzt von Regellisten ersetzten Terme. Ein Ergebnis, das einem
-   davon gleicht, schliesst einen Zyklus (A -> B -> A) und gilt als kein Fortschritt. */
+/* 2026: die zuletzt von Regellisten ersetzten Terme und ihre Ergebnisse. Ein
+   Ergebnis, von dem die Kette der Ersetzungen wieder zum jetzigen Term fuehrt,
+   schliesst einen Zyklus (A -> B -> A) und gilt als kein Fortschritt. */
 #define NHIST 16
-static Node * hist[NHIST];
+static Node * hist[NHIST], * hist_to[NHIST];
 static int hist_rule[NHIST];
 static int hist_pos = 0;
 
@@ -85,15 +86,18 @@ static void hist_clear (void)
 	for (i = 0; i < NHIST; i++)
 		{
 		delete(hist[i]);
-		hist[i] = NULL;
+		delete(hist_to[i]);
+		hist[i] = hist_to[i] = NULL;
 		}
 	hist_pos = 0;
 }
 
-static void hist_add (Node * t, int rule)
+static void hist_add (Node * t, Node * to, int rule)
 {
 	delete(hist[hist_pos]);
+	delete(hist_to[hist_pos]);
 	hist[hist_pos] = term_copy(t);
+	hist_to[hist_pos] = term_copy(to);
 	hist_rule[hist_pos] = rule;
 	hist_pos = (hist_pos + 1) % NHIST;
 }
@@ -107,11 +111,30 @@ static BOOLEAN hist_revisit (Node * t, int rule)
 	return n >= 3;
 }
 
-static BOOLEAN hist_has (Node * t)
+static BOOLEAN has_subterm (Node * t, Node * s)
 {
-	int i;
-	for (i = 0; i < NHIST; i++)
-		if (hist[i] && term_equal(hist[i], t)) return TRUE;
+	if (! t) return FALSE;
+	if (term_equal(t, s)) return TRUE;
+	if (t->type == SYM_TYPE || t->type == Const) return FALSE;
+	return has_subterm(t->l, s) || has_subterm(t->r, s);
+}
+
+/* does old -> neu close a cycle? neu was replaced before, and the chain of
+ * replacements from there (also of subterms, as in A -> subst(B), B -> A)
+ * leads to old. A term that was replaced in another branch (Int(b,x) -> b*x
+ * elsewhere) may come up again. */
+static BOOLEAN hist_cycle (Node * neu, Node * old)
+{
+	Node * cur = neu;
+	int steps, i;
+	for (steps = 0; steps < NHIST; steps++)
+		{
+		for (i = 0; i < NHIST; i++)
+			if (hist[i] && has_subterm(cur, hist[i])) break;
+		if (i == NHIST) return FALSE;
+		cur = hist_to[i];
+		if (has_subterm(cur, old)) return TRUE;
+		}
 	return FALSE;
 }
 
@@ -172,7 +195,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 				/* 2026: in einer Regelliste wird eine Regel ohne Fortschritt
 				   (Ergebnis gleich dem Term) uebersprungen; die naechste wird versucht */
 				if (Baum && Baum->type == RULELIST
-				    && (term_equal(neu, old) || term_has_nan(neu) || hist_has(neu)
+				    && (term_equal(neu, old) || term_has_nan(neu) || hist_cycle(neu, old)
 				        || hist_revisit(old, found)))
 					{
 					DEBG((2,"REWR: rule %d makes no progress or gives NaN, skipped\n", found));
@@ -181,7 +204,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 					continue;
 					}
 				if (Baum && Baum->type == RULELIST)
-					hist_add(old, found);
+					hist_add(old, neu, found);
 				DEBG((2,"REWR: "));
 				DBFK(2,print(old));
 				* p_term = neu;

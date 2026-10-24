@@ -8,11 +8,11 @@
 
 # Regel 1 (6 Varianten):
 #   Int[ArcSec[c_ + d_.*x_], x_Symbol] := (c + d*x)*ArcSec[c + d*x]/d - Int[1/((c + d*x)*Sqrt[1 - 1/(c + d*x)^2]), x] /; FreeQ[{c, d}, x]
-ADDSPEC RubiRules : IF NIN(Xv,P_c,O_d) Int(arcsec((P_c)+((O_d)*(Xv))),Xv) = ((((((P_c)+(((O_d)*(Xv)))))*(arcsec(((P_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))))+((((-1))*(Int(((((((P_c)+(((O_d)*(Xv)))))*(((((1)+((((-1))*(((((P_c)+(((O_d)*(Xv)))))^((-2))))))))^((1/2))))))^((-1))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,P_c,O_d) Int(arcsec((P_c)+((O_d)*(Xv))),Xv) = ((((((P_c)+(((O_d)*(Xv)))))*(arcsec(((P_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))))+((((-1))*(Int(((((((P_c)+(((O_d)*(Xv)))))^((-1))))*(((((1)+((((-1))*(((((P_c)+(((O_d)*(Xv)))))^((-2))))))))^((-(1/2)))))),Xv)))))
 
 # Regel 2 (6 Varianten):
 #   Int[ArcCsc[c_ + d_.*x_], x_Symbol] := (c + d*x)*ArcCsc[c + d*x]/d + Int[1/((c + d*x)*Sqrt[1 - 1/(c + d*x)^2]), x] /; FreeQ[{c, d}, x]
-ADDSPEC RubiRules : IF NIN(Xv,P_c,O_d) Int(arccsc((P_c)+((O_d)*(Xv))),Xv) = ((((((P_c)+(((O_d)*(Xv)))))*(arccsc(((P_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))))+(Int(((((((P_c)+(((O_d)*(Xv)))))*(((((1)+((((-1))*(((((P_c)+(((O_d)*(Xv)))))^((-2))))))))^((1/2))))))^((-1))),Xv)))
+ADDSPEC RubiRules : IF NIN(Xv,P_c,O_d) Int(arccsc((P_c)+((O_d)*(Xv))),Xv) = ((((((P_c)+(((O_d)*(Xv)))))*(arccsc(((P_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))))+(Int(((((((P_c)+(((O_d)*(Xv)))))^((-1))))*(((((1)+((((-1))*(((((P_c)+(((O_d)*(Xv)))))^((-2))))))))^((-(1/2)))))),Xv)))
 
 # Regel 3 (108 Varianten):
 #   Int[(a_. + b_.*ArcSec[c_ + d_.*x_])^p_., x_Symbol] := 1/d*Subst[Int[(a + b*ArcSec[x])^p, x], x, c + d*x] /; FreeQ[{a, b, c, d}, x] && IGtQ[p, 0]

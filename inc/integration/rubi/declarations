@@ -2,4 +2,4 @@
 VAR P_A,P_F,P_Fx,P_G,P_H,P_P2,P_P2x,P_P3,P_P4,P_P4x,P_P6,P_Pm,P_Pn,P_Polyx,P_Pp,P_Pq,P_Px,P_Q4,P_Q6,P_Qn,P_Qq,P_Qr,P_Qx,P_RFx,P_RGx,P_Rn,P_Rr,P_a,P_a1,P_a2,P_b,P_c,P_d,P_d1,P_d2,P_e,P_e1,P_e2,P_f,P_f1,P_f2,P_g,P_h,P_j,P_k,P_m,P_m1,P_m2,P_mn,P_n,P_n1,P_n2,P_p,P_q,P_q1,P_q2,P_r,P_s,P_u,P_v,P_w,P_y,P_z : real
 VAR O_A,O_B,O_C,O_Fx,O_Px,O_a,O_a1,O_a2,O_b,O_b1,O_b2,O_c,O_d,O_d1,O_d2,O_e,O_e1,O_e2,O_f,O_f1,O_f2,O_g,O_g1,O_g2,O_h,O_i,O_j,O_jn,O_k,O_l,O_m,O_mn,O_mn2,O_n,O_n2,O_n3,O_nn,O_non2,O_p,O_q,O_r,O_s,O_t,O_u,O_v,O_w,O_y : real
 OPT O_A,O_B,O_C,O_Fx,O_Px,O_a,O_a1,O_a2,O_b,O_b1,O_b2,O_c,O_d,O_d1,O_d2,O_e,O_e1,O_e2,O_f,O_f1,O_f2,O_g,O_g1,O_g2,O_h,O_i,O_j,O_jn,O_k,O_l,O_m,O_mn,O_mn2,O_n,O_n2,O_n3,O_nn,O_non2,O_p,O_q,O_r,O_s,O_t,O_u,O_v,O_w,O_y
-NUM K_1,K_2,K_3 : real
+NUM K_1,K_2,K_3,K_4 : real

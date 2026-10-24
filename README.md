@@ -258,16 +258,19 @@ REWR fq(x,x) : tq             # prints gq (0 ,1 ,1 )
 are not merged into the rule tree. They are kept in a list in the order of
 their definition, like in Mathematica or Rubi, and the first rule that
 matches wins. The matcher ([listmatch.c](listmatch.c)) tries the swapped
-operands of commutative operators and the missing optional operands by
-backtracking, and the conditions are part of the match: if a condition
+operands of commutative operators, the other groupings of nested
+operands (`u*f(x)` matches `x^2*f(x)*g` with `u = x^2*g`, up to six
+operands) and the missing optional operands by backtracking, and the
+conditions are part of the match: if a condition
 fails, the next possibility is tried. Two more rules apply to rule lists
 only:
 
 - If the result of a rule equals the term (no progress), contains a NaN,
-  or equals one of the last eight terms that rules of a list replaced (a
-  cycle), the rule is skipped and the next rule of the list is tried.
-- The result is simplified trivially (`u^0`, `u^1`, `1*u`, `0*u`, `0+u`),
-  as Mathematica does automatically.
+  or closes a cycle (it was replaced before, and the chain of the last 16
+  replacements from there, also of subterms, leads back to the term), the
+  rule is skipped and the next rule of the list is tried.
+- The result is simplified trivially (`u^0`, `u^1`, `1*u`, `0*u`, `0+u`,
+  `(u^m)^k = u^(m*k)` for integers), as Mathematica does automatically.
 
 A rule list of several thousand rules is fast, because a quick test of the
 function names skips most rules without running the matcher.
@@ -501,10 +504,10 @@ loaded by the integration rules and can also be used on their own:
 | `polyq(u,x)`, `polyq(u,x,n)`, `linearq(u,x)` | `u` is a polynomial in `x`, of degree `n`, of degree 1 |
 | `sumq(u)`, `productq(u)`, `powerq(u)` | form of the top level of `u` |
 | `expand(u)` | multiply out products and integer powers of sums, collect like terms |
-| `expandintegrand(u,x)`, `expandintegrand(u,v,x)` | `expand(u)`, `expand(u*v)`; stays unevaluated if nothing changes |
+| `expandintegrand(u,x)`, `expandintegrand(u,v,x)` | partial fractions of a rational function with exact coefficients, else `expand(u)`, `expand(u*v)`; stays unevaluated if nothing changes |
 | `coeff(u,x,n)`, `coeff(u,x)`, `expon(u,x)` | coefficient of `x^n` or `x`, degree in `x` |
 | `subst(u,x,v)` | `u` with `x` replaced by `v` (waits while `u` contains `Int`) |
-| `simp(u,x)`, `simplify(u)`, `dist(u,v,x)`, `rt(u,n)` | `u`, `u`, `u*v`, `n`-th root |
+| `simp(u,x)`, `simplify(u)`, `dist(u,v,x)`, `rt(u,n)` | `u` with like powers in a product combined, the same, `u*v`, `n`-th root |
 | `intpart(u)`, `fracpart(u)` | integer and non-integer parts of numbers |
 | `fractionq(u,..)`, `halfintegerq(u,..)`, `nicesqrtq(u)` | non-integer numbers, halves of odd integers, a number > 0 |
 | `gcd(m,n,..)`, `numerator(u)`, `denominator(u)` | for numbers (as fractions) and for products (negative powers) |
@@ -535,10 +538,15 @@ REWR expand((x+1)^3) : t2            # prints x ^ 3 + 3 * x ^ 2 + 3 * x + 1
 ```
 
 The term functions are applied during rewriting, so they are used with
-`REWR`. Some are simpler than their Rubi counterparts: `expandintegrand`
-does no partial fractions (it multiplies out, and writes a polynomial times
-`(c+d*x)^n` as a sum of powers of `c+d*x`), `eqq` compares terms after
-multiplying out, and `simp` returns its argument unchanged.
+`REWR`. Some are simpler than their Rubi counterparts. `expandintegrand`
+splits a rational function with exact rational coefficients into partial
+fractions ([apart.c](apart.c), like Mathematica's `Apart`); the
+denominator is factored into its square-free parts and rational roots, and
+along the factors written in the input, but other irreducible factors of
+degree 2 and more are not found. Otherwise it multiplies out, and writes a
+polynomial times `(c+d*x)^n` as a sum of powers of `c+d*x`. `eqq` compares
+terms after multiplying out, and `simp` only combines like powers in a
+product, such as `(a*b)^-1*(a^-1*b^-1)^-1 = 1`.
 
 Larger example programs are [LiNbO3/abso1](LiNbO3/abso1) and
 [LiNbO3/compute](LiNbO3/compute) (X-ray absorption and structure factors
@@ -578,6 +586,7 @@ in the same way.
 | [symfkt.c](symfkt.c) | Symbolic helper functions (`expand`, `coeff`, `polyq`, ...). |
 | [numsort.c](numsort.c), [exact.c](exact.c) | Subsorts (`SUBSORT`, `INTNUM`) and the exact number sorts with GMP. |
 | [specfun.c](specfun.c) | Special functions (erf, Fresnel, Ei, Gamma, zeta, elliptic integrals, 2F1, ...). |
+| [apart.c](apart.c) | Partial fractions of rational functions with exact coefficients (GMP). |
 | [tools/rubi2rewrite.py](tools/rubi2rewrite.py) | Translator of Rubi's integration rules. |
 | [tools/rubitest.py](tools/rubitest.py) | Runs Rubi's test suite and checks the results numerically. |
 | [nodes.h](nodes.h) | Named access to the node structures built by the parser. |
@@ -632,7 +641,8 @@ in the same way.
   and further elementary functions (`csc`, `sec`, `cot`, `arccot`, the
   hyperbolic and inverse hyperbolic functions, `polylog`, `productlog`).
 - Special functions ([specfun.c](specfun.c)) with derivative rules, and
-  more of Rubi's helper functions in [symfkt.c](symfkt.c).
+  more of Rubi's helper functions in [symfkt.c](symfkt.c), among them
+  partial fractions ([apart.c](apart.c)).
 - Exact numbers: sorts `integer` and `rational` with GMP ([inc/exact](inc/exact)),
   the statements `SUBSORT` and `INTNUM`, and the choice of operator
   variants by the sorts of their arguments.

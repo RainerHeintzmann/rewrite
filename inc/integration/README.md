@@ -105,9 +105,11 @@ have it, so a few steps are added:
 
 - `RubiNorm` brings the integrand into a similar normal form first:
   `x-y` becomes `x+(-1)*y`, `x/y` becomes `x*y^(-1)`, `sqrt(x)` becomes
-  `x^0.5`, numeric factors move to the front. Unlike `IntNorm` of the
-  hand-translated subset, it does not multiply out products with sums,
-  because Mathematica does not do that either.
+  `x^0.5`, numeric factors move to the front, and `(u*v)^k` becomes
+  `u^k*v^k` for integer `k`, so `1/(x*(a+b*x))` is `x^-1*(a+b*x)^-1`. The
+  translator writes Rubi's patterns in the same form, as Mathematica does.
+  Unlike `IntNorm` of the hand-translated subset, it does not multiply out
+  products with sums, because Mathematica does not do that either.
 - `exp(u)` is written as `eE^u` with the symbolic constant `eE` (sort
   `positive`, no numerical value), as Mathematica writes `E^u`, so that
   rules for `F^u` apply to it and `ln(eE) = 1` stays exact. `IntOut` turns
@@ -122,14 +124,49 @@ have it, so a few steps are added:
   complex numbers. Instead, the last rule of `RubiRules` writes hyperbolic
   functions for which no rule applies with exponentials (`hyp2exp`):
   `sinh(u) = (e^u-e^-u)/2`, ... The result then contains `exp`.
-- The first rules of `RubiRules` write polynomials in the integrand as
-  `c0 + c1*x + c2*x^2 + ...` with collected coefficients (`normpoly`), and
-  split integrals of sums and constant factors.
+- The first rules of `RubiRules` take constant factors out of the integral
+  (first, as Mathematica does, so that `-1*x*u` does not become
+  `(-1*x)*u`, which rules for `(c*x)^m` would match with `c = -1`), write
+  polynomials in the integrand as `c0 + c1*x + c2*x^2 + ...` with collected
+  coefficients (`normpoly`, which also combines like powers in a product,
+  `x*x^-1 = 1`), and split integrals of sums.
+- Rubi's `ExpandIntegrand` splits rational functions into partial fractions
+  (Mathematica's `Apart`). `expandintegrand` does this with exact rational
+  coefficients ([apart.c](../../apart.c)), as `c*p(x)*b(x)^-k` with the
+  number in front. Rubi's general rule `Int[u] := Int[ExpandIntegrand[u]]`
+  for a sum then integrates a rational function term by term. `simp`
+  combines like powers in a product, so that factors like
+  `((x-1)*(x+1)^2)^-1*((x-1)^-1*(x+1)^-2)^-1` from Rubi's rules become 1.
 - Every rule result is simplified trivially: `u^0`, `u^1`, `1*u`, `0*u`,
-  `0+u`.
+  `0+u`, and `(u^m)^k = u^(m*k)` for integers `m`, `k`.
 - A rule whose result equals the term (no progress), contains a NaN, or
-  equals one of the last terms that rules replaced (a cycle like
-  expanding and factoring again), is skipped and the next rule is tried.
+  closes a cycle, is skipped and the next rule is tried. A cycle: the
+  result was replaced before, and the chain of the last replacements from
+  there (also of subterms, as in `A -> subst(B)`, `B -> A`) leads back to
+  the term, like expanding and factoring again. A term that was replaced
+  in another branch may come up again.
+- Rubi's `IntHide` integrates, `inthide` leaves `Int(u,x)`. In
+  `InverseFunctionFreeQ[IntHide[u,x],x]` (integration by parts),
+  `inversefunctionfreeq` decides for a rational `u` from its partial
+  fractions (`c/b(x)` gives `ln` or `arctan`); other integrands count as
+  free, since integration by parts is valid anyway.
+- Mathematica's `Times` is flat: `u_*(a_+b_.*ArcTan[x])` matches
+  `x^2*ArcTan[x]/(1+x^2)` with `u = x^2/(1+x^2)`. Terms in rewrite are
+  binary trees, so the matcher of rule lists also tries all other ways to
+  split a nested product (or sum) of up to six operands into two groups
+  for a commutative operator. `normpoly` writes a product with powers
+  first and other functions last.
+- A rule whose result still contains `polyquotient` or `polyremainder`
+  (division of a non-polynomial, which Mathematica's `PolynomialQuotient`
+  does in its own way) or `expandintegrand` (for example partial fractions
+  with symbolic coefficients) is skipped like a rule without progress.
+- `PolyQ[u, x^n]` checks that `u` is a polynomial in `x` with only the
+  powers `x^(k*n)`.
+- Mathematica calculates with complex intermediate values; rewrite only
+  with real ones. Rules that need real intermediate values under a
+  condition get it from a table in the translator (`REAL_CONDITIONS`):
+  Cardano's formula for cubic polynomials only with a positive
+  discriminant, `PosQ[4*b^3*d+27*a^2*d^2]`.
 - An optional variable that occurs twice, like `e.` in
   `(c+d*tan(e.+f.*x))/(a+b*tan(e.+f.*x))`, may be missing in both places.
 - `RubiCollect` combines like summands of the result (`collect`).
@@ -168,16 +205,16 @@ results are:
 
 | Result | Problems | Share of tested |
 | --- | --- | --- |
-| solved and verified | 848 | 55.1% |
-| no antiderivative found | 672 | 43.7% |
+| solved and verified | 1221 | 79.3% |
+| no antiderivative found | 294 | 19.1% |
 | wrong | 3 | 0.2% |
-| crash or time-out | 7 | 0.5% |
-| not verifiable | 9 | 0.6% |
+| crash or time-out | 1 | 0.1% |
+| not verifiable | 20 | 1.3% |
 
 One problem uses a function that rewrite does not have and is not tested.
 The three wrong results contain special functions outside their real
 domain, where the check compares different complex branches. A run takes
-about ten minutes. The harness needs `mpmath` for the special functions
+about five minutes. The harness needs `mpmath` for the special functions
 (`pacman -S mingw-w64-ucrt-x86_64-python-mpmath` in MSYS2).
 
 ## The hand-translated subset

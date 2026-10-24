@@ -142,6 +142,60 @@ static BOOLEAN bind_and_go (Node * var, Node * t, Goal * next)
 	return FALSE;
 }
 
+/* ---------------- regrouping of commutative operators ----------------
+ * Mathematica's Times is flat: a pattern u*(a+b*f(x)) matches x^2*f(x)*g
+ * with u = x^2*g. The terms here are binary trees, so for a commutative
+ * operator the factors of a nested product are split into two groups in
+ * every way, and each group becomes a temporary product. The bindings of
+ * the meta variables point into these nodes until the result of the rule
+ * is built; they are freed at the next outermost match_list call. */
+
+#define MAXFLAT 6
+static Node ** arena = NULL;
+static int arena_n = 0, arena_cap = 0;
+static int ml_depth = 0;
+
+static Node * arena_node (int type, Node * l, Node * r)
+{
+	Node * n = mknod(type, l, r);
+	if (arena_n == arena_cap)
+		{
+		arena_cap = arena_cap ? 2 * arena_cap : 64;
+		arena = (Node **) realloc(arena, arena_cap * sizeof(Node *));
+		if (! arena) fatal("listmatch : no room");
+		}
+	arena[arena_n++] = n;
+	return n;
+}
+
+static void arena_free (void)
+{
+	while (arena_n > 0) delnod(arena[--arena_n]);
+}
+
+/* the operands of nested t = f1 h f2 h ..., or -1 if more than MAXFLAT */
+static int flatten (Node * t, const char * h, Node ** f, int n)
+{
+	if (n < 0) return n;
+	if (t->type == Func && term_nargs(t) == 2 && strcmp(name(TERM_HEAD(t)), h) == 0)
+		return flatten(term_arg(t, 1), h, f, flatten(term_arg(t, 0), h, f, n));
+	if (n == MAXFLAT) return -1;
+	f[n] = t;
+	return n + 1;
+}
+
+static Node * group (Node * head, Node ** f, int n, unsigned mask)	/* subset */
+{
+	Node * r = NULL;
+	int i;
+	for (i = 0; i < n; i++)
+		if (mask & (1u << i))
+			r = r ? arena_node(Func, head, arena_node(Terms, r, f[i])) : f[i];
+	return r;
+}
+
+static BOOLEAN regroup (Node * p, Node * t, Goal * next);
+
 static BOOLEAN lm_solve (Goal * g)
 {
 	Node * p, * t, * d;
@@ -190,6 +244,8 @@ static BOOLEAN lm_solve (Goal * g)
 				return TRUE;
 			if (n == 2 && is_comm(p)		/* swapped operands */
 			    && goal2(term_arg(p, 0), term_arg(t, 1), term_arg(p, 1), term_arg(t, 0), g->next))
+				return TRUE;
+			if (n == 2 && is_comm(p) && regroup(p, t, g->next))	/* other groups */
 				return TRUE;
 			}
 		if (n == 2 && (d = default_of(p, & right_only)))	/* missing operand */
@@ -293,6 +349,35 @@ static int hs_has (HeadSet * s, const char * h)
 	for (i = 0; i < s->n; i++)
 		if (strcmp(s->h[i], h) == 0) return 1;
 	return 0;
+}
+
+/* see above (regrouping): splits whose groups cannot have a head the
+ * pattern operands allow are skipped without matching */
+static BOOLEAN regroup (Node * p, Node * t, Goal * next)
+{
+	Node * f[MAXFLAT];
+	HeadSet ha = {0}, hb = {0};
+	unsigned mask, all, left;
+	const char * h = name(TERM_HEAD(t));
+	int nl = flatten(term_arg(t, 0), h, f, 0);	/* the split already tried */
+	int n = flatten(t, h, f, 0);
+	if (n < 3 || nl < 0) return FALSE;
+	heads_of(term_arg(p, 0), & ha);
+	heads_of(term_arg(p, 1), & hb);
+	all = (1u << n) - 1;
+	left = (1u << nl) - 1;
+	for (mask = 1; mask < all; mask++)
+		{
+		unsigned rest = all & ~mask;
+		if (mask == left || rest == left) continue;
+		if (! hs_has(& ha, (mask & (mask - 1)) ? h : head_name(f[__builtin_ctz(mask)]))
+		    || ! hs_has(& hb, (rest & (rest - 1)) ? h : head_name(f[__builtin_ctz(rest)])))
+			continue;
+		if (goal2(term_arg(p, 0), group(t->l, f, n, mask),
+		          term_arg(p, 1), group(t->l, f, n, rest), next))
+			return TRUE;
+		}
+	return FALSE;
 }
 
 #define MAXCACHE 8
@@ -402,7 +487,19 @@ static Cand * candidates (int k, const char * th, const char * fh)
 
 int lm_start = 0, lm_last = -1;
 
+static Node * match_rules (Node * term, Node * list);
+
 Node * match_list (Node * term, Node * list)
+{
+	Node * r;
+	if (ml_depth == 0) arena_free();	/* the last result is built by now */
+	ml_depth++;
+	r = match_rules(term, list);
+	ml_depth--;
+	return r;
+}
+
+static Node * match_rules (Node * term, Node * list)
 {
 	Cand * c;
 	const char * th, * fh = NULL;

@@ -78,6 +78,7 @@ ADDSPEC RubiNorm : IF (Kc == 0) Kc*Uv = 0
 ADDSPEC RubiNorm : IF (Kc == 0) Kc+Uv = Uv
 ADDSPEC RubiNorm : IF (Kc == 0) Uv+Kc = Uv
 ADDSPEC RubiNorm : IF (is_int(Kc)) (Uv^Vv)^Kc = Uv^(Vv*Kc)   # nicht (x^2)^0.5 = x
+ADDSPEC RubiNorm : IF (is_int(Kc)) (Uv*Vv)^Kc = Uv^Kc*Vv^Kc   # wie Mathematica: 1/(u v) = u^-1 v^-1
 ADDSPEC RubiNorm : Uv*Uv = Uv^2
 ADDSPEC RubiNorm : Uv^Vv*Uv = Uv^(Vv+1)
 ADDSPEC RubiNorm : Uv*Uv^Vv = Uv^(Vv+1)

@@ -38,10 +38,10 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{848}
-\newcommand{\psolved}{55.1\%}
+\newcommand{\nsolved}{1221}
+\newcommand{\psolved}{79.3\%}
 \newcommand{\nwrong}{3}
-\newcommand{\nfailed}{7}
+\newcommand{\nfailed}{1}
 
 \title{\texttt{rewrite}: a programming language that learns its\\
        mathematics from rule files}
@@ -400,7 +400,16 @@ return a new term, or nothing if they do not apply. About 60 of them are
 implemented, from predicates on the form of a term to polynomial division,
 the product-to-sum reduction of trigonometric powers, and Rubi's measures
 of simplicity based on the size of a term. Their results are exact when
-their inputs are. Many results of Rubi need special functions; 27 of them,
+their inputs are. \texttt{ExpandIntegrand} splits rational functions into
+partial fractions, as Mathematica's \texttt{Apart}: with GMP rationals, the
+denominator is split into square-free parts, rational roots and the factors
+given in the input, and the extended Euclidean algorithm gives the
+numerators. Rubi's last general rule, $\int u\,dx=\int
+\texttt{ExpandIntegrand}[u]\,dx$ if the result is a sum, then integrates
+every rational function term by term. A condition like
+\texttt{SumQ[ExpandIntegrand[u,x]]} needs its inner helper evaluated
+first; \texttt{rewrite} calculated conditions from the outside in, so the
+rule never applied until this was changed. Many results of Rubi need special functions; 27 of them,
 from the error function and the Fresnel and exponential integrals to the
 incomplete Gamma function, elliptic integrals in Carlson's
 form~\cite{carlson1995} and the hypergeometric function ${}_2F_1$, were
@@ -411,7 +420,8 @@ rule. Their values agree with mpmath~\cite{mpmath} to within $10^{-11}$.
 automatic simplification, which \texttt{rewrite} does not have. Most of the
 work after the first translation went into reproducing the parts Rubi
 depends on. A normal-form rule set writes $x-y$ as $x+(-1)\,y$, $x/y$ as
-$x\,y^{-1}$ and $\sqrt{x}$ as $x^{1/2}$, but, unlike our first version and
+$x\,y^{-1}$, $\sqrt{x}$ as $x^{1/2}$ and $(uv)^k$ as $u^kv^k$ for integer
+$k$ (in the translated patterns as well), but, unlike our first version and
 like Mathematica, it does not multiply out products with sums: Rubi's rules
 for $(c+d\tan x)/(a+b\tan x)$ expect the product. Polynomials in the
 integrand are brought into the form $c_0+c_1x+c_2x^2+\dots$ with collected
@@ -420,11 +430,17 @@ simplified trivially ($u^0$, $u^1$, $1\cdot u$, $0+u$). In Mathematica,
 some rules that make no progress are harmless because exact arithmetic or
 other rules prevent a loop; in \texttt{rewrite} they looped. The rule list
 therefore skips a rule whose result equals the term, contains a NaN or a
-division by zero, or equals one of the last terms the list replaced (a
-cycle such as expanding and factoring again), and a rule that keeps
-rewriting the same term. The matcher also had to learn that an optional
+division by zero, or closes a cycle such as expanding and factoring again
+(the result was replaced before, and the chain of the last replacements,
+also of subterms, leads back to the term), and a rule that keeps rewriting
+the same term. Only the chain counts: a term that was replaced in another
+branch, like $\int b\,dx$, may come up again. The matcher also had to learn that an optional
 variable already bound to its default value may be missing a second time,
-as in $(c+d\tan(e+fx))/(a+b\tan(e+fx))$ with $e=0$. Finally, Rubi's
+as in $(c+d\tan(e+fx))/(a+b\tan(e+fx))$ with $e=0$, and that products are
+flat: Mathematica's pattern $u\,(a+b\arctan x)$ matches
+$x^2\arctan x/(1+x^2)$ with $u=x^2/(1+x^2)$, so for a commutative operator
+the matcher also tries every split of up to six nested operands into two
+groups. Finally, Rubi's
 substitutions $\int u\,dx$ with $x\to\sqrt{a+bx}$ rely on Mathematica
 treating the new variable as non-negative. \texttt{Subst[Int[u,x],x,v]}
 therefore integrates in a fresh constant of sort \texttt{nonneg} when $v$ is
@@ -512,10 +528,10 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 672 & 43.7\% \\
+no antiderivative found   & 294 & 19.1\% \\
 wrong result              & \nwrong  & 0.2\% \\
-crash or time-out         & \nfailed & 0.5\% \\
-not verifiable            & 9 & 0.6\% \\
+crash or time-out         & \nfailed & 0.1\% \\
+not verifiable            & 20 & 1.3\% \\
 \bottomrule
 \end{tabular}
 \caption{Results on the \ntested{} tested problems of four independent
@@ -527,11 +543,14 @@ The development of the translation went through several such measurements;
 each round of fixes, such as the normal form without multiplying out, the
 matching of optional variables bound to their default, the special
 functions and the missing helpers, raised the share of verified results.
-During a first measurement, 41\% of the problems were solved. The three
+During a first measurement, 41\% of the problems were solved, 55\% before
+the cosine unification, the hyperbolic fallback and the symbolic $e$, 62\%
+after them, and 79\% after partial fractions, the inside-out evaluation of
+nested helpers and the flat matching of products. The three
 results counted as wrong contain special functions evaluated outside their
 real domain (${}_2F_1$ at arguments $e^x>1$, the incomplete Gamma function
 of a negative argument), where the check compares different complex
-branches. A run takes about ten minutes.
+branches. A run takes about five minutes.
 
 The translation also served as a test of the library itself. It revealed
 two incorrect simplification rules in the standard algebra, which turned

@@ -8,27 +8,27 @@
 
 # Regel 1 (108 Varianten):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])/x_, x_Symbol] := (a + b*Log[c*x^n])^2/(2*b*n) /; FreeQ[{a, b, c, n}, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_n) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))*((Xv)^(K_1)),Xv) = ((((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(2)))*(((((2)*(O_b)*(O_n)))^((-1)))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_n) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))*((Xv)^(K_1)),Xv) = ((((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(2)))*((1/2))*(((O_b)^((-1))))*(((O_n)^((-1)))))
 
 # Regel 2 (216 Varianten):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_./x_, x_Symbol] := 1/(b*n)*Subst[Int[x^p, x], x, a + b*Log[c*x^n]] /; FreeQ[{a, b, c, n, p}, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_n,O_p) Int((((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p))*((Xv)^(K_1)),Xv) = ((((((O_b)*(O_n)))^((-1))))*(intsubst(((Xv)^(O_p)),Xv,((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_n,O_p) Int((((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p))*((Xv)^(K_1)),Xv) = ((((O_b)^((-1))))*(((O_n)^((-1))))*(intsubst(((Xv)^(O_p)),Xv,((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))
 
 # Regel 3 (648 Varianten):
 #   Int[(d_.*x_)^m_.*(a_. + b_.*Log[c_.*x_^n_.]), x_Symbol] := b*(d*x)^(m + 1)*Log[c*x^n]/(d*(m + 1)) /; FreeQ[{a, b, c, d, m, n}, x] && NeQ[m, -1] && EqQ[a*(m + 1) - b*n, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (neq(O_m,(-1))), (eqq(((((O_a)*(((O_m)+(1)))))+((((-1))*(O_b)*(O_n)))),0)) Int((((O_d)*(Xv))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((O_b)*(((((O_d)*(Xv)))^(((O_m)+(1)))))*(ln(((O_c)*(((Xv)^(O_n))))))*(((((O_d)*(((O_m)+(1)))))^((-1)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (neq(O_m,(-1))), (eqq(((((O_a)*(((O_m)+(1)))))+((((-1))*(O_b)*(O_n)))),0)) Int((((O_d)*(Xv))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((O_b)*(((((O_d)*(Xv)))^(((O_m)+(1)))))*(ln(((O_c)*(((Xv)^(O_n))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1)))))
 
 # Regel 4 (648 Varianten):
 #   Int[(d_.*x_)^m_.*(a_. + b_.*Log[c_.*x_^n_.]), x_Symbol] := (d*x)^(m + 1)*(a + b*Log[c*x^n])/(d*(m + 1)) - b*n*(d*x)^(m + 1)/(d*(m + 1)^2) /; FreeQ[{a, b, c, d, m, n}, x] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (neq(O_m,(-1))) Int((((O_d)*(Xv))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_n)*(((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_d)*(((((O_m)+(1)))^(2)))))^((-1)))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (neq(O_m,(-1))) Int((((O_d)*(Xv))^(O_m))*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(O_n)*(((((O_d)*(Xv)))^(((O_m)+(1)))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-2)))))))
 
 # Regel 5 (1296 Varianten):
 #   Int[(d_.*x_)^m_.*(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := (d*x)^(m + 1)*(a + b*Log[c*x^n])^p/(d*(m + 1)) - b*n*p/(m + 1)*Int[(d*x)^m*(a + b*Log[c*x^n])^(p - 1), x] /; FreeQ[{a, b, c, d, m, n}, x] && NeQ[m, -1] && GtQ[p, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (neq(O_m,(-1))), (((O_p > 0))) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p)),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))*(((((O_d)*(((O_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_n)*(O_p)*(((((O_m)+(1)))^((-1))))*(Int(((((((O_d)*(Xv)))^(O_m)))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((O_p)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (neq(O_m,(-1))), (((O_p > 0))) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p)),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(O_n)*(O_p)*(((((O_m)+(1)))^((-1))))*(Int(((((((O_d)*(Xv)))^(O_m)))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((O_p)+((-1))))))),Xv)))))
 
 # Regel 6 (648 Varianten):
 #   Int[(d_.*x_)^m_.*(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := (d*x)^(m + 1)*(a + b*Log[c*x^n])^(p + 1)/(b*d*n*(p + 1)) - (m + 1)/(b*n*(p + 1))*Int[(d*x)^m*(a + b*Log[c*x^n])^(p + 1), x] /; FreeQ[{a, b, c, d, m, n}, x] && NeQ[m, -1] && LtQ[p, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (neq(O_m,(-1))), (((P_p < (-1)))) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p)),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))))*(((((O_b)*(O_d)*(O_n)*(((P_p)+(1)))))^((-1))))))+((((-1))*(((O_m)+(1)))*(((((O_b)*(O_n)*(((P_p)+(1)))))^((-1))))*(Int(((((((O_d)*(Xv)))^(O_m)))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (neq(O_m,(-1))), (((P_p < (-1)))) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p)),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))))*(((O_b)^((-1))))*(((O_d)^((-1))))*(((O_n)^((-1))))*(((((P_p)+(1)))^((-1))))))+((((-1))*(((O_m)+(1)))*(((O_b)^((-1))))*(((O_n)^((-1))))*(((((P_p)+(1)))^((-1))))*(Int(((((((O_d)*(Xv)))^(O_m)))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))))),Xv)))))
 
 # Regel 7 (12 Varianten):
 #   Int[x_^m_./Log[c_.*x_^n_], x_Symbol] := 1/n*Subst[Int[1/Log[c*x], x], x, x^n] /; FreeQ[{c, m, n}, x] && EqQ[m, n - 1]
@@ -44,7 +44,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_p), (integerq(O_m)) Int(((Xv)^(O_m))
 
 # Regel 10 (648 Varianten):
 #   Int[(d_.*x_)^m_.*(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := (d*x)^(m + 1)/(d*n*(c*x^n)^((m + 1)/n))* Subst[Int[E^((m + 1)/n*x)*(a + b*x)^p, x], x, Log[c*x^n]] /; FreeQ[{a, b, c, d, m, n, p}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n,P_p) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p)),Xv) = ((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((((O_d)*(O_n)*(((((O_c)*(((Xv)^(O_n)))))^(((((O_m)+(1)))*(((O_n)^((-1))))))))))^((-1))))*(intsubst((((eE^(((((O_m)+(1)))*(((O_n)^((-1))))*(Xv)))))*(((((O_a)+(((O_b)*(Xv)))))^(P_p)))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n,P_p) Int((((O_d)*(Xv))^(O_m))*(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p)),Xv) = ((((((O_d)*(Xv)))^(((O_m)+(1)))))*(((O_d)^((-1))))*(((O_n)^((-1))))*(((((((O_c)*(((Xv)^(O_n)))))^(((((O_m)+(1)))*(((O_n)^((-1))))))))^((-1))))*(intsubst((((eE^(((((O_m)+(1)))*(((O_n)^((-1))))*(Xv)))))*(((((O_a)+(((O_b)*(Xv)))))^(P_p)))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
 
 # Regel 11 (648 Varianten):
 #   Int[(d_.*x_^q_)^m_*(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := (d*x^q)^m/x^(m*q)*Int[x^(m*q)*(a + b*Log[c*x^n])^p, x] /; FreeQ[{a, b, c, d, m, n, p, q}, x]

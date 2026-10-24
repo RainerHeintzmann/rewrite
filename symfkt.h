@@ -20,7 +20,7 @@ s_function * give_sfkt (const char * name);   /* NULL if unknown */
 Node * call_builtin (Node * term);            /* term: Func node of a builtin */
 int term_equal (Node * a, Node * b);          /* structurally equal terms */
 Node * term_copy (Node * t);                  /* copy of a term */
-int term_has_nan (Node * t);                  /* contains NaN or infinity */
+int term_has_nan (Node * t);                  /* contains NaN, infinity, 1/0 or a failed polyquotient */
 void term_simplify_trivial (Node ** p);       /* u^0, u^1, 1*u, 0*u, 0+u in place */
 
 #endif

@@ -50,6 +50,11 @@ Symbol * make_exact (long long p, long long q);
 BOOLEAN num_exact (Symbol * s);			/* integer or rational value */
 Symbol * exact_root (Symbol * s, long k);	/* exact k-th root, or NULL */
 
+/* for apart.c: an exact number as a new mpq_ptr (NULL if not exact), and a
+ * number from an mpq_ptr (taken; integer sort if the denominator is 1) */
+void * exact_to_rat (Symbol * s);
+Symbol * make_exact_rat (void * q);
+
 /* may a meta variable of sort vsort match term? Only checked for sorts that
  * are subsorts of another (nonneg, integer, ...); a variable of sort real
  * matches any term, as before. */

@@ -12,7 +12,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c) Int(((O_a)+((O_b)*(arc
 
 # Regel 2 (54 Varianten):
 #   Int[(a_. + b_.*ArcCoth[c_.*x_])/x_, x_Symbol] := a*Log[x] + b/2*PolyLog[2, -1/(c*x)] - b/2*PolyLog[2, 1/(c*x)] /; FreeQ[{a, b, c}, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c) Int(((O_a)+((O_b)*(arccoth((O_c)*(Xv)))))*((Xv)^(K_1)),Xv) = ((((O_a)*(ln(Xv))))+(((O_b)*((1/2))*(polylog(2,(((-1))*(((((O_c)*(Xv)))^((-1)))))))))+((((-(1/2)))*(O_b)*(polylog(2,((((O_c)*(Xv)))^((-1))))))))
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c) Int(((O_a)+((O_b)*(arccoth((O_c)*(Xv)))))*((Xv)^(K_1)),Xv) = ((((O_a)*(ln(Xv))))+(((O_b)*((1/2))*(polylog(2,(((-1))*(((O_c)^((-1))))*(((Xv)^((-1)))))))))+((((-(1/2)))*(O_b)*(polylog(2,((((O_c)^((-1))))*(((Xv)^((-1))))))))))
 
 # Regel 3 (54 Varianten):
 #   Int[(a_. + b_.*ArcTanh[c_.*x_])^p_/x_, x_Symbol] := 2*(a + b*ArcTanh[c*x])^p*ArcTanh[1 - 2/(1 - c*x)] - 2*b*c*p* Int[(a + b*ArcTanh[c*x])^(p - 1)* ArcTanh[1 - 2/(1 - c*x)]/(1 - c^2*x^2), x] /; FreeQ[{a, b, c}, x] && IGtQ[p, 1]
@@ -80,11 +80,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m), (igtq(P_p,1)), (fractionq(P_n)) 
 
 # Regel 19 (216 Varianten):
 #   Int[(d_*x_)^m_*(a_. + b_.*ArcTanh[c_.*x_^n_.]), x_Symbol] := (d*x)^(m + 1)*(a + b*ArcTanh[c*x^n])/(d*(m + 1)) - b*c*n/(d^n*(m + 1))*Int[(d*x)^(m + n)/(1 - c^2*x^(2*n)), x] /; FreeQ[{a, b, c, d, m, n}, x] && IntegerQ[n] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,P_m,O_n), (integerq(O_n)), (neq(P_m,(-1))) Int((((P_d)*(Xv))^(P_m))*((O_a)+((O_b)*(arctanh((O_c)*((Xv)^(O_n)))))),Xv) = ((((((((P_d)*(Xv)))^(((P_m)+(1)))))*(((O_a)+(((O_b)*(arctanh(((O_c)*(((Xv)^(O_n))))))))))*(((((P_d)*(((P_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_c)*(O_n)*(((((((P_d)^(O_n)))*(((P_m)+(1)))))^((-1))))*(Int(((((((P_d)*(Xv)))^(((P_m)+(O_n)))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(((2)*(O_n)))))))))^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,P_m,O_n), (integerq(O_n)), (neq(P_m,(-1))) Int((((P_d)*(Xv))^(P_m))*((O_a)+((O_b)*(arctanh((O_c)*((Xv)^(O_n)))))),Xv) = ((((((((P_d)*(Xv)))^(((P_m)+(1)))))*(((O_a)+(((O_b)*(arctanh(((O_c)*(((Xv)^(O_n))))))))))*(((P_d)^((-1))))*(((((P_m)+(1)))^((-1))))))+((((-1))*(O_b)*(O_c)*(O_n)*(((((P_d)^(O_n)))^((-1))))*(((((P_m)+(1)))^((-1))))*(Int(((((((P_d)*(Xv)))^(((P_m)+(O_n)))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(((2)*(O_n)))))))))^((-1))))),Xv)))))
 
 # Regel 20 (216 Varianten):
 #   Int[(d_*x_)^m_*(a_. + b_.*ArcCoth[c_.*x_^n_.]), x_Symbol] := (d*x)^(m + 1)*(a + b*ArcCoth[c*x^n])/(d*(m + 1)) - b*c*n/(d^n*(m + 1))*Int[(d*x)^(m + n)/(1 - c^2*x^(2*n)), x] /; FreeQ[{a, b, c, d, m, n}, x] && IntegerQ[n] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,P_m,O_n), (integerq(O_n)), (neq(P_m,(-1))) Int((((P_d)*(Xv))^(P_m))*((O_a)+((O_b)*(arccoth((O_c)*((Xv)^(O_n)))))),Xv) = ((((((((P_d)*(Xv)))^(((P_m)+(1)))))*(((O_a)+(((O_b)*(arccoth(((O_c)*(((Xv)^(O_n))))))))))*(((((P_d)*(((P_m)+(1)))))^((-1))))))+((((-1))*(O_b)*(O_c)*(O_n)*(((((((P_d)^(O_n)))*(((P_m)+(1)))))^((-1))))*(Int(((((((P_d)*(Xv)))^(((P_m)+(O_n)))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(((2)*(O_n)))))))))^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,P_m,O_n), (integerq(O_n)), (neq(P_m,(-1))) Int((((P_d)*(Xv))^(P_m))*((O_a)+((O_b)*(arccoth((O_c)*((Xv)^(O_n)))))),Xv) = ((((((((P_d)*(Xv)))^(((P_m)+(1)))))*(((O_a)+(((O_b)*(arccoth(((O_c)*(((Xv)^(O_n))))))))))*(((P_d)^((-1))))*(((((P_m)+(1)))^((-1))))))+((((-1))*(O_b)*(O_c)*(O_n)*(((((P_d)^(O_n)))^((-1))))*(((((P_m)+(1)))^((-1))))*(Int(((((((P_d)*(Xv)))^(((P_m)+(O_n)))))*(((((1)+((((-1))*(((O_c)^(2)))*(((Xv)^(((2)*(O_n)))))))))^((-1))))),Xv)))))
 
 # Regel 21 (432 Varianten):
 #   Int[(d_*x_)^m_*(a_. + b_.*ArcTanh[c_.*x_^n_.])^p_., x_Symbol] := d^IntPart[m]*(d*x)^FracPart[m]/x^FracPart[m]* Int[x^m*(a + b*ArcTanh[c*x^n])^p, x] /; FreeQ[{a, b, c, d, m, n}, x] && IGtQ[p, 0] && (EqQ[p, 1] || RationalQ[m, n])

@@ -319,3 +319,13 @@ void * rat_lt (void * arg[]) { return truth(mpq_cmp(Q(0), Q(1)) < 0); }
 void * rat_le (void * arg[]) { return truth(mpq_cmp(Q(0), Q(1)) <= 0); }
 void * rat_eq (void * arg[]) { return truth(mpq_equal(Q(0), Q(1))); }
 void * rat_ne (void * arg[]) { return truth(! mpq_equal(Q(0), Q(1))); }
+
+/* for apart.c: the integer value of a rational with denominator 1 */
+int rat_is_integer (void * q) { return mpz_cmp_ui(mpq_denref((mpq_ptr) q), 1) == 0; }
+int rat_sgn (void * q) { return mpq_sgn((mpq_ptr) q); }
+void * rat_numer (void * q)
+{
+	mpz_ptr z = new_int();
+	mpz_set(z, mpq_numref((mpq_ptr) q));
+	return z;
+}

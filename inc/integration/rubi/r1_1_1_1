@@ -20,7 +20,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*(Xv)))^(
 
 # Regel 4 (9 Varianten):
 #   Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /; FreeQ[{a, b, m}, x] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m), (neq(P_m,(-1))) Int(((O_a)+((O_b)*(Xv)))^(P_m),Xv) = ((((((O_a)+(((O_b)*(Xv)))))^(((P_m)+(1)))))*(((((O_b)*(((P_m)+(1)))))^((-1)))))
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m), (neq(P_m,(-1))) Int(((O_a)+((O_b)*(Xv)))^(P_m),Xv) = ((((((O_a)+(((O_b)*(Xv)))))^(((P_m)+(1)))))*(((O_b)^((-1))))*(((((P_m)+(1)))^((-1)))))
 
 # Regel 5 (9 Varianten):
 #   Int[(a_. + b_.*u_)^m_, x_Symbol] := 1/Coefficient[u, x, 1]*Subst[Int[(a + b*x)^m, x], x, u] /; FreeQ[{a, b, m}, x] && LinearQ[u, x] && NeQ[u, x]

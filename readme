@@ -402,7 +402,8 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    polyq, freeq, subst, und weitere elementare Funktionen (csc, sec, cot,
    arccot, hyperbolische und Area-Funktionen, polylog, productlog).
  - Spezialfunktionen (specfun.c, z.B. erf, Fresnel, Ei, Gamma, zeta,
-   elliptische Integrale, 2F1) mit Ableitungsregeln; weitere Rubi-Hilfsfunktionen.
+   elliptische Integrale, 2F1) mit Ableitungsregeln; weitere Rubi-Hilfsfunktionen,
+   darunter Partialbruchzerlegung (apart.c).
  - Exakte Zahlen (inc/exact, exact.c mit GMP): Sorten integer und rational,
    Untersorten mit SUBSORT, ganze Literale mit INTNUM; Operatorvarianten
    werden nach den Sorten der Argumente gewaehlt.

@@ -14,13 +14,15 @@ DEFAULT * = 1
 DEFAULT RIGHT ^ = 1
 COMM +,*
 ALG RubiRules
-# zuerst: Polynome im Integranden in Mathematicas Normalform c0+c1*x+...
+# zuerst konstante Faktoren herausziehen, wie Mathematica: sonst macht normpoly
+# aus -1*(x*u) den Faktor (-1*x), und Regeln fuer (c*x)^m passen mit c = -1
+ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
+# Polynome im Integranden in Mathematicas Normalform c0+c1*x+...
 # (ohne Aenderung wird die Regel uebersprungen)
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)
-# Integrale von Summen und konstante Faktoren gleich hier aufteilen, bevor
-# andere Regeln die Summe umformen (sonst Zyklen ausmultiplizieren/ausklammern)
+# Integrale von Summen gleich hier aufteilen, bevor andere Regeln die Summe
+# umformen (sonst Zyklen ausmultiplizieren/ausklammern)
 ADDSPEC RubiRules : Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)
-ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
 INC "inc/integration/rubi/r1_1_1_1"
 INC "inc/integration/rubi/r1_1_1_2"
 INC "inc/integration/rubi/r1_1_1_3"

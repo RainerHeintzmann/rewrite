@@ -55,6 +55,9 @@ void * int_from_ll (long long v);
 void * rat_from_ll (long long p, long long q);
 void * rat_root_exact (void * q, long k);    /* NULL if not exact */
 void * rat_den (void * arg[]);
+int rat_is_integer (void * q);
+int rat_sgn (void * q);
+void * rat_numer (void * q);			/* new mpz */
 void * rat_is_int (void * arg[]);
 void * rat_gt (void * arg[]);
 void * rat_ge (void * arg[]);

@@ -271,6 +271,12 @@ def normalize(e):
         # (u^p)^n = u^(p n) for integer n, as Mathematica does automatically
         return normalize(call('Power', args[0][2][0],
                               ('num', args[0][2][1][1] * args[1][1])))
+    if (head == 'Power' and len(args) == 2 and is_num(args[1])
+            and args[1][1].denominator == 1 and args[0][0] == 'call'
+            and args[0][1] == 'Times'):
+        # (u v)^n = u^n v^n for integer n, as Mathematica does automatically:
+        # 1/((a+b x) (c+d x)) is Times[Power[a+b x,-1], Power[c+d x,-1]]
+        return normalize(call('Times', *[call('Power', f, args[1]) for f in args[0][2]]))
     return ('call', head, args)
 
 
@@ -687,10 +693,21 @@ def instantiate(e, assign):
     return ('call', h, [instantiate(a, assign) for a in args])
 
 
+# extra conditions for rules that are only valid in real numbers under a
+# condition: Mathematica calculates with complex intermediate values
+REAL_CONDITIONS = [
+    # Cardano: the square root of the discriminant must be real
+    ('Sqrt[4*b^3*d+27*a^2*d^2]', 'PosQ[4*b^3*d+27*a^2*d^2]'),
+]
+
+
 def translate_rule(text):
     """returns a list of (rewrite rule, number of variants, ctx); raises
     Untranslatable. A rule with function variables F_[...] gives one rule
     per admissible function."""
+    for key, cond in REAL_CONDITIONS:
+        if key in text and '/;' in text:
+            text = text.rstrip() + ' && ' + cond
     lhs_s, rhs_s = split_top(text, ':=')
     if rhs_s is None:
         raise Untranslatable("not a rule")
@@ -916,13 +933,15 @@ DEFAULT * = 1
 DEFAULT RIGHT ^ = 1
 COMM +,*
 ALG RubiRules
-# zuerst: Polynome im Integranden in Mathematicas Normalform c0+c1*x+...
+# zuerst konstante Faktoren herausziehen, wie Mathematica: sonst macht normpoly
+# aus -1*(x*u) den Faktor (-1*x), und Regeln fuer (c*x)^m passen mit c = -1
+ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
+# Polynome im Integranden in Mathematicas Normalform c0+c1*x+...
 # (ohne Aenderung wird die Regel uebersprungen)
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)
-# Integrale von Summen und konstante Faktoren gleich hier aufteilen, bevor
-# andere Regeln die Summe umformen (sonst Zyklen ausmultiplizieren/ausklammern)
+# Integrale von Summen gleich hier aufteilen, bevor andere Regeln die Summe
+# umformen (sonst Zyklen ausmultiplizieren/ausklammern)
 ADDSPEC RubiRules : Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)
-ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
 %s
 # zuletzt: Hyperbelfunktionen, fuer die keine Regel passt, als e^u schreiben
 # (Rubi nimmt dafuer sin, cos mit imaginaerem Argument)
