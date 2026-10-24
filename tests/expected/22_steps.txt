@@ -1,0 +1,20 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+Step 1: 1.1.2.2 (c x)^m (a+b x^2)^p, rule 9
+  Int[(c_.*x_)^m_.*(a_+b_.*x_^2)^p_,x_Symbol] := (c*x)^(m+1)*(a+b*x^2)^p/(c*(m+2*p+1)) + 2*a*p/(m+2*p+1) \[Star] Int[(c*x)^m*(a+b*x^2)^(p-1),x] /; FreeQ[{a,b,c,m},x] && GtQ[p,0] && NeQ[m+2*p+1,0] && IntBinomialQ[a,b,c,2,m,p,x]
+  Int (x ^ 2 * (1 + -1 * x ^ 2 )^ (1/2) ,x )
+    = x ^ 3 * (1 + -1 * x ^ 2 )^ (1/2) * (1/4) + (1/4) * Int (x ^ 2 * (1 + -1 * x ^ 2 )^ (-1/2) ,x )
+Step 2: 1.1.2.2 (c x)^m (a+b x^2)^p, rule 23
+  Int[(c_.*x_)^m_*(a_+b_.*x_^2)^p_,x_Symbol] := c*(c*x)^(m-1)*(a+b*x^2)^(p+1)/(b*(m+2*p+1)) - a*c^2*(m-1)/(b*(m+2*p+1)) \[Star] Int[(c*x)^(m-2)*(a+b*x^2)^p,x] /; FreeQ[{a,b,c,p},x] && GtQ[m,2-1] && NeQ[m+2*p+1,0] && IntBinomialQ[a,b,c,2,m,p,x]
+  Int (x ^ 2 * (1 + -1 * x ^ 2 )^ (-1/2) ,x )
+    = x * (1 + -1 * x ^ 2 )^ (1/2) * -1 * (1/2) + (1/2) * Int ((1 + -1 * x ^ 2 )^ (-1/2) ,x )
+Step 3: 1.1.2.1 (a+b x^2)^p, rule 17
+  Int[1/Sqrt[a_+b_.*x_^2],x_Symbol] := ArcSin[Rt[-b,2]*x/Sqrt[a]]/Rt[-b,2] /; FreeQ[{a,b},x] && GtQ[a,0] && NegQ[b]
+  Int ((1 + -1 * x ^ 2 )^ (-1/2) ,x )
+    = arcsin (x )
+(1/8) * arcsin (x )+ (1/4) * (1 - x ^ 2 )^ (1/2) * x ^ 3 - (1/8) * (1 - x ^ 2 )^ (1/2) * x 
+Step 1: 2.3 Miscellaneous exponentials, rule 16
+  Int[(e_. + f_.*x_)^m_.*F_^(a_. + b_.*(c_. + d_.*x_)^n_), x_Symbol] := (e + f*x)^n*F^(a + b*(c + d*x)^n)/(b*f*n*(c + d*x)^n*Log[F]) /; FreeQ[{F, a, b, c, d, e, f, n}, x] && EqQ[m, n - 1] && EqQ[d*e - c*f, 0]
+  Int (x * eE ^ x ^ 2 ,x )
+    = x ^ 2 * eE ^ x ^ 2 * (1/2) * x ^ -2 * ln (eE )^ -1 
+(1/2) * exp (x ^ 2 )
+- arctanh (cos (x ))

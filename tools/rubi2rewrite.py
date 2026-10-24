@@ -1115,6 +1115,38 @@ def translate_unify(util_path, out_dir, all_vars, stats):
     return 'r4_0_unify'
 
 
+def write_steps(out_dir):
+    """labels for the solution steps (STEPS RubiRules "inc/integration/rubi/steps"):
+    one line 'index<TAB>label<TAB>Mathematica rule' per rule of RubiRules, in
+    the order in which the files add them"""
+    out = []
+
+    def scan(path, default_label):
+        section, label, text = default_label, default_label, ''
+        lines = open(path, encoding='utf-8').read().split('\n')
+        for k, line in enumerate(lines):
+            if line.startswith('#   ') and k > 0 and lines[k - 1].rstrip().endswith('Abschnitt'):
+                section = line[4:].strip()
+            m = re.match(r'# (Regel|Definition) (\d+)', line)
+            if m:
+                label = '%s, %s %s' % (section, 'rule' if m.group(1) == 'Regel' else 'definition',
+                                       m.group(2))
+                text = ''
+            elif line.startswith('#   ') and not text and label != section:
+                text = line[4:].strip()
+            m = re.match(r'INC "inc/integration/rubi/(\w+)"', line)
+            if m:
+                scan(os.path.join(out_dir, m.group(1)), m.group(1))
+                label, text = section, ''
+            if line.startswith('ADDSPEC RubiRules'):
+                out.append('%d\t%s\t%s' % (len(out), label, text or line[len('ADDSPEC RubiRules : '):]))
+                if label == section:
+                    text = ''
+    scan(os.path.join(out_dir, 'all'), 'Rubi loader')
+    with open(os.path.join(out_dir, 'steps'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write('\n'.join(out) + '\n')
+
+
 def main():
     args = [a for a in sys.argv[1:] if a != '--stats']
     order_file = None
@@ -1156,6 +1188,7 @@ def main():
             f.write('NUM %s : real\n' % ','.join(sorted(all_vars['K'], key=lambda k: int(k[2:]))))
     with open(os.path.join(out_dir, 'all'), 'w', newline='\n') as f:
         f.write(LOADER % '\n'.join('INC "inc/integration/rubi/%s"' % n for n in names))
+    write_steps(out_dir)
 
     total = sum(f[3] for f in stats['files'])
     done = sum(f[2] for f in stats['files'])

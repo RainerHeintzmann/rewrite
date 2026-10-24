@@ -70,6 +70,7 @@ static const Reserved words [] = {	/* sortiert */
 	{ "SORT",   SORT },
 	{ "SPEC",   SPEC },
 	{ "STEP",   STEP },
+	{ "STEPS",  STEPS },    /* Loesungsweg einer Regelliste (2026) */
 	{ "SUBSORT",SUBSORT },  /* Untersorte mit Umwandlung (2026) */
 	{ "SYS",    SYS },
 	{ "TERM",   TERM },

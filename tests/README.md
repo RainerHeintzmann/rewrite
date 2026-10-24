@@ -49,6 +49,7 @@ can be used in scripts and CI.
 | `19_rubi` | Integration with the automatically translated Rubi rules (`RubiIntegrate`), each result checked by differentiation. |
 | `20_exact` | Exact numbers from `inc/exact`: integers and fractions, widening to real, LIFTed rules. |
 | `21_specfun` | Special functions (erf, Fresnel, sine and cosine integrals, Ei, Gamma, zeta, elliptic integrals, 2F1, ...): values and derivative rules. |
+| `22_steps` | Solution steps of the Rubi rules (`STEPS RubiRules "inc/integration/rubi/steps"`), and switching them off. |
 | `ex_*` | The example programs of the original project, for example `LiNbO3/abso1`. |
 
 Files used by the tests are in [data](data). All paths in the tests are

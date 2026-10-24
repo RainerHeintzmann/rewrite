@@ -59,7 +59,7 @@ mknod(FUNC,(Node *) declare, \
 %token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -248,6 +248,7 @@ aninstruction	: /* Nichts */ 	{$$=NULL;}
  													}
 			| LIFT '(' termlist ')' TO '(' termlist ')'	{$$=mknod(FUNC,(Node *) termlist_is_termlist,mknod(PARAM,(Node *) $7,(Node *) $3));}
 			| DBG Const 	      	{$$=mknod(FUNC,(Node *) setdebug,(Node *) ($2));}
+			| STEPS Alg String		{$$=mknod(FUNC,(Node *) steps_fkt,mknod(PARAM,(Node *) $2,(Node *) $3));} /* 2026 */
 			| RETURN term								{$$=mknod(FUNC,(Node *) return_fkt,$2);}
 			| QUIT                      {$$=mknod(FUNC,(Node *) quit_fkt,NULL);}
 			| OPT idlist                {$$=mknod(FUNC,(Node *) opt_fkt,$2);}

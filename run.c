@@ -7,6 +7,9 @@
  */
 
 #include <string.h> /* fuer strcmp */
+#include <stdio.h>
+#include <stdlib.h>
+#include "strsave.h"
 
 #include "inout.h"
 #include "run.h"
@@ -138,10 +141,75 @@ static BOOLEAN hist_cycle (Node * neu, Node * old)
 	return FALSE;
 }
 
+/* 2026: solution steps. STEPS Alg "file" shows every rule of the rule list
+   of Alg that is applied, with a label from the file (lines
+   "index<TAB>label<TAB>text", index = position of the rule in the list);
+   STEPS Alg "" switches it off. */
+static Symbol * steps_alg = NULL;
+static char ** steps_label = NULL;
+static int steps_n = 0, step_no = 0;
+
+static void steps_clear (void)
+{
+	int i;
+	for (i = 0; i < steps_n; i++) free(steps_label[i]);
+	free(steps_label);
+	steps_label = NULL;
+	steps_n = 0;
+}
+
+void steps_fkt (Node * np)
+{
+	const char * file = name((Symbol *) np->r->r);
+	FILE * f;
+	char line[8192];
+	steps_clear();
+	steps_alg = NULL;
+	if (! file || ! * file) return;			/* STEPS Alg "": off */
+	if (! (f = fopen(file, "r")))
+		{
+		printfErr("STEPS : cannot read %s\n", file);
+		return;
+		}
+	while (fgets(line, sizeof(line), f))
+		{
+		char * tab;
+		long i = strtol(line, & tab, 10);
+		if (tab == line || * tab != '\t' || i < 0 || i > 1000000) continue;
+		if (i >= steps_n)
+			{
+			int n = (int) i + 1, k;
+			steps_label = (char **) realloc(steps_label, n * sizeof(char *));
+			if (! steps_label) fatal("STEPS : no room");
+			for (k = steps_n; k < n; k++) steps_label[k] = NULL;
+			steps_n = n;
+			}
+		line[strcspn(line, "\r\n")] = 0;
+		free(steps_label[i]);
+		steps_label[i] = strsave(tab + 1);
+		}
+	fclose(f);
+	steps_alg = (Symbol *) np->r->l;
+}
+
+static void show_step (int rule, Node * old, Node * neu)
+{
+	const char * l = (rule >= 0 && rule < steps_n) ? steps_label[rule] : NULL;
+	const char * t = l ? strchr(l, '\t') : NULL;
+	printfOut("Step %d: ", ++step_no);
+	if (l) printfOut("%.*s\n  %s\n  ", (int) (t ? t - l : (int) strlen(l)), l, t ? t + 1 : "");
+	else printfOut("rule %d\n  ", rule);
+	print(old);
+	printfOut("\n    = ");
+	print(neu);
+	printfOut("\n");
+}
+
 void rewrite_begin (void)	/* vor REWR (verschachtelt: nur aussen zuruecksetzen) */
 {
 	if (rewrite_depth++ == 0)
 		{
+		step_no = 0;
 		rewrite_steps = 0;
 		step_limit_hit = FALSE;
 		hist_clear();
@@ -205,6 +273,8 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 					}
 				if (Baum && Baum->type == RULELIST)
 					hist_add(old, neu, found);
+				if (steps_alg && Baum && Baum == atypes(steps_alg))
+					show_step(found, old, neu);
 				DEBG((2,"REWR: "));
 				DBFK(2,print(old));
 				* p_term = neu;

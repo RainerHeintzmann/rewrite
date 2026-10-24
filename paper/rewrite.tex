@@ -491,7 +491,11 @@ The complete integration is the algebra list
 SPEC RubiIntegrate : (RubiNorm,IntRubi,RubiRules),RubiCollect,IntOut,All
 \end{lstlisting}
 where \texttt{RubiCollect} combines like summands of the result and
-\texttt{IntOut} restores the usual output form.
+\texttt{IntOut} restores the usual output form. As Rubi, \texttt{rewrite}
+can show the solution steps: after \texttt{STEPS RubiRules "file"}, every
+rule of the list that is applied is printed with the integral before and
+after it, labelled with its Rubi section, number and Mathematica original
+from a file that the translator writes along with the rules.
 
 \subsection{Results}
 

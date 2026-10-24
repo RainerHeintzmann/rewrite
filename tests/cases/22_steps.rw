@@ -1,0 +1,18 @@
+# Solution steps: STEPS Alg "file" shows each applied rule of the rule list
+# of Alg with its label (inc/integration/rubi/steps, written by
+# tools/rubi2rewrite.py: Rubi section, rule number, Mathematica rule).
+INC "inc/all"
+INC "inc/integration/all"
+INC "inc/integration/rubi/all"
+TERM FF : real
+CONST yy : real
+x = yy
+STEPS RubiRules "inc/integration/rubi/steps"
+FF = REWR Int(x^2*sqrt(1-x^2),x) : RubiIntegrate
+FF
+FF = REWR Int(x*exp(x^2),x) : RubiIntegrate
+FF
+# switched off again: no steps
+STEPS RubiRules ""
+FF = REWR Int(1/sin(x),x) : RubiIntegrate
+FF

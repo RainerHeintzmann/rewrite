@@ -45,6 +45,7 @@ void print	_1p(Node *);
 Node * solve	_2p(Node * ,Node *);
 Node * rewrite _2p(Node * ,Node *);
 void rewrite_begin (void);   /* 2026: Schrittbegrenzung fuer REWR */
+void steps_fkt (Node * np);  /* 2026: STEPS Alg "file": Loesungsweg anzeigen */
 void rewrite_end (void);
 extern long max_rewrite_steps;
 

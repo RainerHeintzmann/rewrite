@@ -36,6 +36,31 @@ REWR Int(x/(1+x^4),x) : RubiIntegrate
 `Int(f,x)` is the indefinite integral without integration constant. If no
 rule applies, the remaining integral is returned unchanged.
 
+Like Rubi, rewrite can show the solution steps: each rule applied, with
+its Rubi section and number, the Mathematica original, and the integral
+before and after (as an intermediate term, e.g. with `eE` for `e`):
+
+```text
+STEPS RubiRules "inc/integration/rubi/steps"
+REWR Int(x^2*sqrt(1-x^2),x) : RubiIntegrate
+Step 1: 1.1.2.2 (c x)^m (a+b x^2)^p, rule 9
+  Int[(c_.*x_)^m_.*(a_+b_.*x_^2)^p_,x_Symbol] := (c*x)^(m+1)*(a+b*x^2)^p/(c*(m+2*p+1)) + ...
+  Int (x ^ 2 * (1 + -1 * x ^ 2 )^ (1/2) ,x )
+    = x ^ 3 * (1 + -1 * x ^ 2 )^ (1/2) * (1/4) + (1/4) * Int (x ^ 2 * (1 + -1 * x ^ 2 )^ (-1/2) ,x )
+Step 2: 1.1.2.2 (c x)^m (a+b x^2)^p, rule 23
+  ...
+Step 3: 1.1.2.1 (a+b x^2)^p, rule 17
+  Int[1/Sqrt[a_+b_.*x_^2],x_Symbol] := ArcSin[Rt[-b,2]*x/Sqrt[a]]/Rt[-b,2] /; ...
+  Int ((1 + -1 * x ^ 2 )^ (-1/2) ,x )
+    = arcsin (x )
+(1/8) * arcsin (x )+ (1/4) * (1 - x ^ 2 )^ (1/2) * x ^ 3 - (1/8) * (1 - x ^ 2 )^ (1/2) * x
+STEPS RubiRules ""
+```
+
+The labels come from `rubi/steps`, which the translator writes along with
+the rules. Steps done inside C helpers (partial fractions, substitutions)
+appear as one step.
+
 Numbers are exact where possible: the integration package loads
 [inc/exact](../exact), so `1/3` stays the fraction `(1/3)`, and roots like
 `sqrt(3)` become real numbers. Rubi also uses complex numbers, which the
@@ -283,5 +308,5 @@ checks every result by differentiating it again, and
 | [2_exponentials](2_exponentials) | Exponentials, and polynomials times exponentials. |
 | [4.1_sine](4.1_sine) | Sine and cosine, and polynomials times them. |
 | [rubi/all](rubi/all) | Loads the automatically translated rules and defines `RubiIntegrate`. |
-| [rubi/](rubi) | One file per Rubi rule file, `declarations`, `STATISTICS.txt`. |
+| [rubi/](rubi) | One file per Rubi rule file, `declarations`, `STATISTICS.txt`, `steps` (labels for `STEPS`). |
 | [LICENSE.Rubi](LICENSE.Rubi) | License of the original rules. |

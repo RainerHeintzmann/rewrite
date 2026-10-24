@@ -405,6 +405,7 @@ This prints `10 20 30`.
 | `DATA Const` | Reads the next number from the data file into `Const`. Non-numeric text up to the end of the line is skipped. |
 | `SYS "command"` | Runs a shell command. |
 | `DEBUG n` | Sets the debug level of the interpreter. |
+| `STEPS Alg "file"` | Shows each applied rule of the rule list of `Alg` (solution steps), labelled from `file` (lines `index<TAB>label<TAB>text`); `STEPS Alg ""` switches it off. |
 | `QUIT` | Ends the program. |
 
 ## The standard library
