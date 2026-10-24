@@ -88,6 +88,10 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m), (neq(P_m,(-1)))
 | helpers defined in the rule files (`IntBinomialQ`, ...) | inlined |
 | `ExpandIntegrand`, `PolyQ`, `Subst`, `Rt`, `D`, ... | the C helpers of [inc/helpers](../helpers) |
 | Rubi's inert trig functions `sin`, `cos`, ... | the normal functions |
+| `LinearQ[{u,v},x]` (a predicate on a list) | `linearq(u,x) && linearq(v,x)` |
+| `ReplaceAll[u, x -> v]` | `replaceall(u,x,v)` |
+| `ExpandTrig`, `ExpandTrigReduce` | `expandintegrand`, `expandtrigreduce` |
+| `Erf`, `FresnelS`, `SinIntegral`, `ExpIntegralEi`, `Gamma`, `EllipticF`, `Hypergeometric2F1`, ... | the special functions of [inc/alg](../alg) (`erf`, `fresnels`, `sinint`, `expint`, `Gamma`, `ellipticf`, `hyp2f1`, ...) |
 
 The rules are stored in Rubi's order in a rule list (see "Rule lists" in
 the main README). The matcher handles optional parts and commutative
@@ -135,7 +139,23 @@ the derivative of the result must equal the integrand at several points.
 python3 tools/rubitest.py SUITE --files Apostol --report report.txt
 ```
 
-RESULTS_PLACEHOLDER
+On the four collections of independent problems in the test suite
+(textbooks of Apostol, Hearn, Stewart and Timofeev, 1540 problems), the
+results are:
+
+| Result | Problems | Share of tested |
+| --- | --- | --- |
+| solved and verified | 847 | 55.0% |
+| no antiderivative found | 673 | 43.7% |
+| wrong | 3 | 0.2% |
+| crash or time-out | 7 | 0.5% |
+| not verifiable | 9 | 0.6% |
+
+One problem uses a function that rewrite does not have and is not tested.
+The three wrong results contain special functions outside their real
+domain, where the check compares different complex branches. A run takes
+about ten minutes. The harness needs `mpmath` for the special functions
+(`pacman -S mingw-w64-ucrt-x86_64-python-mpmath` in MSYS2).
 
 ## The hand-translated subset
 
