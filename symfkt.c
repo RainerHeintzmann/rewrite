@@ -201,7 +201,8 @@ int term_has_nan (Node * t)	/* contains NaN, infinity or a division by zero */
 	if (is_head(t, "polyquotient", 3) || is_head(t, "polyremainder", 3)
 	    || is_head(t, "expandintegrand", -1) || is_head(t, "substexp", -1)
 	    || is_head(t, "substfor", -1) || is_head(t, "trignorm", -1)
-	    || is_head(t, "substfracpow", -1) || is_head(t, "substsqrtquad", -1)) return 1;
+	    || is_head(t, "substfracpow", -1) || is_head(t, "substsqrtquad", -1)
+	    || is_head(t, "trigexpand", -1)) return 1;
 	n = term_nargs(t);
 	for (i = 0; i < n; i++)
 		if (term_has_nan(arg(t, i))) return 1;
@@ -537,12 +538,20 @@ static Node * tl_collect (TList * l)
 		else ms[nm++] = m;
 		if (fabs(m.c) > mag[j]) mag[j] = fabs(m.c);
 		}
+	{
+	double gmax = 0;		/* the largest coefficient of the sum */
+	for (j = 0; j < nm; j++)
+		if (fabs(ms[j].c) > gmax) gmax = fabs(ms[j].c);
 	for (j = 0; j < nm; j++)
 		{
-		/* cancelled up to rounding errors: 0.375 a - 0.375 a */
-		if (fabs(ms[j].c) > 1e-12 * mag[j]) s = mk_add(s, mono_build(& ms[j]));
+		/* cancelled up to rounding errors: 0.375 a - 0.375 a; or a rounding
+		 * error next to the other summands: 3e-17 * u from cos(pi/2) */
+		if (fabs(ms[j].c) > 1e-12 * mag[j]
+		    && (ms[j].exact || fabs(ms[j].c) > 1e-13 * gmax))
+			s = mk_add(s, mono_build(& ms[j]));
 		free(ms[j].f);
 		}
+	}
 	free(ms);
 	free(mag);
 	tl_free(l);	/* the monomials referred to these terms */
@@ -1210,14 +1219,41 @@ static Node * pi2_shift (Node * t)
 	summands_to(arg(t, 0), & l, 0);
 	for (j = 0; j < l.n; j++)
 		if (! k && num_value(l.t[j], & v) && (q = v / (M_PI / 2), fabs(q - floor(q + 0.5)) < 1e-9)
-		    && ((long) floor(q + 0.5)) % 2 != 0)
-			k = (int) ((((long) floor(q + 0.5)) % 4 + 4) % 4);	/* 1 or 3 */
+		    && ((long) floor(q + 0.5)) % 4 != 0)
+			k = (int) ((((long) floor(q + 0.5)) % 4 + 4) % 4);	/* 1, 2 or 3 */
 		else
 			rest = rest ? mk_add(rest, tcpy(l.t[j])) : tcpy(l.t[j]);
 	tl_free(& l);
 	if (! k || ! rest) { delete(rest); return NULL; }
+	if (k == 2)		/* shift by pi: sin(u+pi) = -sin(u), tan(u+pi) = tan(u) */
+		{
+		r = mk_f1(sh[i].f, rest);
+		return (i == 2 || i == 3) ? r : mk_neg(r);
+		}
 	r = mk_f1(sh[i].g, rest);
 	return (k == 1 ? sh[i].s1 : sh[i].s3) < 0 ? mk_neg(r) : r;
+}
+
+/* all trig functions of u + k*pi/2 in t written without the shift */
+static Node * shift_all (Node * t)
+{
+	Node * r, * s;
+	int k, n;
+	t = deref(t);
+	if (! t || t->type != Func) return tcpy(t);
+	n = term_nargs(t);
+	{
+	Node * args = NULL, ** tail = & args;
+	for (k = 0; k < n; k++)
+		{
+		Node * c = shift_all(arg(t, k));
+		if (k < n - 1) { * tail = mknod(Terms, c, NULL); tail = & (* tail)->r; }
+		else * tail = c;
+		}
+	r = mknod(Func, t->l, args);
+	}
+	if ((s = pi2_shift(r)) != NULL) { delete(r); return s; }
+	return r;
 }
 
 /* ---- trignorm(u, x): Mathematica's 1/sin = csc and Rubi's FixInertTrigFunction ----
@@ -1401,6 +1437,179 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 		}
 	if (! r) r = mk_int(1);
 	if (nt == 0 || tequal(r, a[0])) { delete(r); return NULL; }	/* no change */
+	return r;
+}
+
+/* ---- trigexpand(u, x): Mathematica's TrigExpand for multiple angles ----
+ * If u contains sin, cos, tan, cot, sec, csc of at least two different
+ * multiples k*w of one angle w = g*x (sin(2x) and cos(x), cos(x) and
+ * tan(x/2)), all of them are written with sin(w) and cos(w):
+ *   sin(k w) = sum_{j odd} (-1)^((j-1)/2) C(k,j) cos^(k-j) sin^j,
+ *   cos(k w) = sum_{j even} (-1)^(j/2) C(k,j) cos^(k-j) sin^j,
+ * tan, cot, sec, csc as quotients. NULL if u has no such form. */
+
+#define MAXTX 16
+typedef struct { int n, ok, denom; double c[MAXTX]; int frac[MAXTX]; double g; } TrigExp;
+
+static int is_circ (Node * t)
+{
+	static const char * h[] = { "sin", "cos", "tan", "cot", "sec", "csc", NULL };
+	int i;
+	t = deref(t);
+	if (! t || t->type != Func || term_nargs(t) != 1) return 0;
+	for (i = 0; h[i]; i++)
+		if (is_head(t, h[i], 1)) return 1;
+	return 0;
+}
+
+static int tx_coeff (Node * t, Node * x, double * c)	/* argument = c*x */
+{
+	Node * k[64];		/* MAXDEG, defined below */
+	int deg, j, ok;
+	if (! poly_coeffs(arg(t, 0), x, k, & deg)) return 0;
+	ok = deg == 1 && is_zero(k[0]) && num_value(k[1], c) && * c != 0;
+	for (j = 0; j <= deg; j++) delete(k[j]);
+	return ok;
+}
+
+/* ctx: 0 polynomial, 1 in a denominator (negative power), 2 under a
+ * non-integer power, 3 in another function (exp(sin(x))) */
+static void tx_scan (Node * u, Node * x, TrigExp * s, int ctx)
+{
+	double c, e;
+	int i, k, n;
+	u = deref(u);
+	if (! s->ok || ! u || ! contains(u, x)) return;
+	if (u->type != Func) { s->ok = 0; return; }	/* x outside the trig functions */
+	if (is_head(u, "^", 2))
+		{
+		int c2 = ctx;
+		if (! num_value(arg(u, 1), & e) || e != floor(e))
+			{
+			c2 = 2;
+			/* (sin(x)*cos(x)^3)^(1/2): would be split into powers of
+			 * the factors, which is wrong where both are negative */
+			if (is_head(arg(u, 0), "*", 2) || is_head(arg(u, 0), "/", 2)) { s->ok = 0; return; }
+			}
+		else if (e < 0 && c2 == 0) c2 = 1;
+		tx_scan(arg(u, 0), x, s, c2);
+		tx_scan(arg(u, 1), x, s, ctx == 2 ? 2 : 3);	/* e^sin(x) */
+		return;
+		}
+	if (! is_circ(u) && ! is_head(u, "+", 2) && ! is_head(u, "*", 2) && ! is_head(u, "-", -1))
+		{
+		n = term_nargs(u);
+		for (k = 0; k < n; k++) tx_scan(arg(u, k), x, s, ctx == 2 ? 2 : 3);
+		return;
+		}
+	if (is_circ(u))
+		{
+		if (! tx_coeff(u, x, & c)) { s->ok = 0; return; }
+		/* not a polynomial in sin and cos */
+		if (ctx != 0 || ! is_head(u, "sin", 1) && ! is_head(u, "cos", 1)) s->denom = 1;
+		for (i = 0; i < s->n; i++)
+			if (fabs(s->c[i] - c) < 1e-12) break;
+		if (i == s->n)
+			{
+			if (s->n == MAXTX) { s->ok = 0; return; }
+			s->frac[s->n] = 0;
+			s->c[s->n++] = c;
+			}
+		/* under a root: sin(2x) = 2 sin cos is a product, cos(2x) a sum */
+		if (ctx == 2 && ! is_head(u, "cos", 1)) s->frac[i] = 1;
+		return;
+		}
+	n = term_nargs(u);
+	for (k = 0; k < n; k++) tx_scan(arg(u, k), x, s, ctx);
+}
+
+static Node * tx_multiple (int sine, int k, Node * w)	/* sin(k w) or cos(k w) */
+{
+	Node * r = NULL;
+	double binom = 1;
+	int j;
+	for (j = 0; j <= k; j++)
+		{
+		if (j > 0) binom = binom * (k - j + 1) / j;
+		if ((j % 2 == 1) == sine)
+			{
+			double sg = ((sine ? (j - 1) / 2 : j / 2) % 2) ? -1 : 1;
+			Node * t = mk_mul(mk_int(sg * binom),
+				mk_mul(mk_pow(mk_f1("cos", tcpy(w)), mk_int(k - j)),
+				       mk_pow(mk_f1("sin", tcpy(w)), mk_int(j))));
+			r = r ? mk_add(r, t) : t;
+			}
+		}
+	return r;
+}
+
+static Node * tx_repl (Node * u, Node * x, TrigExp * s, Node * w)
+{
+	double c;
+	int k, n;
+	u = deref(u);
+	if (! contains(u, x) || u->type != Func) return tcpy(u);
+	if (is_circ(u) && tx_coeff(u, x, & c))
+		{
+		const char * h = name(TERM_HEAD(u));
+		int m = (int) floor(fabs(c) / s->g + 0.5);
+		double sg = c < 0 ? -1 : 1;		/* sin(-kw) = -sin(kw) */
+		Node * sk = mk_mul(mk_int(sg), tx_multiple(1, m, w)), * ck = tx_multiple(0, m, w);
+		if (! strcmp(h, "sin")) { delete(ck); return sk; }
+		if (! strcmp(h, "cos")) { delete(sk); return ck; }
+		if (! strcmp(h, "tan")) return mk_mul(sk, mk_pow(ck, mk_int(-1)));
+		if (! strcmp(h, "cot")) return mk_mul(ck, mk_pow(sk, mk_int(-1)));
+		if (! strcmp(h, "sec")) { delete(sk); return mk_pow(ck, mk_int(-1)); }
+		delete(ck);
+		return mk_pow(sk, mk_int(-1));				/* csc */
+		}
+	n = term_nargs(u);
+	{
+	Node * args = NULL, ** tail = & args;
+	for (k = 0; k < n; k++)
+		{
+		Node * a = tx_repl(arg(u, k), x, s, w);
+		if (k < n - 1) { * tail = mknod(Terms, a, NULL); tail = & (* tail)->r; }
+		else * tail = a;
+		}
+	return mknod(Func, u->l, args);
+	}
+}
+
+static Node * s_trigexpand (Node * a[], int n, Symbol * f)
+{
+	TrigExp s;
+	double p, q, gp = 0, gq = 1;
+	int i;
+	Node * w, * r;
+	Node * u;
+	if (n != 2) return NULL;
+	s.n = 0; s.ok = 1; s.denom = 0;
+	u = shift_all(a[0]);			/* sec(pi/2 + 2x) = -csc(2x) */
+	tx_scan(u, a[1], & s, 0);
+	/* only with trig functions in a denominator: products of sin and cos
+	 * are left to Rubi's product-to-sum reduction (cos(3x)*cos(5x)) */
+	if (! s.ok || s.n < 2 || ! s.denom) { delete(u); return NULL; }
+	for (i = 0; i < s.n; i++)		/* g = gcd of the coefficients */
+		{
+		double x1, y1, t;
+		if (! rat_approx(fabs(s.c[i]), & p, & q)) { delete(u); return NULL; }
+		x1 = gp; y1 = p;
+		while (y1 != 0) { t = fmod(x1, y1); x1 = y1; y1 = t; }
+		gp = x1;
+		x1 = gq; y1 = q;
+		while (y1 != 0) { t = fmod(x1, y1); x1 = y1; y1 = t; }
+		gq = gq / x1 * q;
+		}
+	s.g = gp / gq;
+	for (i = 0; i < s.n; i++)
+		if (fabs(s.c[i]) / s.g > 12.5			/* too many terms */
+		    || (s.frac[i] && fabs(fabs(s.c[i]) - s.g) > 1e-12))	/* sin(2x)^(3/2) */
+			{ delete(u); return NULL; }
+	w = s.g == 1 ? tcpy(a[1]) : mk_mul(mk_num_ex(s.g, 1), tcpy(a[1]));
+	r = tx_repl(u, a[1], & s, w);
+	delete(w);
+	delete(u);
 	return r;
 }
 
@@ -3566,6 +3775,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "nonfreefactors",  s_nonfreefactors },
 	{ "removecontent",   s_removecontent },
 	{ "trignorm",        s_trignorm },
+	{ "trigexpand",      s_trigexpand },
 	{ "substfracpow",    s_substfracpow },
 	{ "substsqrtquad",   s_substsqrtquad },
 	{ "expandtosum",     s_expandtosum },

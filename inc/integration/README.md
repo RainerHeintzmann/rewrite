@@ -156,6 +156,16 @@ have it, so a few steps are added:
   next to a power of a sum of cosines becomes `sin(x)^-1`, ... The first
   rule of `RubiRules` after the constant factors does both (`trignorm`,
   with Rubi's tables); it also combines `sin(x)*csc(x)^3 = csc(x)^2`.
+- Multiple angles: for a function of trig functions of different multiples
+  of one angle (and no `x` outside them), as `sin(x)/cos(2*x)`,
+  `sin(2*x)*sqrt(1+3*cos(x)^2)` or `exp(sin(x))*sin(2*x)`, the next rule
+  writes all of them with `sin` and `cos` of the angle (`trigexpand`,
+  Mathematica's `TrigExpand`: `cos(2*x) = cos(x)^2 - sin(x)^2`, ...).
+  Shifts by multiples of `pi/2` from the cosine unification are removed
+  first. Not expanded are polynomials in sines and cosines, which Rubi
+  reduces from products to sums (`cos(3*x)*cos(5*x)`, the expansion would
+  undo that), and multiples of sines under a root (`sin(2*x)^(3/2)` would
+  become a power of a product).
 - Hyperbolic functions: Rubi turns `sinh(u)` into `-i*sin(i*u)`, which needs
   complex numbers. Instead, the last rule of `RubiRules` writes hyperbolic
   functions for which no rule applies with exponentials (`hyp2exp`):
@@ -264,16 +274,19 @@ results are:
 
 | Result | Problems | Share of tested |
 | --- | --- | --- |
-| solved and verified | 1355 | 88.0% |
-| no antiderivative found | 164 | 10.7% |
-| wrong | 2 | 0.1% |
+| solved and verified | 1390 | 90.3% |
+| no antiderivative found | 126 | 8.2% |
+| wrong | 3 | 0.2% |
 | crash or time-out | 0 | 0.0% |
-| not verifiable | 18 | 1.2% |
+| not verifiable | 20 | 1.3% |
 
 One problem uses a function that rewrite does not have and is not tested.
-The two wrong results contain special functions outside their real
-domain, where the check compares different complex branches. A run takes
-about three minutes. The harness needs `mpmath` for the special functions
+Two wrong results contain special functions outside their real domain,
+where the check compares different complex branches. The third splits
+`sqrt(sin(x)*cos(x)^3)` into `cos(x)^(3/2)*sin(x)^(1/2)` (Rubi's rules for
+fractional powers of products), which is wrong where both factors are
+negative. A run takes
+about five minutes. The harness needs `mpmath` for the special functions
 (`pacman -S mingw-w64-ucrt-x86_64-python-mpmath` in MSYS2).
 
 ## The hand-translated subset

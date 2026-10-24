@@ -38,9 +38,9 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{1355}
-\newcommand{\psolved}{88.0\%}
-\newcommand{\nwrong}{2}
+\newcommand{\nsolved}{1390}
+\newcommand{\psolved}{90.3\%}
+\newcommand{\nwrong}{3}
 \newcommand{\nfailed}{0}
 
 \title{\texttt{rewrite}: a programming language that learns its\\
@@ -480,7 +480,13 @@ on Mathematica writing $1/\sin x$ as $\csc x$, and on its own
 \texttt{FixInertTrigFunction}, which rewrites products of two trigonometric
 functions, e.g.\ $\sec x\sin^2x$ as $\cos^{-1}x\sin^2x$; a C function with
 Rubi's tables does both before the rules are tried. Without it, even
-$\int dx/\sin x$ remained unsolved. For hyperbolic
+$\int dx/\sin x$ remained unsolved. Similarly, functions of
+trigonometric functions of different multiples of one angle, such as
+$\sin x/\cos 2x$ or $e^{\sin x}\sin 2x$, are written with $\sin x$ and
+$\cos x$ first, as Mathematica's \texttt{TrigExpand} does; polynomials in
+sines and cosines are left to Rubi's product-to-sum reduction, which the
+expansion would undo.
+For hyperbolic
 functions, Rubi uses $\sinh u=-i\sin(iu)$, which needs complex numbers.
 Instead, a last rule writes hyperbolic functions for which no other rule
 applies with exponentials, $\sinh u=(e^u-e^{-u})/2$, so that
@@ -557,10 +563,10 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 164 & 10.7\% \\
-wrong result              & \nwrong  & 0.1\% \\
+no antiderivative found   & 126 & 8.2\% \\
+wrong result              & \nwrong  & 0.2\% \\
 crash or time-out         & \nfailed & 0.0\% \\
-not verifiable            & 18 & 1.2\% \\
+not verifiable            & 20 & 1.3\% \\
 \bottomrule
 \end{tabular}
 \caption{Results on the \ntested{} tested problems of four independent
@@ -577,12 +583,14 @@ the cosine unification, the hyperbolic fallback and the symbolic $e$, 62\%
 after them, 79\% after partial fractions, the inside-out evaluation of
 nested helpers and the flat matching of products, 84\% with Rubi's
 substitutions, 85.5\% with the normal form of trigonometric products, and
-88\% with Rubi's meaning of \texttt{GtQ} and the substitutions for roots.
-The two
+88\% with Rubi's meaning of \texttt{GtQ} and the substitutions for roots,
+and 90\% with the expansion of multiple angles. Two of the
 results counted as wrong contain special functions evaluated outside their
 real domain (${}_2F_1$ at an argument $e^{7x}/3>1$, the incomplete Gamma
 function of a negative argument), where the check compares different
-complex branches. A run takes about three minutes.
+complex branches; the third writes $\sqrt{\sin x\cos^3x}$ as
+$\cos^{3/2}x\,\sin^{1/2}x$, which is wrong where both factors are
+negative. A run takes about five minutes.
 
 The translation also served as a test of the library itself. It revealed
 two incorrect simplification rules in the standard algebra, which turned

@@ -20,6 +20,9 @@ ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
 # wie Mathematica 1/sin(u) = csc(u), und Rubis FixInertTrigFunction fuer
 # Produkte zweier Winkelfunktionen: sec(u)*sin(u)^2 = cos(u)^-1*sin(u)^2
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(trignorm(Uv,Xv),Xv)
+# Vielfache eines Winkels (sin(2x) neben cos(x)) mit sin, cos des Winkels
+# schreiben, wie Mathematicas TrigExpand
+ADDSPEC RubiRules : Int(Uv,Xv) = Int(trigexpand(Uv,Xv),Xv)
 # Polynome im Integranden in Mathematicas Normalform c0+c1*x+...
 # (ohne Aenderung wird die Regel uebersprungen)
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)

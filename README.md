@@ -530,6 +530,7 @@ loaded by the integration rules and can also be used on their own:
 | `nonsumq(u)` | `u` is no sum |
 | `derivdivides(y,u,x)`, `falseq(u)` | `u/y'` if it is free of `x` (else unevaluated); `u` is an unevaluated helper, i.e. Rubi's `False` |
 | `trignorm(u,x)`, `removecontent(u,x)` | `1/sin = csc` and Rubi's `FixInertTrigFunction` for products of trig functions; `u` without constant factors, `cos(pi/2+x)` as `-sin(x)` |
+| `trigexpand(u,x)` | trig functions of multiples of one angle with `sin`, `cos` of the angle (Mathematica's `TrigExpand`); not for polynomials in sin and cos |
 | `substfracpow(u,x)`, `substsqrtquad(u,x)` | Rubi's substitutions `t = (a+b*x)^(1/n)` and Euler's for `sqrt(a+b*x+c*x^2)` (the transformed integral) |
 | `gtq(u,v)`, `ltq`, `geq`, `leq` | Rubi's `GtQ`, ...: false unless both are numbers |
 
