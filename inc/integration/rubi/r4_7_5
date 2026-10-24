@@ -230,16 +230,16 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_p), (eqq(((O_b)+(O_c)),0)) I
 #   Int[u_.*(a_. + b_.*cot[d_. + e_.*x_]^2 + c_.*csc[d_. + e_.*x_]^2)^p_., x_Symbol] := (a + c)^p*Int[ActivateTrig[u], x] /; FreeQ[{a, b, c, d, e, p}, x] && EqQ[b + c, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_p), (eqq(((O_b)+(O_c)),0)) Int((O_u)*(((O_a)+((O_b)*((cot((O_d)+((O_e)*(Xv))))^(2)))+((O_c)*((csc((O_d)+((O_e)*(Xv))))^(2))))^(O_p)),Xv) = ((((((O_a)+(O_c)))^(O_p)))*(Int(O_u,Xv)))
 
-# Regel 48 nicht uebersetzt: function DerivativeDivides
+# Regel 48 nicht uebersetzt: predicate InertTrigFreeQ
 #   Int[u_/y_, x_Symbol] := With[{q = DerivativeDivides[ActivateTrig[y], ActivateTrig[u], x]}, q*Log[RemoveContent[ActivateTrig[y], x]] /; Not[FalseQ[q]]] /; Not[InertTrigFreeQ[u]]
 
-# Regel 49 nicht uebersetzt: function DerivativeDivides
+# Regel 49 nicht uebersetzt: predicate InertTrigFreeQ
 #   Int[u_/(y_*w_), x_Symbol] := With[{q = DerivativeDivides[ActivateTrig[y*w], ActivateTrig[u], x]}, q*Log[RemoveContent[ActivateTrig[y*w], x]] /; Not[FalseQ[q]]] /; Not[InertTrigFreeQ[u]]
 
-# Regel 50 nicht uebersetzt: function DerivativeDivides
+# Regel 50 nicht uebersetzt: predicate InertTrigFreeQ
 #   Int[u_*y_^m_., x_Symbol] := With[{q = DerivativeDivides[ActivateTrig[y], ActivateTrig[u], x]}, q*ActivateTrig[y^(m + 1)]/(m + 1) /; Not[FalseQ[q]]] /; FreeQ[m, x] && NeQ[m, -1] && Not[InertTrigFreeQ[u]]
 
-# Regel 51 nicht uebersetzt: function DerivativeDivides
+# Regel 51 nicht uebersetzt: predicate InertTrigFreeQ
 #   Int[u_*y_^m_.*z_^n_., x_Symbol] := With[{q = DerivativeDivides[ActivateTrig[y*z], ActivateTrig[u*z^(n - m)], x]}, q*ActivateTrig[y^(m + 1)*z^(m + 1)]/(m + 1) /; Not[FalseQ[q]]] /; FreeQ[{m, n}, x] && NeQ[m, -1] && Not[InertTrigFreeQ[u]]
 
 # Regel 52 (81 Varianten):
@@ -270,7 +270,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p), (not(integerq(O_n))), (n
 
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p), (not(integerq(O_n))), (not(integerq(P_p))) Int((O_u)*(((O_a)*(((O_b)*(csc((O_c)+((O_d)*(Xv)))))^(P_p)))^(O_n)),Xv) = ((((O_a)^(intpart(O_n))))*(((((O_a)*(((((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))^(P_p)))))^(fracpart(O_n))))*(((((((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))^(((P_p)*(fracpart(O_n))))))^((-1))))*(Int(((O_u)*(((((O_b)*(csc(((O_c)+(((O_d)*(Xv))))))))^(((O_n)*(P_p)))))),Xv)))
 
-# Regel 54 nicht uebersetzt: predicate FalseQ
+# Regel 54 nicht uebersetzt: function FunctionOfTrig
 #   Int[u_*(c_.*sin[v_])^m_, x_Symbol] := With[{w = FunctionOfTrig[u*Sin[v/2]^(2*m)/(c*Tan[v/2])^m, x]}, (c*Sin[v])^m*(c*Tan[v/2])^m/Sin[v/2]^(2*m)* Int[u*Sin[v/2]^(2*m)/(c*Tan[v/2])^m, x] /; Not[FalseQ[w]] && FunctionOfQ[NonfreeFactors[Tan[w], x], u*Sin[v/2]^(2*m)/(c*Tan[v/2])^m, x]] /; FreeQ[c, x] && LinearQ[v, x] && IntegerQ[m + 1/2] && Not[SumQ[u]] && InverseFunctionFreeQ[u, x]
 
 # Regel 55 (17496 Varianten):

@@ -1,10 +1,9 @@
-translated 6810 of 7422 rules (92%) from 200 files
+translated 6830 of 7422 rules (92%) from 200 files
 
 reasons for rules that were not translated:
    245  symbol I
     41  predicate MatchQ
     25  Module with a local variable without value
-    24  function DerivativeDivides
     19  call of a non-symbol
     19  function HypergeometricPFQ
     16  predicate FunctionOfExponentialQ
@@ -15,6 +14,7 @@ reasons for rules that were not translated:
      9  function Complex in pattern
      8  function PolynomialDivide
      8  parse error: expected ']', got ';'
+     8  predicate InertTrigFreeQ
      8  function Integral
      7  symbol u
      7  predicate TrinomialMatchQ
@@ -24,7 +24,6 @@ reasons for rules that were not translated:
      6  function variable without a finite set of functions
      5  function Factor
      5  parse error at '['
-     5  predicate FalseQ
      5  predicate IGeQ
      4  predicate PerfectSquareQ
      4  function Mod
@@ -32,8 +31,8 @@ reasons for rules that were not translated:
      4  function RationalFunctionExpand
      4  function Sum
      4  function NormalizePowerOfLinear
-     4  predicate InertTrigFreeQ
      4  function ExpandExpression
+     4  function PowerVariableExpn
      3  predicate AtomQ
      3  function Sign
      3  predicate ComplexFreeQ
@@ -62,6 +61,7 @@ reasons for rules that were not translated:
      1  function NormalizeIntegrand
      1  function Exponent
      1  predicate IntegralFreeQ
+     1  function FunctionOfTrig
      1  function TrigSimplify
      1  Block
      1  parse error: expected ')', got '!'
@@ -152,7 +152,7 @@ per file (translated / total):
   24 /   24  r3_2_1       3.2.1 (f+g x)^m (A+B log(e ((a+b x) over (c+d x))^n))^p
   19 /   19  r3_2_2       3.2.2 (f+g x)^m (h+i x)^q (A+B log(e ((a+b x) over (c+d x))^n))^p
   19 /   20  r3_2_3       3.2.3 u log(e (f (a+b x)^p (c+d x)^q)^r)^s
-  39 /   43  r3_5         3.5 Miscellaneous logarithms
+  41 /   43  r3_5         3.5 Miscellaneous logarithms
   26 /   26  r4_1_0_1     4.1.0.1 (a sin)^m (b trg)^n
   30 /   30  r4_1_0_2     4.1.0.2 (a trg)^m (b tan)^n
   14 /   14  r4_1_0_3     4.1.0.3 (a csc)^m (b sec)^n
@@ -265,8 +265,8 @@ per file (translated / total):
   26 /   29  r8_5         8.5 Hyperbolic integral functions
   20 /   24  r8_6         8.6 Gamma functions
    5 /    5  r8_7         8.7 Zeta function
-  24 /   26  r8_8         8.8 Polylogarithm function
+  26 /   26  r8_8         8.8 Polylogarithm function
   44 /   44  r8_9         8.9 Product logarithm function
    2 /    3  r8_10        8.10 Bessel functions
    0 /   21  r9_1         9.1 Derivative integration rules
-  24 /   67  r9_3         9.3 Miscellaneous integration rules
+  40 /   67  r9_3         9.3 Miscellaneous integration rules

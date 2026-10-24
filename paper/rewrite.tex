@@ -38,8 +38,8 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{1290}
-\newcommand{\psolved}{83.8\%}
+\newcommand{\nsolved}{1292}
+\newcommand{\psolved}{84.0\%}
 \newcommand{\nwrong}{2}
 \newcommand{\nfailed}{0}
 
@@ -414,7 +414,11 @@ rule never applied until this was changed. Rubi's substitutions rest on
 integrand is a function of, say, $\sin w$ and write it in a new variable,
 also through identities such as $\cos^2w=1-\sin^2w$; with these two C
 functions, 34 substitution rules for trigonometric and hyperbolic functions
-became translatable. The substitution $x\to F^{gx}$ for functions of
+became translatable. \texttt{DerivativeDivides[y,u,x]} returns $u/y'$ if it
+is free of $x$, and \texttt{False} otherwise; it is a C function that stays
+unevaluated when it does not apply, and \texttt{FalseQ} tests for exactly
+that, so that 20 rules of the form $\int u\,f(y)\,dx=q\int f(t)\,dt$ with
+$t=y$ could be translated. The substitution $x\to F^{gx}$ for functions of
 exponentials is a C function that takes the place of Rubi's rule, which
 uses pattern tests the translator cannot express. Many results of Rubi need special functions; 27 of them,
 from the error function and the Fresnel and exponential integrals to the
@@ -479,11 +483,11 @@ where \texttt{RubiCollect} combines like summands of the result and
 
 \subsection{Results}
 
-The translator converts 6810 of Rubi's 7422 rules (92\%), which become
-7301 \texttt{rewrite} rules after the expansion of function variables. The
+The translator converts 6830 of Rubi's 7422 rules (92\%), which become
+7321 \texttt{rewrite} rules after the expansion of function variables. The
 largest group of the remaining rules needs complex numbers (245 rules);
 others use the rest of Rubi's substitution machinery
-(\texttt{DerivativeDivides}, \texttt{FunctionOfExponentialQ}), general pattern tests
+(\texttt{FunctionOfExponentialQ}), general pattern tests
 (\texttt{MatchQ}), function variables without a finite set of functions,
 or the generalized hypergeometric function. Loading all translated rules takes
 about half a second, and a typical integral a fraction of a second.
@@ -535,7 +539,7 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 231 & 15.0\% \\
+no antiderivative found   & 229 & 14.9\% \\
 wrong result              & \nwrong  & 0.1\% \\
 crash or time-out         & \nfailed & 0.0\% \\
 not verifiable            & 16 & 1.0\% \\
@@ -606,7 +610,7 @@ the tests.
 
 Performance is adequate for interactive use. Loading the standard library
 and computing a derivative takes well below 0.1\,s on a current laptop;
-loading the 7301 integration rules about half a second. A scalar loop
+loading the 7321 integration rules about half a second. A scalar loop
 written in the language itself needs about 0.25\,$\mu$s per iteration
 (measured for $10^7$ iterations of \texttt{s = s + k*k}). We estimate this
 to be about two orders of magnitude slower than an equivalent compiled

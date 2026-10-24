@@ -345,7 +345,7 @@ RHS_HELPERS = {
     'SimplifyIntegrand': 'simp',
     'ExpandTrig': 'expandintegrand', 'ExpandTrigReduce': 'expandtrigreduce',
     'LeafCount': 'leafcount', 'BinomialDegree': 'binomialdegree',
-    'Numer': 'numerator', 'SubstFor': 'substfor',
+    'Numer': 'numerator', 'SubstFor': 'substfor', 'DerivativeDivides': 'derivdivides',
 }
 # predicates in conditions
 PREDICATES = {
@@ -357,7 +357,7 @@ PREDICATES = {
     'PolynomialQ': 'polyq', 'NiceSqrtQ': 'nicesqrtq',
     'BinomialQ': 'binomialq', 'QuadraticQ': 'quadraticq',
     'RationalFunctionQ': 'rationalfunctionq', 'InverseFunctionFreeQ': 'inversefunctionfreeq',
-    'FunctionOfQ': 'functionofq',
+    'FunctionOfQ': 'functionofq', 'FalseQ': 'falseq',
     'SimplerQ': 'simplerq', 'SumSimplerQ': 'sumsimplerq', 'SimplerSqrtQ': 'simplersqrtq',
     'KnownSineIntegrandQ': 'knownsineintegrandq', 'KnownTangentIntegrandQ': 'knowntangentintegrandq',
     'KnownCotangentIntegrandQ': 'knowncotangentintegrandq',
@@ -981,6 +981,7 @@ ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
 # am Ende: gleiche Summanden des Ergebnisses zusammenfassen
 ALG RubiCollect
 ADDSPEC RubiCollect : Uv+Vv = collect(Uv+Vv)
+ADDSPEC RubiCollect : Uv*Vv = simp(Uv*Vv)       # x^2*e/x^2 = e
 OPT
 DEFAULT
 COMM

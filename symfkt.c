@@ -814,9 +814,10 @@ static Node * s_expandintegrand (Node * a[], int n, Symbol * f)
 	expand_to(in, & l);
 	r = tl_collect(& l);
 	/* Rubi rules like Int[u] := Int[ExpandIntegrand[u,x],x] loop if the
-	 * expansion makes no progress (e.g. partial fractions, which are not
-	 * implemented). Then expandintegrand stays unevaluated. */
-	if (tequal(r, in))
+	 * expansion makes no progress. Then expandintegrand stays unevaluated;
+	 * also if no sum results: only the form of a product would change,
+	 * and RubiNorm would change it back. */
+	if (tequal(r, in) || ! (is_head(r, "+", 2) || is_head(r, "-", 2)))
 		{
 		delete(r);
 		r = NULL;
@@ -880,6 +881,8 @@ static Node * s_subst (Node * a[], int n, Symbol * f)
 #define MAXPF 64
 typedef struct { Node * base; double e; } PowFac;
 
+static int pf_merged, pf_numbers;	/* like bases combined, numbers seen */
+
 static int pf_collect (Node * u, double k, PowFac * pf, int * n, Node ** coef)
 {
 	double e;
@@ -898,12 +901,14 @@ static int pf_collect (Node * u, double k, PowFac * pf, int * n, Node ** coef)
 	if (num_sym(u))
 		{
 		* coef = mk_mul(* coef, mk_pow(tcpy(u), mk_int(k)));
+		pf_numbers++;
 		return 1;
 		}
 	for (i = 0; i < * n; i++)
 		if (tequal(pf[i].base, u))
 			{
 			pf[i].e += k;
+			pf_merged++;
 			return 1;
 			}
 	if (* n == MAXPF) return 0;
@@ -918,6 +923,7 @@ static Node * simp_product (Node * u)
 	Node * coef = mk_int(1), * r = NULL;
 	double c;
 	int n = 0, i, pass;
+	pf_merged = pf_numbers = 0;
 	if (! pf_collect(u, 1, pf, & n, & coef)) { delete(coef); return tcpy(u); }
 	/* powers and atoms first, other functions (ln, arcsec, ...) last: the
 	 * matcher does not regroup products, and Rubi's patterns u*(a+b*f(x))
@@ -941,7 +947,11 @@ static Node * s_simp (Node * a[], int n, Symbol * f)	/* simp(u,x), simplify(u) *
 {
 	if (n < 1 || n > 2) return NULL;
 	if (is_head(a[0], "*", 2) || is_head(a[0], "^", 2) || is_head(a[0], "/", 2))
-		return simp_product(a[0]);
+		{
+		Node * r = simp_product(a[0]);
+		if (pf_merged || pf_numbers > 1 || is_zero(r)) return r;	/* 0*n^-1 = 0 */
+		delete(r);		/* nothing combined: keep the order (no cycle with collect) */
+		}
 	return tcpy(a[0]);
 }
 
@@ -2934,6 +2944,74 @@ static Node * s_substfor (Node * a[], int n, Symbol * f)	/* ([h,] v, u, x) */
 	return n == 4 ? mk_mul(tcpy(a[0]), r) : r;
 }
 
+/* ---- derivdivides(y, u, x), falseq(u): Rubi's DerivativeDivides ----
+ * the quotient q = u/y' if it is free of x (then Int[u*f(y)] is
+ * q*Subst[Int[f(x)],x,y]); else derivdivides stays unevaluated, and
+ * falseq, Rubi's FalseQ, is true for such an unevaluated helper. */
+
+static Node * quotient_free (Node * u, Node * v, Node * x)	/* u/v if free of x */
+{
+	Node * t = mk_mul(tcpy(u), mk_pow(tcpy(v), mk_int(-1)));
+	Node * q = simp_product(t), * c = NULL, * d;
+	TList lu = {0}, lv = {0}, ld = {0};
+	int j;
+	delete(t);
+	if (! contains(q, x)) return q;
+	delete(q);
+	expand_to(u, & lu);			/* sums: u = c*v with a constant c? */
+	expand_to(v, & lv);
+	for (j = 0; j < lv.n && ! c && lu.n > 0; j++)
+		{
+		t = mk_mul(tcpy(lu.t[0]), mk_pow(tcpy(lv.t[j]), mk_int(-1)));
+		c = simp_product(t);
+		delete(t);
+		if (contains(c, x)) { delete(c); c = NULL; }
+		}
+	tl_free(& lu);
+	tl_free(& lv);
+	if (! c) return NULL;
+	d = mk_add(tcpy(u), mk_neg(mk_mul(tcpy(c), tcpy(v))));
+	expand_to(d, & ld);
+	delete(d);
+	d = tl_collect(& ld);
+	if (is_zero(d)) { delete(d); return c; }
+	delete(d);
+	delete(c);
+	return NULL;
+}
+
+static Node * s_derivdivides (Node * a[], int n, Symbol * f)
+{
+	Node * y, * u, * x, * dy, * q;
+	double dgy, dgu;
+	if (n != 3) return NULL;
+	y = a[0]; u = a[1]; x = a[2];
+	if (! contains(y, x)) return NULL;
+	if (poly_info(y, x, & dgy, -1, NULL))
+		{
+		Node * c0 = NULL;
+		int ax = dgy == 1 && poly_info(y, x, & dgu, 0, & c0) && is_zero(c0);
+		delete(c0);
+		if (ax) return NULL;			/* a*x: Rubi says False */
+		if (! poly_info(u, x, & dgu, -1, NULL) || dgu != dgy - 1) return NULL;
+		}
+	if (! (dy = deriv(y, x))) return NULL;
+	if (is_zero(dy)) { delete(dy); return NULL; }
+	q = quotient_free(u, dy, x);
+	delete(dy);
+	return q;
+}
+
+static Node * s_falseq (Node * a[], int n, Symbol * f)
+{
+	Node * t;
+	double v;
+	if (n != 1) return NULL;
+	t = deref(a[0]);
+	if (t && t->type == Func && builtin(t->l)) return mk_bool(1, f);	/* not applicable */
+	return mk_bool(is_num(t, & v) && v == 0, f);
+}
+
 /* ================= trivial simplification of rule results ================= */
 
 static int num_is (Node * t, double v)
@@ -3038,6 +3116,8 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "substexp", s_substexp },
 	{ "functionofq", s_functionofq },
 	{ "substfor", s_substfor },
+	{ "derivdivides", s_derivdivides },
+	{ "falseq", s_falseq },
 	{ "intsubst", s_substint },
 	{ "binomialmatchq", s_binomialmatchq },
 	{ "quadraticmatchq", s_quadraticmatchq },

@@ -87,3 +87,5 @@ FUNC hyp2exp : real,real >> real         ATT hyp2exp      # sinh, cosh, ... als 
 FUNC substexp : real,real >> real        ATT substexp     # Rubi: Substitution x -> F^(g x)
 FUNC functionofq : real++ >> bool       ATT functionofq   # Rubi: FunctionOfQ[v,u,x(,pure)]
 FUNC substfor : real++ >> real           ATT substfor     # Rubi: SubstFor[(h,)v,u,x]
+FUNC derivdivides : real,real,real >> real ATT derivdivides # Rubi: DerivativeDivides[y,u,x]
+FUNC falseq : real >> bool               ATT falseq       # Rubi: FalseQ (Hilfsfunktion nicht anwendbar)

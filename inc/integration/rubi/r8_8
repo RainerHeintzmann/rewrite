@@ -102,8 +102,10 @@ ADDSPEC RubiRules : IF NIN(Xv,P_F,O_a,O_b,O_c,O_d,P_n,O_p) Int(polylog(P_n,(O_d)
 #   Int[(e_. + f_.*x_)^m_.*PolyLog[n_, d_.*(F_^(c_.*(a_. + b_.*x_)))^p_.], x_Symbol] := (e + f*x)^m* PolyLog[n + 1, d*(F^(c*(a + b*x)))^p]/(b*c*p*Log[F]) - f*m/(b*c*p*Log[F])* Int[(e + f*x)^(m - 1)*PolyLog[n + 1, d*(F^(c*(a + b*x)))^p], x] /; FreeQ[{F, a, b, c, d, e, f, n, p}, x] && GtQ[m, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,O_a,O_b,O_c,O_d,O_e,O_f,P_n,O_p), (((O_m > 0))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(polylog(P_n,(O_d)*(((P_F)^((O_c)*((O_a)+((O_b)*(Xv)))))^(O_p)))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(O_m)))*(polylog(((P_n)+(1)),((O_d)*(((((P_F)^(((O_c)*(((O_a)+(((O_b)*(Xv)))))))))^(O_p))))))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((O_p)^((-1))))*(((ln(P_F))^((-1))))))+((((-1))*(O_f)*(O_m)*(((O_b)^((-1))))*(((O_c)^((-1))))*(((O_p)^((-1))))*(((ln(P_F))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+((-1))))))*(polylog(((P_n)+(1)),((O_d)*(((((P_F)^(((O_c)*(((O_a)+(((O_b)*(Xv)))))))))^(O_p))))))),Xv)))))
 
-# Regel 25 nicht uebersetzt: function DerivativeDivides
+# Regel 25 (2 Varianten):
 #   Int[u_*PolyLog[n_, v_], x_Symbol] := With[{w = DerivativeDivides[v, u*v, x]}, w*PolyLog[n + 1, v] /; Not[FalseQ[w]]] /; FreeQ[n, x]
+ADDSPEC RubiRules : IF NIN(Xv,P_n), (not(falseq(derivdivides(P_v,((P_u)*(P_v)),Xv)))) Int((P_u)*(polylog(P_n,P_v)),Xv) = ((derivdivides(P_v,((P_u)*(P_v)),Xv))*(polylog(((P_n)+(1)),P_v)))
 
-# Regel 26 nicht uebersetzt: function DerivativeDivides
+# Regel 26 (4 Varianten):
 #   Int[u_*Log[w_]*PolyLog[n_, v_], x_Symbol] := With[{z = DerivativeDivides[v, u*v, x]}, z*Log[w]*PolyLog[n + 1, v] - Int[SimplifyIntegrand[z*D[w, x]*PolyLog[n + 1, v]/w, x], x] /; Not[FalseQ[z]]] /; FreeQ[n, x] && InverseFunctionFreeQ[w, x]
+ADDSPEC RubiRules : IF NIN(Xv,P_n), (inversefunctionfreeq(P_w,Xv)), (not(falseq(derivdivides(P_v,((P_u)*(P_v)),Xv)))) Int((P_u)*(ln(P_w))*(polylog(P_n,P_v)),Xv) = ((((derivdivides(P_v,((P_u)*(P_v)),Xv))*(ln(P_w))*(polylog(((P_n)+(1)),P_v))))+((((-1))*(Int(simp(((derivdivides(P_v,((P_u)*(P_v)),Xv))*(deriv(P_w,Xv))*(polylog(((P_n)+(1)),P_v))*(((P_w)^((-1))))),Xv),Xv)))))

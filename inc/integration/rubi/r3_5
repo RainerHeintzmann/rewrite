@@ -6,11 +6,13 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: function DerivativeDivides
+# Regel 1 (2 Varianten):
 #   Int[u_*Log[v_], x_Symbol] := With[{w = DerivativeDivides[v, u*(1 - v), x]}, w*PolyLog[2, 1 - v] /; Not[FalseQ[w]]]
+ADDSPEC RubiRules : IF (not(falseq(derivdivides(P_v,((P_u)*(((1)+((((-1))*(P_v)))))),Xv)))) Int((P_u)*(ln(P_v)),Xv) = ((derivdivides(P_v,((P_u)*(((1)+((((-1))*(P_v)))))),Xv))*(polylog(2,((1)+((((-1))*(P_v)))))))
 
-# Regel 2 nicht uebersetzt: function DerivativeDivides
+# Regel 2 (36 Varianten):
 #   Int[(a_. + b_.*Log[u_])*Log[v_]*w_, x_Symbol] := With[{z = DerivativeDivides[v, w*(1 - v), x]}, z*(a + b*Log[u])*PolyLog[2, 1 - v] - b*Int[SimplifyIntegrand[z*PolyLog[2, 1 - v]*D[u, x]/u, x], x] /; Not[FalseQ[z]]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b), (inversefunctionfreeq(P_u,Xv)), (not(falseq(derivdivides(P_v,((P_w)*(((1)+((((-1))*(P_v)))))),Xv)))) Int(((O_a)+((O_b)*(ln(P_u))))*(ln(P_v))*(P_w),Xv) = ((((derivdivides(P_v,((P_w)*(((1)+((((-1))*(P_v)))))),Xv))*(((O_a)+(((O_b)*(ln(P_u))))))*(polylog(2,((1)+((((-1))*(P_v))))))))+((((-1))*(O_b)*(Int(simp(((derivdivides(P_v,((P_w)*(((1)+((((-1))*(P_v)))))),Xv))*(polylog(2,((1)+((((-1))*(P_v))))))*(deriv(P_u,Xv))*(((P_u)^((-1))))),Xv),Xv)))))
 
 # Regel 3 (36 Varianten):
 #   Int[Log[c_.*Log[d_.*x_^n_.]^p_.], x_Symbol] := x*Log[c*Log[d*x^n]^p] - n*p*Int[1/Log[d*x^n], x] /; FreeQ[{c, d, n, p}, x]

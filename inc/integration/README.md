@@ -129,7 +129,10 @@ have it, so a few steps are added:
   write it with `v` replaced by `x`; for `v = sin(w)` also `csc(w) = 1/v`,
   `cos(w)^(2m) = (1-v^2)^m`, ..., likewise for cos, tan, cot and the
   hyperbolic functions. So `Int[u*cos(w)]` with `u` a function of
-  `sin(w)` becomes an integral in `sin(w)`. Rubi's substitution
+  `sin(w)` becomes an integral in `sin(w)`. Rubi's `DerivativeDivides[y,u,x]`
+  (`derivdivides`) gives `u/y'` if it is free of `x`, so that
+  `Int[u*f(y)] = q*Subst[Int[f(x)],x,y]`; if not, it stays unevaluated,
+  and `falseq` (Rubi's `FalseQ`) is true for such a helper. Rubi's substitution
   `x -> F^(g*x)` for functions of exponentials (`FunctionOfExponential`,
   section 2.3) is the C function `substexp`; the translator puts it in
   place of Rubi's rule (`HAND_RULES`). `FullSimplify` becomes `simplify`,
@@ -216,8 +219,8 @@ results are:
 
 | Result | Problems | Share of tested |
 | --- | --- | --- |
-| solved and verified | 1290 | 83.8% |
-| no antiderivative found | 231 | 15.0% |
+| solved and verified | 1292 | 84.0% |
+| no antiderivative found | 229 | 14.9% |
 | wrong | 2 | 0.1% |
 | crash or time-out | 0 | 0.0% |
 | not verifiable | 16 | 1.0% |

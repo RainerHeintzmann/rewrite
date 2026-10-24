@@ -504,7 +504,7 @@ loaded by the integration rules and can also be used on their own:
 | `polyq(u,x)`, `polyq(u,x,n)`, `linearq(u,x)` | `u` is a polynomial in `x`, of degree `n`, of degree 1 |
 | `sumq(u)`, `productq(u)`, `powerq(u)` | form of the top level of `u` |
 | `expand(u)` | multiply out products and integer powers of sums, collect like terms |
-| `expandintegrand(u,x)`, `expandintegrand(u,v,x)` | partial fractions of a rational function with exact coefficients, else `expand(u)`, `expand(u*v)`; stays unevaluated if nothing changes |
+| `expandintegrand(u,x)`, `expandintegrand(u,v,x)` | partial fractions of a rational function with exact coefficients, else `expand(u)`, `expand(u*v)`; stays unevaluated if no sum results |
 | `coeff(u,x,n)`, `coeff(u,x)`, `expon(u,x)` | coefficient of `x^n` or `x`, degree in `x` |
 | `subst(u,x,v)` | `u` with `x` replaced by `v` (waits while `u` contains `Int`) |
 | `simp(u,x)`, `simplify(u)`, `dist(u,v,x)`, `rt(u,n)` | `u` with like powers in a product combined, the same, `u*v`, `n`-th root |
@@ -527,6 +527,7 @@ loaded by the integration rules and can also be used on their own:
 | `functionofq(v,u,x)`, `substfor(h,v,u,x)` | `u` is a function of `v` (also through identities: `cos(w)^2 = 1-sin(w)^2`, ...); `h*u` with `v` replaced by `x` |
 | `substexp(u,x)`, `intsubst(u,x,v)`, `hyp2exp(u,x)` | Rubi's substitution `x -> F^(g x)` for functions of exponentials; `Subst[Int[u,x],x,v]`; hyperbolic functions as exponentials |
 | `nonsumq(u)` | `u` is no sum |
+| `derivdivides(y,u,x)`, `falseq(u)` | `u/y'` if it is free of `x` (else unevaluated); `u` is an unevaluated helper, i.e. Rubi's `False` |
 
 The predicates return true or false and can be used in conditions, also
 combined with `&&` and `||`:
