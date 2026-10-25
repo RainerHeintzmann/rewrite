@@ -1,4 +1,4 @@
-translated 7183 of 7492 rules (96%) from 201 files
+translated 7183 of 7492 rules (96%) from 202 files
 
 reasons for rules that were not translated:
     25  Module with a local variable without value

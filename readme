@@ -422,7 +422,9 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    (wie Number in Julia): Regeln mit Variablen der Sorte number gelten auch
    fuer reelle und komplexe Terme; ein Term aus reellen Teilen behaelt seine
    reellen Operatoren. Die Integration kennt die imaginaere Einheit im
-   (im^2 = -1, Mathematicas I).
+   (im^2 = -1, Mathematicas I). Hyperbolische Funktionen werden wie in Rubi
+   vor den trigonometrischen Regeln als sinh(v) = -im*sin(im*v) usw.
+   geschrieben (hyp2trig) und im Ergebnis zurueckverwandelt (imagfn).
  - Funktionen, die durch Regellisten definiert sind: FUNC f ... ATT RULES Alg
    (f(..) = REWR f(..) : Alg, auch in Bedingungen und aus C). deriv und Rubis
    FixInertTrigFunction sind jetzt Regeln statt C-Tabellen.

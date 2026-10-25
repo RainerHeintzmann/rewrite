@@ -35,5 +35,20 @@ TN = REWR Int(im*x*sin(x),x) : RubiIntegrate
 TN
 TN = REWR Int(x^2,x) : RubiIntegrate
 TN
+# hyperbolic functions as trig functions of im*v (Rubi's DeactivateTrig)
+# and back (imagfn, as Mathematica evaluates sin(im*w) = im*sinh(w))
+REWR hyp2trig(sinh(x)^2*cosh(2*x),x) : raw
+REWR hyp2trig(x*exp(x)*sinh(x),x) : raw
+REWR imagfn(sin(im*x) + cos(2*im*x) + arctan(-3*x)) : raw
+TN = REWR Int(sinh(x),x) : RubiIntegrate
+TN
+TN = REWR Int(x*sinh(x),x) : RubiIntegrate
+TN
+TN = REWR Int(cosh(2*x+1),x) : RubiIntegrate
+TN
+TN = REWR Int(1/(1+sinh(x)^2)^2,x) : RubiIntegrate
+TN
+TN = REWR Int(sech(x),x) : RubiIntegrate
+TN
 # a sort cannot be declared again as a constant
 CONST number : real

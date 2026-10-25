@@ -112,6 +112,7 @@ INC "inc/integration/rubi/r3_2_2"
 INC "inc/integration/rubi/r3_2_3"
 INC "inc/integration/rubi/r3_5"
 INC "inc/integration/rubi/r4_0_fixinert"
+INC "inc/integration/rubi/r4_0_deactivate"
 INC "inc/integration/rubi/r4_0_unify"
 INC "inc/integration/rubi/r4_1_0_1"
 INC "inc/integration/rubi/r4_1_0_2"
@@ -242,7 +243,9 @@ ADDSPEC RubiCollect : Uv*Vv = simp(Uv*Vv)       # x^2*e/x^2 = e
 # numbers distributed, positive summands first, A/B; in one pass, instead of
 # the general simplification All, which needs many steps for large results
 ALG RubiOut
-ADDSPEC RubiOut : Uv = normform(Uv)
+# im out of the functions first, as Mathematica evaluates sin(im*w) =
+# im*sinh(w) (the hyperbolic functions come back from hyp2trig)
+ADDSPEC RubiOut : Uv = normform(imagfn(Uv))
 OPT
 DEFAULT
 COMM

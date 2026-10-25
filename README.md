@@ -699,6 +699,7 @@ The helpers are:
 | `knownsineintegrandq(u,x)` (also `tangent`, `cotangent`, `secant`), `piecewiselinearq`, `linearpairq` | Rubi's tests for integrands it knows |
 | `functionofq(v,u,x)`, `substfor(h,v,u,x)` | `u` is a function of `v` (also through identities: `cos(w)^2 = 1-sin(w)^2`, ...); `h*u` with `v` replaced by `x` |
 | `substexp(u,x)`, `intsubst(u,x,v)`, `hyp2exp(u,x)` | Rubi's substitution `x -> F^(g x)` for functions of exponentials; `Subst[Int[u,x],x,v]`; hyperbolic functions as exponentials |
+| `hyp2trig(u,x)`, `imagfn(u)` | Rubi's `DeactivateTrig` for hyperbolic functions, `sinh(v) = -im*sin(im*v)`, ... (only for functions of trig or hyperbolic functions of linear arguments); back as Mathematica evaluates: `sin(im*w) = im*sinh(w)`, `arctan(im*w) = im*arctanh(w)`, `sin(-u) = -sin(u)`, ... |
 | `nonsumq(u)` | `u` is no sum |
 | `derivdivides(y,u,x)`, `falseq(u)` | `u/y'` if it is free of `x` (else unevaluated); `u` is an unevaluated helper, i.e. Rubi's `False` |
 | `trignorm(u,x)`, `removecontent(u,x)` | `1/sin = csc` and Rubi's `FixInertTrigFunction` for products of trig functions; `u` without constant factors, `cos(pi/2+x)` as `-sin(x)` |

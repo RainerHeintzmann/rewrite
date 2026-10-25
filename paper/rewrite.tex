@@ -559,10 +559,15 @@ $\cos x$ first, as Mathematica's \texttt{TrigExpand} does; polynomials in
 sines and cosines are left to Rubi's product-to-sum reduction, which the
 expansion would undo.
 For hyperbolic
-functions, Rubi uses $\sinh u=-i\sin(iu)$, which needs complex numbers.
-Instead, a last rule writes hyperbolic functions for which no other rule
-applies with exponentials, $\sinh u=(e^u-e^{-u})/2$, so that
-$\int x\sinh x\,dx$ and $\int\cosh^2x\,dx$ are found.
+functions, Rubi~4.17 has no basic rules; it writes $\sinh v=-i\sin(iv)$,
+$\cosh v=\cos(iv)$, \dots{} before its trigonometric rules, and
+Mathematica's evaluation turns $\sin(iw)$ back into $i\sinh w$. The same
+happens here with the imaginary unit \texttt{im} of sort \texttt{number}: a C helper rewrites the hyperbolic functions of
+an integrand that is a function of trigonometric or hyperbolic functions of
+linear arguments, and the output step takes \texttt{im} out of the
+functions again, so that $\int x\sinh x\,dx$ gives $x\cosh x-\sinh x$.
+Hyperbolic functions for which still no rule applies are written with
+exponentials, $\sinh u=(e^u-e^{-u})/2$, by a last rule.
 
 The complete integration is the algebra list
 \begin{lstlisting}
@@ -657,15 +662,17 @@ integration problem collections in Rubi's test suite.}
 
 These collections come from textbooks and are the problems on which the
 translation was developed. A sample of every 20th problem of the other
-sections of the test suite (about 4600 problems, of 72\,000) shows where
-the translation is less complete: algebraic functions 88\%, trigonometric
-functions 71\%, exponentials 67\%, hyperbolic functions 51\%, inverse
-hyperbolic functions 47\%, logarithms 34\% and inverse trigonometric
-functions 30\% are solved. Part of the difference is due to the problems
-themselves: 3--23\% of those in a section need complex numbers in Rubi's
-result, and some cannot be integrated by Rubi either. The rest points to
-missing or inexact helpers; a single wrong predicate (\texttt{PolyQ} with a
-non-symbol as variable) cost a fifth of the solved logarithm problems.
+sections of the test suite (about 3700 problems, of 72\,000) shows where
+the translation is less complete: algebraic functions 85\%, trigonometric
+functions 78\%, hyperbolic functions 76\%, exponentials 73\%, inverse
+hyperbolic functions 58\%, logarithms 55\%, inverse trigonometric
+functions 54\% and special functions 42\% are solved, 75\% in all. The
+imaginary unit raised the trigonometric, hyperbolic and inverse
+trigonometric shares by 9 to 23 points, since many of Rubi's results
+contain it. The rest of the difference points to missing or inexact
+helpers and to time-outs of large problems; a single wrong predicate
+(\texttt{PolyQ} with a non-symbol as variable) once cost a fifth of the
+solved logarithm problems.
 
 The development of the translation went through several such measurements;
 each round of fixes, such as the normal form without multiplying out, the

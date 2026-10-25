@@ -97,6 +97,8 @@ FUNC linearpairq : real,real,real >> bool ATT SYMBOLIC linearpairq
 FUNC algebraicfunctionq : real++ >> bool ATT SYMBOLIC algebraicfunctionq
 FUNC intsubst : real,real,real >> real    ATT SYMBOLIC intsubst     # Subst[Int[u,x],x,v]
 FUNC hyp2exp : real,real >> real         ATT SYMBOLIC hyp2exp      # sinh, cosh, ... as e^u
+FUNC hyp2trig : real,real >> real        ATT SYMBOLIC hyp2trig     # Rubi DeactivateTrig: sinh(v) = -im*sin(im*v), ...
+FUNC imagfn : real >> real               ATT SYMBOLIC imagfn       # sin(im*w) = im*sinh(w), ... (as Mathematica)
 FUNC functionofexponentialq : real,real >> bool ATT SYMBOLIC functionofexponentialq # Rubi: FunctionOfExponentialQ
 FUNC normform : real >> real ATT SYMBOLIC normform # final form: collected, positive terms first, A/B (fast, instead of All)
 FUNC substexp : real,real >> real        ATT SYMBOLIC substexp     # Rubi: Substitution x -> F^(g x)
@@ -190,6 +192,8 @@ OTHER linearpairq       : number,number,number >> bool ATT SYMBOLIC linearpairq
 OTHER algebraicfunctionq: number++ >> bool ATT SYMBOLIC algebraicfunctionq
 OTHER intsubst          : number,number,number >> number ATT SYMBOLIC intsubst
 OTHER hyp2exp           : number,number >> number ATT SYMBOLIC hyp2exp
+OTHER hyp2trig          : number,number >> number ATT SYMBOLIC hyp2trig
+OTHER imagfn            : number >> number ATT SYMBOLIC imagfn
 OTHER functionofexponentialq: number,number >> bool ATT SYMBOLIC functionofexponentialq
 OTHER normform          : number >> number ATT SYMBOLIC normform
 OTHER substexp          : number,number >> number ATT SYMBOLIC substexp

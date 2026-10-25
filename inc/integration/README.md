@@ -185,10 +185,22 @@ have it, so a few steps are added:
   reduces from products to sums (`cos(3*x)*cos(5*x)`, the expansion would
   undo that), and multiples of sines under a root (`sin(2*x)^(3/2)` would
   become a power of a product).
-- Hyperbolic functions: Rubi turns `sinh(u)` into `-i*sin(i*u)`, which needs
-  complex numbers. Instead, the last rule of `RubiRules` writes hyperbolic
-  functions for which no rule applies with exponentials (`hyp2exp`):
-  `sinh(u) = (e^u-e^-u)/2`, ... The result then contains `exp`.
+- Hyperbolic functions: Rubi 4.17 has no basic rules for `sinh`, `cosh`,
+  ...; its first trig rule (`DeactivateTrig`) writes them as trig functions
+  of an imaginary argument. The generated file
+  [rubi/r4_0_deactivate](rubi/r4_0_deactivate), loaded in Rubi's place
+  before the trig rules, does the same with `hyp2trig`: `sinh(v) =
+  -im*sin(im*v)`, `cosh(v) = cos(im*v)`, `tanh(v) = -im*tan(im*v)`, `coth(v)
+  = im*cot(im*v)`, `sech(v) = sec(im*v)`, `csch(v) = im*csc(im*v)`, when the
+  integrand is a function of trig or hyperbolic functions of linear
+  arguments (Rubi's `FunctionOfTrigOfLinearQ`; otherwise it is unchanged
+  and the rule is skipped). `RubiOut` turns the result back, as Mathematica
+  evaluates it (`imagfn`): `sin(im*w) = im*sinh(w)`, `cos(im*w) =
+  cosh(w)`, ..., `arctan(im*w) = im*arctanh(w)`, and odd and even
+  functions of a negative argument, `sin(-u) = -sin(u)`. So
+  `Int(x*sinh(x),x)` gives `x * cosh (x )- sinh (x )`. Hyperbolic
+  functions for which still no rule applies are written with exponentials
+  by the last rule of `RubiRules` (`hyp2exp`): `sinh(u) = (e^u-e^-u)/2`, ...
 - Substitutions. Rubi's `FunctionOfQ[v,u,x]` and `SubstFor[h,v,u,x]`
   (`functionofq`, `substfor`) decide whether `u` is a function of `v` and
   write it with `v` replaced by `x`; for `v = sin(w)` also `csc(w) = 1/v`,
@@ -334,7 +346,15 @@ where the check compares different complex branches. The third splits
 `sqrt(sin(x)*cos(x)^3)` into `cos(x)^(3/2)*sin(x)^(1/2)` (Rubi's rules for
 fractional powers of products), which is wrong where both factors are
 negative. A run takes
-about five minutes. The harness needs `mpmath` for the special functions
+about five minutes.
+
+A sample of every 20th problem of the whole suite (`--every 20`, about
+3700 problems, about half an hour) gives, by section: algebraic functions
+85%, trigonometric functions 78%, hyperbolic functions 76%, exponentials
+73%, inverse hyperbolic functions 58%, logarithms 55%, inverse
+trigonometric functions 54%, special functions 42%; 75% in all, 1.8%
+wrong. With the imaginary unit `im` the trigonometric (69% before),
+hyperbolic (53%) and inverse trigonometric (33%) sections gained most. The harness needs `mpmath` for the special functions
 (`pacman -S mingw-w64-ucrt-x86_64-python-mpmath` in MSYS2).
 
 ## The hand-translated subset

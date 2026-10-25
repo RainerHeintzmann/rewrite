@@ -622,6 +622,7 @@ static void tl_product (TList * a, TList * b, TList * out)	/* all products a_i*b
 
 static void summands_to (Node * t, TList * out, int neg);
 static Node * tl_collect (TList * l);
+static void factors_to (Node * t, TList * out);
 
 static void expand_to (Node * t, TList * out)
 {
@@ -661,7 +662,20 @@ static void expand_to (Node * t, TList * out)
 	         && e == floor(e) && e >= 2 && e <= MAXEXPPOWER)
 		{
 		expand_to(arg(t, 0), & a);
-		if (a.n < 2)
+		if (a.n == 1 && is_head(a.t[0], "*", 2))	/* (-im*u)^2 = (-1)^2*im^2*u^2 */
+			{
+			TList fl = {0};
+			Node * p = NULL;
+			factors_to(a.t[0], & fl);
+			for (i = 0; i < fl.n; i++)
+				{
+				Node * q = mk_pow(tcpy(fl.t[i]), mk_int((int) e));
+				p = p ? mk_mul(p, q) : q;
+				}
+			free(fl.t);			/* the factors belong to a.t[0] */
+			tl_add(out, p);
+			}
+		else if (a.n < 2)
 			tl_add(out, tcpy(t));
 		else
 			{
@@ -2689,15 +2703,84 @@ static Node * nf_pretty (Node * u)
 	return nf_rebuild(u, nf_pretty);
 }
 
+/* The rule Uv = normform(Uv) (RubiOut) is tried on every subterm of a
+ * result that is already in normal form; a large result needs thousands of
+ * such calls. The structural hashes of all subterms of the results are
+ * kept, and a term found there is returned unchanged. A false hit only
+ * leaves a term less tidy, never wrong. */
+#define NF_SET (1 << 18)
+static unsigned long long nf_set[NF_SET];
+static int nf_count = 0;
+
+static unsigned long long nf_mix (unsigned long long h, unsigned long long v)
+{
+	return (h ^ v) * 1099511628211ULL;
+}
+
+static unsigned long long nf_hash (Node * t, int mark);
+
+static void nf_insert (unsigned long long h)
+{
+	unsigned i;
+	if (! h) h = 1;
+	if (nf_count > NF_SET / 2)		/* full: start again */
+		{
+		memset(nf_set, 0, sizeof(nf_set));
+		nf_count = 0;
+		}
+	for (i = (unsigned) (h % NF_SET); nf_set[i]; i = (i + 1) % NF_SET)
+		if (nf_set[i] == h) return;
+	nf_set[i] = h;
+	nf_count++;
+}
+
+static int nf_known (unsigned long long h)
+{
+	unsigned i;
+	if (! h) h = 1;
+	for (i = (unsigned) (h % NF_SET); nf_set[i]; i = (i + 1) % NF_SET)
+		if (nf_set[i] == h) return 1;
+	return 0;
+}
+
+static unsigned long long nf_hash (Node * t, int mark)	/* mark: insert all subterms */
+{
+	unsigned long long h = 1469598103934665603ULL, b;
+	const char * s;
+	double v;
+	int k, n;
+	t = deref(t);
+	if (! t) return 7;
+	if (is_num(t, & v))
+		{
+		memcpy(& b, & v, sizeof(b));
+		h = nf_mix(h, b + 3);
+		}
+	else if (t->type == Func)
+		{
+		for (s = name(TERM_HEAD(t)); * s; s++)
+			h = nf_mix(h, (unsigned char) * s);
+		n = term_nargs(t);
+		for (k = 0; k < n; k++)
+			h = nf_mix(h, nf_hash(arg(t, k), mark) + k);
+		}
+	else
+		h = nf_mix(h, (unsigned long long) (size_t) (t->type == Const ? t->l : t));
+	if (mark) nf_insert(h);
+	return h;
+}
+
 static Node * s_normform (Node * a[], int n, Symbol * f)
 {
 	Node * c, * k, * r;
 	if (n != 1) return NULL;
+	if (nf_known(nf_hash(a[0], 0))) return tcpy(a[0]);	/* already in normal form */
 	c = nf_canon(a[0]);
 	k = nf_collect(c);
 	delete(c);
 	r = nf_pretty(k);
 	delete(k);
+	nf_hash(r, 1);
 	return r;
 }
 
@@ -3546,6 +3629,380 @@ static int linear_parts (Node * v, Node * x, Node ** c0, Node ** c1)	/* v = c0 +
 	return 1;
 }
 
+/* ---- hyp2trig(u, x): hyperbolic functions as trig functions with im ----
+ * Rubi's DeactivateTrig: at the start of the trig rules (4.1.0.1) an
+ * integrand that is a function of trig or hyperbolic functions of a linear
+ * argument (FunctionOfTrigOfLinearQ) gets the hyperbolic functions written
+ * as trig functions of im*v (Rubi 4.17 has no basic rules for sinh, cosh,
+ * ...): sinh(v) = -im*sin(im*v), cosh(v) = cos(im*v), tanh(v) =
+ * -im*tan(im*v), coth(v) = im*cot(im*v), sech(v) = sec(im*v), csch(v) =
+ * im*csc(im*v). imagfn (below) turns the result back. Not applicable: u
+ * unchanged. */
+
+static const char * trig_heads[] = { "sin", "cos", "tan", "cot", "sec", "csc", NULL };
+
+static int is_trigf (Node * u)
+{
+	int i;
+	for (i = 0; trig_heads[i]; i++)
+		if (is_head(u, trig_heads[i], 1)) return 1;
+	return 0;
+}
+
+static Node * im_node (void)
+{
+	Symbol * s = role_find("im");
+	return s ? mknod(Const, (Node *) s, NULL) : NULL;
+}
+
+static Node * collected (Node * t)	/* multiplied out and collected (takes t) */
+{
+	TList l = {0};
+	expand_to(t, & l);
+	delete(t);
+	return tl_collect(& l);
+}
+
+/* FunctionOfTrigOfLinearQ: all trig (kind 1) or all hyperbolic (kind 2)
+ * functions, of linear arguments c0 + c1 x that are rational multiples of
+ * each other (Rubi's FunctionOfTrig) */
+typedef struct { Node * x, * c0, * c1; int kind, nhyp; } TrigLin;
+
+static int tl_arg (TrigLin * s, Node * v, int kind)
+{
+	Node * c0, * c1, * det, * q;
+	double d;
+	int ok;
+	if (! linear_parts(v, s->x, & c0, & c1)) return 0;
+	if (kind == 2) s->nhyp++;
+	if (! s->kind)
+		{
+		s->kind = kind; s->c0 = c0; s->c1 = c1;
+		return 1;
+		}
+	ok = s->kind == kind;
+	if (ok)
+		{
+		det = collected(mk_add(mk_mul(tcpy(s->c0), tcpy(c1)), mk_neg(mk_mul(tcpy(s->c1), tcpy(c0)))));
+		q = collected(mk_mul(tcpy(s->c1), mk_pow(tcpy(c1), mk_int(-1))));
+		ok = is_num(det, & d) && d == 0 && is_num(q, & d);
+		delete(det);
+		delete(q);
+		}
+	delete(c0);
+	delete(c1);
+	return ok;
+}
+
+static int trig_fn (TrigLin * s, Node * u)	/* trig(c0 + c1 x) or hyp(c0 + c1 x) */
+{
+	u = deref(u);
+	if (! (is_trigf(u) || is_hyp(u))) return 0;
+	return tl_arg(s, arg(u, 0), is_hyp(u) ? 2 : 1);
+}
+
+/* an algebraic function of such functions (AlgebraicTrigFunctionQ), x
+ * only inside them */
+static int trig_algebraic (TrigLin * s, Node * u)
+{
+	int i, n;
+	u = deref(u);
+	if (! contains(u, s->x)) return 1;
+	if (! u || u->type != Func) return 0;		/* x itself */
+	if (is_trigf(u) || is_hyp(u)) return trig_fn(s, u);
+	if (is_head(u, "^", 2))
+		return ! contains(arg(u, 1), s->x) && trig_algebraic(s, arg(u, 0));
+	if (! (is_head(u, "+", 2) || is_head(u, "*", 2) || is_head(u, "-", 2) || is_head(u, "/", 2)
+	       || is_head(u, "-", 1) || is_head(u, "mi", 1)))
+		return 0;
+	n = term_nargs(u);
+	for (i = 0; i < n; i++)
+		if (! trig_algebraic(s, arg(u, i))) return 0;
+	return 1;
+}
+
+/* (a + b*trig(e + f x))^n: exactly one function, in one summand */
+static int trig_binomial (TrigLin * s, Node * u)
+{
+	TList l = {0}, fl = {0};
+	int i, j, k = 0, ok = 1;
+	u = deref(u);
+	if (is_head(u, "^", 2))
+		{
+		if (contains(arg(u, 1), s->x)) return 0;
+		u = deref(arg(u, 0));
+		}
+	if (is_trigf(u) || is_hyp(u)) return trig_fn(s, u);
+	if (! is_head(u, "+", 2)) return 0;
+	summands_to(u, & l, 0);
+	for (i = 0; i < l.n && ok; i++)
+		{
+		int m = 0;
+		if (! contains(l.t[i], s->x)) continue;
+		k++;
+		factors_to(l.t[i], & fl);
+		for (j = 0; j < fl.n && ok; j++)
+			if (contains(fl.t[j], s->x))
+				{
+				m++;
+				ok = trig_fn(s, fl.t[j]);
+				}
+		ok = ok && m == 1;
+		free(fl.t);			/* the factors belong to the summand */
+		fl.t = NULL; fl.n = fl.cap = 0;
+		}
+	tl_free(& l);
+	return ok && k == 1;
+}
+
+/* (c + d x)^m (a + b*trig(e + f x))^n, the first case of Rubi's
+ * FunctionOfTrigOfLinearQ */
+static int trig_linear_product (TrigLin * s, Node * u)
+{
+	TList l = {0};
+	int i, nlin = 0, ntrig = 0, ok = 1;
+	factors_to(u, & l);
+	for (i = 0; i < l.n && ok; i++)
+		{
+		Node * t = deref(l.t[i]), * b = t, * c0, * c1;
+		if (! contains(t, s->x)) continue;
+		if (is_head(t, "^", 2) && ! contains(arg(t, 1), s->x)) b = arg(t, 0);
+		if (nlin == 0 && linear_parts(b, s->x, & c0, & c1))
+			{
+			delete(c0);
+			delete(c1);
+			nlin++;
+			}
+		else
+			{
+			ntrig++;
+			ok = trig_binomial(s, t);
+			}
+		}
+	free(l.t);
+	return ok && ntrig == 1;
+}
+
+static void trig_lin_free (TrigLin * s)
+{
+	if (s->c0) delete(s->c0);
+	if (s->c1) delete(s->c1);
+	s->c0 = s->c1 = NULL;
+	s->kind = s->nhyp = 0;
+}
+
+static int function_of_trig_of_linear (Node * u, Node * x, int * nhyp)
+{
+	TrigLin s = { x, NULL, NULL, 0, 0 };
+	int ok = trig_linear_product(& s, u);
+	if (! ok)
+		{
+		trig_lin_free(& s);
+		ok = trig_algebraic(& s, u);
+		}
+	* nhyp = s.nhyp;
+	trig_lin_free(& s);
+	return ok;
+}
+
+/* hyp(v) = c * trig(im*v): the trig function, and c (0: 1, 1: im, -1: -im) */
+static Node * hyp_trig (Node * u, Node * im, int * c)
+{
+	static const struct { const char * h, * t; int c; } tab[] = {
+		{ "sinh", "sin", -1 }, { "cosh", "cos", 0 }, { "tanh", "tan", -1 },
+		{ "coth", "cot", 1 }, { "sech", "sec", 0 }, { "csch", "csc", 1 }, { NULL, NULL, 0 } };
+	const char * h = role_of(TERM_HEAD(u));
+	int i;
+	for (i = 0; tab[i].h && strcmp(h, tab[i].h); i++)
+		;
+	* c = tab[i].c;
+	return mk_f1(tab[i].t, collected(mk_mul(tcpy(im), tcpy(arg(u, 0)))));	/* im*v, multiplied out */
+}
+
+static Node * imag_coef (int c, double e, Node * im)	/* c^e for c = 1, im, -im, e an integer */
+{
+	double rest;
+	int sg;
+	if (! c) return mk_int(1);
+	sg = imag_reduce(e, & rest);
+	if (c < 0 && fmod(fabs(e), 2.0) == 1) sg = -sg;
+	return rest ? (sg < 0 ? mk_neg(tcpy(im)) : tcpy(im)) : mk_int(sg);
+}
+
+static Node * hyp2trig (Node * u, Node * x, Node * im)
+{
+	Node * args = NULL, ** tail = & args;
+	int k, n, c;
+	double e;
+	u = deref(u);
+	if (! u || u->type != Func || ! contains(u, x)) return tcpy(u);
+	if (is_hyp(u))
+		{
+		Node * t = hyp_trig(u, im, & c);
+		return c ? mk_mul(imag_coef(c, 1, im), t) : t;
+		}
+	/* sinh(v)^2 = -sin(im*v)^2: the power of the factor written out, as
+	 * Mathematica evaluates (-I*Sin[I*v])^2 */
+	if (is_head(u, "^", 2) && is_hyp(deref(arg(u, 0))) && is_num(arg(u, 1), & e) && e == floor(e))
+		{
+		Node * t = hyp_trig(deref(arg(u, 0)), im, & c);
+		t = mk_pow(t, tcpy(arg(u, 1)));
+		return c ? mk_mul(imag_coef(c, e, im), t) : t;
+		}
+	n = term_nargs(u);
+	for (k = 0; k < n; k++)
+		{
+		Node * c = hyp2trig(arg(u, k), x, im);
+		if (k < n - 1)
+			{
+			* tail = mknod(Terms, c, NULL);
+			tail = & (* tail)->r;
+			}
+		else
+			* tail = c;
+		}
+	return mknod(Func, u->l, args);
+}
+
+static Node * simp_im_products (Node * u, Node * im)	/* -im*t*(im*s) = t*s, not multiplied out */
+{
+	Node * args = NULL, ** tail = & args, * r;
+	int k, n;
+	u = deref(u);
+	if (! u || u->type != Func || ! contains(u, im)) return tcpy(u);
+	n = term_nargs(u);
+	for (k = 0; k < n; k++)
+		{
+		Node * c = simp_im_products(arg(u, k), im);
+		if (k < n - 1)
+			{
+			* tail = mknod(Terms, c, NULL);
+			tail = & (* tail)->r;
+			}
+		else
+			* tail = c;
+		}
+	r = mknod(Func, u->l, args);
+	if (is_head(r, "*", 2))
+		{
+		Node * s = simp_product(r);
+		delete(r);
+		r = s;
+		}
+	return r;
+}
+
+static Node * s_hyp2trig (Node * a[], int n, Symbol * f)
+{
+	Node * im, * r, * s;
+	int nhyp = 0;
+	if (n != 2) return NULL;
+	if (! function_of_trig_of_linear(a[0], a[1], & nhyp) || nhyp == 0 || ! (im = im_node()))
+		return tcpy(a[0]);			/* unchanged: the rule does not apply */
+	r = hyp2trig(a[0], a[1], im);
+	s = simp_im_products(r, im);
+	delete(r);
+	delete(im);
+	return s;
+}
+
+/* ---- imagfn(u): im out of the functions, as Mathematica evaluates ----
+ * sin(im*w) = im*sinh(w), cos(im*w) = cosh(w), tan(im*w) = im*tanh(w),
+ * cot(im*w) = -im*coth(w), sec(im*w) = sech(w), csc(im*w) = -im*csch(w),
+ * the same from hyperbolic to trig functions, and arcsin(im*w) =
+ * im*arcsinh(w), arcsinh(im*w) = im*arcsin(w), arctan(im*w) =
+ * im*arctanh(w), arctanh(im*w) = im*arctan(w). The argument counts as
+ * im*w when -im*argument, multiplied out, has no im left. */
+static const struct { const char * f, * g; int c; } imag_tab[] = {	/* f(im*w) = c*g(w), c: 0 = 1, 1 = im, -1 = -im */
+	{ "sin", "sinh", 1 }, { "cos", "cosh", 0 }, { "tan", "tanh", 1 },
+	{ "cot", "coth", -1 }, { "sec", "sech", 0 }, { "csc", "csch", -1 },
+	{ "sinh", "sin", 1 }, { "cosh", "cos", 0 }, { "tanh", "tan", 1 },
+	{ "coth", "cot", -1 }, { "sech", "sec", 0 }, { "csch", "csc", -1 },
+	{ "arcsin", "arcsinh", 1 }, { "arcsinh", "arcsin", 1 },
+	{ "arctan", "arctanh", 1 }, { "arctanh", "arctan", 1 },
+	{ NULL, NULL, 0 } };
+
+/* odd and even functions: f(-u) = -f(u) or f(u), for an argument with a
+ * negative numeric factor, as Mathematica evaluates them */
+static const struct { const char * f; int odd; } odd_even[] = {
+	{ "sin", 1 }, { "tan", 1 }, { "cot", 1 }, { "csc", 1 },
+	{ "sinh", 1 }, { "tanh", 1 }, { "coth", 1 }, { "csch", 1 },
+	{ "arcsin", 1 }, { "arctan", 1 }, { "arcsinh", 1 }, { "arctanh", 1 },
+	{ "cos", 0 }, { "sec", 0 }, { "cosh", 0 }, { "sech", 0 },
+	{ NULL, 0 } };
+
+static int neg_factor (Node * t)	/* -3, -3*u (a product with a negative number) */
+{
+	TList l = {0};
+	double v;
+	int i, neg = 0;
+	t = deref(t);
+	if (is_num(t, & v)) return v < 0;
+	if (is_head(t, "-", 1)) return 1;
+	if (! is_head(t, "*", 2)) return 0;
+	factors_to(t, & l);
+	for (i = 0; i < l.n; i++)
+		if (is_num(l.t[i], & v) && v < 0) neg = 1;
+	free(l.t);			/* the factors belong to t */
+	return neg;
+}
+
+static Node * imagfn (Node * u, Node * im)
+{
+	Node * args = NULL, ** tail = & args, * r;
+	int k, n, i;
+	u = deref(u);
+	if (! u || u->type != Func) return tcpy(u);
+	n = term_nargs(u);
+	for (k = 0; k < n; k++)
+		{
+		Node * c = imagfn(arg(u, k), im);
+		if (k < n - 1)
+			{
+			* tail = mknod(Terms, c, NULL);
+			tail = & (* tail)->r;
+			}
+		else
+			* tail = c;
+		}
+	r = mknod(Func, u->l, args);
+	if (n != 1) return r;
+	if (neg_factor(arg(r, 0)))		/* sin(-2*w) = -sin(2*w), cos(-2*w) = cos(2*w) */
+		for (i = 0; odd_even[i].f; i++)
+			if (is_head(r, odd_even[i].f, 1))
+				{
+				Node * g = mk_f1(odd_even[i].f, collected(mk_neg(tcpy(arg(r, 0)))));
+				delete(r);
+				r = odd_even[i].odd ? mk_neg(g) : g;
+				if (odd_even[i].odd) return r;
+				break;
+				}
+	if (! contains(arg(r, 0), im)) return r;
+	for (i = 0; imag_tab[i].f; i++)
+		if (is_head(r, imag_tab[i].f, 1))
+			{
+			Node * w = collected(mk_mul(mk_neg(tcpy(im)), tcpy(arg(r, 0))));
+			Node * g;
+			if (contains(w, im)) { delete(w); return r; }
+			g = mk_f1(imag_tab[i].g, w);
+			if (imag_tab[i].c) g = mk_mul(imag_tab[i].c > 0 ? tcpy(im) : mk_neg(tcpy(im)), g);
+			delete(r);
+			return g;
+			}
+	return r;
+}
+
+static Node * s_imagfn (Node * a[], int n, Symbol * f)
+{
+	Node * im, * r, * s;
+	if (n != 1 || ! (im = im_node())) return NULL;
+	s = shift_all(a[0]);		/* cos(im + pi/2 + 2*im*x) = -sin(im + 2*im*x) */
+	r = imagfn(s, im);
+	delete(s);
+	delete(im);
+	return r;
+}
+
 static int expo_add (ExpoState * s, Node * base, Node * v, Node * x)
 {
 	Node * c0, * c1;
@@ -4315,6 +4772,8 @@ void term_simplify_trivial (Node ** p)
 
 static Node * s_matchq (Node * a[], int n, Symbol * f);
 static Node * s_normform (Node * a[], int n, Symbol * f);
+static Node * s_hyp2trig (Node * a[], int n, Symbol * f);
+static Node * s_imagfn (Node * a[], int n, Symbol * f);
 static Node * s_listq (Node * a[], int n, Symbol * f);
 static Node * s_length (Node * a[], int n, Symbol * f);
 static Node * s_part (Node * a[], int n, Symbol * f);
@@ -4447,6 +4906,8 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "binomsum", s_binomsum },
 	{ "matchq", s_matchq },
 	{ "normform", s_normform },
+	{ "hyp2trig", s_hyp2trig },
+	{ "imagfn", s_imagfn },
 	{ "listq", s_listq },		/* lists (inc/list) */
 	{ "length", s_length },
 	{ "part", s_part },
