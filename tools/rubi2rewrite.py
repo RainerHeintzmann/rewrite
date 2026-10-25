@@ -928,6 +928,12 @@ HAND_RULES = [
     # Rubi 9.3: Euler's substitutions for functions of x and Sqrt[a+b*x+c*x^2]
     ('Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2',
      'ADDSPEC RubiRules : Int(P_u,Xv) = substsqrtquad(P_u,Xv)'),
+    # Rubi 1.1.3.1/2: x^m/(a+b*x^n) for odd n or n = 2 mod 4, partial
+    # fractions with cos(k pi/n) (Module, CompoundExpression and Sum in Rubi)
+    ('Int[1/(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[',
+     'ADDSPEC RubiRules : Int(P_u,Xv) = binomsum(P_u,Xv)'),
+    ('Int[x_^m_./(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[',
+     'ADDSPEC RubiRules : Int(P_u,Xv) = binomsum(P_u,Xv)'),
 ]
 
 

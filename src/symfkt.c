@@ -225,7 +225,7 @@ int term_has_nan (Node * t)	/* contains NaN, infinity or a division by zero */
 	 * coefficients): the rule assumed Mathematica's semantics, its result is
 	 * of no use */
 	if (is_head(t, "polyquotient", 3) || is_head(t, "polyremainder", 3)
-	    || is_head(t, "expandintegrand", -1) || is_head(t, "substexp", -1)
+	    || is_head(t, "expandintegrand", -1) || is_head(t, "substexp", -1) || is_head(t, "binomsum", -1)
 	    || is_head(t, "substfor", -1) || is_head(t, "trignorm", -1)
 	    || is_head(t, "substfracpow", -1) || is_head(t, "substsqrtquad", -1)
 	    || is_head(t, "trigexpand", -1)) return 1;
@@ -1247,7 +1247,9 @@ static Node * s_inthide (Node * a[], int n, Symbol * f)	/* inthide */
 
 /* ================= numbers as fractions ================= */
 
-/* v = p/q (continued fractions, q <= 1e6); 0 if no such fraction is close */
+/* v = p/q (continued fractions, q <= 1e6); 0 if no such fraction is close.
+ * Close means a few rounding errors: with 1e-12, every real number had a
+ * fraction (0.128710 = 245352250447/1906243172561 after a few steps). */
 static int rat_approx (double v, double * p, double * q)
 {
 	double x = fabs(v), h0 = 0, h1 = 1, k0 = 1, k1 = 0, a, h, k;
@@ -1259,7 +1261,7 @@ static int rat_approx (double v, double * p, double * q)
 		h = a * h1 + h0; k = a * k1 + k0;
 		h0 = h1; h1 = h; k0 = k1; k1 = k;
 		if (k1 > 1e6) return 0;
-		if (fabs(fabs(v) - h1 / k1) <= 1e-12 * (1.0 + fabs(v))) break;
+		if (fabs(fabs(v) - h1 / k1) <= 1e-14 * (1.0 + fabs(v))) break;
 		if (x - a < 1e-15) break;
 		x = 1.0 / (x - a);
 		}
@@ -3487,6 +3489,140 @@ static Node * s_substexp (Node * a[], int n, Symbol * f)
 	return r;
 }
 
+/* ---- binomsum(u, x): Rubi 1.1.3.1/2, x^m/(a+b*x^n) by partial fractions ----
+ * For an odd n, or n = 2 mod 4, and 0 <= m < n-1: with r/s = Rt[a/b, n]
+ * (or Rt[-a/b, n] if a/b < 0) the denominator splits into linear and
+ * quadratic factors with the coefficients cos(j*pi/n). Rubi writes these
+ * rules with Module, CompoundExpression and Sum; here they are one helper
+ * that gives c * (sum of the integrals), or NULL if u has not that form. */
+
+static Node * cos_pi (long p, long q)	/* cos(p/q*pi), exact for q = 1..6 */
+{
+	long g, a = labs(p), b = q;
+	Node * r5;
+	Symbol * ps;
+	while (b) { long t = a % b; a = b; b = t; }
+	g = a ? a : 1;
+	p /= g; q /= g;
+	p %= 2 * q; if (p < 0) p += 2 * q;	/* p/q in [0, 2) */
+	if (p > q) p = 2 * q - p;		/* cos(pi*(2-t)) = cos(pi*t) */
+	switch (q)
+		{
+		case 1: return mk_int(p == 0 ? 1 : -1);
+		case 2: return mk_int(0);
+		case 3: return mk_num_ex(p == 1 ? 0.5 : -0.5, 1);
+		case 4: return mk_mul(mk_int(p == 1 ? 1 : -1), mk_pow(mk_int(2), mk_num_ex(-0.5, 1)));
+		case 6: return mk_mul(mk_num_ex(p == 1 ? 0.5 : -0.5, 1), mk_pow(mk_int(3), mk_num_ex(0.5, 1)));
+		case 5:
+			r5 = mk_pow(mk_int(5), mk_num_ex(0.5, 1));
+			if (p == 1) return mk_mul(mk_num_ex(0.25, 1), mk_add(mk_int(1), r5));
+			if (p == 2) return mk_mul(mk_num_ex(0.25, 1), mk_add(r5, mk_int(-1)));
+			if (p == 3) return mk_mul(mk_num_ex(0.25, 1), mk_add(mk_int(1), mk_neg(r5)));
+			return mk_mul(mk_num_ex(-0.25, 1), mk_add(mk_int(1), r5));
+		}
+	ps = find_symbol("pi");
+	if (! ps) return mk_num(cos(M_PI * p / q));
+	return mk_f1("cos", mk_mul(mk_num_ex((double) p / q, 1), mknod(Const, (Node *) ps, NULL)));
+}
+
+/* Int[(r*cm + sg*s*cm1*x)/(r^2 + sg*2*r*s*c1*x + s^2*x^2), x] (takes cm, cm1, c1) */
+static Node * bs_quad (Node * r, Node * s, Node * cm, Node * cm1, Node * c1, int sg, int sgq, Node * x)
+{
+	Node * num = mk_add(mk_mul(tcpy(r), cm), mk_mul(mk_int(sg), mk_mul(mk_mul(tcpy(s), cm1), tcpy(x))));
+	Node * den = mk_add(mk_add(mk_pow(tcpy(r), mk_int(2)),
+	                           mk_mul(mk_int(2 * sgq), mk_mul(mk_mul(mk_mul(tcpy(r), tcpy(s)), c1), tcpy(x)))),
+	                    mk_mul(mk_pow(tcpy(s), mk_int(2)), mk_pow(tcpy(x), mk_int(2))));
+	return mk_f2("Int", mk_mul(num, mk_pow(den, mk_int(-1))), tcpy(x));
+}
+
+static Node * s_binomsum (Node * a[], int n, Symbol * f)
+{
+	Node * x, * num, * den, * c = NULL, * pa = NULL, * pb = NULL, * pn = NULL;
+	Node * q = NULL, * r = NULL, * s = NULL, * fac, * sum = NULL, * lin, * res = NULL, * ra[2];
+	double m, dn;
+	long nn, mm, k;
+	int pos;
+	if (n != 2) return NULL;
+	x = a[1];
+	num = numden(a[0], 0);
+	den = numden(a[0], 1);
+	if (! monomial(num, x, & c, & m) || m != floor(m) || m < 0
+	    || ! bparts(den, x, & pa, & pb, & pn) || ! is_num(pn, & dn) || dn != floor(dn))
+		goto out;
+	nn = (long) dn; mm = (long) m;
+	if (mm >= nn - 1) goto out;
+	if (! ((nn % 2 == 1 && nn >= (mm > 0 ? 3 : 5)) || (nn % 4 == 2 && nn >= 6 && mm % 2 == 0)))
+		goto out;
+	{
+	Node * ab = mk_mul(tcpy(pa), mk_pow(tcpy(pb), mk_int(-1)));
+	pos = posaux(ab);
+	ra[0] = pos ? ab : mk_neg(ab);
+	ra[1] = mk_int(nn);
+	q = s_rt(ra, 2, f);
+	delete(ra[0]); delete(ra[1]);
+	}
+	if (! q || term_has_nan(q)) goto out;
+	r = numden(q, 0);
+	s = numden(q, 1);
+	/* fac = 2*r^(m+1)/(a*n*s^m) */
+	fac = mk_mul(mk_mul(mk_int(2), mk_pow(tcpy(r), mk_int(mm + 1))),
+	             mk_pow(mk_mul(mk_mul(tcpy(pa), mk_int(nn)), mk_pow(tcpy(s), mk_int(mm))), mk_int(-1)));
+	if (nn % 2 == 1)
+		{
+		for (k = 1; k <= (nn - 1) / 2; k++)
+			{
+			long j = 2 * k - 1;
+			Node * t = pos ? bs_quad(r, s, cos_pi(j * mm, nn), cos_pi(j * (mm + 1), nn), cos_pi(j, nn), -1, -1, x)
+			               : bs_quad(r, s, cos_pi(j * mm, nn), cos_pi(j * (mm + 1), nn), cos_pi(j, nn), 1, 1, x);
+			sum = sum ? mk_add(sum, t) : t;
+			}
+		/* pos: -(-r)^(m+1)/(a n s^m) Int[1/(r+s x)] + fac*sum;
+		 * neg: r^(m+1)/(a n s^m) Int[1/(r-s x)] - 2(-r)^(m+1)/(a n s^m) sum */
+		lin = mk_f2("Int", mk_pow(mk_add(tcpy(r), mk_mul(mk_int(pos ? 1 : -1), mk_mul(tcpy(s), tcpy(x)))), mk_int(-1)), tcpy(x));
+		{
+		/* separate statements: the constructors take (and may free) their
+		 * arguments, and C does not fix the order of evaluation */
+		Node * base = mk_pow(mk_mul(mk_mul(tcpy(pa), mk_int(nn)), mk_pow(tcpy(s), mk_int(mm))), mk_int(-1));
+		Node * c1, * c2;
+		if (pos)
+			{
+			c1 = mk_mul(mk_int(-1), mk_mul(mk_pow(mk_neg(tcpy(r)), mk_int(mm + 1)), base));
+			c2 = fac;
+			}
+		else
+			{
+			c1 = mk_mul(mk_pow(tcpy(r), mk_int(mm + 1)), tcpy(base));
+			c2 = mk_mul(mk_mul(mk_int(-2), mk_pow(mk_neg(tcpy(r)), mk_int(mm + 1))), base);
+			delete(fac);
+			}
+		res = mk_add(mk_mul(c1, lin), mk_mul(c2, sum));
+		}
+		}
+	else
+		{
+		for (k = 1; k <= (nn - 2) / 4; k++)
+			{
+			long j = pos ? 2 * k - 1 : 2 * k;
+			Node * t1 = bs_quad(r, s, cos_pi(j * mm, nn), cos_pi(j * (mm + 1), nn), cos_pi(j, nn), -1, -1, x);
+			Node * t2 = bs_quad(r, s, cos_pi(j * mm, nn), cos_pi(j * (mm + 1), nn), cos_pi(j, nn), 1, 1, x);
+			Node * t = mk_add(t1, t2);
+			sum = sum ? mk_add(sum, t) : t;
+			}
+		/* pos: 2(-1)^(m/2) r^(m+2)/(a n s^m) Int[1/(r^2+s^2 x^2)]; neg: 2 r^(m+2)/(a n s^m) Int[1/(r^2-s^2 x^2)] */
+		lin = mk_f2("Int", mk_pow(mk_add(mk_pow(tcpy(r), mk_int(2)),
+		                                 mk_mul(mk_int(pos ? 1 : -1), mk_mul(mk_pow(tcpy(s), mk_int(2)), mk_pow(tcpy(x), mk_int(2))))),
+		                          mk_int(-1)), tcpy(x));
+		res = mk_add(mk_mul(mk_mul(mk_mul(mk_int(pos && (mm / 2) % 2 ? -2 : 2), mk_pow(tcpy(r), mk_int(mm + 2))),
+		                           mk_pow(mk_mul(mk_mul(tcpy(pa), mk_int(nn)), mk_pow(tcpy(s), mk_int(mm))), mk_int(-1))), lin),
+		             mk_mul(fac, sum));
+		}
+	res = mk_mul(tcpy(c), res);
+out:
+	delete(num); delete(den); delete(c); delete(pa); delete(pb); delete(pn);
+	delete(q); delete(r); delete(s);
+	return res;
+}
+
 /* ---- functionofq(v, u, x [, pure]), substfor(h, v, u, x) ----
  * Rubi's FunctionOfQ and SubstFor: u is a function of v (in x) if every
  * occurrence of x in u lies in v. For v = d*g(w) with a trig or hyperbolic
@@ -4010,6 +4146,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "collect",         s_collect },
 	{ "hyp2exp", s_hyp2exp },
 	{ "substexp", s_substexp },
+	{ "binomsum", s_binomsum },
 	{ "functionofq", s_functionofq },
 	{ "substfor", s_substfor },
 	{ "derivdivides", s_derivdivides },

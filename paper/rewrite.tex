@@ -521,10 +521,13 @@ from a file that the translator writes along with the rules.
 
 \subsection{Results}
 
-The translator converts 6835 of Rubi's 7432 rules (92\%; rules that Rubi
+The translator converts 6845 of Rubi's 7432 rules (92\%; rules that Rubi
 writes in two variants, with and without \texttt{ShowStep}, count twice),
-which become 7329 \texttt{rewrite} rules after the expansion of function
-variables. The
+which become 7333 \texttt{rewrite} rules after the expansion of function
+variables. Rules that Rubi writes as small programs (\texttt{Module} with
+several statements, \texttt{Sum}, lists) are replaced by C functions: the
+substitutions of section 9.3 and the partial fractions of
+$x^m/(a+bx^n)$ with the coefficients $\cos(k\pi/n)$. The
 largest group of the remaining rules needs complex numbers (245 rules);
 others use the rest of Rubi's substitution machinery
 (\texttt{FunctionOfExponentialQ}), general pattern tests

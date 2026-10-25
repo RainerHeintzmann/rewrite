@@ -191,6 +191,11 @@ have it, so a few steps are added:
   powers of a linear function, `substsqrtquad` does Euler's substitutions
   for functions of `x` and `sqrt(a+b*x+c*x^2)`. Rubi writes these rules
   twice (with and without `ShowStep`); the translator takes the second.
+  The rules for `x^m/(a+b*x^n)` with an odd `n` or `n = 2 mod 4` (sections
+  1.1.3.1/2) use `Module` with several statements and `Sum[u, {k, ...}]`;
+  the C function `binomsum` gives the same sum of integrals of linear and
+  quadratic partial fractions, with `cos(k*pi/n)` exact for `n` up to 6:
+  `Int(1/(1+x^5),x)` is exact, `Int(1/(1+x^7),x)` has real coefficients.
 - Rubi's `GtQ[u,v]` (also `LtQ`, `GeQ`, `LeQ`) is false unless both are
   numbers, so that `Not[GtQ[a^2,0]]` is true for a symbol `a`. The
   translator writes `gtq(u,v)`, ... instead of `u > v`, which cannot be

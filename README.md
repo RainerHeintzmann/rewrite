@@ -548,6 +548,7 @@ loaded by the integration rules and can also be used on their own:
 | `trignorm(u,x)`, `removecontent(u,x)` | `1/sin = csc` and Rubi's `FixInertTrigFunction` for products of trig functions; `u` without constant factors, `cos(pi/2+x)` as `-sin(x)` |
 | `trigexpand(u,x)` | trig functions of multiples of one angle with `sin`, `cos` of the angle (Mathematica's `TrigExpand`); not for polynomials in sin and cos |
 | `substfracpow(u,x)`, `substsqrtquad(u,x)` | Rubi's substitutions `t = (a+b*x)^(1/n)` and Euler's for `sqrt(a+b*x+c*x^2)` (the transformed integral) |
+| `binomsum(u,x)` | `x^m/(a+b*x^n)` for odd `n` or `n = 2 mod 4` as a sum of integrals of linear and quadratic partial fractions with coefficients `cos(k*pi/n)` (exact for `n` up to 6) |
 | `gtq(u,v)`, `ltq`, `geq`, `leq` | Rubi's `GtQ`, ...: false unless both are numbers |
 
 The predicates return true or false and can be used in conditions, also

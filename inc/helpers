@@ -94,6 +94,7 @@ FUNC algebraicfunctionq : real++ >> bool ATT algebraicfunctionq
 FUNC intsubst : real,real,real >> real    ATT intsubst     # Subst[Int[u,x],x,v]
 FUNC hyp2exp : real,real >> real         ATT hyp2exp      # sinh, cosh, ... als e^u
 FUNC substexp : real,real >> real        ATT substexp     # Rubi: Substitution x -> F^(g x)
+FUNC binomsum : real,real >> real        ATT binomsum     # Rubi: x^m/(a+b x^n), Partialbrueche mit cos(k pi/n)
 FUNC functionofq : real++ >> bool       ATT functionofq   # Rubi: FunctionOfQ[v,u,x(,pure)]
 FUNC substfor : real++ >> real           ATT substfor     # Rubi: SubstFor[(h,)v,u,x]
 FUNC derivdivides : real,real,real >> real ATT derivdivides # Rubi: DerivativeDivides[y,u,x]

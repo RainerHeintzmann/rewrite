@@ -142,16 +142,17 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a1,O_b1,P_a2,O_b2,O_c,O_m), (eqq(((((P_a2)*(O_b1
 #   Int[x_/(a_ + b_.*x_^3), x_Symbol] := -1/(3*Rt[a, 3]*Rt[b, 3])*Int[1/(Rt[a, 3] + Rt[b, 3]*x), x] + 1/(3*Rt[a, 3]*Rt[b, 3])* Int[(Rt[a, 3] + Rt[b, 3]*x)/(Rt[a, 3]^2 - Rt[a, 3]*Rt[b, 3]*x + Rt[b, 3]^2*x^2), x] /; FreeQ[{a, b}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int((Xv)*(((P_a)+((O_b)*((Xv)^(3))))^(K_1)),Xv) = (((((-(1/3)))*(((rt(P_a,3))^((-1))))*(((rt(O_b,3))^((-1))))*(Int(((((rt(P_a,3))+(((rt(O_b,3))*(Xv)))))^((-1))),Xv))))+((((1/3))*(((rt(P_a,3))^((-1))))*(((rt(O_b,3))^((-1))))*(Int(((((rt(P_a,3))+(((rt(O_b,3))*(Xv)))))*(((((((rt(P_a,3))^(2)))+((((-1))*(rt(P_a,3))*(rt(O_b,3))*(Xv)))+(((((rt(O_b,3))^(2)))*(((Xv)^(2)))))))^((-1))))),Xv)))))
 
-# Regel 35 nicht uebersetzt: parse error: expected ']', got ';'
+# Regel 35 (von Hand, C-Hilfsfunktion):
 #   Int[x_^m_./(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[a/b, n]], s = Denominator[Rt[a/b, n]], k, u}, u = Int[(r*Cos[(2*k - 1)*m*Pi/n] - s*Cos[(2*k - 1)*(m + 1)*Pi/n]*x)/(r^2 - 2*r*s*Cos[(2*k - 1)*Pi/n]*x + s^2*x^2), x]; -(-r)^(m + 1)/(a*n*s^m)*Int[1/(r + s*x), x] + Dist[2*r^(m + 1)/(a*n*s^m), Sum[u, {k, 1, (n - 1)/2}], x]] /; FreeQ[{a, b}, x] && IGtQ[(n - 1)/2, 0] && IGtQ[m, 0] && LtQ[m, n - 1] && PosQ[a/b]
+ADDSPEC RubiRules : Int(P_u,Xv) = binomsum(P_u,Xv)
 
-# Regel 36 nicht uebersetzt: parse error: expected ']', got ';'
+# Regel 36 (von Hand, wie oben):
 #   Int[x_^m_./(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[-a/b, n]], s = Denominator[Rt[-a/b, n]], k, u}, u = Int[(r*Cos[(2*k - 1)*m*Pi/n] + s*Cos[(2*k - 1)*(m + 1)*Pi/n]*x)/(r^2 + 2*r*s*Cos[(2*k - 1)*Pi/n]*x + s^2*x^2), x]; r^(m + 1)/(a*n*s^m)*Int[1/(r - s*x), x] - Dist[2*(-r)^(m + 1)/(a*n*s^m), Sum[u, {k, 1, (n - 1)/2}], x]] /; FreeQ[{a, b}, x] && IGtQ[(n - 1)/2, 0] && IGtQ[m, 0] && LtQ[m, n - 1] && NegQ[a/b]
 
-# Regel 37 nicht uebersetzt: parse error: expected ']', got ';'
+# Regel 37 (von Hand, wie oben):
 #   Int[x_^m_./(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[a/b, n]], s = Denominator[Rt[a/b, n]], k, u}, u = Int[(r*Cos[(2*k - 1)*m*Pi/n] - s*Cos[(2*k - 1)*(m + 1)*Pi/n]*x)/(r^2 - 2*r*s*Cos[(2*k - 1)*Pi/n]*x + s^2*x^2), x] + Int[(r*Cos[(2*k - 1)*m*Pi/n] + s*Cos[(2*k - 1)*(m + 1)*Pi/n]*x)/(r^2 + 2*r*s*Cos[(2*k - 1)*Pi/n]*x + s^2*x^2), x]; 2*(-1)^(m/2)*r^(m + 2)/(a*n*s^m)*Int[1/(r^2 + s^2*x^2), x] + Dist[2*r^(m + 1)/(a*n*s^m), Sum[u, {k, 1, (n - 2)/4}], x]] /; FreeQ[{a, b}, x] && IGtQ[(n - 2)/4, 0] && IGtQ[m, 0] && LtQ[m, n - 1] && PosQ[a/b]
 
-# Regel 38 nicht uebersetzt: parse error: expected ']', got ';'
+# Regel 38 (von Hand, wie oben):
 #   Int[x_^m_./(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[-a/b, n]], s = Denominator[Rt[-a/b, n]], k, u}, u = Int[(r*Cos[2*k*m*Pi/n] - s*Cos[2*k*(m + 1)*Pi/n]*x)/(r^2 - 2*r*s*Cos[2*k*Pi/n]*x + s^2*x^2), x] + Int[(r*Cos[2*k*m*Pi/n] + s*Cos[2*k*(m + 1)*Pi/n]*x)/(r^2 + 2*r*s*Cos[2*k*Pi/n]*x + s^2*x^2), x]; 2*r^(m + 2)/(a*n*s^m)*Int[1/(r^2 - s^2*x^2), x] + Dist[2*r^(m + 1)/(a*n*s^m), Sum[u, {k, 1, (n - 2)/4}], x]] /; FreeQ[{a, b}, x] && IGtQ[(n - 2)/4, 0] && IGtQ[m, 0] && LtQ[m, n - 1] && NegQ[a/b]
 
 # Regel 39 (12 Varianten):
