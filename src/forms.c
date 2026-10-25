@@ -10,161 +10,161 @@
 #include "sync.h"
 #include "numsort.h"	/* 2026: var_sort_ok */  /* For IS_follows, lock_rtypes */
 #include "nodes.h"
-#include "symfkt.h"	/* 2026: symbolic_constant */
+#include "symfn.h"	/* 2026: symbolic_constant */
 
 extern Node * chain_pos;
 extern Node var_chain;
 
-static Node * alt_ers,
-            * in_ers,
-            * neu_ers,
-            * ers_arg,
-          * * wo_ers,
-          * * wo_ers_weg,
-          * * alt_ers_weg,
-          * * merk_p_baum;
+static Node * old_repl,
+            * in_repl,
+            * new_repl,
+            * repl_arg,
+          * * where_repl,
+          * * where_repl_path,
+          * * old_repl_path,
+          * * saved_p_tree;
 
-static BOOLEAN matched_ers;
+static BOOLEAN matched_repl;
 static int depthcount;
-static Node * ersetz;
+static Node * repl_node;
 
-Node * einhaengen (Node * form,Node * Ersetz)
+Node * attach_repl (Node * form,Node * Repl)
 {
-	return mknod(ERSETZ_TYPE,form,Ersetz);  /* use tcopy ?? (But does not work because of Cond) */
+	return mknod(REPL_TYPE,form,Repl);  /* use tcopy ?? (But does not work because of Cond) */
 }
 
 Node * mkor(Node * l,Node * r)
 {
-	DEBG((4,"Mache ODER-Knoten im Formel-Baum :"));
-	DBFK(4,print(r->l));
+	DEBG((4,"Mache ODER-Knoten im Formel-rtree :"));
+	DBFN(4,print(r->l));
 	DEBG((4,"\n"));
 	return mknod(OR_TYPE,l,r);
 }
 
-Node * instree(Node * Baum,Node * form,Node * Ersetz)
+Node * instree(Node * rtree,Node * form,Node * Repl)
 {
-		DEBG((5,"instree: Baum: "));
-		DBFK(5,print(Baum));
+		DEBG((5,"instree: rtree: "));
+		DBFN(5,print(rtree));
 		DEBG((5,",form: "));
-		DBFK(5,print(form));
+		DBFN(5,print(form));
 		DEBG((5,"\n"));
 
-if (alt_ers == (Node *) NULL)
+if (old_repl == (Node *) NULL)
 	{
-	return mkor(Baum,einhaengen(form,Ersetz));
+	return mkor(rtree,attach_repl(form,Repl));
 	}
 else
 	{
-	alt_ers->l = Baum;
-	return mkor(alt_ers,einhaengen(form,Ersetz));
+	old_repl->l = rtree;
+	return mkor(old_repl,attach_repl(form,Repl));
 	}
 }
 
-BOOLEAN merge2(Node * form,Node * Baum)
+BOOLEAN merge2(Node * form,Node * rtree)
 {
 	DEBG((5,"Merge2 form: "));
-	DBFK(5,print(form));
+	DBFN(5,print(form));
 	DEBG((5,",tree: "));
-	DBFK(5,print(Baum));
+	DBFN(5,print(rtree));
 	DEBG((5,"\n"));
 
 	depthcount++;
-	if ((form != NULL) && (Baum != NULL) 
-		&& (form->type == SYM_TYPE) && (Baum->type == SYM_TYPE)
-		&& (lexval((Symbol *) form) == Var) && (lexval((Symbol *) Baum) == Var))
+	if ((form != NULL) && (rtree != NULL) 
+		&& (form->type == SYM_TYPE) && (rtree->type == SYM_TYPE)
+		&& (lexval((Symbol *) form) == Var) && (lexval((Symbol *) rtree) == Var))
 			return FALSE; /* Metavariables must never match, otherwise there are decision problems later when restoring the variables : */
 
-	if (form == Baum)
+	if (form == rtree)
 		return TRUE;   /* Subtrees are identical (symbols or NULL) */
 
-	if ((Baum == (Node *) NULL) || (form == (Node *) NULL))
+	if ((rtree == (Node *) NULL) || (form == (Node *) NULL))
 		{
 		return FALSE;
 		}
 		
-	if (Baum->type==ERSETZ_TYPE)
+	if (rtree->type==REPL_TYPE)
 		{
 		BOOLEAN tmp;
-    in_ers = Baum;
-		alt_ers_weg = merk_p_baum;
+    in_repl = rtree;
+		old_repl_path = saved_p_tree;
 #ifdef DEBUG
-			if (alt_ers_weg == (Node **)NULL)
-				DEBG((5," merk_p_baum is NULL !\n"));
+			if (old_repl_path == (Node **)NULL)
+				DEBG((5," saved_p_tree is NULL !\n"));
 #endif			
-		merk_p_baum = &(Baum->l);
-		if (tmp=merge2(form,Baum->l))
+		saved_p_tree = &(rtree->l);
+		if (tmp=merge2(form,rtree->l))
 			{
-			DEBG((6," matched ers. !\n"));
-	    matched_ers = TRUE;
+			DEBG((6," matched repl. !\n"));
+	    matched_repl = TRUE;
 			}
-    in_ers = NULL;
-		alt_ers_weg = (Node **) NULL;
+    in_repl = NULL;
+		old_repl_path = (Node **) NULL;
 		return tmp;		
 		}
 
-	if (Baum->type==OR_TYPE)
+	if (rtree->type==OR_TYPE)
 		{
 		BOOLEAN tmp;
-		int depth1,depth2,merk_depth;
+		int depth1,depth2,saved_depth;
 		depth1 = 0;
 		depth2 = 0;
-		merk_depth=depthcount;
+		saved_depth=depthcount;
 		depthcount = 0;
-		if (in_ers != (Node *) NULL)
+		if (in_repl != (Node *) NULL)
 			fatal("internal-error: merge2 did not expect ERSETZ before OR");
 
-		/* merk_p_baum = &(Baum->l);
-    matched_ers = FALSE;
-		if (merge2(form,Baum->l))
+		/* saved_p_tree = &(rtree->l);
+    matched_repl = FALSE;
+		if (merge2(form,rtree->l))
 			{
-			depthcount += merk_depth;
+			depthcount += saved_depth;
 			return TRUE;
 			}
 		depth1=depthcount; */
 
 		/* depthcount =0;
-		merk_p_baum = &(Baum->r);
-    matched_ers = FALSE;
-		if (merge2(form,Baum->r))
+		saved_p_tree = &(rtree->r);
+    matched_repl = FALSE;
+		if (merge2(form,rtree->r))
 			{
-			depthcount += merk_depth;
+			depthcount += saved_depth;
 			return TRUE;
 			}
 		depth2=depthcount;
 		
 		depthcount =0;
-    matched_ers = FALSE; */
+    matched_repl = FALSE; */
 		/* if (depth1 >= depth2) */
 		/* 	{  */
-		/* 	merk_p_baum = &(Baum->l); */
-		/*	tmp = merge2(form,Baum->l);  /* count depth, take the better tree */
+		/* 	saved_p_tree = &(rtree->l); */
+		/*	tmp = merge2(form,rtree->l);  /* count depth, take the better tree */
 	  /* 	} */
 		/* else */
 		/* 	{ */
-		/* 	merk_p_baum = &(Baum->r); */
-		/* 	tmp = merge2(form,Baum->r);  /* count depth, take the better tree */
+		/* 	saved_p_tree = &(rtree->r); */
+		/* 	tmp = merge2(form,rtree->r);  /* count depth, take the better tree */
 		/* 	} */
 
-		depthcount += merk_depth;
-		merk_p_baum = &(Baum->r); 
-    matched_ers = FALSE;
-		tmp = merge2(form,Baum->r);  /* Better: count depth, take the better tree */
+		depthcount += saved_depth;
+		saved_p_tree = &(rtree->r); 
+    matched_repl = FALSE;
+		tmp = merge2(form,rtree->r);  /* Better: count depth, take the better tree */
 		if (! tmp)  /* see also below */
-			if (wo_ers == (Node * *) NULL)
+			if (where_repl == (Node * *) NULL)
 				{
-				wo_ers = &(Baum->r);
-				neu_ers = form;
-				wo_ers_weg = alt_ers_weg;
-				alt_ers = in_ers;
+				where_repl = &(rtree->r);
+				new_repl = form;
+				where_repl_path = old_repl_path;
+				old_repl = in_repl;
 				}
 		return tmp;
 		}
 
 
 	if (  (form -> type == SYM_TYPE)   /* possibly the same value ? */
-		 && (Baum -> type == SYM_TYPE))
+		 && (rtree -> type == SYM_TYPE))
 		{
-		BOOLEAN tmp=symeq((Symbol *) form,(Symbol *) Baum);
+		BOOLEAN tmp=symeq((Symbol *) form,(Symbol *) rtree);
 #ifdef DEBUG
 			DEBG((6,"symeq returned "));
 			if (tmp)
@@ -175,62 +175,62 @@ BOOLEAN merge2(Node * form,Node * Baum)
 		return tmp;
 		}
 	else
-		if (form->type==Baum->type)   /* Term or Func ,.. */
+		if (form->type==rtree->type)   /* Term or Func ,.. */
 			{
-				BOOLEAN m1,m2,merk_ers;
+				BOOLEAN m1,m2,saved_repl;
 
-				merk_p_baum = &(Baum->l);
-				m1= merge2(form->l,Baum->l);
-				merk_ers = matched_ers;
-				merk_p_baum = &(Baum->r);
-				m2= merge2(form->r,Baum->r);
-				if (! matched_ers)
-					matched_ers = merk_ers;
+				saved_p_tree = &(rtree->l);
+				m1= merge2(form->l,rtree->l);
+				saved_repl = matched_repl;
+				saved_p_tree = &(rtree->r);
+				m2= merge2(form->r,rtree->r);
+				if (! matched_repl)
+					matched_repl = saved_repl;
 
 				if (m1 && m2)
 					{
 					DEBG((6,"merge2: matched two eqal terms:"));
-					DBFK(6,print(Baum->l));
+					DBFN(6,print(rtree->l));
 					DEBG((6,", "));
-					DBFK(6,print(Baum->r));
+					DBFN(6,print(rtree->r));
 					DEBG((6,", ret. true.\n"));
 					return TRUE;
 					}
 				if (! m1)
-					if (wo_ers == (Node * *) NULL)
+					if (where_repl == (Node * *) NULL)
 						{
-						wo_ers = &(Baum->l);
-						neu_ers = form->l;
-						wo_ers_weg = alt_ers_weg;
-						alt_ers = in_ers;
+						where_repl = &(rtree->l);
+						new_repl = form->l;
+						where_repl_path = old_repl_path;
+						old_repl = in_repl;
 						}
 				if (! m2)
-					if (wo_ers == (Node * *) NULL)
+					if (where_repl == (Node * *) NULL)
 						{
-						wo_ers = &(Baum->r);
-						neu_ers = form->r;
-						wo_ers_weg = alt_ers_weg;
-						alt_ers = in_ers;
+						where_repl = &(rtree->r);
+						new_repl = form->r;
+						where_repl_path = old_repl_path;
+						old_repl = in_repl;
 						}
 				if ((!m1)       /* && (!m2) but problems with Func followed by OR node ! */
-				  || ( matched_ers))
+				  || ( matched_repl))
 						{
-						if (! matched_ers)
+						if (! matched_repl)
 							{
-							DEBG((6,"merge2: Got two wrong Terms, wo_ers := NULL : "));
-							DBFK(6,print(Baum->l));
+							DEBG((6,"merge2: Got two wrong Terms, where_repl := NULL : "));
+							DBFN(6,print(rtree->l));
 							DEBG((6,", "));
-							DBFK(6,print(form->l));
+							DBFN(6,print(form->l));
 							DEBG((6,"und "));
-							DBFK(6,print(Baum->r));
+							DBFN(6,print(rtree->r));
 							DEBG((6,", "));
-							DBFK(6,print(form->r));
+							DBFN(6,print(form->r));
 							DEBG((6,"\n"));
 							}
 
-						wo_ers = (Node * *) NULL;
-						alt_ers = in_ers;
-						matched_ers = FALSE; /* Reset, the next possible replacement takes place */
+						where_repl = (Node * *) NULL;
+						old_repl = in_repl;
+						matched_repl = FALSE; /* Reset, the next possible replacement takes place */
 						}
 				else
 						depthcount--;
@@ -240,93 +240,93 @@ BOOLEAN merge2(Node * form,Node * Baum)
 	return FALSE;
 }
 
-Node * merge(Node * form,Node * Ersetz,Node * Baum)
+Node * merge(Node * form,Node * Repl,Node * rtree)
 {
 	DEBG((5,"Merge form: "));
-	DBFK(5,print(form));
+	DBFN(5,print(form));
 	DEBG((5,"in tree: "));
-	DBFK(5,print(Baum));
+	DBFN(5,print(rtree));
 	DEBG((5,"\n"));
 
-	if (Baum == (Node *) NULL)
-		return einhaengen(form,Ersetz);
+	if (rtree == (Node *) NULL)
+		return attach_repl(form,Repl);
   else
     {
-		in_ers  = (Node *) NULL;
-		alt_ers = (Node *) NULL;
-		wo_ers  = (Node * *) NULL;
-		neu_ers = (Node *) NULL;
-		ers_arg = (Node *) NULL;
-		wo_ers_weg = (Node * *) NULL;
-		merk_p_baum = (Node * *) NULL;
-		alt_ers_weg = (Node * *) NULL;
-		matched_ers = FALSE;
+		in_repl  = (Node *) NULL;
+		old_repl = (Node *) NULL;
+		where_repl  = (Node * *) NULL;
+		new_repl = (Node *) NULL;
+		repl_arg = (Node *) NULL;
+		where_repl_path = (Node * *) NULL;
+		saved_p_tree = (Node * *) NULL;
+		old_repl_path = (Node * *) NULL;
+		matched_repl = FALSE;
 
-		if (! merge2(form,Baum))
+		if (! merge2(form,rtree))
 			{
-			if (alt_ers==Baum)
-				if (wo_ers == (Node **) NULL)
-					alt_ers=NULL; /* Upper ER node is replaced entirely */
+			if (old_repl==rtree)
+				if (where_repl == (Node **) NULL)
+					old_repl=NULL; /* Upper ER node is replaced entirely */
 				else
-          Baum = Baum->l; /* Because the ER node is pulled into the subtree ! */
+          rtree = rtree->l; /* Because the ER node is pulled into the subtree ! */
 			else
-					if (alt_ers != (Node *) NULL)
-						(* wo_ers_weg) = alt_ers->l;
+					if (old_repl != (Node *) NULL)
+						(* where_repl_path) = old_repl->l;
 
-			if (wo_ers == (Node * *) NULL)
+			if (where_repl == (Node * *) NULL)
 				{
-				DEBG((6,"wo_ers == NULL \n"));
-				return instree(Baum,form,Ersetz);
+				DEBG((6,"where_repl == NULL \n"));
+				return instree(rtree,form,Repl);
 				}
 
-			(* wo_ers) = instree(* wo_ers,neu_ers,Ersetz);
-			return Baum;
+			(* where_repl) = instree(* where_repl,new_repl,Repl);
+			return rtree;
 			}
-		return Baum;
+		return rtree;
 		}
 }
 
 
-BOOLEAN match2 (Node * term,Node * Baum)
+BOOLEAN match2 (Node * term,Node * rtree)
 {
 	DEBG((5,"match2: term:"));
-	DBFK(5,print(term));
+	DBFN(5,print(term));
 	DEBG((5,",tree: "));
-	DBFK(5,print(Baum));
+	DBFN(5,print(rtree));
 	DEBG((5,"\n"));
 
-	if (term == Baum)
+	if (term == rtree)
 		{
 		DEBG((6,"match2: pointers are eqal: "));
-		DBFK(6,print(term));
+		DBFN(6,print(term));
 		DEBG((6,"\n"));
 		return TRUE;
 		}
 
-	if ((Baum == (Node *) NULL) || (term == (Node *) NULL))
+	if ((rtree == (Node *) NULL) || (term == (Node *) NULL))
 		{
 		RESTORE
 		return FALSE;
 		}
 
-	if (Baum->type==ERSETZ_TYPE)
+	if (rtree->type==REPL_TYPE)
 		{
 		DEBG((6,"match2: found ER-Type := "));
-		DBFK(6,print(Baum->l));
+		DBFN(6,print(rtree->l));
 		DEBG((6," ; "));
-		DBFK(6,print(Baum->r));
+		DBFN(6,print(rtree->r));
 		DEBG((6,"\n"));
 
-		if (match2(term,Baum->l) == TRUE)
+		if (match2(term,rtree->l) == TRUE)
 			{
-			DEBG((6,"match2: ersetz := "));
-			DBFK(6,print(Baum->r));
+			DEBG((6,"match2: repl_node := "));
+			DBFN(6,print(rtree->r));
 			DEBG((6,"\n"));
 
 			/* matching formula found, now check the condition */
-			if (COND_CALL(RES_COND(Baum->r)))	/* Condition for the equation */
+			if (COND_CALL(RES_COND(rtree->r)))	/* Condition for the equation */
 				{
-				ersetz = Baum->r; /* Condition matches too ! */
+				repl_node = rtree->r; /* Condition matches too ! */
 				return TRUE;
 				}
 			else
@@ -342,17 +342,17 @@ BOOLEAN match2 (Node * term,Node * Baum)
 			}
 		}
 
-	if (Baum->type==OR_TYPE)
+	if (rtree->type==OR_TYPE)
 		{
-		if (match2(term,Baum->l))
+		if (match2(term,rtree->l))
 			return TRUE;
-		if (match2(term,Baum->r))
+		if (match2(term,rtree->r))
 			return TRUE;
 		RESTORE
 		return FALSE;
 		}
 
-	if (((Baum -> type) == SYM_TYPE))
+	if (((rtree -> type) == SYM_TYPE))
 		{
 			Symbol * tsym;
 
@@ -369,12 +369,12 @@ BOOLEAN match2 (Node * term,Node * Baum)
 										return FALSE; /* Does happen in the tree ! */
 										/* printfErr("match2: Internal ERROR : term : ");
 										   print(term);
-										   printfErr("Baum : ");
-										   print(Baum);
+										   printfErr("rtree : ");
+										   print(rtree);
 										   printfErr("(unexpected term-type) Nr.:%d !\n",term->type); */
 				}
 
-		if  (lexval((Symbol *) Baum) == Var) /* Replace variable */
+		if  (lexval((Symbol *) rtree) == Var) /* Replace variable */
 			{
 			if (term->type == SYM_TYPE)	/* 2026: the symbol inside a Const node, reached
 							   by the traversal: a variable matches the Const */
@@ -392,9 +392,9 @@ BOOLEAN match2 (Node * term,Node * Baum)
 				return FALSE;
 				}
 
-			/* Different sorts are assigned too, formerly: if (! eq_sorts(rtypes((Symbol *) Baum),rtypes(tsym))) return FALSE;*/
+			/* Different sorts are assigned too, formerly: if (! eq_sorts(rtypes((Symbol *) rtree),rtypes(tsym))) return FALSE;*/
 			/* 2026: except for subsorts (VAR X : nonneg only matches nonneg) */
-			if (! var_sort_ok(rtypes((Symbol *) Baum), term))
+			if (! var_sort_ok(rtypes((Symbol *) rtree), term))
 				{
 				RESTORE
 				return FALSE;
@@ -402,64 +402,64 @@ BOOLEAN match2 (Node * term,Node * Baum)
 
                        /* Types (also function results) match now */
 
-			if (hasval(Baum))                 /* Numeric variable ? */
+			if (hasval(rtree))                 /* Numeric variable ? */
        if (!(lexval(tsym) == Const)
   				|| ! hasval(tsym)            /* only replace numeric Const / Func */
 				|| symbolic_constant(tsym))	/* 2026: pi in exact mode: no number */
         {
-			/*	 Node * erg1=calkulate (term);
-					if (!erg1 || rtypes((Symbol *) erg1) != numbertype)
+			/*	 Node * rslt1=calculate (term);
+					if (!rslt1 || rtypes((Symbol *) rslt1) != numbertype)
 					{
 					RESTORE
 					return FALSE;
 					}
 				 else
-					delete(erg1); */
+					delete(rslt1); */
 
 					RESTORE
 					return FALSE;
 				}
 
 			chain_pos = chain_pos -> l = mknod(CHAIN,NULL,NULL);
-			chain_pos->r = (Node *) Baum; /* Occupy new position */
+			chain_pos->r = (Node *) rtree; /* Occupy new position */
 			DEBG((4,"Variable ersetzt : "));
-			DBFK(4,print(Baum));
+			DBFN(4,print(rtree));
 
-				Baum->type = term->type;  /* Const or Func */
-				Baum->l = term->l;
-				Baum->r = term->r;
+				rtree->type = term->type;  /* Const or Func */
+				rtree->l = term->l;
+				rtree->r = term->r;
 
-	/* (* Baum) = (* term);	only possible replacement directly in the symbol table ! */
+	/* (* rtree) = (* term);	only possible replacement directly in the symbol table ! */
 		   												/* Node structure is copied (and thus overwritten !) */
 
 				DEBG((4,"-> "));
-				DBFK(4,print(Baum));
+				DBFN(4,print(rtree));
 				DEBG((4,"\n"));
 
 			return TRUE;
 			}
 		else			/* Compare constants or functions */
 			{
-			if (lexval((Symbol *) Baum) == Term)
+			if (lexval((Symbol *) rtree) == Term)
 				{
-				return match2(term,Baum->l); /* Skip the symbol slot */
+				return match2(term,rtree->l); /* Skip the symbol slot */
 				}
-			return symeq((Symbol *) term,(Symbol *) Baum);
+			return symeq((Symbol *) term,(Symbol *) rtree);
 			}
 	}
 
-	if ((term -> type) == (Baum -> type))
+	if ((term -> type) == (rtree -> type))
 				{
 
 				if (term->type == Func)
 					{	
 					Node * tmpchain = NULL;
-					if (term->l != Baum->l && variant_fits((Symbol *) term->l,(Symbol *) Baum->l)
-					    && ! IS_follows((Symbol *) term->l,(Symbol *) Baum->l))
-						return match2(term->r,Baum->r);	/* 2026: + : real,real for + : number,number */
-					if (IS_follows((Symbol *) term->l,(Symbol *) Baum->l))
-						if (lock_rtypes((Symbol *) Baum->l,(Symbol *) term->l,& tmpchain))
-							if (match2(term->r,Baum->r))
+					if (term->l != rtree->l && variant_fits((Symbol *) term->l,(Symbol *) rtree->l)
+					    && ! IS_follows((Symbol *) term->l,(Symbol *) rtree->l))
+						return match2(term->r,rtree->r);	/* 2026: + : real,real for + : number,number */
+					if (IS_follows((Symbol *) term->l,(Symbol *) rtree->l))
+						if (lock_rtypes((Symbol *) rtree->l,(Symbol *) term->l,& tmpchain))
+							if (match2(term->r,rtree->r))
 								{
 								chain_pos -> l = tmpchain;
 								while (chain_pos -> l)
@@ -472,7 +472,7 @@ BOOLEAN match2 (Node * term,Node * Baum)
 								while (tmpchain)
 									{
 									oldc=tmpchain;
-									IS_Verbindung((Symbol *) (tmpchain->r))=(Symbol *) NULL;
+									IS_link((Symbol *) (tmpchain->r))=(Symbol *) NULL;
 									DEBG((4,"restoring Sort: %s\n",((Symbol *) tmpchain->r)->name));
 									tmpchain=tmpchain->l;
 									delnod(oldc);
@@ -483,8 +483,8 @@ BOOLEAN match2 (Node * term,Node * Baum)
 					if (term->type == Const)
 						{
 						Node * tmpchain = NULL;
-						if (IS_follows((Symbol *) term->l,(Symbol *) Baum->l))
-							if (lock_rtypes((Symbol *) Baum->l,(Symbol *) term->l,& tmpchain))
+						if (IS_follows((Symbol *) term->l,(Symbol *) rtree->l))
+							if (lock_rtypes((Symbol *) rtree->l,(Symbol *) term->l,& tmpchain))
 								{
 								chain_pos -> l = tmpchain;
 								while (chain_pos -> l)
@@ -492,13 +492,13 @@ BOOLEAN match2 (Node * term,Node * Baum)
 								return TRUE;
 								}
 						}
-					else if ((match2(term->l,Baum->l)) && (match2(term->r,Baum->r)))
+					else if ((match2(term->l,rtree->l)) && (match2(term->r,rtree->r)))
 								return TRUE;
 				
 				RESTORE
 				return FALSE;
 				}
-	else			/* Here term and Baum differ ! */
+	else			/* Here term and rtree differ ! */
 		{
 
 		DEBG((5,"Terms don't match : returned False !\n"));
@@ -508,7 +508,7 @@ BOOLEAN match2 (Node * term,Node * Baum)
 		}
 }
 
-Node * match (Node * term,Node * Baum)
+Node * match (Node * term,Node * rtree)
 {
 static Node dummy = {
 CHAIN,
@@ -516,10 +516,10 @@ NULL,
 NULL
 };
 
-ersetz = &dummy; /* so that in_tree does not return NULL ! */
+repl_node = &dummy; /* so that in_tree does not return NULL ! */
 
-if(match2(term,Baum))
-	return ersetz;
+if(match2(term,rtree))
+	return repl_node;
 else
 	return (Node *) NULL;
 }
@@ -527,9 +527,9 @@ else
 BOOLEAN testrewrite _2a ((term,formterm) , Node * term ,Node * formterm)
 {
 		DEBG((4,"testrewrite : trying Term : "));
-		DBFK(4,print(term));
+		DBFN(4,print(term));
 		DEBG((4,"  , Form : "));
-		DBFK(4,print(formterm));
+		DBFN(4,print(formterm));
 		DEBG((4,"\n"));
 
 	if (term == formterm) /* Compare symbols / pointers (also NULL !!) */
@@ -550,12 +550,12 @@ BOOLEAN testrewrite _2a ((term,formterm) , Node * term ,Node * formterm)
 			chain_pos = chain_pos -> l = mknod(CHAIN,NULL,NULL);
 			chain_pos->r = (Node *) formterm;
 			DEBG((4,"Variable ersetzt : "));
-			DBFK(4,print(formterm));
+			DBFN(4,print(formterm));
 
 			(* formterm) = (* term);	/* only possible replacement directly in the symbol table !*/
 												/* formterm->l is overwritten !! */
 			DEBG((4,"-> "));
-			DBFK(4,print(formterm));
+			DBFN(4,print(formterm));
 			DEBG((4,"\n"));
 
 			return TRUE;

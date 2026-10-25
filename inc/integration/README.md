@@ -169,7 +169,7 @@ have it, so a few steps are added:
   functions: `sec(x)*sin(x)^2` becomes `cos(x)^-1*sin(x)^2`, `csc(x)`
   next to a power of a sum of cosines becomes `sin(x)^-1`, ... The first
   rule of `RubiRules` after the constant factors does both: `trignorm`
-  (symfkt.c) does Mathematica's step and combines `sin(x)*csc(x)^3 =
+  (symfn.c) does Mathematica's step and combines `sin(x)*csc(x)^3 =
   csc(x)^2`, then calls `fixinert`, a function defined by rules (`ATT
   RULES`) that the translator writes from Rubi's definitions
   ([rubi/r4_0_fixinert](rubi/r4_0_fixinert)). In Rubi these definitions

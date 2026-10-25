@@ -29,10 +29,10 @@ extern void setDebug(int pri);
 
 #ifdef DEBUG
 #define DEBG(x) printfDebug x
-#define DBFK(pri,funct) if (mustDebug(pri)) funct
+#define DBFN(pri,funct) if (mustDebug(pri)) funct
 #else
 #define DEBG(x)    
-#define DBFK(pri,funct)    
+#define DBFN(pri,funct)    
 #endif
 
 #endif

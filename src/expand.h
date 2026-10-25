@@ -18,9 +18,9 @@
 
 #include "run.h"
 
-void    opt_fkt     (Node * np);   /* OPT idlist */
-void    comm_fkt    (Node * np);   /* COMM funclist */
-void    default_fkt (Node * np);   /* DEFAULT [RIGHT] f = value */
+void    opt_fn     (Node * np);   /* OPT idlist */
+void    comm_fn    (Node * np);   /* COMM funclist */
+void    default_fn (Node * np);   /* DEFAULT [RIGHT] f = value */
 BOOLEAN and_cond    (Node * np);   /* condition list c1, c2 */
 
 /* adds a rule to the rules of an algebra: to a rule list (listmatch.c) if

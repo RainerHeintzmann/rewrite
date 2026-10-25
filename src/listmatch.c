@@ -22,7 +22,7 @@
 #include "nodes.h"
 #include "sync.h"		/* IS_follows */
 #include "listmatch.h"
-#include "symfkt.h"		/* term_equal */
+#include "symfn.h"		/* term_equal */
 #include "numsort.h"		/* var_sort_ok */
 
 extern Node var_chain;		/* run.c */
@@ -539,9 +539,9 @@ static Node * match_rules (Node * term, Node * list)
 		if (goal(FORM_LHS(it->l), term, NULL))
 			{
 			DEBG((2,"[rule %d: ", i));
-			DBFK(2,print(FORM_LHS(it->l)));
+			DBFN(2,print(FORM_LHS(it->l)));
 			DEBG((2," = "));
-			DBFK(2,print(RES_RHS(cur_res)));
+			DBFN(2,print(RES_RHS(cur_res)));
 			DEBG((2,"]\n"));
 			lm_last = i;
 			return cur_res;

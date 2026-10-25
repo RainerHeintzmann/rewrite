@@ -1,5 +1,5 @@
 /*
- *	symfkt.c (2026)
+ *	symfn.c (2026)
  *
  *	Symbolic helper functions, mainly for the rule-based integration
  *	(names follow Rubi's helpers in lower case, e.g. FreeQ -> freeq).
@@ -51,8 +51,8 @@
 #include "node.h"
 #include "nodes.h"
 #include "sync.h"
-#include "userfkt.h"  /* MAXARGS */
-#include "symfkt.h"
+#include "userfn.h"  /* MAXARGS */
+#include "symfn.h"
 #include "numsort.h"	/* 2026: integer, rational */
 #include "exact.h"
 #include "apart.h"	/* partial fractions */
@@ -122,7 +122,7 @@ static int num_value (Node * t, double * v)
 		{
 		int save = calc_exact_only;
 		calc_exact_only = 1;
-		r = calkulate(t);
+		r = calculate(t);
 		calc_exact_only = save;
 		/* exact mode: ln(2), pi/6 are no numbers either (exact_symbolic) */
 		if (r && exact_numbers() && ! num_exact((Symbol *) r) && exactish(t))
@@ -132,7 +132,7 @@ static int num_value (Node * t, double * v)
 			}
 		}
 	else
-		r = calkulate(t);	/* with a real value for 2^(1/2) */
+		r = calculate(t);	/* with a real value for 2^(1/2) */
 	if (! r) return 0;
 	if (! num_to_double((Symbol *) r, v))
 		{ delnum((Symbol *) r, TRUE); return 0; }
@@ -160,7 +160,7 @@ static int num_value_exact (Node * t)
 	if (s) return num_exact(s);
 	t = deref(t);
 	if (! t || t->type != Func) return 0;
-	r = calkulate(t);
+	r = calculate(t);
 	if (! r) return 0;
 	ex = num_exact((Symbol *) r);
 	delnum((Symbol *) r, TRUE);
@@ -181,11 +181,11 @@ static int num_value_exact (Node * t)
 static struct { char * role, * sym; } roles[MAXROLES];
 static int nroles = 0;
 
-void role_fkt (Node * np)	/* SYMBOLIC "role" = "symbol"; SYMBOLIC alone: clear */
+void role_fn (Node * np)	/* SYMBOLIC "role" = "symbol"; SYMBOLIC alone: clear */
 {
 	const char * r, * sy;
 	int i;
-	np = np->r;			/* the statement: FUNC(role_fkt, PARAM(role, symbol)) */
+	np = np->r;			/* the statement: FUNC(role_fn, PARAM(role, symbol)) */
 	if (! np)
 		{
 		for (i = 0; i < nroles; i++) { free(roles[i].role); free(roles[i].sym); }
@@ -346,7 +346,7 @@ static int contains (Node * t, Node * x)
 static Node * mk_num (double v)
 {
 	double * d = (double *) malloc(sizeof(double));
-	if (! d) fatal("symfkt : no room");
+	if (! d) fatal("symfn : no room");
 	* d = v;
 	return mknod(Const, (Node *) mknum(d, NULL), NULL);
 }
@@ -354,7 +354,7 @@ static Node * mk_num (double v)
 static Node * mk_bool (int b, Symbol * f)		/* 1/0 in the result sort of f */
 {
 	double * d = (double *) malloc(sizeof(double));
-	if (! d) fatal("symfkt : no room");
+	if (! d) fatal("symfn : no room");
 	* d = b ? 1.0 : 0.0;
 	return mknod(Const, (Node *) mknum(d, rtypes(f)), NULL);
 }
@@ -459,7 +459,7 @@ Node * numeric_real (Node * t)
 	double v;
 	if (! c) return NULL;
 	retype_term(c);
-	r = calkulate(c);
+	r = calculate(c);
 	delete(c);
 	if (r && num_to_double((Symbol *) r, & v) && ! isfinite(v))	/* 1/0 stays 1/0 */
 		{ delnum((Symbol *) r, TRUE); return NULL; }
@@ -485,7 +485,7 @@ Node * numeric_contagion (Node * t)
 		}
 	if (! inexact || ! (c = real_copy(t))) return NULL;
 	retype_term(c);
-	r = calkulate(c);
+	r = calculate(c);
 	delete(c);
 	return r;
 }
@@ -498,7 +498,7 @@ Node * term_copy (Node * t)	/* exported tcpy */
 static Symbol * fsym (const char * f)	/* f: a role */
 {
 	Symbol * s = role_find(f);
-	if (! s) fatal("symfkt : function %s is not declared (SYMBOLIC role)", role_symbol_name(f));
+	if (! s) fatal("symfn : function %s is not declared (SYMBOLIC role)", role_symbol_name(f));
 	return s;
 }
 
@@ -554,7 +554,7 @@ static Node * fold_exact (const char * f, Node * a, Node * b)
 	Node * t = mk_f2(f, a, b), * r;
 	int save = calc_exact_only;
 	calc_exact_only = 1;		/* 2^(1/2) stays a term */
-	r = calkulate(t);
+	r = calculate(t);
 	calc_exact_only = save;
 	if (! r) return t;		/* e.g. division by zero: stays a term */
 	delete(t);
@@ -617,7 +617,7 @@ static void tl_add (TList * l, Node * t)
 		{
 		l->cap = l->cap ? 2 * l->cap : 8;
 		l->t = (Node **) realloc(l->t, l->cap * sizeof(Node *));
-		if (! l->t) fatal("symfkt : no room");
+		if (! l->t) fatal("symfn : no room");
 		}
 	l->t[l->n++] = t;
 }
@@ -740,7 +740,7 @@ static void mono_addfac (Mono * m, Node * base, double e, int exact)
 		{
 		m->cap = m->cap ? 2 * m->cap : 4;
 		m->f = (Fac *) realloc(m->f, m->cap * sizeof(Fac));
-		if (! m->f) fatal("symfkt : no room");
+		if (! m->f) fatal("symfn : no room");
 		}
 	m->f[m->nf].base = base;
 	m->f[m->nf].e = e;
@@ -853,7 +853,7 @@ static Node * tl_collect (TList * l)
 	double * mag = (double *) calloc(l->n ? l->n : 1, sizeof(double));
 	int i, j, nm = 0;
 	Node * s = NULL;
-	if (! ms || ! mag) fatal("symfkt : no room");
+	if (! ms || ! mag) fatal("symfn : no room");
 	for (i = 0; i < l->n; i++)
 		{
 		Mono m = { 1.0, NULL, 0, 0, 1 };
@@ -2204,7 +2204,7 @@ static RatFun * to_ratfun (Node * u, Node * x)
 	if (u->type != Func) return NULL;
 	if (! contains(u, x))			/* a calculable number like 1/3 */
 		{
-		if (! (r = calkulate(u))) return NULL;
+		if (! (r = calculate(u))) return NULL;
 		q = exact_to_rat((Symbol *) r);
 		delnum((Symbol *) r, TRUE);
 		return q ? rf_const(q) : NULL;
@@ -2871,7 +2871,7 @@ Node * special_value (Node * t)
 		if (is_head(t, arith[i], -1)) return NULL;	/* pi/6 stays as it is */
 	save = calc_exact_only;
 	calc_exact_only = 0;
-	c = calkulate(t);
+	c = calculate(t);
 	calc_exact_only = save;
 	if (! c) return NULL;
 	i = num_to_double((Symbol *) c, & v);
@@ -4951,7 +4951,7 @@ static Node * s_rules (Node * a[], int n, Symbol * f)
 	Node * args = NULL, * t;
 	int i, k;
 	for (k = 0; k < nrulefn; k++)
-		if (urs_fkt(rulefn[k].f) == urs_fkt(f)) break;
+		if (orig_func(rulefn[k].f) == orig_func(f)) break;
 	if (k == nrulefn || rulefn[k].active || n < 1) return NULL;
 	for (i = n - 1; i >= 0; i--)		/* the call f(a1,..,an) */
 		args = args ? mknod(Terms, tcpy(a[i]), args) : tcpy(a[i]);
@@ -4966,7 +4966,7 @@ static Node * s_rules (Node * a[], int n, Symbol * f)
 	}
 	rulefn[k].active = 0;
 	t = deref(t);
-	if (t && t->type == Func && urs_fkt(TERM_HEAD(t)) == urs_fkt(f))
+	if (t && t->type == Func && orig_func(TERM_HEAD(t)) == orig_func(f))
 		{
 		delete(t);			/* unchanged: not applicable */
 		return NULL;
@@ -4974,7 +4974,7 @@ static Node * s_rules (Node * a[], int n, Symbol * f)
 	return t;
 }
 
-s_function * rules_sfkt (void)
+s_function * rules_sfn (void)
 {
 	return s_rules;
 }
@@ -5103,7 +5103,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "knownsecantintegrandq", s_knownsecant },
 };
 
-s_function * give_sfkt (const char * name)
+s_function * give_sfn (const char * name)
 {
 	int i;
 	for (i = 0; i < (int) (sizeof(symfunction) / sizeof(symfunction[0])); i++)
@@ -5170,7 +5170,7 @@ static Node * mk_list (Node * e[], int n)	/* takes the elements */
 	if (n == 0)
 		{
 		Symbol * s = role_find("nil");
-		if (! s) fatal("symfkt : nil is not declared (inc/list)");
+		if (! s) fatal("symfn : nil is not declared (inc/list)");
 		return mknod(Const, (Node *) s, NULL);
 		}
 	args = e[n - 1];
@@ -5462,7 +5462,7 @@ Node * call_builtin (Node * term)
 	int n = 0, i;
 	Node * res;
 	/* nested calls first, as in sumq(expandintegrand(u,x)): a condition is
-	 * calculated top-down (realcalk), which passes them unevaluated */
+	 * calculated top-down (realcalc), which passes them unevaluated */
 	for (a = TERM_ARGS(term); a && n < MAXARGS; a = ARGS_NEXT(a))
 		{
 		Node * t = deref(ARGS_ITEM(a));

@@ -1,4 +1,4 @@
-# SYMBOLIC "role" = "symbol": the helpers of symfkt.c recognize and build
+# SYMBOLIC "role" = "symbol": the helpers of symfn.c recognize and build
 # terms with roles ("+", "cos", "pi", ...). By default a role is the symbol
 # of the same name; a library with other names maps them.
 INC "inc/all"

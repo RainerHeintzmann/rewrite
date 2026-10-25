@@ -14,7 +14,7 @@
  *	the second one; the C function converts a value (widening). Sorts are
  *	static: a term keeps its sort, but a function declared for a wider sort
  *	accepts its arguments (getsymbol), and the values are converted when the
- *	function is calculated (realcalk). Each sort has at most one wider sort,
+ *	function is calculated (realcalc). Each sort has at most one wider sort,
  *	so the subsorts form chains like integer < rational < real.
  *
  *	INTNUM makes numbers written without '.' and exponent (12, 0, 7) values

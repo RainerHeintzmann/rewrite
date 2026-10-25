@@ -9,7 +9,7 @@
  *
  */
 
-double myfak (double a);
+double myfactorial (double a);
 double * cpy_real(double * x);
 void show_real (double * x);
 int cmp_real (double * x,double * y);
@@ -22,7 +22,7 @@ double * mult (double * arg[]);
 double * divide (double * arg[]);
 double * power(double * arg[]);
 double * r_ln (double * arg[]);
-double * wurzel (double * arg[]);
+double * sqrt_plain (double * arg[]);
 double * r_sin (double * arg[]);
 double * r_cos (double * arg[]);
 double * r_tan (double * arg[]);

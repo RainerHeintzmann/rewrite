@@ -10,7 +10,7 @@ sind einige Beispiele.
 
 Numerisches Auswerten der Terme ist auch moeglich. Benutzer koennen 
 eigene Funktionen schreiben und sie in die Liste vorhandener
-Funktionen in dem Modul 'userfkt.c' einfuegen.
+Funktionen in dem Modul 'userfn.c' einfuegen.
 
 UEBERSETZEN (Compilieren) :
 Benoetigt werden gcc, flex, bison und make.
@@ -143,7 +143,7 @@ FUNC name : sortname [,..] >> sortname [LA1..5|RU] [ATT name]
                 eingelesen.
 
                 ATT name legt den Namen der Funktion in der Liste 
-                'userfunction' im Modul userfkt.c fest, die aufgerufen wird, 
+                'userfunction' im Modul userfn.c fest, die aufgerufen wird, 
                 wenn alle Argumente der Funktion einen numerischen Wert besitzen.
 								name ist nicht in "" zu setzen. 
 								Name darf frei geweahlt werden (auch gleichlautend mit einem Funkti
@@ -271,7 +271,7 @@ ATT sortname Name1 , Name2 , Name3 , Name4
                Name3 bezeichnet die Loeschfunktion in 'userfunction' mit der
                Numerische Werte geloescht werden.
                Bsp.: ATT complex show_complex,cmp_complex,cpy_complex,del_complex
-               siehe Modul userfkt.c
+               siehe Modul userfn.c
 
 
 FOR Constname = N1 TO N2 [STEP N3] DO Block
@@ -351,7 +351,7 @@ Eine Reihe von "benutzerdefinieren" Funktionen sind schon implementiert.
 Dazu gehoeren wichtige Funktionen auf reelen Zahlen (real.c),
 complexen Zahlen (complex.c), reelen Vectoren (rvector.c) und reelen
 Matrizen (rmatrix.c) und Verbindungen der Datentypen. Alle Funktionen
-sind im Modul (userfkt.c) eingetragen. Neue Funktionen muessen immer
+sind im Modul (userfn.c) eingetragen. Neue Funktionen muessen immer
 ein array von Zeigern auf Argumente als Argument bekommen und einen Zeiger
 auf das Resultat zurueckliefern. Beispiele sind in den genannten c-Modulen
 zu finden.
@@ -400,7 +400,7 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    (listmatch.c). Nicht berechenbare Bedingungen fuehren nicht mehr zum
    Absturz. REWR bricht nach 100000 Schritten ab.
  - Interne Aufraeumarbeit: benannte Zugriffe auf die Knotenstrukturen (nodes.h).
- - Symbolische Hilfsfunktionen in C (symfkt.c, inc/helpers) wie expand, coeff,
+ - Symbolische Hilfsfunktionen in C (symfn.c, inc/helpers) wie expand, coeff,
    polyq, freeq, subst, und weitere elementare Funktionen (csc, sec, cot,
    arccot, hyperbolische und Area-Funktionen, polylog, productlog).
  - Spezialfunktionen (specfun.c, z.B. erf, Fresnel, Ei, Gamma, zeta,
@@ -409,7 +409,7 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Exakte Zahlen (inc/exact, exact.c mit GMP): Sorten integer und rational,
    Untersorten mit SUBSORT, ganze Literale mit INTNUM; Operatorvarianten
    werden nach den Sorten der Argumente gewaehlt.
- - Symbolische C-Funktionen (symfkt.c) werden mit ATT SYMBOLIC name angebunden
+ - Symbolische C-Funktionen (symfn.c) werden mit ATT SYMBOLIC name angebunden
    (ATT SYMBOLIC HOLD: Argumente unausgewertet, fuer matchq). Sie kennen die
    Operatoren der Bibliothek ueber Rollen ("+", "cos", "pi", ...); eine
    Bibliothek mit anderen Namen ordnet sie zu: SYMBOLIC "cos" = "kos".

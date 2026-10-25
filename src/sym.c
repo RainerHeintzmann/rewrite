@@ -155,7 +155,7 @@ Node * ochain;
 		{
 		if (lexval((Symbol *) chain->r) == Sort)
 			{
-			IS_Verbindung(chain->r) = (Symbol *) NULL;
+			IS_link(chain->r) = (Symbol *) NULL;
 			DEBG((4,"restoring Sort: %s\n",((Symbol *) chain->r)->name));
 			}
 		else

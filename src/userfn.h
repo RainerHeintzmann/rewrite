@@ -1,8 +1,8 @@
-#ifndef	USERFKT_H
-#define	USERFKT_H
+#ifndef	USERFN_H
+#define	USERFN_H
 
 /*
- *	userfkt.h  V1.00
+ *	userfn.h  V1.00
  *
  *	Copyright (c)  Rainer Heintzmann 	(1992)
  *
@@ -11,11 +11,11 @@
 
 typedef void * u_function (void * []);
 
-extern u_function * give_ufkt (char * name);
-extern u_function * give_ufkt_quiet (char * name);  /* 2026: without an error message */
+extern u_function * give_ufn (char * name);
+extern u_function * give_ufn_quiet (char * name);  /* 2026: without an error message */
 
 #define MAXARGS 32  /* maximum number of function arguments (recompile run.c after changing it !!) */
 
-/* extern Node * calkulate(Node *); /* prototype for the function from run.c */
+/* extern Node * calculate(Node *); /* prototype for the function from run.c */
 
 #endif

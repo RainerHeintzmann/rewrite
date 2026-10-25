@@ -40,11 +40,11 @@ extern void numassign2 (Node * froass,Symbol * toass);
 
 extern void numassign (Node * np);   /* sets or deletes a number */
 
-extern void while_fkt (Node * np);
+extern void while_fn (Node * np);
 
-extern void if_fkt (Node * np);
+extern void if_fn (Node * np);
 
-extern void forschleife (Node * np);
+extern void for_loop (Node * np);
 
 extern void changeout (Node * np);
 
@@ -52,17 +52,17 @@ extern void readdata (Node * np);
 
 extern void changedata (Node * np);
 
-extern void system_fkt (Node * np);
+extern void system_fn (Node * np);
 
-extern void include_fkt (Node * np);
+extern void include_fn (Node * np);
 
-extern void info_fkt (Node * np);
+extern void info_fn (Node * np);
 
-extern void rewrite_ass_fkt (Node * np);
+extern void rewrite_ass_fn (Node * np);
 
-extern void rewrite_fkt (Node * np);
+extern void rewrite_fn (Node * np);
 
-extern void quit_fkt (Node * np);
+extern void quit_fn (Node * np);
 
 extern BOOLEAN IS_follows (Symbol * from,Symbol * to);
 extern BOOLEAN variant_fits (Symbol * t,Symbol * p);	/* 2026: + : real,real fits + : number,number */

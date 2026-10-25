@@ -1,7 +1,7 @@
 /*
  *	symsolve.c (2026)
  *
- *	C helpers of the equation solver inc/solve, included by symfkt.c after
+ *	C helpers of the equation solver inc/solve, included by symfn.c after
  *	symmat.c. The methods themselves are rules in the style of PRESS
  *	(Bundy and Welham 1981): isolation, polynomial methods, change of the
  *	unknown, attraction of logarithms, removal of square roots. The

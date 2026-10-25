@@ -120,7 +120,7 @@ double * c_asqr (complex * arg[])	{return mkreal(Re(arg[0])*Re(arg[0])+Im(arg[0]
 double * c_abs (complex * arg[])	{return mkreal(sqrt(Re(arg[0])*Re(arg[0])+Im(arg[0])*Im(arg[0])));}
 
 /* complex * c_power(complex * arg[])				{return mkcomplex(pow((* arg[0]),(* arg[1])));}
-complex * c_wurzel (complex * arg[])			{return mkcomplex(sqrt((* arg[0])));}
+complex * c_sqrt (complex * arg[])			{return mkcomplex(sqrt((* arg[0])));}
 
 complex * c_asinus   (complex * arg[])		{return mkcomplex(asin((* arg[0])));}
 complex * c_acosinus (complex * arg[])		{return mkcomplex(acos((* arg[0])));}

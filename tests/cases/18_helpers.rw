@@ -1,4 +1,4 @@
-# Symbolic helper functions (inc/helpers, symfkt.c) and the elementary
+# Symbolic helper functions (inc/helpers, symfn.c) and the elementary
 # functions added in 2026 (inc/alg).
 INC "inc/all"
 INC "inc/helpers"

@@ -17,12 +17,12 @@
 #include "syn.h"
 #include "stack.h"
 #include "forms.h"
-#include "userfkt.h"
+#include "userfn.h"
 #include "sync.h" /* for IS_follows,IS_search  */
 #include "node.h"
 #include "defs.h"
 #include "nodes.h"
-#include "symfkt.h"
+#include "symfn.h"
 #include "listmatch.h"
 #include "numsort.h"	/* 2026: SUBSORT */
 
@@ -55,17 +55,17 @@ BOOLEAN (* condfunc) (Node *);
 
 int i;    /* for temporary storage */
 
-Node * rewrite _2a ((term,Baum) , Node * term ,Node * Baum)
+Node * rewrite _2a ((term,rtree) , Node * term ,Node * rtree)
 {
 	DEBG((5,"rewrite : trying Term : "));
-	DBFK(5,print(term));
+	DBFN(5,print(term));
 	DEBG((5,", Tree : "));
-	DBFK(5,print(Baum));
+	DBFN(5,print(rtree));
 	DEBG((5,"\n"));
 
-	if (Baum && Baum->type == RULELIST)	/* rule list (listmatch.c) */
-		return match_list(term,Baum);
-	return match(term,Baum);
+	if (rtree && rtree->type == RULELIST)	/* rule list (listmatch.c) */
+		return match_list(term,rtree);
+	return match(term,rtree);
 
 }
 
@@ -168,13 +168,13 @@ static BOOLEAN has_subterm (Node * t, Node * s)
 	return has_subterm(t->l, s) || has_subterm(t->r, s);
 }
 
-/* does old -> neu close a cycle? neu was replaced before, and the chain of
+/* does old -> fresh close a cycle? fresh was replaced before, and the chain of
  * replacements from there (also of subterms, as in A -> subst(B), B -> A)
  * leads to old. A term that was replaced in another branch (Int(b,x) -> b*x
  * elsewhere) may come up again. */
-static BOOLEAN hist_cycle (Node * neu, Node * old)
+static BOOLEAN hist_cycle (Node * fresh, Node * old)
 {
-	Node * cur = neu;
+	Node * cur = fresh;
 	int steps, i;
 	for (steps = 0; steps < NHIST; steps++)
 		{
@@ -204,7 +204,7 @@ static void steps_clear (void)
 	steps_n = 0;
 }
 
-void steps_fkt (Node * np)
+void steps_fn (Node * np)
 {
 	const char * file = name((Symbol *) np->r->r);
 	FILE * f;
@@ -238,7 +238,7 @@ void steps_fkt (Node * np)
 	steps_alg = (Symbol *) np->r->l;
 }
 
-static void show_step (int rule, Node * old, Node * neu)
+static void show_step (int rule, Node * old, Node * fresh)
 {
 	const char * l = (rule >= 0 && rule < steps_n) ? steps_label[rule] : NULL;
 	const char * t = l ? strchr(l, '\t') : NULL;
@@ -247,7 +247,7 @@ static void show_step (int rule, Node * old, Node * neu)
 	else printfOut("rule %d\n  ", rule);
 	print(old);
 	printfOut("\n    = ");
-	print(neu);
+	print(fresh);
 	printfOut("\n");
 }
 
@@ -268,72 +268,72 @@ void rewrite_end (void)
 	if (rewrite_depth == 0) hist_clear();
 }
 
-BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
+BOOLEAN find_position _2a ((p_term,rtree), Node * * p_term, Node * rtree)
 {
-	Node * lt, * rt,* ers ,* maintype;
+	Node * lt, * rt,* repl ,* maintype;
 	BOOLEAN rewritten;
 
 	if (* p_term == NULL || step_limit_hit)
 		return FALSE;
 
 	DEBG((4,"\nsuche_Stelle : term : "));
-	DBFK(4,print(* p_term));
+	DBFN(4,print(* p_term));
 	DEBG((4,"\n"));
 
     /* first local terms, then global ones */
 
-	do rewritten=(suche_Stelle (&((* p_term) -> l),Baum));
+	do rewritten=(find_position (&((* p_term) -> l),rtree));
 	while (rewritten);
-	do rewritten=(suche_Stelle (&((* p_term) -> r),Baum));
+	do rewritten=(find_position (&((* p_term) -> r),rtree));
 	while (rewritten);
 
 	lm_start = 0;
 	while (1)
 			{
 			double tp = profiling() ? profile_now() : 0;
-			ers = rewrite(* p_term,Baum);
+			repl = rewrite(* p_term,rtree);
 			if (tp > 0) profile_add("[loop] match", profile_now() - tp);
-			if (! ers) break;
+			if (! repl) break;
 			{
-			Node * old = * p_term, * neu;
+			Node * old = * p_term, * fresh;
 			int found = lm_last;
 
 				lt = (* p_term) -> l;
 				rt = (* p_term) -> r;
-				if (RES_DO(ers)) {CALLFUNCT(RES_DO(ers));} /* executes a DO block */
+				if (RES_DO(repl)) {CALLFUNCT(RES_DO(repl));} /* executes a DO block */
 				if (lt && lt->type == SYM_TYPE)
 					maintype=rtypes((Symbol *) lt);
 				else
 					maintype=NULL;
-				neu = tcopy(RES_RHS(ers)); /* insert formula (it is also 'lifted' !) */
-				retype_term(neu);	/* 2026: variants matching the sorts of the arguments (SUBSORT) */
+				fresh = tcopy(RES_RHS(repl)); /* insert formula (it is also 'lifted' !) */
+				retype_term(fresh);	/* 2026: variants matching the sorts of the arguments (SUBSORT) */
 				tp = profiling() ? profile_now() : 0;
-				neu = tcalc(neu);  /* evaluate formula numerically */
+				fresh = tcalc(fresh);  /* evaluate formula numerically */
 				if (tp > 0) profile_add("[loop] tcalc rhs", profile_now() - tp);
 				tp = profiling() ? profile_now() : 0;
-				if (Baum && Baum->type == RULELIST)
-					term_simplify_trivial(& neu);	/* x^0, 1*u, ... like Mathematica */
+				if (rtree && rtree->type == RULELIST)
+					term_simplify_trivial(& fresh);	/* x^0, 1*u, ... like Mathematica */
 				RESTORE;					/* restore symbol table (also remove locks)*/
 				/* 2026: in a rule list a rule without progress
 				   (result equal to the term) is skipped; the next one is tried */
-				if (Baum && Baum->type == RULELIST
-				    && (term_equal(neu, old) || term_has_nan(neu) || hist_cycle(neu, old)
+				if (rtree && rtree->type == RULELIST
+				    && (term_equal(fresh, old) || term_has_nan(fresh) || hist_cycle(fresh, old)
 				        || hist_revisit(old, found)))
 					{
 					if (tp > 0) profile_add("[loop] progress checks", profile_now() - tp);
 					DEBG((2,"REWR: rule %d makes no progress or gives NaN, skipped\n", found));
-					delete(neu);
+					delete(fresh);
 					lm_start = found + 1;
 					continue;
 					}
 				if (tp > 0) profile_add("[loop] progress checks", profile_now() - tp);
-				if (Baum && Baum->type == RULELIST)
-					hist_add(old, neu, found);
-				if (steps_alg && Baum && Baum == atypes(steps_alg))
-					show_step(found, old, neu);
+				if (rtree && rtree->type == RULELIST)
+					hist_add(old, fresh, found);
+				if (steps_alg && rtree && rtree == atypes(steps_alg))
+					show_step(found, old, fresh);
 				DEBG((2,"REWR: "));
-				DBFK(2,print(old));
-				* p_term = neu;
+				DBFN(2,print(old));
+				* p_term = fresh;
 				delete (lt);
 				delete (rt);
 				if (old->type != SYM_TYPE)
@@ -341,7 +341,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 				else
 					delete(old);  /* frees only numbers */
 				DEBG((2," -> "));
-				DBFK(2,print(*p_term));
+				DBFN(2,print(*p_term));
 				DEBG((2,"\n"));
 				didrewrite = TRUE; /* was rewritten */
 				if (++rewrite_steps > max_rewrite_steps && ! step_limit_hit)
@@ -363,7 +363,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 Node * solve _2a ((term,alglist), Node * term ,Node * alglist)
 {
 	int rewritten;
-	Node  * Baum;
+	Node  * rtree;
 	Node  * algpt;
 	BOOLEAN wasbefore;
 
@@ -393,19 +393,19 @@ Node * solve _2a ((term,alglist), Node * term ,Node * alglist)
 				term = solve(term,atypes((Symbol *)(algpt->l)));
 
 			DEBG((1,"Alg: "));
-			DBFK(1,print(algpt->l));
+			DBFN(1,print(algpt->l));
 			DEBG((1,"Term: "));
-			DBFK(1,print(term));
+			DBFN(1,print(term));
 			DEBG((1,"\n"));
 			}
 
 		return term;
 		}
 
-	Baum=alglist;
+	rtree=alglist;
 
 	chain_pos = & var_chain;
-	do rewritten=(suche_Stelle (&term,Baum));
+	do rewritten=(find_position (&term,rtree));
 	while (rewritten);
 
 
@@ -458,7 +458,7 @@ int	this_type;					/* since La1 .. La5 are entered in the tree as Func ! */
 		printfOut(") ");
 		break;
 
-	case ERSETZ_TYPE :
+	case REPL_TYPE :
 		printfOut("( ");
 		tprint(np ->l,0);
 		printfOut(") = (");
@@ -524,7 +524,7 @@ int	this_type;					/* since La1 .. La5 are entered in the tree as Func ! */
 			{
 			tprint(np -> l,0);		/* print name of the function (opening bracket) */
 			tprint(np -> r,0);              /* print content in between */
-			tprint((Node *) (((Symbol *)(np -> l))->klammer),0); /* other bracket */
+			tprint((Node *) (((Symbol *)(np -> l))->bracket),0); /* other bracket */
 			return;
 			}
 		/* else			; */
@@ -684,9 +684,9 @@ Node * npre = npr;
 	if (npr == NULL) return FALSE;
 
 	DEBG((4,"func in_tree2 ( "));
-	DBFK(4,print(npl));
+	DBFN(4,print(npl));
 	DEBG((4,", "));
-	DBFK(4,print(npr));
+	DBFN(4,print(npr));
 	DEBG((4," )\n"));
 
 	if (npr->type != Terms)
@@ -711,22 +711,22 @@ BOOLEAN not_in_tree _1a ((np),Node * np)
 }
 
 BOOLEAN isnt_zero (Node * np)
-{ Node * erg1;
+{ Node * rslt1;
 	double val;
   BOOLEAN iszero=FALSE;
-	erg1=calkulate (np);
-	if (! erg1)
+	rslt1=calculate (np);
+	if (! rslt1)
 		return FALSE;	/* not calculable (e.g. symbolic): condition does not hold */
-	/* if (rtypes((Symbol *) erg1) != numbertype)
+	/* if (rtypes((Symbol *) rslt1) != numbertype)
 		fprintf(stderr,"ERROR -- Condition with non calculatable type !\n");
 	else */
 
 		{
-		if (! num_to_double((Symbol *) erg1, & val))	/* 2026: also integer, rational */
-			val=(* ((double *) value((Symbol *) erg1)));
+		if (! num_to_double((Symbol *) rslt1, & val))	/* 2026: also integer, rational */
+			val=(* ((double *) value((Symbol *) rslt1)));
 		iszero=(val==0.0);
 		}
-	delete (erg1);
+	delete (rslt1);
 	return (! iszero);
 }
 
@@ -734,7 +734,7 @@ BOOLEAN lower_between _1a((np),Node * np)
 {
 	int rtw;
 	DEBG((4,"func lower_between ( "));
-	DBFK(4,print(np));
+	DBFN(4,print(np));
 	DEBG((4," )\n"));
 
 	rtw= (tcmp(np->l,np->r) > 0) ? TRUE : FALSE;
@@ -755,9 +755,9 @@ if (b == NULL)
 	return  1;
 
 DEBG((4,"tcmp ( "));
-DBFK(4,print(a));
+DBFN(4,print(a));
 DEBG((4," und "));
-DBFK(4,print(b));
+DBFN(4,print(b));
 DEBG((4," )\n"));
 
 if (a->type == SYM_TYPE)
@@ -838,15 +838,15 @@ static Node * param_sort (Symbol * f, int i)
 	return (a->r != NULL) ? a->l : a;
 }
 
-static Symbol * lastsym = NULL;	/* symbol with the sort of the last value of realcalk */
+static Symbol * lastsym = NULL;	/* symbol with the sort of the last value of realcalc */
 
-void * realcalk(Node * term,int * perr)
+void * realcalc(Node * term,int * perr)
 {
 	Node * lterm;
-	void * erg; /* results of the subtrees */
+	void * rslt; /* results of the subtrees */
 
-	DEBG((5,"realcalk : "));
-	DBFK(5,print(term));
+	DEBG((5,"realcalc : "));
+	DBFN(5,print(term));
 	DEBG((5,"\n"));
 
   if (term->type == SYM_TYPE)
@@ -858,19 +858,19 @@ void * realcalk(Node * term,int * perr)
 			}
 		if (lexval((Symbol *) term) == Term) /* replaced term ? */
 			if (term->l) 
-				return realcalk(term->l,perr);
+				return realcalc(term->l,perr);
 		
 		* perr = TRUE; /* e.g. VAR */
 		return NULL;
 		}
 
-	if (term->type == Func && builtin(term->l))	/* symbolic C function (symfkt.c) */
+	if (term->type == Func && builtin(term->l))	/* symbolic C function (symfn.c) */
 		{
 		Node * res = call_builtin(term);
 		void * v = NULL;
 		if (res)
 			{
-			v = realcalk(res, perr);
+			v = realcalc(res, perr);
 			/* 2026: the value has the sort of the result (e.g. rational); for
 			   the caller it must have the declared sort of the function */
 			if (! * perr && v && rtypes(lastsym) != rtypes(TERM_HEAD(term)))
@@ -890,7 +890,7 @@ void * realcalk(Node * term,int * perr)
 		}
 
   if (term->type == Func && ! hasval(term->l) && ! exe_always(term->l)
-      && kette((Symbol *) term->l) != NULL)
+      && variants((Symbol *) term->l) != NULL)
 		{	/* 2026: a symbolic variant (e.g. > : number,number in a rule with
 			   variables of sort number): the variant for the sorts of the
 			   actual arguments may be calculable */
@@ -899,7 +899,7 @@ void * realcalk(Node * term,int * perr)
 		retype_term(c);
 		if (TERM_HEAD(c) != TERM_HEAD(term) && hasval(TERM_HEAD(c)))
 			{
-			v = realcalk(c, perr);
+			v = realcalc(c, perr);
 			delete(c);
 			return v;
 			}
@@ -911,12 +911,12 @@ void * realcalk(Node * term,int * perr)
 		if (exe_always(term->l) && (term->type == Func)) /* user-defined function */
 			{ Node * lterm;
 			if ((lterm=exe_function(term)) != NULL)
-				return realcalk(lterm,perr);
+				return realcalc(lterm,perr);
 			}
 
 		* perr = TRUE;       /* function not calculable or constant without value */
-		DEBG((5,"realcalk: found not calkulable symbol : "));
-		DBFK(5,print(term));
+		DEBG((5,"realcalc: found not calkulable symbol : "));
+		DBFN(5,print(term));
 		DEBG((5,"\n"));
 		return NULL;
 		}
@@ -947,7 +947,7 @@ void * realcalk(Node * term,int * perr)
 	lterm=TERM_ARGS(term);
 
 	{
-	void * feld[MAXARGS];
+	void * vals[MAXARGS];
 	Symbol * syms[MAXARGS];
 	Node * conv[MAXARGS];		/* 2026: sort after extension (SUBSORT), otherwise NULL */
 	int i=0,j;
@@ -955,18 +955,18 @@ void * realcalk(Node * term,int * perr)
 	for ( ; lterm; lterm = ARGS_NEXT(lterm))
 		{
 		Node * want;
-		feld[i]=realcalk(ARGS_ITEM(lterm),perr);/* Const or Funct */
+		vals[i]=realcalc(ARGS_ITEM(lterm),perr);/* Const or Funct */
 		syms[i]=lastsym;
 		conv[i]=NULL;
 		/* 2026: convert the value of a subsort into the declared sort */
-		if (! * perr && feld[i] && (want = param_sort(TERM_HEAD(term), i)) != NULL
+		if (! * perr && vals[i] && (want = param_sort(TERM_HEAD(term), i)) != NULL
 		    && want != rtypes(syms[i]) && sort_dist(rtypes(syms[i]), want) > 0)
 			{
-			void * w = sort_convert(feld[i], rtypes(syms[i]), want);
+			void * w = sort_convert(vals[i], rtypes(syms[i]), want);
 			if (w)
 				{
-				DELNUM(syms[i],feld[i]);
-				feld[i] = w;
+				DELNUM(syms[i],vals[i]);
+				vals[i] = w;
 				conv[i] = want;
 				}
 			}
@@ -977,10 +977,10 @@ void * realcalk(Node * term,int * perr)
 		}
 	if (!(* perr))
 		{
-		feld[i] = NULL; /* mark the end (for variable arguments) */
+		vals[i] = NULL; /* mark the end (for variable arguments) */
 		lastsym = TERM_HEAD(term);
-		erg= ((void * (*) (void * [])) value(TERM_HEAD(term)))(feld); /* call of the user function */
-		if (erg == NULL)	/* 2026: no result (e.g. exact division by 0) */
+		rslt= ((void * (*) (void * [])) value(TERM_HEAD(term)))(vals); /* call of the user function */
+		if (rslt == NULL)	/* 2026: no result (e.g. exact division by 0) */
 			* perr = TRUE;
 		}
 
@@ -988,15 +988,15 @@ void * realcalk(Node * term,int * perr)
 		{
 		if (((Node *) syms[j])->type != SYM_TYPE)
 			 fatal("run.c : Not a Symbol to delete !! j: %d, type: %d\n",j,((Node *) syms[j])->type);
-		if (feld[j] && conv[j])	/* converted value */
-			((void (*) (void *)) del(conv[j])) (feld[j]);
-		else if (feld[j])  /* on error (perr) the value is NULL: nothing to free */
-			DELNUM(syms[j],feld[j]);
+		if (vals[j] && conv[j])	/* converted value */
+			((void (*) (void *)) del(conv[j])) (vals[j]);
+		else if (vals[j])  /* on error (perr) the value is NULL: nothing to free */
+			DELNUM(syms[j],vals[j]);
 		}
 	}
 
 	if (!(* perr))
-		return erg;
+		return rslt;
 	else
 		return (void *) NULL;
 }
@@ -1036,22 +1036,22 @@ return;
    with real numbers */
 int calc_exact_only = 0;
 
-Node * calkulate (Node * term) /* gets a pointer to a calculable function */
+Node * calculate (Node * term) /* gets a pointer to a calculable function */
 {
 	Symbol * sp;
 	int error = FALSE;
-	void * erg;
+	void * rslt;
 
-	DEBG((4,"calkulate : "));
-	DBFK(4,print(term));
+	DEBG((4,"calculate : "));
+	DBFN(4,print(term));
 	DEBG((4,"\n"));
 
 	/* functions_execute(term);  modifies the tree ! */
 
-	erg=realcalk(term,&error);
+	rslt=realcalc(term,&error);
 
 #ifdef DEBUG
-	DEBG((4,"calkulate : realcalk : "));
+	DEBG((4,"calculate : realcalc : "));
 	if (error== TRUE)
 		DEBG((4,"Term not calkulable \n"));
 	else
@@ -1075,10 +1075,10 @@ Node * calkulate (Node * term) /* gets a pointer to a calculable function */
 			if ((term->type == Const)
 				|| (term->type == Func))
 				{
-				sp=mknum(erg,rtypes((Symbol *) (term->l)));
+				sp=mknum(rslt,rtypes((Symbol *) (term->l)));
 
 				rtypes(sp)=rtypes((Symbol *)(term->l)); /* result type of the function */
-				/* 2026: calculated by a narrower variant (realcalk: e.g. + :
+				/* 2026: calculated by a narrower variant (realcalc: e.g. + :
 				   integer,integer for + : number,number): its sort */
 				if (term->type == Func && lastsym && rtypes(lastsym) != rtypes(sp)
 				    && sort_dist(rtypes(lastsym), rtypes(sp)) > 0)
@@ -1086,7 +1086,7 @@ Node * calkulate (Node * term) /* gets a pointer to a calculable function */
 				}
 			else
 				{
-				sp=mknum(erg,rtypes((Symbol *) term));
+				sp=mknum(rslt,rtypes((Symbol *) term));
 
 				if ((term->type == SYM_TYPE) && (lexval((Symbol *)term) == Term))
 					{
@@ -1100,7 +1100,7 @@ Node * calkulate (Node * term) /* gets a pointer to a calculable function */
 					}
 				else
 					{
-					printfOut("calkulate : Internal ERROR : unexpected term-type : ");
+					printfOut("calculate : Internal ERROR : unexpected term-type : ");
 					print(term);
 					printfOut("  Typenr. : %d\n",term->type);
 					delnum(sp,TRUE); /* the value belongs to the number */
@@ -1108,7 +1108,7 @@ Node * calkulate (Node * term) /* gets a pointer to a calculable function */
 					}
 				}
 		DEBG((4,"calculate returned : "));
-		DBFK(4,print((Node *) sp));
+		DBFN(4,print((Node *) sp));
 		DEBG((4,"\n"));
 		return (Node *) sp;
 		}
@@ -1138,7 +1138,7 @@ if ((term -> type) == Func && ! builtin(term->l))
 	retype_node(term);	/* 2026: arguments can now be exact numbers (SUBSORT) */
 	}
 
-if ((term -> type) == Func && builtin(term->l))  /* symbolic C function (symfkt.c) */
+if ((term -> type) == Func && builtin(term->l))  /* symbolic C function (symfn.c) */
 	{
 	Node * res = call_builtin(term);
 	if (res)
@@ -1170,7 +1170,7 @@ if  ((term -> type) == Func) /* the rest is mapped onto it */
 		}
 	int save = calc_exact_only;
 	calc_exact_only = 1;		/* 2^(1/2) stays exact in a term */
-	sp = (Symbol *) calkulate(term);
+	sp = (Symbol *) calculate(term);
 	calc_exact_only = save;
 
 	if (sp == NULL)		/* 2026: 2^(1/2)*0.7: a real number makes it numeric */
@@ -1180,9 +1180,9 @@ if  ((term -> type) == Func) /* the rest is mapped onto it */
 	else
 		{
 		DEBG((4,"- tcalc did numerics : funct : "));
-		DBFK(4,print(term));
+		DBFN(4,print(term));
 		DEBG((4," => "));
-		DBFK(4,print((Node *) sp));
+		DBFN(4,print((Node *) sp));
 		DEBG((4," \n"));
 
 		delete(term);
@@ -1245,15 +1245,15 @@ if (term->type == SYM_TYPE)
 	if (IS_FUNCTION(lexval((Symbol *) term))
 			|| (lexval((Symbol *) term) == Const))  /*  'lift' */
 		{Symbol * sp2=(Symbol *) term,* spnew, * spold=NULL;
-		while((sp=IS_Verbindung(rtypes(sp2))) != NULL)  /* IS_VERB. is set while analysing the left part of the formula */
+		while((sp=IS_link(rtypes(sp2))) != NULL)  /* IS_VERB. is set while analysing the left part of the formula */
 			{
 			if (sp == spold) break; /* runs in a circle */
 			spold=sp;
 
 			DEBG((4,"lift : "));
-			DBFK(4,print((Node *) sp));
+			DBFN(4,print((Node *) sp));
 			DEBG((4,", "));
-			DBFK(4,print((Node *) rtypes(sp)));
+			DBFN(4,print((Node *) rtypes(sp)));
 			DEBG((4,"\n"));
 			if ((spnew=IS_search(sp,sp2)) == NULL) break;
 			sp2=spnew;

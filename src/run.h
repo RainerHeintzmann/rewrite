@@ -40,13 +40,13 @@ Node * get_numbertype(void);
 void delete _1p (Node * );
 Node * tcopy _1p(Node *);
 Node * tcalc _1p(Node *);
-Node * calkulate _1p(Node *);
+Node * calculate _1p(Node *);
 extern int calc_exact_only;   /* 2026: 1: no real value for 2^(1/2) */
 void print	_1p(Node *);
 Node * solve	_2p(Node * ,Node *);
 Node * rewrite _2p(Node * ,Node *);
 void rewrite_begin (void);   /* 2026: step limit for REWR */
-void steps_fkt (Node * np);  /* 2026: STEPS Alg "file": show the solution steps */
+void steps_fn (Node * np);  /* 2026: STEPS Alg "file": show the solution steps */
 void rewrite_end (void);
 void * rewrite_push (void);  /* 2026: nested REWR (ATT RULES): set the outer state aside */
 void rewrite_pop (void * p);

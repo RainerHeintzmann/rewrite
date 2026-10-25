@@ -1,10 +1,10 @@
-#ifndef SYMFKT_H
-#define SYMFKT_H
+#ifndef SYMFN_H
+#define SYMFN_H
 
 /*
- *	symfkt.h (2026)
+ *	symfn.h (2026)
  *
- *	Symbolic C functions: unlike the numeric functions in userfkt.c they
+ *	Symbolic C functions: unlike the numeric functions in userfn.c they
  *	get the argument terms and return a new term (or NULL if they do not
  *	apply). They are attached like numeric functions:
  *	    FUNC expand : real >> real ATT expand
@@ -16,16 +16,16 @@
 
 typedef Node * s_function (Node * args[], int nargs, Symbol * f);
 
-s_function * give_sfkt (const char * name);   /* NULL if unknown */
+s_function * give_sfn (const char * name);   /* NULL if unknown */
 void rules_fn_register (Symbol * f, Node * algs); /* ATT RULES alglist */
-s_function * rules_sfkt (void);               /* the C function behind ATT RULES */
-void role_fkt (Node * np);                    /* SYMBOLIC "role" = "symbol" */
+s_function * rules_sfn (void);               /* the C function behind ATT RULES */
+void role_fn (Node * np);                    /* SYMBOLIC "role" = "symbol" */
 Node * call_builtin (Node * term);
 int symbolic_constant (Symbol * s);	/* 2026: pi in exact mode: no value in terms */
 int exact_symbolic (Node * t);	/* 2026: exact mode: f(exact args), pi: no numeric value in a term */
 Node * special_value (Node * t);	/* 2026: its exact value (1/2, 3^(1/2)/2, pi/6) or NULL */
 typedef int show_function (Node * term, int prec);	/* 2026: SHOW: 1 if it printed the term */
-show_function * give_pfkt (const char * name);	/* print function by name, NULL if unknown (reported) */
+show_function * give_pfn (const char * name);	/* print function by name, NULL if unknown (reported) */
 void show_def (Node * np);			/* SHOW f ATT name */
 int profiling (void);                         /* REWRITE_PROFILE set? */
 double profile_now (void);

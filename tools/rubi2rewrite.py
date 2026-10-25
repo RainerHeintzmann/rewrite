@@ -1016,7 +1016,7 @@ def collect_matchq_defs(util_path):
 # rules that cannot be translated, but whose work a C helper does: the start
 # of the Mathematica text -> the rule in rewrite (at the same place in the
 # order). The helper stays unevaluated if it does not apply, and the rule
-# list then skips the rule (symfkt.c, term_has_nan).
+# list then skips the rule (symfn.c, term_has_nan).
 HAND_RULES = [
     # Rubi 2.3: integrand a function of F^(c x): substitute x -> F^(g x)
     ('Int[u_, x_Symbol] := With[{v = FunctionOfExponential[u, x]}',
@@ -1121,7 +1121,7 @@ ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
 ALG RubiCollect
 ADDSPEC RubiCollect : Uv+Vv = collect(Uv+Vv)
 ADDSPEC RubiCollect : Uv*Vv = simp(Uv*Vv)       # x^2*e/x^2 = e
-# the result in its final form for output (normform, symfkt.c): collected,
+# the result in its final form for output (normform, symfn.c): collected,
 # numbers distributed, positive summands first, A/B; in one pass, instead of
 # the general simplification All, which needs many steps for large results
 ALG RubiOut
@@ -1161,7 +1161,7 @@ DEACTIVATE_TEXT = """# r4_0_deactivate
 # functions (4.1.0.1, Rubi 4.17.3, MIT license, see LICENSE.Rubi),
 #   Int[u_, x_Symbol] := Int[DeactivateTrig[u, x], x] /; FunctionOfTrigOfLinearQ[u, x]
 # Trig functions are always active here; DeactivateTrig only writes the
-# hyperbolic functions as trig functions of im*v (hyp2trig, symfkt.c:
+# hyperbolic functions as trig functions of im*v (hyp2trig, symfn.c:
 # sinh(v) = -im*sin(im*v), ...), so that the trig rules apply to them.
 # Rubi 4.17 has no basic rules for sinh, cosh, ... RubiOut turns the
 # result back (imagfn: sin(im*w) = im*sinh(w), ...). hyp2trig leaves u
@@ -1194,7 +1194,7 @@ FIXINERT_HEADER = """# r4_0_fixinert
 # It writes products of trig functions in the forms the rules expect:
 # sec(u)^m*sin(u)^n = cos(u)^-m*sin(u)^n, and so on. Here it is the function
 # fixinert(u, x), defined by the rule list FixInert (ATT RULES); trignorm
-# (symfkt.c) calls it after Mathematica's 1/sin = csc.
+# (symfn.c) calls it after Mathematica's 1/sin = csc.
 ALG FixInert
 FUNC fixinert : real,real >> real ATT RULES FixInert
 OTHER fixinert : number,number >> number ATT RULES FixInert

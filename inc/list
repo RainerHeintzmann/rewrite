@@ -2,7 +2,7 @@
 # Lists as terms, like Mathematica's List: list(a,b,c), the empty list nil.
 # The elements may be any terms, also lists (list(list(1,2),list(3,4)) is a
 # matrix). Elements and results have the sort real, so that lists nest
-# freely. The functions are symbolic C functions (symfkt.c) that work on
+# freely. The functions are symbolic C functions (symfn.c) that work on
 # the structure; they stay unevaluated if an argument is no list.
 # Needs inc/all:
 #     INC "inc/all"

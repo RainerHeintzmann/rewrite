@@ -12,7 +12,7 @@
 #include "fatal.h"
 #include "real.h"
 
-#define MAXPOTENZ 30
+#define MAXPOWER 30
 #define MAXREAL 9.0E+259;
 
 double mypow (double a,double b)
@@ -24,7 +24,7 @@ printfErr("Tried to compute a non-integer negative power (Domain Error) !\n");
 return 0.0;
 }
 
-double myfak (double a)
+double myfactorial (double a)
 {
 double result=1;
 int i = (int) a;
@@ -42,7 +42,7 @@ double * mkreal (double x)
 double * dp;
 	dp = malloc(sizeof(double));
 	if (NULL==(void *) dp)
-		fatal("userfkt : (mkreal) ERROR no Space for making double !\n");
+		fatal("userfn : (mkreal) ERROR no Space for making double !\n");
 	(* dp) = x;
 	return dp;
 }
@@ -84,7 +84,7 @@ double * mult (double * arg[])			{return mkreal((* arg[0]) * (* arg[1]));}
 double * divide (double * arg[])		{return mkreal((* arg[0]) / (* arg[1]));}
 double * power(double * arg[])			{return mkreal(mypow((* arg[0]),(* arg[1])));}
 double * r_ln (double * arg[])	{return mkreal(log((* arg[0])));}
-double * wurzel (double * arg[])		{return mkreal(sqrt((* arg[0])));}
+double * sqrt_plain (double * arg[])		{return mkreal(sqrt((* arg[0])));}
 double * r_sin (double * arg[])			{return mkreal(sin((* arg[0])));}
 double * r_cos (double * arg[])		{return mkreal(cos((* arg[0])));}
 double * r_tan (double * arg[])		{return mkreal(tan((* arg[0])));}
@@ -94,7 +94,7 @@ double * r_tanh (double * arg[])      {return mkreal(tanh((* arg[0])));}
 double * r_exp(double * arg[])			{return mkreal(exp((* arg[0])));}
 double * ai(double * arg[])			{return mkreal(-(* arg[0]));}
 double * mi(double * arg[])			{return mkreal(((double) 1)/(* arg[0]));}
-double * factorial(double * arg[])			{return mkreal(myfak(* arg[0]));}
+double * factorial(double * arg[])			{return mkreal(myfactorial(* arg[0]));}
 double * r_arcsin   (double * arg[])		{return mkreal(asin((* arg[0])));}
 double * r_arccos (double * arg[])		{return mkreal(acos((* arg[0])));}
 double * r_arctan (double * arg[])		{return mkreal(atan((* arg[0])));}
@@ -124,11 +124,11 @@ double * bessel   (double * arg[])
 
 	v=0;
 	if (v < -n) v= -n;  /* -> v > 0 */
-	summand = mypow(-1.0,(double) v)/(myfak((double)v)*myfak((double)(n+v)));
+	summand = mypow(-1.0,(double) v)/(myfactorial((double)v)*myfactorial((double)(n+v)));
 	if (n != 0) summand *= mypow(x/2.0,(double)( n+2*v));
 	result=summand;
 
-	for (v++;v<MAXPOTENZ;v++)
+	for (v++;v<MAXPOWER;v++)
 		{
 /* printf(" summ: %d, %g %g\n",v,summand,result);  */
 		summand *= (-1.0)*x_2/((double)(v*(n+v+1)));

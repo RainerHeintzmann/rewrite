@@ -46,7 +46,7 @@ TRUE,
 static double Zero = 0.0;
 static double One  = 1.0;
 
-static Symbol Null_Symbol={
+static Symbol Zero_Symbol={
 {SYM_TYPE,
 (Node *) NULL,
 (Node *) NULL
@@ -66,7 +66,7 @@ NULL,
 0
 };
 
-static Symbol Eins_Symbol={
+static Symbol One_Symbol={
 {SYM_TYPE,
 (Node *) NULL,
 (Node *) NULL
@@ -149,9 +149,9 @@ BOOLEAN symeq (Symbol * a,Symbol * b) /* Compares two symbols for equality */
 {
 BOOLEAN tmp;
 	DEBG((6,"symeq("));
-	DBFK(6,print(((Node *) a)));
+	DBFN(6,print(((Node *) a)));
 	DEBG((6,", "));
-	DBFK(6,print((Node *) b));
+	DBFN(6,print((Node *) b));
 	DEBG((6,") \n"));
 
 if (a==b) return TRUE;
@@ -301,19 +301,19 @@ Symbol * sp;
 		{
 		if (* (double *) value == 0.0)
 			{
-			if (numbertype) rtypes(& Null_Symbol) = numbertype;
+			if (numbertype) rtypes(& Zero_Symbol) = numbertype;
 			else
-				rtypes(& Null_Symbol) = ( Node *) & stdsort;
+				rtypes(& Zero_Symbol) = ( Node *) & stdsort;
 			free_number_value(value); /* the shared symbol has its own value */
-			return & Null_Symbol;
+			return & Zero_Symbol;
 			}
 		if (* (double *) value == 1.0)
 			{
-			if (numbertype) rtypes(& Eins_Symbol) = numbertype;
+			if (numbertype) rtypes(& One_Symbol) = numbertype;
 			else
-				rtypes(& Eins_Symbol) = ( Node *) & stdsort;
+				rtypes(& One_Symbol) = ( Node *) & stdsort;
 			free_number_value(value); /* the shared symbol has its own value */
-			return & Eins_Symbol;
+			return & One_Symbol;
 			}
 		}
 
@@ -335,12 +335,12 @@ Symbol * sp;
 void delsym (Symbol * sp)
 {
 	DEBG((4,"delsym Symbol:"));
-	DBFK(4,print((Node *) sp));
+	DBFN(4,print((Node *) sp));
 	DEBG((4,"\n"));
 
 	if (! sp) return;
 
-	if ((sp == & Eins_Symbol) || (sp == & Null_Symbol))
+	if ((sp == & One_Symbol) || (sp == & Zero_Symbol))
 		return;
 
 	sp->node.type = SYM_TYPE;
@@ -356,12 +356,12 @@ void delsym (Symbol * sp)
 void delnum (Symbol * number,BOOLEAN delvalue)
 {	
 	DEBG((4,"hier delnum Number :"));
-	DBFK(4,print((Node *) number));
+	DBFN(4,print((Node *) number));
 	DEBG((4,"\n"));
 
 	if (! number) return;
 
-	if ((number == & Eins_Symbol) || (number == & Null_Symbol))
+	if ((number == & One_Symbol) || (number == & Zero_Symbol))
 		return;
 	if (! rtypes(number))
 		fatal("FATAL ERROR node.c : delnum: Number has no rtype");
@@ -386,10 +386,10 @@ Symbol * clonesym(Symbol * s) /* names duplicated ! */
 }
 
 
-/* TRUE for the shared numbers 0 and 1 (Null_Symbol, Eins_Symbol).
+/* TRUE for the shared numbers 0 and 1 (Zero_Symbol, One_Symbol).
  * Their value lives in static memory and must never be handed to a variable
  * and later freed with free(). */
 BOOLEAN is_shared_num (Symbol * sp)
 {
-	return (sp == & Null_Symbol) || (sp == & Eins_Symbol);
+	return (sp == & Zero_Symbol) || (sp == & One_Symbol);
 }

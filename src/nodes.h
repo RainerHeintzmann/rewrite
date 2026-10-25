@@ -59,28 +59,28 @@ Node ** term_argp  (Node * t, int i);   /* address of argument i, or NULL */
 #define ASSIGN_TARGET(np)  ((np)->r->l)
 #define ASSIGN_TERM(np)    ((np)->r->r)
 
-/* WHILE cond body:  FUNC(while_fkt, PARAM(cond, body)) */
+/* WHILE cond body:  FUNC(while_fn, PARAM(cond, body)) */
 #define WHILE_COND(np)     ((np)->r->l)
 #define WHILE_BODY(np)     ((np)->r->r)
 
-/* IF cond then [ELSE else]:  FUNC(if_fkt, PARAM(cond, PARAM(then, else))) */
+/* IF cond then [ELSE else]:  FUNC(if_fn, PARAM(cond, PARAM(then, else))) */
 #define IF_COND(np)        ((np)->r->l)
 #define IF_THEN(np)        ((np)->r->r->l)
 #define IF_ELSE(np)        ((np)->r->r->r)
 
 /* FOR var = from TO to STEP step DO body:
- *	FUNC(forschleife, PARAM(PARAM(from, to), PARAM(PARAM(step, var), body))) */
+ *	FUNC(for_loop, PARAM(PARAM(from, to), PARAM(PARAM(step, var), body))) */
 #define FOR_FROM(np)       ((np)->r->l->l)
 #define FOR_TO(np)         ((np)->r->l->r)
 #define FOR_STEP(np)       ((np)->r->r->l->l)
 #define FOR_VAR(np)        ((np)->r->r->l->r)
 #define FOR_BODY(np)       ((np)->r->r->r)
 
-/* REWR term : algs:  FUNC(rewrite_fkt, PARAM(term, algs)) */
+/* REWR term : algs:  FUNC(rewrite_fn, PARAM(term, algs)) */
 #define REWR_TERM(np)      ((np)->r->l)
 #define REWR_ALGS(np)      ((np)->r->r)
 
-/* Term = REWR term : algs:  FUNC(rewrite_ass_fkt, PARAM(Term, PARAM(term, algs))) */
+/* Term = REWR term : algs:  FUNC(rewrite_ass_fn, PARAM(Term, PARAM(term, algs))) */
 #define REWRASS_TARGET(np) ((np)->r->l)
 #define REWRASS_TERM(np)   ((np)->r->r->l)
 #define REWRASS_ALGS(np)   ((np)->r->r->r)
@@ -106,13 +106,13 @@ Node ** term_argp  (Node * t, int i);   /* address of argument i, or NULL */
 #define BRK_CLOSE(np)      ((np)->r->r)
 
 /* OTHER f : sorts >> sort att:
- *	FUNC(other_fkt, PARAM(f, PARAM(sorts, PARAM(sort, att)))) */
+ *	FUNC(other_fn, PARAM(f, PARAM(sorts, PARAM(sort, att)))) */
 #define OTHER_SYM(np)      ((np)->r->l)
 #define OTHER_SORTS(np)    ((np)->r->r->l)
 #define OTHER_RTYPE(np)    ((np)->r->r->r->l)
 #define OTHER_ATT(np)      ((np)->r->r->r->r)
 
-/* attach C function or user function to f:  FUNC(att_fkt, PARAM(f, att)) */
+/* attach C function or user function to f:  FUNC(att_fn, PARAM(f, att)) */
 #define ATTF_SYM(np)       ((np)->r->l)
 #define ATTF_ATT(np)       ((np)->r->r)
 

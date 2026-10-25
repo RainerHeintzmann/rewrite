@@ -180,10 +180,10 @@ how the function is written:
   `f(x,y)`.
 
 `ATT name` connects the function to a C function in the list
-`userfunction` in [userfkt.c](src/userfkt.c). It is called when all arguments
+`userfunction` in [userfn.c](src/userfn.c). It is called when all arguments
 have numerical values. Otherwise the function stays symbolic.
 `ATT SYMBOLIC name` connects it to a symbolic C function in
-[symfkt.c](src/symfkt.c) instead, which gets the argument terms (see
+[symfn.c](src/symfn.c) instead, which gets the argument terms (see
 [Symbolic helper functions](#symbolic-helper-functions));
 `ATT SYMBOLIC HOLD name` passes them unevaluated.
 
@@ -738,7 +738,7 @@ With exact numbers, the results are exact: `exp(2*x+1) = 5` gives
 ### Symbolic helper functions
 
 [inc/helpers](inc/helpers) declares helper functions written in C
-([symfkt.c](src/symfkt.c)) with `ATT SYMBOLIC`. Unlike numerical functions,
+([symfn.c](src/symfn.c)) with `ATT SYMBOLIC`. Unlike numerical functions,
 they work on the terms themselves: they get the argument terms and return a
 new term, or nothing if they do not apply (then the call stays as it is).
 Their names follow the helpers of Rubi in lower case. They are loaded by the
@@ -855,7 +855,7 @@ of LiNbO3), [inc/chaos](inc/chaos), [inc/molekuel](inc/molekuel) and
 ## Adding C functions
 
 New numerical functions are written in C and entered in the list
-`userfunction` in [userfkt.c](src/userfkt.c). A function gets an array of
+`userfunction` in [userfn.c](src/userfn.c). A function gets an array of
 pointers to its arguments and returns a pointer to a newly allocated result:
 
 ```c
@@ -867,7 +867,7 @@ Examples are in [real.c](src/real.c), [complex.c](src/complex.c),
 connected with `ATT` in a `FUNC` or `OTHER` declaration.
 
 Symbolic functions, which work on terms instead of numbers, are entered in
-the list `symfunction` in [symfkt.c](src/symfkt.c). They get the argument terms
+the list `symfunction` in [symfn.c](src/symfn.c). They get the argument terms
 and return a new term, or `NULL` if they do not apply, and are connected with
 `ATT SYMBOLIC name` (or `ATT SYMBOLIC HOLD name` for unevaluated arguments;
 plain `ATT name` also finds them if no numerical function has that name). To
@@ -889,17 +889,17 @@ where the library [inc/](inc) and the tests are used from.
 | [run.c](src/run.c), [forms.c](src/forms.c) | Rewriting engine and numerical evaluation. |
 | [expand.c](src/expand.c) | Settings `OPT`, `DEFAULT`, `COMM` and condition lists. |
 | [listmatch.c](src/listmatch.c) | Rule lists with a backtracking matcher. |
-| [symfkt.c](src/symfkt.c) | Symbolic helper functions (`expand`, `coeff`, `polyq`, ...). |
+| [symfn.c](src/symfn.c) | Symbolic helper functions (`expand`, `coeff`, `polyq`, ...). |
 | [numsort.c](src/numsort.c), [exact.c](src/exact.c) | Subsorts (`SUBSORT`, `INTNUM`) and the exact number sorts with GMP. |
 | [specfun.c](src/specfun.c) | Special functions (erf, Fresnel, Ei, Gamma, zeta, elliptic integrals, 2F1, ...). |
 | [apart.c](src/apart.c) | Partial fractions of rational functions with exact coefficients (GMP). |
-| [symsolve.c](src/symsolve.c) | Helpers of the equation solver: polynomial roots, the new unknown, square roots, checking (included by symfkt.c). |
-| [symmat.c](src/symmat.c) | Symbolic matrices on lists: Bareiss elimination on sparse polynomials (included by symfkt.c). |
+| [symsolve.c](src/symsolve.c) | Helpers of the equation solver: polynomial roots, the new unknown, square roots, checking (included by symfn.c). |
+| [symmat.c](src/symmat.c) | Symbolic matrices on lists: Bareiss elimination on sparse polynomials (included by symfn.c). |
 | [tools/rubi2rewrite.py](tools/rubi2rewrite.py) | Translator of Rubi's integration rules. |
 | [tools/rubitest.py](tools/rubitest.py) | Runs Rubi's test suite and checks the results numerically. |
 | [nodes.h](src/nodes.h) | Named access to the node structures built by the parser. |
 | [sym.c](src/sym.c), [node.c](src/node.c), [stack.c](src/stack.c) | Symbol table and memory for nodes and symbols. |
-| [userfkt.c](src/userfkt.c), [real.c](src/real.c), [bool.c](src/bool.c), [complex.c](src/complex.c), [vector.c](src/vector.c), [matrix.c](src/matrix.c) | Built-in numerical functions. |
+| [userfn.c](src/userfn.c), [real.c](src/real.c), [bool.c](src/bool.c), [complex.c](src/complex.c), [vector.c](src/vector.c), [matrix.c](src/matrix.c) | Built-in numerical functions. |
 | [inout.c](src/inout.c) | Output, output redirection and data input. |
 
 ## Known limitations
@@ -945,11 +945,11 @@ where the library [inc/](inc) and the tests are used from.
 - New pattern features: optional parts (`OPT`, `DEFAULT`), commutative
   operators (`COMM`) and lists of conditions (`IF c1, c2`). A condition
   that cannot be calculated no longer crashes the interpreter.
-- Symbolic helper functions in C ([symfkt.c](src/symfkt.c), [inc/helpers](inc/helpers))
+- Symbolic helper functions in C ([symfn.c](src/symfn.c), [inc/helpers](inc/helpers))
   and further elementary functions (`csc`, `sec`, `cot`, `arccot`, the
   hyperbolic and inverse hyperbolic functions, `polylog`, `productlog`).
 - Special functions ([specfun.c](src/specfun.c)) with derivative rules, and
-  more of Rubi's helper functions in [symfkt.c](src/symfkt.c), among them
+  more of Rubi's helper functions in [symfn.c](src/symfn.c), among them
   partial fractions ([apart.c](src/apart.c)).
 - Exact numbers: sorts `integer` and `rational` with GMP ([inc/exact](inc/exact)),
   the statements `SUBSORT` and `INTNUM`, and the choice of operator

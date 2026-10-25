@@ -14,7 +14,7 @@
 #include "syn.h"
 #include "node.h"
 #include "nodes.h"
-#include "userfkt.h"
+#include "userfn.h"
 #include "numsort.h"
 #include "exact.h"
 

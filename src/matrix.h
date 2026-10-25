@@ -12,19 +12,19 @@
 #include "vector.h"
 
 typedef struct {
-	int Zeilen;
-	int Spalten;
+	int Rows;
+	int Cols;
 	double * Matrix;
 	} matrix;
 
-#define Zeilen(mp)  ((mp)->Zeilen)
-#define Spalten(mp) ((mp)->Spalten)
+#define Rows(mp)  ((mp)->Rows)
+#define Cols(mp) ((mp)->Cols)
 #define Matrix(mp)  ((mp)->Matrix)
-#define Matsize(mp) (Zeilen(mp)*Spalten(mp)*sizeof(double))
-#define Elem(dp,Ze,Sp,maxSp) (*(dp+(Ze*maxSp+Sp)))
-#define MatElem(mp,Ze,Sp) (((Ze) >= Zeilen(mp) || (Ze) < 0) ? (printfErr("Matrix element error : Matrix has not enought rows\n"),0.0) : \
-                          ((Sp) >= Spalten(mp) || (Sp) < 0) ? (printfErr("Matrix element error : Matrix has not enought columns\n"),0.0) : \
-                                                  (*(Matrix(mp)+((Ze)*Spalten(mp)+(Sp)))) )
+#define Matsize(mp) (Rows(mp)*Cols(mp)*sizeof(double))
+#define Elem(dp,Nrow,Ncol,maxNcol) (*(dp+(Nrow*maxNcol+Ncol)))
+#define MatElem(mp,Nrow,Ncol) (((Nrow) >= Rows(mp) || (Nrow) < 0) ? (printfErr("Matrix element error : Matrix has not enought rows\n"),0.0) : \
+                          ((Ncol) >= Cols(mp) || (Ncol) < 0) ? (printfErr("Matrix element error : Matrix has not enought columns\n"),0.0) : \
+                                                  (*(Matrix(mp)+((Nrow)*Cols(mp)+(Ncol)))) )
                                
 
 void     show_mat (matrix * mp);

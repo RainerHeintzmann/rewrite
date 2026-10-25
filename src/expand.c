@@ -59,7 +59,7 @@ static void mark_optional (Symbol * sp)
 	opt_vars[n_opt++] = sp;
 }
 
-void opt_fkt (Node * np)		/* FUNC(opt_fkt, idlist); without list: clear */
+void opt_fn (Node * np)		/* FUNC(opt_fn, idlist); without list: clear */
 {
 	Node * l;
 	if (! INSTR_PAR(np)) { n_opt = 0; return; }
@@ -77,7 +77,7 @@ static void mark_comm (Symbol * sp)
 	comm_funcs[n_comm++] = sp;
 }
 
-void comm_fkt (Node * np)		/* FUNC(comm_fkt, funclist); without list: clear */
+void comm_fn (Node * np)		/* FUNC(comm_fn, funclist); without list: clear */
 {
 	Node * l;
 	if (! INSTR_PAR(np)) { n_comm = 0; return; }
@@ -86,7 +86,7 @@ void comm_fkt (Node * np)		/* FUNC(comm_fkt, funclist); without list: clear */
 	mark_comm((Symbol *) l);
 }
 
-void default_fkt (Node * np)	/* FUNC(default_fkt, PARAM(PARAM(f, right_only), value)) */
+void default_fn (Node * np)	/* FUNC(default_fn, PARAM(PARAM(f, right_only), value)) */
 {
 	Symbol * f;
 	BOOLEAN right;

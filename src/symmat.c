@@ -1,7 +1,7 @@
 /*
  *	symmat.c (2026)
  *
- *	Symbolic matrices on lists, included by symfkt.c (it uses its static
+ *	Symbolic matrices on lists, included by symfn.c (it uses its static
  *	helpers). A matrix is a list of rows, list(list(a,b),list(c,d)), a
  *	vector a list (inc/list, inc/linalg):
  *
@@ -1153,15 +1153,15 @@ static int show_list (Node * t, int prec)
 	return 1;
 }
 
-static const struct { const char * name; show_function * fn; } pfkt_tab[] = {
+static const struct { const char * name; show_function * fn; } pfn_tab[] = {
 	{ "show_list", show_list },
 	{ NULL, NULL } };
 
-show_function * give_pfkt (const char * name)
+show_function * give_pfn (const char * name)
 {
 	int i;
-	for (i = 0; pfkt_tab[i].name; i++)
-		if (! strcmp(pfkt_tab[i].name, name)) return pfkt_tab[i].fn;
+	for (i = 0; pfn_tab[i].name; i++)
+		if (! strcmp(pfn_tab[i].name, name)) return pfn_tab[i].fn;
 	printfErr(" --ERROR SHOW : print function %s is not implemented\n", name);
 	return NULL;
 }
@@ -1174,6 +1174,6 @@ void show_def (Node * np)		/* FUNC(show_def, PARAM(f, print function or NULL)) *
 	p->l = p->r = NULL;		/* a symbol and a C function: not deleted */
 	do	{
 		showfn(s) = (void *) fn;
-		s = kette(s);
+		s = variants(s);
 		} while (s && s != f);
 }

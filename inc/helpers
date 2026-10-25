@@ -1,5 +1,5 @@
 # inc/helpers (2026)
-# Symbolic helper functions (in C, symfkt.c), mainly for the
+# Symbolic helper functions (in C, symfn.c), mainly for the
 # rule-based integration (inc/integration). The names follow Rubi's
 # helper functions in lower case (FreeQ -> freeq).
 # They get the terms themselves, not their numerical values.

@@ -42,10 +42,10 @@ vector * mkvec (int Dimension)
 vector * vp;
 double * dp;
 	if (!(vp = malloc(sizeof(vector))))
-		fatal("userfkt : (mkvector) ERROR no Space for making vector !\n");
+		fatal("userfn : (mkvector) ERROR no Space for making vector !\n");
 	vp->Dimension = Dimension;
   if (!(dp = malloc(Vecsize(vp))))
-		fatal("userfkt : (mkvector) ERROR no Space for making vector !\n");
+		fatal("userfn : (mkvector) ERROR no Space for making vector !\n");
 	Vector(vp) = dp;
 	/* printfOut("mkvec : size %d ptr : %p, %p\n",Dimension,vp,Vector(vp)); */
 	return vp;
@@ -562,7 +562,7 @@ vector * rt = mkvec(Dimension(vp));
 double * drt= Vector(rt);
 
 for(i=0;i<Dimension(vp);i++)
-	* (drt ++) = myfak(* (dp ++));
+	* (drt ++) = myfactorial(* (dp ++));
 
 return rt;
 }

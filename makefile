@@ -9,9 +9,9 @@
 S	= src
 L	= -Wl,-Bstatic -lgmp -Wl,-Bdynamic -lm
 O	= $(addprefix $(S)/, scan.o sym.o sync.o defs.o syn.o run.o stack.o \
-userfkt.o forms.o node.o inout.o \
+userfn.o forms.o node.o inout.o \
 real.o bool.o complex.o matrix.o vector.o \
-fatal.o strsave.o expand.o symfkt.o listmatch.o numsort.o exact.o specfun.o apart.o)
+fatal.o strsave.o expand.o symfn.o listmatch.o numsort.o exact.o specfun.o apart.o)
 
 T	= rewrite
 
@@ -35,7 +35,7 @@ $(S)/syn.c $(S)/syn.h: $(S)/syn.y
 
 $(O): $(S)/syn.h
 
-$(S)/symfkt.o: $(S)/symmat.c $(S)/symsolve.c
+$(S)/symfn.o: $(S)/symmat.c $(S)/symsolve.c
 
 $(S)/%.o: $(S)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

@@ -26,22 +26,22 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 	void * value;           /* pointer to a value of any type (for Func: function pointer) */
 	Symbol * oldvals;       /* pointer to the list of overwritten values of any type */
 	int		exe_always;       /* always execute the function ?! */
-  Symbol * urs_fkt;				/* for user function pointers */
-  Symbol * klammer;       /* links a left bracket with its matching right bracket (BRACKET function)*/
-  Symbol * kette;         /* links functions of the same name but with different argument types */
-  Symbol * IS_kette;      /* links functions and constants of the same result type (the sort is the anchor) */
-  Symbol * IS_Verbindung; /* links functions and constants that were assigned with 'term IS term'  */
+  Symbol * orig_func;				/* for user function pointers */
+  Symbol * bracket;       /* links a left bracket with its matching right bracket (BRACKET function)*/
+  Symbol * variants;         /* links functions of the same name but with different argument types */
+  Symbol * IS_chain;      /* links functions and constants of the same result type (the sort is the anchor) */
+  Symbol * IS_link; /* links functions and constants that were assigned with 'term IS term'  */
 	int		def_in_blk;       /* block level in which it was defined */
-	int		builtin;          /* 2026: symbolic C function (symfkt.c), gets terms instead of numbers */
+	int		builtin;          /* 2026: symbolic C function (symfn.c), gets terms instead of numbers */
 	void *	showfn;           /* 2026: print function of a function (SHOW f ATT name), see tprint */
 };
 
 #define NOFLAG		0
-#define KOMMFLAG 	1
+#define COMMFLAG 	1
 
 #define SYM_TYPE	((int) 0)
 #define OR_TYPE	((int) 556)       /* forms.c */
-#define ERSETZ_TYPE	((int) 557)   /* forms.c */
+#define REPL_TYPE	((int) 557)   /* forms.c */
 #define CHAIN	555               /* for run.c,forms.c */
 #define RULELIST	((int) 558)  /* 2026: rule list with backtracking (listmatch.c) */
 
@@ -70,11 +70,11 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 #define hasval(p_sym)	(((Symbol *) (p_sym)) -> hasval)
 #define value(p_sym)	(((Symbol *) (p_sym)) -> value)
 #define oldvals(p_sym)	(((Symbol *) (p_sym)) -> oldvals) /* must not be redefined, otherwise rec_build_list in defs.c no longer works ! */
-#define klammer(p_sym)	(((Symbol *) (p_sym)) -> klammer)
-#define kette(p_sym)	(((Symbol *) (p_sym)) -> kette)
-#define IS_kette(p_sym)	(((Symbol *) (p_sym)) -> IS_kette) /* used by function,const,sort */
-#define IS_Verbindung(p_sym)	(((Symbol *) (p_sym)) -> IS_Verbindung) /* used by function,const,sort */
-#define urs_fkt(p_sym)	(((Symbol *) (p_sym)) -> urs_fkt) /* only for functions */
+#define bracket(p_sym)	(((Symbol *) (p_sym)) -> bracket)
+#define variants(p_sym)	(((Symbol *) (p_sym)) -> variants)
+#define IS_chain(p_sym)	(((Symbol *) (p_sym)) -> IS_chain) /* used by function,const,sort */
+#define IS_link(p_sym)	(((Symbol *) (p_sym)) -> IS_link) /* used by function,const,sort */
+#define orig_func(p_sym)	(((Symbol *) (p_sym)) -> orig_func) /* only for functions */
 #define defined_in_block(p_sym)	(((Symbol *) (p_sym)) -> def_in_blk) /* only for terms,constants,functions */
 #define showfn(p_sym)	(((Symbol *) (p_sym)) -> showfn) /* 2026: SHOW */
 #define builtin(p_sym)	(((Symbol *) (p_sym)) -> builtin) /* symbolic C function */
@@ -82,7 +82,7 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 #define show(p_sym)	(((Symbol *) (p_sym)) -> value) /* redefined for SORT (showfkt.) */
 #define cmp(p_sym)	(((Symbol *) (p_sym)) -> rtypes) /* redefined for SORT (comparefkt.) */
 #define cpy(p_sym)	(((Symbol *) (p_sym)) -> atypes) /* redefined for SORT (copyfkt.) */
-#define del(p_sym)	(((Symbol *) (p_sym)) -> klammer) /* redefined for SORT (deletefkt.) */
+#define del(p_sym)	(((Symbol *) (p_sym)) -> bracket) /* redefined for SORT (deletefkt.) */
 
 #define CPYNUM(term,value)          (((void * (*) (void *)) cpy(rtypes((Symbol *)(term)))) ((void *) (value)))
 #define SHOWNUM(term,value)         (((void * (*) (void *)) show(rtypes((Symbol *)(term)))) ((void *) (value)))
