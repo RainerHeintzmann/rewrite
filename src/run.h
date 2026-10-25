@@ -48,6 +48,8 @@ Node * rewrite _2p(Node * ,Node *);
 void rewrite_begin (void);   /* 2026: step limit for REWR */
 void steps_fkt (Node * np);  /* 2026: STEPS Alg "file": show the solution steps */
 void rewrite_end (void);
+void * rewrite_push (void);  /* 2026: nested REWR (ATT RULES): set the outer state aside */
+void rewrite_pop (void * p);
 extern long max_rewrite_steps;
 
 /* condition functions */

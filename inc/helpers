@@ -63,7 +63,13 @@ OTHER expandtosum : real,real,real >> real ATT SYMBOLIC expandtosum
 FUNC polyquotient  : real,real,real >> real ATT SYMBOLIC polyquotient  # polynomial division
 FUNC polyremainder : real,real,real >> real ATT SYMBOLIC polyremainder # remainder
 FUNC normpoly  : real,real >> real        ATT SYMBOLIC normpoly   # polynomials: c0+c1*x+...
-FUNC deriv     : real,real >> real        ATT SYMBOLIC deriv      # derivative (in C)
+# derivative: a function defined by rules (ATT RULES), with the rules Linear, diff
+# of inc/alg; unlike D, every term without x counts as a constant
+ALG DerivDef
+ALG DerivConst
+FUNC deriv     : real,real >> real        ATT RULES DerivDef,(DerivConst,Linear,diff)
+SPEC DerivDef : deriv(X,Y) = D(X,Y)
+SPEC DerivConst : IF NIN(Z,X) D(X,Z) = 0
 FUNC collect   : real >> real             ATT SYMBOLIC collect    # collect like summands
 # 2026: more helper functions of Rubi
 FUNC replaceall : real,real,real >> real  ATT SYMBOLIC replaceall   # u with x -> v (at once)

@@ -495,11 +495,16 @@ static Node * match_rules (Node * term, Node * list);
 
 Node * match_list (Node * term, Node * list)
 {
-	Node * r;
+	Node * r, * settings = cur_settings, * res = cur_res;
 	if (ml_depth == 0) arena_free();	/* the last result is built by now */
 	ml_depth++;
 	r = match_rules(term, list);
 	ml_depth--;
+	if (ml_depth > 0)		/* nested (ATT RULES in a condition): the outer list again */
+		{
+		cur_settings = settings;
+		cur_res = res;
+		}
 	return r;
 }
 

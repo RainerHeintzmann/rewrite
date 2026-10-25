@@ -7,19 +7,21 @@ TERM T : real
 CONST yy : real
 x = yy
 FUNC kos : real >> real ATT cosinus
-FUNC sinus2 : real >> real ATT sinus
-# without roles kos is unknown to the helpers: no derivative
-T = REWR deriv(kos(x)^2,x) : All
+# without roles kos is unknown to the helpers: no power reduction
+T = REWR expandtrigreduce(kos(x)^2,x) : All
 T
-# kos plays the role of the cosine, sinus2 that of the sine
+T = REWR expandtrigreduce(sin(x)^2,x) : All
+T
+# kos plays the role of the cosine: recognized and built
 SYMBOLIC "cos" = "kos"
-SYMBOLIC "sin" = "sinus2"
-T = REWR deriv(kos(x)^2,x) : All
+T = REWR expandtrigreduce(kos(x)^2,x) : All
+T
+T = REWR expandtrigreduce(sin(x)^2,x) : All
 T
 # cos is now no cosine for the helpers
-T = REWR deriv(cos(x),x) : All
+T = REWR expandtrigreduce(cos(x)^2,x) : All
 T
 # back to the names
 SYMBOLIC
-T = REWR deriv(cos(x)^2,x) : All
+T = REWR expandtrigreduce(cos(x)^2,x) : All
 T

@@ -61,7 +61,7 @@ static Node * sym_att (Node * id, int hold);	/* below */
 %token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD RULES
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -157,6 +157,8 @@ att 		: /* NULL */		{ $$ = NULL;}
 			                }
 			  | ATT SYMBOLIC namedId	{ /* 2026: symbolic C function (symfkt.c): gets terms */
 			                  $$ = sym_att($3, 0); }
+			  | ATT RULES alglist	{ /* 2026: function defined by a rule list: f(..) is REWR f(..) : alglist */
+			                  $$ = mknod(ATT,(Node *) rules_sfkt(),mknod(PARAM,$3,NULL)); }
 			  | ATT SYMBOLIC HOLD namedId	{ /* 2026: plus arguments unevaluated (matchq) */
 			                  $$ = sym_att($4, 1); }
 				| ATT '(' {block_begin();no_protect();}

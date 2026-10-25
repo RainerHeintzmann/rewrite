@@ -95,6 +95,52 @@ static void hist_clear (void)
 	hist_pos = 0;
 }
 
+/* 2026: a REWR inside a rewrite step, as for a function defined by rules
+   (ATT RULES) in a condition: the bindings of the rule being tried, the
+   history and didrewrite of the outer rewriting are set aside meanwhile */
+struct rewrite_nest {
+	Node * chain_l, * chain_pos;
+	Node * hist[NHIST], * hist_to[NHIST];
+	int hist_rule[NHIST], hist_pos;
+	BOOLEAN didrewrite;
+};
+
+void * rewrite_push (void)
+{
+	struct rewrite_nest * s = (struct rewrite_nest *) malloc(sizeof(struct rewrite_nest));
+	int i;
+	if (! s) fatal("run.c : no room");
+	s->chain_l = var_chain.l;
+	s->chain_pos = chain_pos;
+	for (i = 0; i < NHIST; i++)
+		{
+		s->hist[i] = hist[i]; s->hist_to[i] = hist_to[i]; s->hist_rule[i] = hist_rule[i];
+		hist[i] = hist_to[i] = NULL;
+		}
+	s->hist_pos = hist_pos;
+	hist_pos = 0;
+	s->didrewrite = didrewrite;
+	var_chain.l = NULL;
+	chain_pos = & var_chain;
+	return s;
+}
+
+void rewrite_pop (void * p)
+{
+	struct rewrite_nest * s = (struct rewrite_nest *) p;
+	int i;
+	hist_clear();
+	for (i = 0; i < NHIST; i++)
+		{
+		hist[i] = s->hist[i]; hist_to[i] = s->hist_to[i]; hist_rule[i] = s->hist_rule[i];
+		}
+	hist_pos = s->hist_pos;
+	didrewrite = s->didrewrite;
+	var_chain.l = s->chain_l;
+	chain_pos = s->chain_pos;
+	free(s);
+}
+
 static void hist_add (Node * t, Node * to, int rule)
 {
 	delete(hist[hist_pos]);

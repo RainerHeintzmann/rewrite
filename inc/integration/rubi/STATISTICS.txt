@@ -1,4 +1,4 @@
-translated 6880 of 7432 rules (93%) from 200 files
+translated 6925 of 7492 rules (92%) from 201 files
 
 reasons for rules that were not translated:
    245  symbol I
@@ -57,7 +57,6 @@ reasons for rules that were not translated:
      1  NeQ with 1 arguments (never true in Rubi either)
      1  function IntSum
      1  predicate InverseFunctionQ
-     1  predicate MonomialQ
      1  condition is never true
      1  function FunctionExpand
      1  function NormalizeIntegrand
@@ -135,7 +134,7 @@ per file (translated / total):
   29 /   34  r1_1_3_8     1.1.3.8 P(x) (c x)^m (a+b x^n)^p
   47 /   52  r1_1_3_7     1.1.3.7 P(x) (a+b x^n)^p
    9 /   11  r1_1_4_4     1.1.4.4 P(x) (c x)^m (a x^j+b x^n)^p
-  11 /   20  r1_3_3       1.3.3 P(x)^p
+  12 /   20  r1_3_3       1.3.3 P(x)^p
   20 /   20  r1_3_1       1.3.1 u (a+b x+c x^2+d x^3)^p
   16 /   18  r1_3_2       1.3.2 u (a+b x+c x^2+d x^3+e x^4)^p
   21 /   21  r1_3_4       1.3.4 P(x) Q(x)^p
@@ -156,6 +155,7 @@ per file (translated / total):
   20 /   20  r3_2_3       3.2.3 u log(e (f (a+b x)^p (c+d x)^q)^r)^s
   42 /   43  r3_5         3.5 Miscellaneous logarithms
   26 /   26  r4_1_0_1     4.1.0.1 (a sin)^m (b trg)^n
+  44 /   60  r4_0_fixinert FixInertTrigFunction
   30 /   30  r4_1_0_2     4.1.0.2 (a trg)^m (b tan)^n
   14 /   14  r4_1_0_3     4.1.0.3 (a csc)^m (b sec)^n
   33 /   33  r4_1_1_1     4.1.1.1 (a+b sin)^n

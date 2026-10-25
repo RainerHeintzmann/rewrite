@@ -1,0 +1,36 @@
+# Functions defined by a rule list: FUNC f ... ATT RULES alglist.
+# f(..) is calculated as REWR f(..) : alglist; if the result is still a
+# call of f, f does not apply. Used for deriv (inc/helpers) and Rubi's
+# FixInertTrigFunction (fixinert).
+INC "inc/all"
+INC "inc/helpers"
+TERM T : real
+CONST yy,nn : real
+x = yy
+# a partial derivative: D of inc/alg, with every term free of x constant
+ALG PdDef
+ALG PdConst
+FUNC pd : real,real >> real ATT RULES PdDef,(PdConst,Linear,diff)
+SPEC PdDef : pd(X,Y) = D(X,Y)
+SPEC PdConst : IF NIN(Z,X) D(X,Z) = 0
+T = REWR pd(x^nn,x) : All
+T
+T = REWR pd(nn*sin(x)^2,x) : All
+T
+# deriv of inc/helpers is defined the same way
+T = REWR deriv(x^3+nn*x,x) : All
+T
+# a rule function in the condition of a rule list (nested rewriting)
+VAR Uu,Xx : real
+OPT Uu
+DEFAULT * = 1
+COMM +,*
+FUNC isconst : real,real >> real
+ALG tc
+SPEC tc : IF (pd(Uu,Xx) == 0) isconst(Uu,Xx) = 1
+ADDSPEC tc : isconst(Uu,Xx) = 0
+OPT
+DEFAULT
+COMM
+REWR isconst(nn^2+3,x) : tc
+REWR isconst(nn*x,x) : tc

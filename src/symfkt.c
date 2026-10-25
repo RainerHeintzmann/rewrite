@@ -35,7 +35,8 @@
  *	  expandtosum(u,v,x)   u*expandtosum(v,x), distributed
  *	  polyquotient(p,q,x), polyremainder(p,q,x)  polynomial division
  *	  normpoly(u,x)        polynomial sums in u as c0 + c1*x + c2*x^2 + ...
- *	  deriv(u,x)           derivative (elementary functions; else unevaluated)
+ *	  (deriv(u,x), the derivative, is a function of inc/helpers defined by
+ *	  rules, see ATT RULES below; deriv() here calls it)
  *	  collect(u)           like summands combined, e.g. 2*a+b-a -> a+b
  */
 
@@ -1534,10 +1535,13 @@ static Node * shift_all (Node * t)
 
 /* ---- trignorm(u, x): Mathematica's 1/sin = csc and Rubi's FixInertTrigFunction ----
  * Every trig or hyperbolic factor with a negative integer exponent becomes
- * its reciprocal function (Mathematica writes Sin[x]^-3 as Csc[x]^3). In a
- * product of exactly two such factors, Rubi then writes the first one (in
- * Mathematica's alphabetical order) to match the second: sec^m*sin^n =
- * cos^-m*sin^n, so that the rules for sin^m*cos^n apply. NULL: no change. */
+ * its reciprocal function (Mathematica writes Sin[x]^-3 as Csc[x]^3). Then
+ * Rubi's FixInertTrigFunction writes the factors in the forms the rules
+ * expect (sec^m*sin^n = cos^-m*sin^n): the function fixinert, defined by
+ * rules translated from Rubi (inc/integration/rubi/r4_0_fixinert); without
+ * it only the first step is done. NULL: no change. */
+
+static Node * s_rules (Node * a[], int n, Symbol * f);
 
 static const char * trig_recip (const char * h)
 {
@@ -1552,60 +1556,10 @@ static const char * trig_recip (const char * h)
 	return NULL;
 }
 
-static const char * fix_inert[][3] = {	/* f1^m * f2^n = g1^-m * f2^n (rubi_util.m) */
-	{"csc","sin","sin"}, {"sec","cos","cos"}, {"cot","tan","tan"}, {"tan","cot","cot"},
-	{"cos","sec","sec"}, {"sin","csc","csc"}, {"sec","sin","cos"}, {"csc","cos","sin"},
-	{"cos","tan","sec"}, {"sin","cot","csc"}, {"sin","sec","csc"}, {"cos","csc","sec"},
-	{"cot","sin","tan"}, {"tan","cos","cot"}, {"csc","tan","sin"}, {"sec","cot","cos"},
-	{"cot","sec","tan"}, {"tan","csc","cot"} };
-
 static int is_canon_trig (const char * h)	/* sin, cos, tan, sinh, cosh, tanh */
 {
 	return ! strcmp(h, "sin") || ! strcmp(h, "cos") || ! strcmp(h, "tan")
 	    || ! strcmp(h, "sinh") || ! strcmp(h, "cosh") || ! strcmp(h, "tanh");
-}
-
-/* Rubi's FixInertTrigFunction[u*f^n*w] with PowerOfInertTrigSumQ[w, g]:
- * f^n = f2^-n (rubi_util.m) */
-static const char * fix_inert_sum[][3] = {
-	{"sec","cos","cos"}, {"csc","sin","sin"}, {"sec","sin","cos"}, {"csc","cos","sin"},
-	{"cot","tan","tan"}, {"cos","tan","sec"}, {"csc","tan","sin"}, {"tan","cot","cot"},
-	{"sin","cot","csc"}, {"sec","cot","cos"}, {"cos","sec","sec"}, {"cot","sec","tan"},
-	{"csc","sec","sin"}, {"sin","csc","csc"}, {"tan","csc","cot"}, {"sec","csc","cos"} };
-
-/* the trig function g if w = (a + b*g(..)^k + ...)^p with a constant summand
- * (Rubi's PowerOfInertTrigSumQ); else NULL */
-static const char * trig_sum_func (Node * w, Node * x)
-{
-	TList l = {0};
-	const char * g = NULL;
-	int i, ok = 1, nconst = 0;
-	w = deref(w);
-	if (is_head(w, "^", 2)) w = arg(w, 0);
-	if (! is_head(w, "+", 2) && ! is_head(w, "-", 2)) return NULL;
-	summands_to(w, & l, 0);
-	for (i = 0; i < l.n && ok; i++)
-		{
-		TList fl = {0};
-		int j, nt = 0;
-		if (! contains(l.t[i], x)) { nconst++; continue; }
-		factors_to(l.t[i], & fl);
-		for (j = 0; j < fl.n; j++)
-			{
-			Node * t = deref(fl.t[j]);
-			if (! contains(t, x)) continue;
-			if (is_head(t, "^", 2)) t = arg(t, 0);
-			if (t->type != Func || term_nargs(t) != 1 || ! trig_recip(role_of(TERM_HEAD(t)))
-			    || (g && strcmp(g, role_of(TERM_HEAD(t))))) { ok = 0; break; }
-			g = role_of(TERM_HEAD(t));
-			nt++;
-			}
-		if (nt != 1) ok = 0;
-		fl.n = 0;
-		tl_free(& fl);
-		}
-	tl_free(& l);
-	return ok && nconst > 0 ? g : NULL;
 }
 
 static Node * s_trignorm (Node * a[], int n, Symbol * f)
@@ -1614,7 +1568,7 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 	Node * fb[MAXPF], * r = NULL, * x;
 	double fe[MAXPF];
 	int trig[MAXPF];		/* 0: other, 1: trig with integer exponent, 2: other exponent */
-	int i, j, k, nf, nt = 0, ntrig = 0, nother = 0, t1 = -1, t2 = -1;
+	int i, j, nf, nt = 0;
 	if (n != 2) return NULL;
 	x = a[1];
 	factors_to(a[0], & l);
@@ -1649,60 +1603,18 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 			}
 		else
 			{
-			if (contains(t, x)) nother++;
 			fb[nf] = tcpy(t); fe[nf] = 1; trig[nf++] = 0;
 			}
 		}
 	l.n = 0;			/* the factors belong to a[0] */
 	tl_free(& l);
 	for (i = 0; i < nf; i++)		/* negative exponents: csc^3, sec, ... */
-		if (trig[i] && fe[i] != 0)
+		if (trig[i] == 1 && fe[i] < 0)
 			{
-			if (trig[i] == 1 && fe[i] < 0)
-				{
-				Node * g = mk_f1(trig_recip(role_of(TERM_HEAD(fb[i]))), tcpy(arg(fb[i], 0)));
-				delete(fb[i]);
-				fb[i] = g;
-				fe[i] = -fe[i];
-				}
-			if (ntrig++ == 0) t1 = i; else t2 = i;
-			}
-	if (ntrig == 2 && nother == 0)		/* Rubi's FixInertTrigFunction for f1^m*f2^n */
-		{
-		Node * h1 = trig[t1] == 2 ? arg(fb[t1], 0) : fb[t1], * h2 = trig[t2] == 2 ? arg(fb[t2], 0) : fb[t2];
-		int first = strcmp(role_of(TERM_HEAD(h1)), role_of(TERM_HEAD(h2))) <= 0 ? t1 : t2;
-		int second = first == t1 ? t2 : t1;
-		Node * hs = second == t1 ? h1 : h2;
-		if (trig[first] == 1)
-			for (k = 0; k < 18; k++)
-				if (! strcmp(fix_inert[k][0], role_of(TERM_HEAD(fb[first])))
-				    && ! strcmp(fix_inert[k][1], role_of(TERM_HEAD(hs))))
-					{
-					Node * g = mk_f1(fix_inert[k][2], tcpy(arg(fb[first], 0)));
-					delete(fb[first]);
-					fb[first] = g;
-					fe[first] = -fe[first];
-					break;
-					}
-		}
-	else				/* f^n next to a power of a sum of g: Rubi's table */
-		for (j = 0; j < nf; j++)
-			{
-			const char * g;
-			if (trig[j] || ! (g = trig_sum_func(fb[j], x))) continue;
-			for (i = 0; i < nf; i++)
-				if (trig[i] == 1 && fe[i] != 0)
-					for (k = 0; k < 16; k++)
-						if (! strcmp(fix_inert_sum[k][0], role_of(TERM_HEAD(fb[i])))
-						    && ! strcmp(fix_inert_sum[k][1], g))
-							{
-							Node * h = mk_f1(fix_inert_sum[k][2], tcpy(arg(fb[i], 0)));
-							delete(fb[i]);
-							fb[i] = h;
-							fe[i] = -fe[i];
-							break;
-							}
-			break;
+			Node * g = mk_f1(trig_recip(role_of(TERM_HEAD(fb[i]))), tcpy(arg(fb[i], 0)));
+			delete(fb[i]);
+			fb[i] = g;
+			fe[i] = -fe[i];
 			}
 	for (i = 0; i < nf; i++)
 		{
@@ -1712,6 +1624,13 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 		r = r ? mk_mul(r, t) : t;
 		}
 	if (! r) r = mk_int(1);
+	if (nt > 0)			/* Rubi's FixInertTrigFunction: rules of the library */
+		{
+		Symbol * fi = role_find("fixinert");
+		Node * fa[2], * g;
+		fa[0] = r; fa[1] = x;
+		if (fi && (g = s_rules(fa, 2, fi)) != NULL) { delete(r); r = g; }
+		}
 	if (nt == 0 || tequal(r, a[0])) { delete(r); return NULL; }	/* no change */
 	return r;
 }
@@ -2324,110 +2243,26 @@ static Node * s_normpoly (Node * a[], int n, Symbol * f)
 	return mk_mul(coef, r);
 }
 
-/* derivative of u with respect to x, or NULL for unknown functions */
+static Node * s_rules (Node * a[], int n, Symbol * f);
+static Node * collect_deep (Node * u);
+
+/* derivative of u with respect to x, or NULL for unknown functions: the
+ * library's function deriv, defined by rules (inc/helpers) */
 static Node * deriv (Node * u, Node * x)
 {
-	Node * a, * b, * da, * db;
-	u = deref(u);
-	if (! u) return NULL;
-	if (! contains(u, x)) return mk_int(0);
-	if (tequal(u, x)) return mk_int(1);
-	if (u->type != Func) return NULL;
-	if (term_nargs(u) == 2)
+	Symbol * f = role_find("deriv");
+	Node * a[2], * r;
+	if (! f) return NULL;
+	a[0] = u; a[1] = x;
+	r = s_rules(a, 2, f);
+	if (r && contains_head(r, "D")) { delete(r); return NULL; }	/* unknown function */
+	if (r)				/* 0+1+4*(2*x) from the rules: collected */
 		{
-		a = arg(u, 0); b = arg(u, 1);
-		if (is_head(u, "^", 2) && ! contains(b, x))		/* b a^(b-1) a' */
-			{
-			if (! (da = deriv(a, x))) return NULL;
-			return mk_mul(mk_mul(tcpy(b), mk_pow(tcpy(a), mk_add(tcpy(b), mk_int(-1)))), da);
-			}
-		if (is_head(u, "^", 2))		/* u (b' ln a + b a'/a) */
-			{
-			if (! (da = deriv(a, x))) return NULL;
-			if (! (db = deriv(b, x))) { delete(da); return NULL; }
-			return mk_mul(tcpy(u), mk_add(mk_mul(db, mk_f1("ln", tcpy(a))),
-				mk_mul(mk_mul(tcpy(b), da), mk_pow(tcpy(a), mk_int(-1)))));
-			}
-		if (! (da = deriv(a, x))) return NULL;
-		if (! (db = deriv(b, x))) { delete(da); return NULL; }
-		if (is_head(u, "+", 2)) return mk_add(da, db);
-		if (is_head(u, "-", 2)) return mk_add(da, mk_neg(db));
-		if (is_head(u, "*", 2)) return mk_add(mk_mul(da, tcpy(b)), mk_mul(tcpy(a), db));
-		if (is_head(u, "/", 2))
-			return mk_mul(mk_add(mk_mul(da, tcpy(b)), mk_neg(mk_mul(tcpy(a), db))),
-			              mk_pow(tcpy(b), mk_int(-2)));
-		delete(da); delete(db);
-		return NULL;
+		Node * c = collect_deep(r);
+		delete(r);
+		r = c;
 		}
-	if (term_nargs(u) != 1) return NULL;
-	a = arg(u, 0);
-	if (! (da = deriv(a, x))) return NULL;
-	{
-	const char * h = role_of(TERM_HEAD(u));
-	Node * g = NULL;		/* outer derivative at a */
-	#define A tcpy(a)
-	#define SQ(t) mk_pow(t, mk_int(2))
-	if (! strcmp(h, "-")) g = mk_int(-1);
-	else if (! strcmp(h, "sin")) g = mk_f1("cos", A);
-	else if (! strcmp(h, "cos")) g = mk_neg(mk_f1("sin", A));
-	else if (! strcmp(h, "tan")) g = mk_pow(mk_f1("cos", A), mk_int(-2));
-	else if (! strcmp(h, "cot")) g = mk_neg(mk_pow(mk_f1("sin", A), mk_int(-2)));
-	else if (! strcmp(h, "sec")) g = mk_mul(mk_f1("sec", A), mk_f1("tan", A));
-	else if (! strcmp(h, "csc")) g = mk_neg(mk_mul(mk_f1("csc", A), mk_f1("cot", A)));
-	else if (! strcmp(h, "exp")) g = mk_f1("exp", A);
-	else if (! strcmp(h, "ln")) g = mk_pow(A, mk_int(-1));
-	else if (! strcmp(h, "sqrt")) g = mk_mul(mk_int(0.5), mk_pow(A, mk_int(-0.5)));
-	else if (! strcmp(h, "mi")) g = mk_neg(mk_pow(A, mk_int(-2)));
-	else if (! strcmp(h, "arcsin")) g = mk_pow(mk_add(mk_int(1), mk_neg(SQ(A))), mk_int(-0.5));
-	else if (! strcmp(h, "arccos")) g = mk_neg(mk_pow(mk_add(mk_int(1), mk_neg(SQ(A))), mk_int(-0.5)));
-	else if (! strcmp(h, "arctan")) g = mk_pow(mk_add(mk_int(1), SQ(A)), mk_int(-1));
-	else if (! strcmp(h, "arccot")) g = mk_neg(mk_pow(mk_add(mk_int(1), SQ(A)), mk_int(-1)));
-	else if (! strcmp(h, "sinh")) g = mk_f1("cosh", A);
-	else if (! strcmp(h, "cosh")) g = mk_f1("sinh", A);
-	else if (! strcmp(h, "tanh")) g = mk_pow(mk_f1("cosh", A), mk_int(-2));
-	else if (! strcmp(h, "coth")) g = mk_neg(mk_pow(mk_f1("sinh", A), mk_int(-2)));
-	else if (! strcmp(h, "sech")) g = mk_neg(mk_mul(mk_f1("sech", A), mk_f1("tanh", A)));
-	else if (! strcmp(h, "csch")) g = mk_neg(mk_mul(mk_f1("csch", A), mk_f1("coth", A)));
-	else if (! strcmp(h, "arcsinh")) g = mk_pow(mk_add(mk_int(1), SQ(A)), mk_int(-0.5));
-	else if (! strcmp(h, "arccosh")) g = mk_pow(mk_add(SQ(A), mk_int(-1)), mk_int(-0.5));
-	else if (! strcmp(h, "arctanh") || ! strcmp(h, "arccoth"))
-		g = mk_pow(mk_add(mk_int(1), mk_neg(SQ(A))), mk_int(-1));
-	/* 2026: special functions (inc/alg) */
-	else if (! strcmp(h, "erf") || ! strcmp(h, "erfc") || ! strcmp(h, "erfi"))
-		{
-		Node * ex = mk_pow(A, mk_int(2));
-		if (strcmp(h, "erfi")) ex = mk_neg(ex);
-		g = mk_mul(mk_num(2.0 / sqrt(M_PI)), mk_f1("exp", ex));
-		if (! strcmp(h, "erfc")) g = mk_neg(g);
-		}
-	else if (! strcmp(h, "fresnels")) g = mk_f1("sin", mk_mul(mk_num(M_PI / 2), SQ(A)));
-	else if (! strcmp(h, "fresnelc")) g = mk_f1("cos", mk_mul(mk_num(M_PI / 2), SQ(A)));
-	else if (! strcmp(h, "sinint")) g = mk_mul(mk_f1("sin", A), mk_pow(A, mk_int(-1)));
-	else if (! strcmp(h, "cosint")) g = mk_mul(mk_f1("cos", A), mk_pow(A, mk_int(-1)));
-	else if (! strcmp(h, "sinhint")) g = mk_mul(mk_f1("sinh", A), mk_pow(A, mk_int(-1)));
-	else if (! strcmp(h, "coshint")) g = mk_mul(mk_f1("cosh", A), mk_pow(A, mk_int(-1)));
-	else if (! strcmp(h, "expint")) g = mk_mul(mk_f1("exp", A), mk_pow(A, mk_int(-1)));
-	else if (! strcmp(h, "logint")) g = mk_pow(mk_f1("ln", A), mk_int(-1));
-	else if (! strcmp(h, "arcsec") || ! strcmp(h, "arccsc"))
-		{
-		g = mk_pow(mk_mul(SQ(A), mk_pow(mk_add(mk_int(1), mk_neg(mk_pow(A, mk_int(-2)))), mk_num_ex(0.5, 1))), mk_int(-1));
-		if (! strcmp(h, "arccsc")) g = mk_neg(g);
-		}
-	else if (! strcmp(h, "arcsech"))
-		g = mk_neg(mk_pow(mk_mul(A, mk_pow(mk_add(mk_int(1), mk_neg(SQ(A))), mk_num_ex(0.5, 1))), mk_int(-1)));
-	else if (! strcmp(h, "arccsch"))
-		g = mk_neg(mk_pow(mk_mul(SQ(A), mk_pow(mk_add(mk_int(1), mk_pow(A, mk_int(-2))), mk_num_ex(0.5, 1))), mk_int(-1)));
-	#undef A
-	#undef SQ
-	if (! g) { delete(da); return NULL; }
-	return mk_mul(g, da);
-	}
-}
-
-static Node * s_deriv (Node * a[], int n, Symbol * f)
-{
-	if (n != 2) return NULL;
-	return deriv(a[0], a[1]);
+	return r;
 }
 
 /* collect(u): like summands of u combined (no multiplying out) */
@@ -4085,6 +3920,65 @@ void term_simplify_trivial (Node ** p)
 
 static Node * s_matchq (Node * a[], int n, Symbol * f);
 
+/* ---- functions defined by a rule list: FUNC f ... ATT RULES alglist ----
+ * f(a1,..,an) is calculated as REWR f(a1,..,an) : alglist. If the result
+ * still is a call of f, f does not apply (the call stays as it is). While
+ * the rule list works on a call of f, f is not calculated again: the rules
+ * themselves rewrite the inner calls. This puts knowledge of the library
+ * (derivatives, trig identities, ...) into rules instead of C tables. */
+
+#define MAXRULEFN 64
+static struct { Symbol * f; Node * algs; int active; } rulefn[MAXRULEFN];
+static int nrulefn = 0;
+
+void rules_fn_register (Symbol * f, Node * algs)
+{
+	int i;
+	for (i = 0; i < nrulefn; i++)
+		if (rulefn[i].f == f) break;
+	if (i == nrulefn)
+		{
+		if (nrulefn == MAXRULEFN) { printfErr("ATT RULES : too many functions\n"); return; }
+		nrulefn++;
+		}
+	rulefn[i].f = f;
+	rulefn[i].algs = algs;
+	rulefn[i].active = 0;
+}
+
+static Node * s_rules (Node * a[], int n, Symbol * f)
+{
+	Node * args = NULL, * t;
+	int i, k;
+	for (k = 0; k < nrulefn; k++)
+		if (urs_fkt(rulefn[k].f) == urs_fkt(f)) break;
+	if (k == nrulefn || rulefn[k].active || n < 1) return NULL;
+	for (i = n - 1; i >= 0; i--)		/* the call f(a1,..,an) */
+		args = args ? mknod(Terms, tcpy(a[i]), args) : tcpy(a[i]);
+	t = mknod(Func, (Node *) f, args);
+	rulefn[k].active = 1;
+	{
+	void * outer = rewrite_push();	/* maybe in a condition of an outer rule */
+	rewrite_begin();
+	t = solve(t, rulefn[k].algs);
+	rewrite_end();
+	rewrite_pop(outer);
+	}
+	rulefn[k].active = 0;
+	t = deref(t);
+	if (t && t->type == Func && urs_fkt(TERM_HEAD(t)) == urs_fkt(f))
+		{
+		delete(t);			/* unchanged: not applicable */
+		return NULL;
+		}
+	return t;
+}
+
+s_function * rules_sfkt (void)
+{
+	return s_rules;
+}
+
 static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "freeq",           s_freeq },
 	{ "integerq",        s_integerq },
@@ -4135,7 +4029,6 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "polyquotient",    s_polyquotient },
 	{ "polyremainder",   s_polyremainder },
 	{ "normpoly",        s_normpoly },
-	{ "deriv",           s_deriv },
 	{ "collect",         s_collect },
 	{ "hyp2exp", s_hyp2exp },
 	{ "substexp", s_substexp },

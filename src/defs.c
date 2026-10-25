@@ -14,6 +14,7 @@
 #include "run.h"
 #include "sync.h"
 #include "nodes.h"
+#include "symfkt.h"	/* ATT RULES */
 #include "expand.h"
 
 
@@ -335,6 +336,7 @@ void other_fkt (Node * np)
 			hasval(newsym) = TRUE;
 			value(newsym)  = ATT_CFUNC(att);
 			builtin(newsym) = att->r ? (att->r->r ? 2 : 1) : 0;	/* symbolic C function, 2: HOLD */
+			if (att->r && att->r->l) rules_fn_register(newsym, att->r->l);	/* ATT RULES alglist */
 			}
 		else /* PARAM */
 			{
@@ -359,7 +361,8 @@ void att_fkt (Node * np)
 		if (ufk->type == ATT) /* user function */
 			{value(sp)  = ATT_CFUNC(ufk);
 			hasval(sp) = TRUE;
-			builtin(sp) = ufk->r ? (ufk->r->r ? 2 : 1) : 0;}	/* symbolic C function, 2: HOLD */
+			builtin(sp) = ufk->r ? (ufk->r->r ? 2 : 1) : 0;	/* symbolic C function, 2: HOLD */
+			if (ufk->r && ufk->r->l) rules_fn_register(sp, ufk->r->l);}	/* ATT RULES alglist */
 		else /* PARAM */
 			{
 			value(sp) =ufk;

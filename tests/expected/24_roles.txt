@@ -1,6 +1,8 @@
  Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
 warning : T was previosly defined to be a : Const !
-deriv (kos (x )^ 2 ,x )
--2 * kos (x )* sinus2 (x )
-deriv (cos (x ),x )
--2 * cos (x )* sin (x )
+kos (x )^ 2 
+0.5 + -0.5 * cos (2 * x )
+0.5 + 0.5 * kos (2 * x )
+0.5 + -0.5 * kos (2 * x )
+cos (x )^ 2 
+0.5 + 0.5 * cos (2 * x )

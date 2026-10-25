@@ -437,7 +437,20 @@ and checks the condition with their bindings. It is declared with
 and it made 28 more rules translatable. Rubi's own form tests, such as
 \texttt{LinearMatchQ} or \texttt{TrinomialMatchQ}, are defined in its
 utility file with \texttt{MatchQ}; the translator now inlines these
-definitions instead of using C functions for them. \texttt{ExpandIntegrand} splits rational functions into
+definitions instead of using C functions for them.
+
+Knowledge that a helper needs beyond a name, such as the derivative of the
+sine, can be kept in rules as well: a function declared with
+\texttt{ATT RULES alglist} is calculated by rewriting its call with the
+rule list, also inside a condition and from C. The derivative used by
+\texttt{DerivativeDivides} is such a function, defined with the rules for
+\texttt{D} of the library; Rubi's \texttt{FixInertTrigFunction} is another,
+translated from Rubi's definitions (44 of 60 are used: in Rubi they act on
+inert functions only, which the translation does not distinguish, and 12
+of them would take integrands away from the rules that solve them). A
+rewriting started in the middle of a condition must set the bindings of
+the rule being tried aside and restore them afterwards; with that, the
+interpreter supports rule-defined functions at any depth. \texttt{ExpandIntegrand} splits rational functions into
 partial fractions, as Mathematica's \texttt{Apart}: with GMP rationals, the
 denominator is split into square-free parts, rational roots and the factors
 given in the input, and the extended Euclidean algorithm gives the
@@ -542,9 +555,9 @@ from a file that the translator writes along with the rules.
 
 \subsection{Results}
 
-The translator converts 6880 of Rubi's 7432 rules (93\%; rules that Rubi
+The translator converts 6881 of Rubi's 7432 rules (93\%; rules that Rubi
 writes in two variants, with and without \texttt{ShowStep}, count twice),
-which become 7368 \texttt{rewrite} rules after the expansion of function
+which become 7369 \texttt{rewrite} rules after the expansion of function
 variables. Rules that Rubi writes as small programs (\texttt{Module} with
 several statements, \texttt{Sum}, lists) are replaced by C functions: the
 substitutions of section 9.3 and the partial fractions of

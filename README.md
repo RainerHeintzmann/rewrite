@@ -153,7 +153,7 @@ x+y*2                                       # prints 4 + y * 2
 | `VAR name [,..] : sort` | Declares a meta variable. It is a placeholder for any term in rewrite rules, for example `A+0=A`. |
 | `NUM name [,..] : sort` | Declares a meta variable that only matches numbers. |
 | `TERM name [,..] : sort` | Declares a term variable, which stores a whole expression. |
-| `FUNC name : sorts >> sort [LA1..LA5\|RA\|RU] [ATT [SYMBOLIC [HOLD]] name]` | Defines a function or operator, see below. |
+| `FUNC name : sorts >> sort [LA1..LA5\|RA\|RU] [ATT [SYMBOLIC [HOLD]] name \| ATT RULES alglist]` | Defines a function or operator, see below. |
 | `OTHER name : sorts >> sort [ATT name]` | Adds another meaning to an existing function name, for other argument types. Example: `OTHER + : vector,vector >> vector`. |
 | `BRA open close : sorts >> sort [ATT name]` | Defines a function written with brackets, like `<a,b>` for a scalar product. `a[b,c]` may be used for `[a,b,c]`, so vectors can be indexed with `v[1]`. |
 | `ATT sort show,cmp,cpy,del` | Assigns the C functions that print, compare, copy and delete values of a sort. Example: `ATT complex show_complex,cmp_complex,cpy_complex,del_complex`. |
@@ -189,6 +189,29 @@ fma3(2,3,y)          # y has no value: prints fma3 (2 ,3 ,y )
 
 `RETURN term` sets the result of such a function. It does not end the
 function.
+
+**Functions defined by rules.** With `ATT RULES alglist` a function is
+calculated by rewriting: `f(a,b)` becomes `REWR f(a,b) : alglist`. If the
+result is still a call of `f`, the function does not apply and the call
+stays as it is. Unlike the other functions, it is also calculated when its
+arguments are terms, also in the condition of a rule and from the C helpers.
+While its rule list works on a call, `f` is not calculated again: the rules
+rewrite the inner calls themselves. The rules are added after the
+declaration, so the algebra is declared first:
+
+```text
+ALG PdDef
+ALG PdConst
+FUNC pd : real,real >> real ATT RULES PdDef,(PdConst,Linear,diff)
+SPEC PdDef : pd(X,Y) = D(X,Y)
+SPEC PdConst : IF NIN(Z,X) D(X,Z) = 0     # every term without x is constant
+REWR pd(nn*sin(x)^2,x) : All              # prints 2 * cos (x )* sin (x )* nn
+```
+
+This is how knowledge of the library reaches the C helpers: the derivative
+`deriv` of [inc/helpers](inc/helpers) is defined like `pd` above, with the
+rules `diff` of [inc/alg](inc/alg), and Rubi's `FixInertTrigFunction` is the
+rule function `fixinert`, translated from Rubi.
 
 ### Rule sets (algebras) and rewriting
 
@@ -527,14 +550,17 @@ operator for different sorts count as the same function:
 
 ```text
 FUNC kos : real >> real ATT cosinus
-SYMBOLIC "cos" = "kos"          # kos is the cosine for the helpers
-REWR deriv(kos(x)^2,x) : All    # prints -2 * kos (x )* sin (x )
-SYMBOLIC                        # back to the names
+SYMBOLIC "cos" = "kos"                    # kos is the cosine for the helpers
+REWR expandtrigreduce(kos(x)^2,x) : All   # prints 0.5 + 0.5 * kos (2 * x )
+SYMBOLIC                                  # back to the names
 ```
 
 The helpers assume the usual properties of these roles: `+` and `*` are
 commutative and associative, `mi(x)` is 1/x, `cos` is the cosine, and so on.
-The rules themselves make no such assumptions.
+The rules themselves make no such assumptions. Where a helper needs more
+than the name, such as a derivative, it uses a function of the library
+defined by rules (`ATT RULES`, see above), so that this knowledge stays in
+the rules: `deriv` and `fixinert`.
 
 `matchq(u, pattern, cond)` is Rubi's `MatchQ[u, pattern /; cond]` (the
 translator also inlines Rubi's `LinearMatchQ`, `BinomialMatchQ`, ... as
@@ -573,7 +599,7 @@ The helpers are:
 | `expandtosum(u,x)`, `expandtosum(u,v,x)` | polynomial `u` as `c0+c1*x+...`; `u` times that of `v` |
 | `polyquotient(p,q,x)`, `polyremainder(p,q,x)` | polynomial division |
 | `normpoly(u,x)` | every polynomial sum in `u` as `c0+c1*x+...` with collected coefficients |
-| `deriv(u,x)` | derivative of elementary functions (stays unevaluated otherwise) |
+| `deriv(u,x)` | derivative, every term without `x` constant; defined by rules (`ATT RULES`, the rules `diff` of inc/alg); `D(f(x),x)` remains for unknown functions |
 | `collect(u)` | like summands combined, e.g. `2*a+b-a` gives `a+b` |
 | `replaceall(u,x,v)` | `u` with `x` replaced by `v` at once |
 | `expandtrigreduce(u,x)`, `expandtrigreduce(v,u,x)` | products and powers of `sin`, `cos`, `sinh`, `cosh` as sums of multiple angles, e.g. `sin(x)^3` gives `(3/4)*sin(x) - (1/4)*sin(3*x)`; times `v` |
@@ -726,6 +752,9 @@ where the library [inc/](inc) and the tests are used from.
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
+- Functions defined by rule lists (`ATT RULES`), also usable in conditions
+  and from C: the derivative `deriv` and Rubi's `FixInertTrigFunction`
+  are rules now instead of C tables.
 - Symbolic C functions are connected with `ATT SYMBOLIC` (`HOLD` for
   unevaluated arguments) and know the library's operators through roles,
   which `SYMBOLIC "role" = "symbol"` maps; `matchq` gives Rubi's `MatchQ`

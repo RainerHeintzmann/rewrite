@@ -17,6 +17,8 @@
 typedef Node * s_function (Node * args[], int nargs, Symbol * f);
 
 s_function * give_sfkt (const char * name);   /* NULL if unknown */
+void rules_fn_register (Symbol * f, Node * algs); /* ATT RULES alglist */
+s_function * rules_sfkt (void);               /* the C function behind ATT RULES */
 void role_fkt (Node * np);                    /* SYMBOLIC "role" = "symbol" */
 Node * call_builtin (Node * term);            /* term: Func node of a builtin */
 int term_equal (Node * a, Node * b);          /* structurally equal terms */

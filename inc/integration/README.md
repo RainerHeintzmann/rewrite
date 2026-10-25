@@ -156,8 +156,16 @@ have it, so a few steps are added:
   and Rubi's `FixInertTrigFunction` then rewrites products of trig
   functions: `sec(x)*sin(x)^2` becomes `cos(x)^-1*sin(x)^2`, `csc(x)`
   next to a power of a sum of cosines becomes `sin(x)^-1`, ... The first
-  rule of `RubiRules` after the constant factors does both (`trignorm`,
-  with Rubi's tables); it also combines `sin(x)*csc(x)^3 = csc(x)^2`.
+  rule of `RubiRules` after the constant factors does both: `trignorm`
+  (symfkt.c) does Mathematica's step and combines `sin(x)*csc(x)^3 =
+  csc(x)^2`, then calls `fixinert`, a function defined by rules (`ATT
+  RULES`) that the translator writes from Rubi's definitions
+  ([rubi/r4_0_fixinert](rubi/r4_0_fixinert)). In Rubi these definitions
+  work on inert functions inside `DeactivateTrig`; here they see every
+  integrand, and the rules do not tell active from inert functions, so 12
+  of them are left out (products of two secants, `tan` or `cot` next to a
+  sum `a+b*sin`, functions next to `a*sin+b*cos`): they would take
+  integrands away from the rules that solve them.
 - Multiple angles: for a function of trig functions of different multiples
   of one angle (and no `x` outside them), as `sin(x)/cos(2*x)`,
   `sin(2*x)*sqrt(1+3*cos(x)^2)` or `exp(sin(x))*sin(2*x)`, the next rule
