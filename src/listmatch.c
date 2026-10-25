@@ -496,10 +496,17 @@ static Node * match_rules (Node * term, Node * list);
 Node * match_list (Node * term, Node * list)
 {
 	Node * r, * settings = cur_settings, * res = cur_res;
+	double t0 = 0;
 	if (ml_depth == 0) arena_free();	/* the last result is built by now */
+	if (ml_depth == 0 && profiling()) t0 = profile_now();
 	ml_depth++;
 	r = match_rules(term, list);
 	ml_depth--;
+	if (ml_depth == 0 && t0 > 0)		/* outermost only (REWRITE_PROFILE) */
+		{
+		prof_match_secs += profile_now() - t0;
+		prof_match_calls++;
+		}
 	if (ml_depth > 0)		/* nested (ATT RULES in a condition): the outer list again */
 		{
 		cur_settings = settings;

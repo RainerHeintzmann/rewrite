@@ -11,7 +11,7 @@ Step 3: 1.1.2.1 (a+b x^2)^p, rule 17
   Int[1/Sqrt[a_+b_.*x_^2],x_Symbol] := ArcSin[Rt[-b,2]*x/Sqrt[a]]/Rt[-b,2] /; FreeQ[{a,b},x] && GtQ[a,0] && NegQ[b]
   Int ((1 + -1 * x ^ 2 )^ (-1/2) ,x )
     = arcsin (x )
-(1/8) * arcsin (x )+ (1/4) * (1 - x ^ 2 )^ (1/2) * x ^ 3 - (1/8) * (1 - x ^ 2 )^ (1/2) * x 
+(1/4) * x ^ 3 * (1 - x ^ 2 )^ (1/2) + (1/8) * arcsin (x )- (1/8) * x * (1 - x ^ 2 )^ (1/2) 
 Step 1: 2.3 Miscellaneous exponentials, rule 16
   Int[(e_. + f_.*x_)^m_.*F_^(a_. + b_.*(c_. + d_.*x_)^n_), x_Symbol] := (e + f*x)^n*F^(a + b*(c + d*x)^n)/(b*f*n*(c + d*x)^n*Log[F]) /; FreeQ[{F, a, b, c, d, e, f, n}, x] && EqQ[m, n - 1] && EqQ[d*e - c*f, 0]
   Int (x * eE ^ x ^ 2 ,x )

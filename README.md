@@ -107,6 +107,15 @@ tests\run_tests.bat             # from cmd or PowerShell on Windows
 
 See [tests/README.md](tests/README.md) for details and for how to add tests.
 
+**Profiling.** With the environment variable `REWRITE_PROFILE=1`, rewrite
+prints at the end how often each symbolic helper was called and how much
+time it took, together with the time of the rule matching, of the
+evaluation of right-hand sides and of the checks for progress:
+
+```text
+REWRITE_PROFILE=1 ./rewrite.exe < problem.rw
+```
+
 ## The language
 
 ### Input conventions
@@ -666,6 +675,7 @@ The helpers are:
 | `nonsumq(u)` | `u` is no sum |
 | `derivdivides(y,u,x)`, `falseq(u)` | `u/y'` if it is free of `x` (else unevaluated); `u` is an unevaluated helper, i.e. Rubi's `False` |
 | `trignorm(u,x)`, `removecontent(u,x)` | `1/sin = csc` and Rubi's `FixInertTrigFunction` for products of trig functions; `u` without constant factors, `cos(pi/2+x)` as `-sin(x)` |
+| `normform(u)` | the final form of a result in one pass: products with a sum as factor distributed, like summands combined, positive summands first, then `- ...`, negative powers as a denominator (used by `RubiIntegrate` instead of `All`) |
 | `trigexpand(u,x)` | trig functions of multiples of one angle with `sin`, `cos` of the angle (Mathematica's `TrigExpand`); not for polynomials in sin and cos |
 | `substfracpow(u,x)`, `substsqrtquad(u,x)` | Rubi's substitutions `t = (a+b*x)^(1/n)` and Euler's for `sqrt(a+b*x+c*x^2)` (the transformed integral) |
 | `binomsum(u,x)` | `x^m/(a+b*x^n)` for odd `n` or `n = 2 mod 4` as a sum of integrals of linear and quadratic partial fractions with coefficients `cos(k*pi/n)` (exact for `n` up to 6) |

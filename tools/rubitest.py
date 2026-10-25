@@ -113,7 +113,7 @@ SPECIAL = {
     'elliptick': 'ellipk', 'ellipticf': 'ellipf', 'elliptice': 'ellipe',
     'ellipticpi': 'ellippi', 'hyp2f1': 'hyp2f1', 'appellf1': 'appellf1',
     'besselj': 'besselj', 'asec': 'asec', 'acsc': 'acsc', 'asech': 'asech',
-    'acsch': 'acsch',
+    'acsch': 'acsch', 'polylog': 'polylog', 'productlog': 'lambertw',
 }
 for _m, _r in [('Erf', 'erf'), ('Erfc', 'erfc'), ('Erfi', 'erfi'), ('FresnelS', 'fresnels'),
                ('FresnelC', 'fresnelc'), ('SinIntegral', 'sinint'), ('CosIntegral', 'cosint'),
@@ -124,7 +124,8 @@ for _m, _r in [('Erf', 'erf'), ('Erfc', 'erfc'), ('Erfi', 'erfi'), ('FresnelS', 
                ('EllipticF', 'ellipticf'), ('EllipticE', 'elliptice'),
                ('EllipticPi', 'ellipticpi'), ('Hypergeometric2F1', 'hyp2f1'),
                ('AppellF1', 'appellf1'), ('BesselJ', 'besselj'), ('ArcSec', 'asec'),
-               ('ArcCsc', 'acsc'), ('ArcSech', 'asech'), ('ArcCsch', 'acsch')]:
+               ('ArcCsc', 'acsc'), ('ArcSech', 'asech'), ('ArcCsch', 'acsch'),
+               ('PolyLog', 'polylog'), ('ProductLog', 'productlog')]:
     PY_FUNCS[_m] = _r
     RW_FUNCS.setdefault(_m, {'asec': 'arcsec', 'acsc': 'arccsc', 'asech': 'arcsech',
                              'acsch': 'arccsch'}.get(_r, _r))
@@ -265,6 +266,26 @@ NUMENV = {
     'pi': math.pi, 'E': math.e, 'pw': pw,
 }
 NUMENV.update(_special_env(False))
+
+
+def _real_if_real(f):
+    """f with a real result where the imaginary part is exactly 0: cmath.log(2)
+    is (0.69+0j), and -(0.69+0j) has the imaginary part -0.0, so that a power
+    (-u)**p would take the branch below the cut (-pi) while Gamma(s, -u) of
+    mpmath takes the principal one; real numbers keep the branches consistent"""
+    def g(*a):
+        v = f(*a)
+        return v.real if isinstance(v, complex) and v.imag == 0 else v
+    return g
+
+
+for _name in ('sin', 'cos', 'tan', 'cot', 'sec', 'csc', 'asin', 'acos', 'atan', 'acot',
+              'sinh', 'cosh', 'tanh', 'coth', 'sech', 'csch', 'asinh', 'acosh', 'atanh',
+              'acoth', 'log', 'sqrt', 'exp'):
+    NUMENV[_name] = _real_if_real(NUMENV[_name])
+for _name in SPECIAL:
+    if _name in NUMENV:
+        NUMENV[_name] = _real_if_real(NUMENV[_name])
 
 def rpw(a, b):
     """real power; ValueError outside the real domain"""

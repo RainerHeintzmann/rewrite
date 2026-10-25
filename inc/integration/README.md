@@ -262,7 +262,14 @@ have it, so a few steps are added:
   discriminant, `PosQ[4*b^3*d+27*a^2*d^2]`.
 - An optional variable that occurs twice, like `e.` in
   `(c+d*tan(e.+f.*x))/(a+b*tan(e.+f.*x))`, may be missing in both places.
-- `RubiCollect` combines like summands of the result (`collect`).
+- `RubiCollect` combines like summands of the result (`collect`), and
+  `RubiOut` writes it in its final form (`normform`, in one pass):
+  products with a sum as factor distributed, like summands combined,
+  `(-u)^3 = -u^3`, the positive summands first and then `- ...`, negative
+  powers as a denominator, `x^2*sin(x)` with the powers of variables first.
+  It replaces the general simplification `All` of [inc/alg](../alg), which
+  needs thousands of single steps for a large result (48 s instead of 10 s
+  for `(a+b*x)^10*(c+d*x)^10`).
 - `Subst[Int[u,x],x,v]` becomes `intsubst(u,x,v)`: `u` is integrated in a
   fresh variable, which has the sort `nonneg` when `v` is a square root or
   another non-negative expression. Then `sqrt(x^2) = x` holds inside, as
@@ -278,7 +285,7 @@ have it, so a few steps are added:
 The algebra list is
 
 ```text
-SPEC RubiIntegrate : (RubiNorm,IntRubi,RubiRules),RubiCollect,IntOut,All
+SPEC RubiIntegrate : (RubiNorm,IntRubi,RubiRules),RubiCollect,IntOut,RubiOut
 ```
 
 ## Measuring with Rubi's test suite

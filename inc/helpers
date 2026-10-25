@@ -97,6 +97,7 @@ FUNC algebraicfunctionq : real++ >> bool ATT SYMBOLIC algebraicfunctionq
 FUNC intsubst : real,real,real >> real    ATT SYMBOLIC intsubst     # Subst[Int[u,x],x,v]
 FUNC hyp2exp : real,real >> real         ATT SYMBOLIC hyp2exp      # sinh, cosh, ... as e^u
 FUNC functionofexponentialq : real,real >> bool ATT SYMBOLIC functionofexponentialq # Rubi: FunctionOfExponentialQ
+FUNC normform : real >> real ATT SYMBOLIC normform # final form: collected, positive terms first, A/B (fast, instead of All)
 FUNC substexp : real,real >> real        ATT SYMBOLIC substexp     # Rubi: Substitution x -> F^(g x)
 FUNC binomsum : real,real >> real        ATT SYMBOLIC binomsum     # Rubi: x^m/(a+b x^n), partial fractions with cos(k pi/n)
 FUNC  matchq : real,real >> bool        ATT SYMBOLIC HOLD matchq  # Rubi: MatchQ[u, pattern]

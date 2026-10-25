@@ -550,10 +550,15 @@ $\int x\sinh x\,dx$ and $\int\cosh^2x\,dx$ are found.
 
 The complete integration is the algebra list
 \begin{lstlisting}
-SPEC RubiIntegrate : (RubiNorm,IntRubi,RubiRules),RubiCollect,IntOut,All
+SPEC RubiIntegrate : (RubiNorm,IntRubi,RubiRules),RubiCollect,IntOut,RubiOut
 \end{lstlisting}
-where \texttt{RubiCollect} combines like summands of the result and
-\texttt{IntOut} restores the usual output form. As Rubi, \texttt{rewrite}
+where \texttt{RubiCollect} combines like summands of the result,
+\texttt{IntOut} restores the usual output form and \texttt{RubiOut} writes
+the result in a normal form for output in one pass of a C function. The
+library's general simplification, which did this before, sorts and
+simplifies one rule application at a time; for a polynomial result of 231
+terms it needed 24\,000 steps, each followed by a new traversal of the
+term, and took most of the time of such integrals. As Rubi, \texttt{rewrite}
 can show the solution steps: after \texttt{STEPS RubiRules "file"}, every
 rule of the list that is applied is printed with the integral before and
 after it, labelled with its Rubi section, number and Mathematica original

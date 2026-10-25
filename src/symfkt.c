@@ -1076,6 +1076,7 @@ static Node * s_expand (Node * a[], int n, Symbol * f)
 }
 
 static Node * expand_linear_product (Node * u, Node * x);
+static Node * expand_linear_inner (Node * u, Node * x);
 static Node * apart_term (Node * u, Node * x);
 
 static Node * s_expandintegrand (Node * a[], int n, Symbol * f)
@@ -1083,6 +1084,8 @@ static Node * s_expandintegrand (Node * a[], int n, Symbol * f)
 	TList l = {0};
 	Node * in, * r;
 	if (n == 2 && (r = expand_linear_product(a[0], a[1])))
+		return r;
+	if (n == 2 && (r = expand_linear_inner(a[0], a[1])))
 		return r;
 	if (n == 2)
 		in = tcpy(a[0]);
@@ -1944,6 +1947,98 @@ static Node * polydiv (Node * a[], int n, int want_rem)
 	return poly_build(quot, dp - dq, a[2]);
 }
 
+/* the linear form L = c + d x (c != 0) inside t, if x occurs in t only
+ * within L: ln(c (d (e + f x)^p)^q) gives e + f x. NULL otherwise. */
+static Node * linear_inner (Node * t, Node * root, Node * x)
+{
+	Node * lc[MAXDEG], * r;
+	int dl, k, i, n;
+	t = deref(t);
+	if (! t || ! contains(t, x)) return NULL;
+	if (is_head(t, "+", 2) && poly_coeffs(t, x, lc, & dl))
+		{
+		int ok = dl == 1 && ! is_zero(lc[0]);
+		for (k = 0; k <= dl; k++) delete(lc[k]);
+		if (ok)
+			{
+			Node * z = mk_int(0), * test = replace(root, t, z);
+			ok = ! contains(test, x);
+			delete(test); delete(z);
+			if (ok) return t;
+			}
+		}
+	if (t->type != Func) return NULL;
+	n = term_nargs(t);
+	for (i = 0; i < n; i++)
+		if ((r = linear_inner(arg(t, i), root, x)) != NULL) return r;
+	return NULL;
+}
+
+/* the factors for which Rubi's ExpandIntegrand uses ExpandLinearProduct:
+ * (a + b log(..(e + f x)..))^n, (a + b F(c + d x))^n with F = arcsin,
+ * arccos, arcsinh, arccosh, and F^(e (c + d x)^n) */
+static int linear_product_factor (Node * t, Node * x)
+{
+	t = deref(t);
+	if (is_head(t, "^", 2) && ! contains(arg(t, 0), x)) return 1;	/* F^(..) */
+	return contains_head(t, "ln") || contains_head(t, "arcsin") || contains_head(t, "arccos")
+	       || contains_head(t, "arcsinh") || contains_head(t, "arccosh");
+}
+
+/* P(x) * f with a factor f as above, x only in L = e + f x inside it: the sum
+ * of e_k L^k f, P(x) written in powers of L (Rubi's ExpandLinearProduct for
+ * logarithms, inverse functions and exponentials). NULL if not this form. */
+static Node * expand_linear_inner (Node * u, Node * x)
+{
+	TList l = {0};
+	Node * fac = NULL, * lin = NULL, * rest = NULL, * p[MAXDEG], * lc[MAXDEG], * r = NULL;
+	double binom;
+	int i, j, k, m, deg, dl;
+	factors_to(u, & l);
+	for (i = 0; i < l.n; i++)
+		{
+		Node * t = l.t[i];
+		if (! fac && contains(t, x) && linear_product_factor(t, x)
+		    && (lin = linear_inner(t, t, x)) != NULL)
+			{
+			fac = t;
+			continue;
+			}
+		rest = rest ? mk_mul(rest, tcpy(t)) : tcpy(t);
+		}
+	if (! fac || ! rest || ! contains(rest, x) || ! poly_coeffs(rest, x, p, & deg) || deg < 1)
+		{
+		l.n = 0; tl_free(& l); delete(rest);
+		return NULL;
+		}
+	delete(rest);
+	if (! poly_coeffs(lin, x, lc, & dl) || dl != 1)
+		{
+		for (j = 0; j <= deg; j++) delete(p[j]);
+		l.n = 0; tl_free(& l);
+		return NULL;
+		}
+	for (k = 0; k <= deg; k++)		/* e_k as in expand_linear_product */
+		{
+		Node * e = NULL;
+		for (j = k; j <= deg; j++)
+			{
+			Node * term;
+			binom = 1;
+			for (m = 1; m <= k; m++) binom = binom * (j - k + m) / m;
+			term = mk_mul(mk_int(binom), tcpy(p[j]));
+			term = mk_mul(term, mk_pow(tcpy(lc[1]), mk_int(-j)));
+			term = mk_mul(term, mk_pow(mk_mul(mk_int(-1), tcpy(lc[0])), mk_int(j - k)));
+			e = mk_add(e, term);
+			}
+		r = mk_add(r, mk_mul(mk_mul(e, mk_pow(tcpy(lin), mk_int(k))), tcpy(fac)));
+		}
+	for (j = 0; j <= deg; j++) delete(p[j]);
+	delete(lc[0]); delete(lc[1]);
+	l.n = 0; tl_free(& l);
+	return r;
+}
+
 /* Rubi's ExpandLinearProduct: P(x) * (c + d x)^n with P a polynomial and n
  * not a non-negative integer is written as a sum of e_k (c + d x)^(k + n):
  *   x = (v - c)/d,  e_k = sum_{j>=k} p_j d^-j binomial(j,k) (-c)^(j-k).
@@ -2325,6 +2420,234 @@ static Node * collect_deep (Node * u)
 		delete(r);
 		r = tl_collect(& l);
 		}
+	return r;
+}
+
+
+/* ---- normform(u): the final form of a result, in one pass ----
+ * Instead of the general simplification All, which sorts and simplifies a
+ * large result one rule step at a time (24000 steps for a polynomial of 231
+ * terms). Three passes:
+ *   canonical:  a - b = a + (-1)*b,  a/b = a*b^-1,  mi(a) = a^-1,  -a = (-1)*a
+ *   collected:  products with a sum as factor distributed (not powers of
+ *               sums), like summands combined in every sum
+ *   printed:    the positive summands first, then "- ..."; negative powers
+ *               into a denominator, c*A/B^k; a negative product as -(...)
+ * The result is the same when normform is applied again. */
+
+static Node * nf_rebuild (Node * u, Node * (* fn) (Node *))	/* fn on the arguments */
+{
+	Node * args = NULL, ** tail = & args;
+	int k, n = term_nargs(u);
+	for (k = 0; k < n; k++)
+		{
+		Node * c = fn(arg(u, k));
+		if (k < n - 1)
+			{
+			* tail = mknod(Terms, c, NULL);
+			tail = & (* tail)->r;
+			}
+		else
+			* tail = c;
+		}
+	return mknod(Func, u->l, args);
+}
+
+static Node * nf_canon (Node * u)
+{
+	Node * r, * a0, * a1;
+	u = deref(u);
+	if (! u || u->type != Func) return tcpy(u);
+	r = nf_rebuild(u, nf_canon);
+	if (is_head(r, "-", 2) || is_head(r, "/", 2))
+		{
+		int minus = is_head(r, "-", 2);
+		a0 = tcpy(arg(r, 0));
+		a1 = tcpy(arg(r, 1));
+		delete(r);
+		return minus ? mk_add(a0, mk_neg(a1)) : mk_mul(a0, mk_pow(a1, mk_int(-1)));
+		}
+	if (is_head(r, "-", 1) || is_head(r, "mi", 1))
+		{
+		int minus = is_head(r, "-", 1);
+		a0 = tcpy(arg(r, 0));
+		delete(r);
+		return minus ? mk_neg(a0) : mk_pow(a0, mk_int(-1));
+		}
+	{
+	double e;			/* (c*u)^n = c^n u^n: (-sin(x))^3 = -sin(x)^3 */
+	if (is_head(r, "^", 2) && is_num(arg(r, 1), & e) && e == floor(e)
+	    && is_head(arg(r, 0), "*", 2) && num_sym(arg(arg(r, 0), 0)))
+		{
+		Node * c = mk_pow(tcpy(arg(arg(r, 0), 0)), tcpy(arg(r, 1)));
+		Node * p = mk_pow(tcpy(arg(arg(r, 0), 1)), tcpy(arg(r, 1)));
+		delete(r);
+		return mk_mul(c, p);
+		}
+	}
+	return r;
+}
+
+/* the summands of t, with numeric factors distributed: 3*(a - 2*(b + c))
+ * gives 3*a, -6*b, -6*c (c: the factor so far, or NULL) */
+static void nf_summands (Node * t, Node * c, TList * out)
+{
+	t = deref(t);
+	if (is_head(t, "+", 2))
+		{
+		nf_summands(arg(t, 0), c, out);
+		nf_summands(arg(t, 1), c, out);
+		return;
+		}
+	if (is_head(t, "*", 2))		/* a product with a sum as factor: distributed */
+		{
+		TList l = {0};
+		int i, k = -1;
+		factors_to(t, & l);
+		for (i = 0; i < l.n && k < 0; i++)
+			if (is_head(l.t[i], "+", 2)) k = i;
+		if (k >= 0)
+			{
+			Node * c2 = c ? tcpy(c) : NULL;
+			for (i = 0; i < l.n; i++)
+				if (i != k) c2 = c2 ? mk_mul(c2, tcpy(l.t[i])) : tcpy(l.t[i]);
+			nf_summands(l.t[k], c2, out);
+			delete(c2);
+			l.n = 0;		/* the factors belong to t */
+			tl_free(& l);
+			return;
+			}
+		l.n = 0;
+		tl_free(& l);
+		}
+	tl_add(out, c ? mk_mul(tcpy(c), tcpy(t)) : tcpy(t));
+}
+
+static Node * nf_collect (Node * u)
+{
+	Node * r;
+	u = deref(u);
+	if (! u || u->type != Func) return tcpy(u);
+	r = nf_rebuild(u, nf_collect);
+	if (is_head(r, "+", 2) || is_head(r, "*", 2))
+		{
+		TList l = {0};
+		nf_summands(r, NULL, & l);
+		delete(r);
+		r = tl_collect(& l);
+		}
+	return r;
+}
+
+static Node * nf_pretty (Node * u);
+
+static int neg_power (Node * t, double * e)	/* b^e with a number e < 0 */
+{
+	return is_head(t, "^", 2) && is_num(arg(t, 1), e) && * e < 0;
+}
+
+/* u without its sign (*neg: the numeric factor was negative), with negative
+ * powers as a denominator */
+static Node * nf_unsigned (Node * u, int * neg)
+{
+	TList l = {0}, nl = {0};
+	Node * num = NULL, * den = NULL, * c = NULL;
+	double v, e;
+	int i;
+	u = deref(u);
+	* neg = 0;
+	if (is_num(u, & v))
+		{
+		if (v < 0) { * neg = 1; return mk_mul(mk_int(-1), tcpy(u)); }
+		return tcpy(u);
+		}
+	if (! is_head(u, "*", 2) && ! neg_power(u, & e)) return nf_pretty(u);
+	factors_to(u, & l);
+	for (i = 0; i < l.n; i++)
+		{
+		Node * t = deref(l.t[i]);
+		if (num_sym(t))
+			{
+			c = c ? mk_mul(c, tcpy(t)) : tcpy(t);
+			continue;
+			}
+		if (neg_power(t, & e))
+			{
+			Node * p = nf_pretty(arg(t, 0));
+			if (e != -1) p = mk_pow(p, mk_num_ex(-e, is_exact(arg(t, 1))));
+			den = den ? mk_mul(den, p) : p;
+			continue;
+			}
+		tl_add(& nl, nf_pretty(t));
+		}
+	{				/* x^2*sin(x), not sin(x)*x^2: atoms and their powers first */
+	int j, m = 0;
+	for (j = 0; j < nl.n; j++)
+		{
+		Node * t = deref(nl.t[j]);
+		if (atom_sym(t) || (is_head(t, "^", 2) && atom_sym(deref(arg(t, 0)))))
+			{
+			Node * h = nl.t[j];
+			int q;
+			for (q = j; q > m; q--) nl.t[q] = nl.t[q - 1];
+			nl.t[m++] = h;
+			}
+		}
+	}
+	l.n = 0;			/* the factors belong to u */
+	tl_free(& l);
+	if (c && is_num(c, & v) && v < 0) { * neg = 1; c = mk_mul(mk_int(-1), c); }
+	if (c && is_num(c, & v) && v == 1) { delete(c); c = NULL; }
+	num = c;			/* c * f1 * f2 ..., built from the left: no parentheses */
+	for (i = 0; i < nl.n; i++) num = num ? mk_f2("*", num, nl.t[i]) : nl.t[i];
+	nl.n = 0;
+	tl_free(& nl);
+	if (! num) num = mk_int(1);
+	return den ? mk_f2("/", num, den) : num;
+}
+
+static Node * nf_pretty (Node * u)
+{
+	double e, v;
+	u = deref(u);
+	if (! u || u->type != Func) return tcpy(u);
+	if (is_head(u, "+", 2))
+		{
+		TList l = {0}, negs = {0};
+		Node * r = NULL;
+		int i, neg;
+		summands_to(u, & l, 0);
+		for (i = 0; i < l.n; i++)		/* positive summands first */
+			{
+			Node * s = nf_unsigned(l.t[i], & neg);
+			if (neg) tl_add(& negs, s);
+			else r = r ? mk_f2("+", r, s) : s;
+			}
+		for (i = 0; i < negs.n; i++)
+			r = r ? mk_f2("-", r, negs.t[i]) : mk_f1("-", negs.t[i]);
+		negs.n = 0;
+		tl_free(& negs);
+		tl_free(& l);
+		return r ? r : mk_int(0);
+		}
+	if (is_head(u, "*", 2) || neg_power(u, & e) || (is_num(u, & v) && v < 0))
+		{
+		int neg;
+		Node * s = nf_unsigned(u, & neg);
+		return neg ? mk_f1("-", s) : s;
+		}
+	return nf_rebuild(u, nf_pretty);
+}
+
+static Node * s_normform (Node * a[], int n, Symbol * f)
+{
+	Node * c, * k, * r;
+	if (n != 1) return NULL;
+	c = nf_canon(a[0]);
+	k = nf_collect(c);
+	delete(c);
+	r = nf_pretty(k);
+	delete(k);
 	return r;
 }
 
@@ -3941,6 +4264,7 @@ void term_simplify_trivial (Node ** p)
 /* ================= table and call ================= */
 
 static Node * s_matchq (Node * a[], int n, Symbol * f);
+static Node * s_normform (Node * a[], int n, Symbol * f);
 static Node * s_listq (Node * a[], int n, Symbol * f);
 static Node * s_length (Node * a[], int n, Symbol * f);
 static Node * s_part (Node * a[], int n, Symbol * f);
@@ -4072,6 +4396,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "functionofexponentialq", s_functionofexponentialq },
 	{ "binomsum", s_binomsum },
 	{ "matchq", s_matchq },
+	{ "normform", s_normform },
 	{ "listq", s_listq },		/* lists (inc/list) */
 	{ "length", s_length },
 	{ "part", s_part },
@@ -4393,6 +4718,78 @@ static Node * s_total (Node * a[], int n, Symbol * f)
 	return r ? r : mk_int(0);
 }
 
+/* ---- profile of the helpers: REWRITE_PROFILE=1 in the environment ----
+ * counts the calls of each symbolic helper and their time (including the
+ * helpers called inside), and the time of the rule list matcher; printed
+ * at the end of the program. Without the variable it costs one test. */
+
+#include <time.h>
+
+#define MAXPROF 256
+static struct { const char * name; long calls; double secs; } prof[MAXPROF];
+static int nprof = 0, prof_on = -1;
+double prof_match_secs = 0;		/* listmatch.c */
+long prof_match_calls = 0;
+
+static double prof_now (void)
+{
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, & ts);
+	return ts.tv_sec + 1e-9 * ts.tv_nsec;
+}
+
+static void prof_report (void)
+{
+	int i, j;
+	for (i = 1; i < nprof; i++)		/* by time, the largest first */
+		for (j = i; j > 0 && prof[j].secs > prof[j - 1].secs; j--)
+			{
+			const char * n = prof[j].name; long c = prof[j].calls; double t = prof[j].secs;
+			prof[j] = prof[j - 1];
+			prof[j - 1].name = n; prof[j - 1].calls = c; prof[j - 1].secs = t;
+			}
+	fprintf(stderr, "\nprofile (REWRITE_PROFILE): rule list matching %.3f s in %ld calls\n",
+	        prof_match_secs, prof_match_calls);
+	fprintf(stderr, "%-24s %10s %10s\n", "helper", "calls", "seconds");
+	for (i = 0; i < nprof && i < 30; i++)
+		fprintf(stderr, "%-24s %10ld %10.3f\n", prof[i].name, prof[i].calls, prof[i].secs);
+}
+
+int profiling (void)
+{
+	if (prof_on < 0)
+		{
+		const char * e = getenv("REWRITE_PROFILE");
+		prof_on = e && * e && * e != '0';
+		if (prof_on) atexit(prof_report);
+		}
+	return prof_on;
+}
+
+double profile_now (void) { return prof_now(); }
+
+void profile_add (const char * name, double secs);
+
+static void prof_add (const char * name, double secs)
+{
+	int i;
+	for (i = 0; i < nprof; i++)
+		if (prof[i].name == name || ! strcmp(prof[i].name, name)) break;
+	if (i == nprof)
+		{
+		if (nprof == MAXPROF) return;
+		prof[nprof].name = name; prof[nprof].calls = 0; prof[nprof].secs = 0;
+		nprof++;
+		}
+	prof[i].calls++;
+	prof[i].secs += secs;
+}
+
+void profile_add (const char * name, double secs)
+{
+	prof_add(name, secs);
+}
+
 Node * call_builtin (Node * term)
 {
 	Symbol * f = TERM_HEAD(term);
@@ -4409,7 +4806,14 @@ Node * call_builtin (Node * term)
 		args[n] = own[n] ? deref(own[n]) : t;
 		n++;
 		}
-	res = ((s_function *) value(f))(args, n, f);
+	if (profiling())
+		{
+		double t0 = prof_now();
+		res = ((s_function *) value(f))(args, n, f);
+		prof_add(name(f), prof_now() - t0);
+		}
+	else
+		res = ((s_function *) value(f))(args, n, f);
 	for (i = 0; i < n; i++) delete(own[i]);
 	retype_term(res);	/* function variants matching the sorts of the new arguments */
 	return res;

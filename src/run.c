@@ -288,7 +288,12 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 	while (rewritten);
 
 	lm_start = 0;
-	while ((ers=rewrite(* p_term,Baum)) != (Node *) NULL)
+	while (1)
+			{
+			double tp = profiling() ? profile_now() : 0;
+			ers = rewrite(* p_term,Baum);
+			if (tp > 0) profile_add("[loop] match", profile_now() - tp);
+			if (! ers) break;
 			{
 			Node * old = * p_term, * neu;
 			int found = lm_last;
@@ -302,7 +307,10 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 					maintype=NULL;
 				neu = tcopy(RES_RHS(ers)); /* insert formula (it is also 'lifted' !) */
 				retype_term(neu);	/* 2026: variants matching the sorts of the arguments (SUBSORT) */
+				tp = profiling() ? profile_now() : 0;
 				neu = tcalc(neu);  /* evaluate formula numerically */
+				if (tp > 0) profile_add("[loop] tcalc rhs", profile_now() - tp);
+				tp = profiling() ? profile_now() : 0;
 				if (Baum && Baum->type == RULELIST)
 					term_simplify_trivial(& neu);	/* x^0, 1*u, ... like Mathematica */
 				RESTORE;					/* restore symbol table (also remove locks)*/
@@ -312,11 +320,13 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 				    && (term_equal(neu, old) || term_has_nan(neu) || hist_cycle(neu, old)
 				        || hist_revisit(old, found)))
 					{
+					if (tp > 0) profile_add("[loop] progress checks", profile_now() - tp);
 					DEBG((2,"REWR: rule %d makes no progress or gives NaN, skipped\n", found));
 					delete(neu);
 					lm_start = found + 1;
 					continue;
 					}
+				if (tp > 0) profile_add("[loop] progress checks", profile_now() - tp);
 				if (Baum && Baum->type == RULELIST)
 					hist_add(old, neu, found);
 				if (steps_alg && Baum && Baum == atypes(steps_alg))
@@ -341,6 +351,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 					          max_rewrite_steps);
 					}
 				return TRUE;
+			}
 			}
 	RESTORE;					/* restore symbol table */
 	lm_start = 0;
@@ -398,7 +409,12 @@ Node * solve _2a ((term,alglist), Node * term ,Node * alglist)
 	while (rewritten);
 
 
-	return tcalc(term);  /* evaluate formula numerically and return it */
+	{
+	double tp = profiling() ? profile_now() : 0;
+	term = tcalc(term);  /* evaluate formula numerically and return it */
+	if (tp > 0) profile_add("[solve] tcalc term", profile_now() - tp);
+	return term;
+	}
 }
 
 
