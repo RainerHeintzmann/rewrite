@@ -214,6 +214,11 @@ dont_protect[blockstufe]=TRUE;
 Symbol * declaresym(Symbol * sp,Node * rtps,Node * atps,int lexv,int hasv)
 {
 	sp=save_local(sp);
+	if (lexval(sp) == Sort && lexv != Sort)	/* 2026: the sorts of other symbols point to it */
+		{
+		printfErr("error : %s is a sort and cannot be declared again as something else !\n",name(sp));
+		return sp;
+		}
 	if (lexval(sp) != Id)
 		{if (lexval(sp) != lexv)
      	  printfErr("warning : %s was previosly defined to be a : %s !\n",name(sp),type(sp));

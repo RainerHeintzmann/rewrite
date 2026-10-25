@@ -13,7 +13,7 @@ There are two rule sets:
   polynomials times them.
 - **`RubiIntegrate`** uses the rules in [rubi](rubi), which the script
   [tools/rubi2rewrite.py](../../tools/rubi2rewrite.py) translates
-  automatically from Rubi's rule files. About 90% of Rubi's
+  automatically from Rubi's rule files. About 96% of Rubi's
   rules are translated. Loading takes about half a second.
 
 ## Usage
@@ -141,6 +141,15 @@ have it, so a few steps are added:
   `positive`, no numerical value), as Mathematica writes `E^u`, so that
   rules for `F^u` apply to it and `ln(eE) = 1` stays exact. `IntOut` turns
   it back into `exp(u)`.
+- Mathematica's `I` is the constant `im` (as in Julia; `I` is the definite
+  integral of inc/alg and `i` the complex number there). It has the sort
+  `number` of inc/alg, above `real` and `complex`, and no numerical value;
+  the C helpers know `im^2 = -1` (`collect`, `simp`, the powers `im^3 =
+  -im`). The pattern variables, `Int` and the helpers are declared for
+  `number`, so the rules match real integrands and integrands with `im`
+  alike, and a real integrand keeps its real operators. `Complex[a,b]`
+  is translated as `a+b*im`. The checker [tools/rubitest.py](../../tools/rubitest.py)
+  evaluates `im` as `1j`.
 - Cosine forms: Rubi has most of its rules only for sine and rewrites
   cosine forms first (`UnifyInertTrigFunction`: `a+b*cos(e+f*x)` becomes
   `a+b*sin(e+pi/2+f*x)`, `sec` becomes `csc`, ...). These 69 definitions

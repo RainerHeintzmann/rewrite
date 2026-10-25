@@ -127,6 +127,7 @@ t_funct (userfunction [])  = {
 	FKT(cpy_complex),	
 	FKT(del_complex),	
 	FKT(real2cpx),		/* 2026: SUBSORT real,complex */
+	FKT(cpx2num),		/* 2026: SUBSORT complex,number */
 	FKT(cpx),					
 	FKT(c_plus),			
 	FKT(c_plus_r),		

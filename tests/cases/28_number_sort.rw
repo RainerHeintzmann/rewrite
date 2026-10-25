@@ -1,0 +1,39 @@
+# The sort number above real and complex (inc/alg) and the imaginary unit im
+# (inc/integration/base): rules written with variables of sort number apply
+# to real terms too, and a term of reals keeps its real variants.
+INC "inc/all"
+INC "inc/integration/all"
+TERM TN : number
+CONST im2 : number
+FUNC never : real >> real
+ALG raw
+SPEC raw : never(X) = X
+# a rule for number matches a real term; its conditions are calculated with
+# the real variants (Uq > 2, 2*Uq)
+VAR Uq : number
+ALG Tn
+SPEC Tn : IF (Uq > 2), (integerq(2*Uq)) Int(Uq,Xv) = Uq*Xv
+TN = REWR Int(3,x) : Tn
+TN
+TN = REWR Int(1,x) : Tn
+TN
+TN = REWR Int(im2,x) : Tn
+TN
+# im^2 = -1 in the helpers
+REWR collect(im*im*x + 2*im*x - im*x) : raw
+REWR simp(im*y*im,x) : raw
+# derivatives of terms with im (inc/alg, ALG diff for number)
+TN = REWR deriv(im*x^2,x) : All
+REWR collect(TN) : raw
+TN = REWR deriv(sin(im*x),x) : All
+REWR collect(TN) : raw
+# integrals with im (Rubi)
+INC "inc/integration/rubi/all"
+TN = REWR Int(sin(im*x),x) : RubiIntegrate
+TN
+TN = REWR Int(im*x*sin(x),x) : RubiIntegrate
+TN
+TN = REWR Int(x^2,x) : RubiIntegrate
+TN
+# a sort cannot be declared again as a constant
+CONST number : real

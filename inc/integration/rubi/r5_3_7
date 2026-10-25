@@ -14,11 +14,13 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_n) Int(arctan((P_a)+((O_b)*((Xv)^(P_n)))
 #   Int[ArcCot[a_ + b_.*x_^n_], x_Symbol] := x*ArcCot[a + b*x^n] + b*n*Int[x^n/(1 + a^2 + 2*a*b*x^n + b^2*x^(2*n)), x] /; FreeQ[{a, b, n}, x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_n) Int(arccot((P_a)+((O_b)*((Xv)^(P_n)))),Xv) = ((((Xv)*(arccot(((P_a)+(((O_b)*(((Xv)^(P_n))))))))))+(((O_b)*(P_n)*(Int(((((Xv)^(P_n)))*(((((1)+(((P_a)^(2)))+(((2)*(P_a)*(O_b)*(((Xv)^(P_n)))))+(((((O_b)^(2)))*(((Xv)^(((2)*(P_n)))))))))^((-1))))),Xv)))))
 
-# Rule 3 not translated: symbol I
+# Rule 3 (18 variants):
 #   Int[ArcTan[a_. + b_.*x_^n_]/x_, x_Symbol] := I/2*Int[Log[1 - I*a - I*b*x^n]/x, x] - I/2*Int[Log[1 + I*a + I*b*x^n]/x, x] /; FreeQ[{a, b, n}, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,P_n) Int((arctan((O_a)+((O_b)*((Xv)^(P_n)))))*((Xv)^(K_1)),Xv) = ((((im)*((1/2))*(Int(((ln(((1)+((((-1))*(im)*(O_a)))+((((-1))*(im)*(O_b)*(((Xv)^(P_n))))))))*(((Xv)^((-1))))),Xv))))+((((-(1/2)))*(im)*(Int(((ln(((1)+(((im)*(O_a)))+(((im)*(O_b)*(((Xv)^(P_n))))))))*(((Xv)^((-1))))),Xv)))))
 
-# Rule 4 not translated: symbol I
+# Rule 4 (18 variants):
 #   Int[ArcCot[a_. + b_.*x_^n_]/x_, x_Symbol] := I/2*Int[Log[1 - I/(a + b*x^n)]/x, x] - I/2*Int[Log[1 + I/(a + b*x^n)]/x, x] /; FreeQ[{a, b, n}, x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,P_n) Int((arccot((O_a)+((O_b)*((Xv)^(P_n)))))*((Xv)^(K_1)),Xv) = ((((im)*((1/2))*(Int(((ln(((1)+((((-1))*(im)*(((((O_a)+(((O_b)*(((Xv)^(P_n)))))))^((-1)))))))))*(((Xv)^((-1))))),Xv))))+((((-(1/2)))*(im)*(Int(((ln(((1)+(((im)*(((((O_a)+(((O_b)*(((Xv)^(P_n)))))))^((-1)))))))))*(((Xv)^((-1))))),Xv)))))
 
 # Rule 5 (24 variants):
 #   Int[x_^m_.*ArcTan[a_ + b_.*x_^n_], x_Symbol] := x^(m + 1)*ArcTan[a + b*x^n]/(m + 1) - b*n/(m + 1)* Int[x^(m + n)/(1 + a^2 + 2*a*b*x^n + b^2*x^(2*n)), x] /; FreeQ[{a, b}, x] && RationalQ[m, n] && m + 1 != 0 && m + 1 != n
@@ -28,17 +30,21 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (rationalq(O_m,P_n)), ((((O_m)+(1)) != 0
 #   Int[x_^m_.*ArcCot[a_ + b_.*x_^n_], x_Symbol] := x^(m + 1)*ArcCot[a + b*x^n]/(m + 1) + b*n/(m + 1)* Int[x^(m + n)/(1 + a^2 + 2*a*b*x^n + b^2*x^(2*n)), x] /; FreeQ[{a, b}, x] && RationalQ[m, n] && m + 1 != 0 && m + 1 != n
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (rationalq(O_m,P_n)), ((((O_m)+(1)) != 0)), ((((O_m)+(1)) != P_n)) Int(((Xv)^(O_m))*(arccot((P_a)+((O_b)*((Xv)^(P_n))))),Xv) = ((((((Xv)^(((O_m)+(1)))))*(arccot(((P_a)+(((O_b)*(((Xv)^(P_n))))))))*(((((O_m)+(1)))^((-1))))))+(((O_b)*(P_n)*(((((O_m)+(1)))^((-1))))*(Int(((((Xv)^(((O_m)+(P_n)))))*(((((1)+(((P_a)^(2)))+(((2)*(P_a)*(O_b)*(((Xv)^(P_n)))))+(((((O_b)^(2)))*(((Xv)^(((2)*(P_n)))))))))^((-1))))),Xv)))))
 
-# Rule 7 not translated: symbol I
+# Rule 7 (81 variants):
 #   Int[ArcTan[a_. + b_.*f_^(c_. + d_.*x_)], x_Symbol] := I/2*Int[Log[1 - I*a - I*b*f^(c + d*x)], x] - I/2*Int[Log[1 + I*a + I*b*f^(c + d*x)], x] /; FreeQ[{a, b, c, d, f}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_f) Int(arctan((O_a)+((O_b)*((P_f)^((O_c)+((O_d)*(Xv)))))),Xv) = ((((im)*((1/2))*(Int(ln(((1)+((((-1))*(im)*(O_a)))+((((-1))*(im)*(O_b)*(((P_f)^(((O_c)+(((O_d)*(Xv))))))))))),Xv))))+((((-(1/2)))*(im)*(Int(ln(((1)+(((im)*(O_a)))+(((im)*(O_b)*(((P_f)^(((O_c)+(((O_d)*(Xv))))))))))),Xv)))))
 
-# Rule 8 not translated: symbol I
+# Rule 8 (81 variants):
 #   Int[ArcCot[a_. + b_.*f_^(c_. + d_.*x_)], x_Symbol] := I/2*Int[Log[1 - I/(a + b*f^(c + d*x))], x] - I/2*Int[Log[1 + I/(a + b*f^(c + d*x))], x] /; FreeQ[{a, b, c, d, f}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_f) Int(arccot((O_a)+((O_b)*((P_f)^((O_c)+((O_d)*(Xv)))))),Xv) = ((((im)*((1/2))*(Int(ln(((1)+((((-1))*(im)*(((((O_a)+(((O_b)*(((P_f)^(((O_c)+(((O_d)*(Xv)))))))))))^((-1)))))))),Xv))))+((((-(1/2)))*(im)*(Int(ln(((1)+(((im)*(((((O_a)+(((O_b)*(((P_f)^(((O_c)+(((O_d)*(Xv)))))))))))^((-1)))))))),Xv)))))
 
-# Rule 9 not translated: symbol I
+# Rule 9 (324 variants):
 #   Int[x_^m_.*ArcTan[a_. + b_.*f_^(c_. + d_.*x_)], x_Symbol] := I/2*Int[x^m*Log[1 - I*a - I*b*f^(c + d*x)], x] - I/2*Int[x^m*Log[1 + I*a + I*b*f^(c + d*x)], x] /; FreeQ[{a, b, c, d, f}, x] && IntegerQ[m] && m > 0
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_f), (integerq(O_m)), ((O_m > 0)) Int(((Xv)^(O_m))*(arctan((O_a)+((O_b)*((P_f)^((O_c)+((O_d)*(Xv))))))),Xv) = ((((im)*((1/2))*(Int(((((Xv)^(O_m)))*(ln(((1)+((((-1))*(im)*(O_a)))+((((-1))*(im)*(O_b)*(((P_f)^(((O_c)+(((O_d)*(Xv))))))))))))),Xv))))+((((-(1/2)))*(im)*(Int(((((Xv)^(O_m)))*(ln(((1)+(((im)*(O_a)))+(((im)*(O_b)*(((P_f)^(((O_c)+(((O_d)*(Xv))))))))))))),Xv)))))
 
-# Rule 10 not translated: symbol I
+# Rule 10 (324 variants):
 #   Int[x_^m_.*ArcCot[a_. + b_.*f_^(c_. + d_.*x_)], x_Symbol] := I/2*Int[x^m*Log[1 - I/(a + b*f^(c + d*x))], x] - I/2*Int[x^m*Log[1 + I/(a + b*f^(c + d*x))], x] /; FreeQ[{a, b, c, d, f}, x] && IntegerQ[m] && m > 0
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_f), (integerq(O_m)), ((O_m > 0)) Int(((Xv)^(O_m))*(arccot((O_a)+((O_b)*((P_f)^((O_c)+((O_d)*(Xv))))))),Xv) = ((((im)*((1/2))*(Int(((((Xv)^(O_m)))*(ln(((1)+((((-1))*(im)*(((((O_a)+(((O_b)*(((P_f)^(((O_c)+(((O_d)*(Xv)))))))))))^((-1)))))))))),Xv))))+((((-(1/2)))*(im)*(Int(((((Xv)^(O_m)))*(ln(((1)+(((im)*(((((O_a)+(((O_b)*(((P_f)^(((O_c)+(((O_d)*(Xv)))))))))))^((-1)))))))))),Xv)))))
 
 # Rule 11 (324 variants):
 #   Int[u_.*ArcTan[c_./(a_. + b_.*x_^n_.)]^m_., x_Symbol] := Int[u*ArcCot[a/c + b*x^n/c]^m, x] /; FreeQ[{a, b, c, n, m}, x]
@@ -104,53 +110,69 @@ ADDSPEC RubiRules : IF (eqq(((O_s)^(2)),1)), (eqq(P_w,((((P_v)^(2)))+(1)))) Int(
 #   Int[u_.*ArcCot[v_ + s_.*Sqrt[w_]], x_Symbol] := Pi*s/4*Int[u, x] - 1/2*Int[u*ArcTan[v], x] /; EqQ[s^2, 1] && EqQ[w, v^2 + 1]
 ADDSPEC RubiRules : IF (eqq(((O_s)^(2)),1)), (eqq(P_w,((((P_v)^(2)))+(1)))) Int((O_u)*(arccot((P_v)+((O_s)*((P_w)^(0.5))))),Xv) = ((((pi)*(O_s)*((1/4))*(Int(O_u,Xv))))+((((-(1/2)))*(Int(((O_u)*(arctan(P_v))),Xv)))))
 
-# Rule 27 not translated: symbol I
+# Rule 27 (81 variants):
 #   Int[ArcTan[c_. + d_.*Tan[a_. + b_.*x_]], x_Symbol] := x*ArcTan[c + d*Tan[a + b*x]] - I*b*Int[x/(c + I*d + c*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d}, x] && EqQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (eqq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int(arctan((O_c)+((O_d)*(tan((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arctan(((O_c)+(((O_d)*(tan(((O_a)+(((O_b)*(Xv)))))))))))))+((((-1))*(im)*(O_b)*(Int(((Xv)*(((((O_c)+(((im)*(O_d)))+(((O_c)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 28 not translated: symbol I
+# Rule 28 (81 variants):
 #   Int[ArcCot[c_. + d_.*Tan[a_. + b_.*x_]], x_Symbol] := x*ArcCot[c + d*Tan[a + b*x]] + I*b*Int[x/(c + I*d + c*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d}, x] && EqQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (eqq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int(arccot((O_c)+((O_d)*(tan((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arccot(((O_c)+(((O_d)*(tan(((O_a)+(((O_b)*(Xv)))))))))))))+(((im)*(O_b)*(Int(((Xv)*(((((O_c)+(((im)*(O_d)))+(((O_c)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 29 not translated: symbol I
+# Rule 29 (81 variants):
 #   Int[ArcTan[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := x*ArcTan[c + d*Cot[a + b*x]] - I*b*Int[x/(c - I*d - c*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d}, x] && EqQ[(c - I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (eqq(((((O_c)+((((-1))*(im)*(O_d)))))^(2)),(-1))) Int(arctan((O_c)+((O_d)*(cot((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arctan(((O_c)+(((O_d)*(cot(((O_a)+(((O_b)*(Xv)))))))))))))+((((-1))*(im)*(O_b)*(Int(((Xv)*(((((O_c)+((((-1))*(im)*(O_d)))+((((-1))*(O_c)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 30 not translated: symbol I
+# Rule 30 (81 variants):
 #   Int[ArcCot[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := x*ArcCot[c + d*Cot[a + b*x]] + I*b*Int[x/(c - I*d - c*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d}, x] && EqQ[(c - I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (eqq(((((O_c)+((((-1))*(im)*(O_d)))))^(2)),(-1))) Int(arccot((O_c)+((O_d)*(cot((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arccot(((O_c)+(((O_d)*(cot(((O_a)+(((O_b)*(Xv)))))))))))))+(((im)*(O_b)*(Int(((Xv)*(((((O_c)+((((-1))*(im)*(O_d)))+((((-1))*(O_c)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 31 not translated: symbol I
+# Rule 31 (81 variants):
 #   Int[ArcTan[c_. + d_.*Tan[a_. + b_.*x_]], x_Symbol] := x*ArcTan[c + d*Tan[a + b*x]] - b*(1 + I*c + d)* Int[x*E^(2*I*a + 2*I*b*x)/(1 + I*c - d + (1 + I*c + d)*E^(2*I*a + 2*I*b*x)), x] + b*(1 - I*c - d)* Int[x*E^(2*I*a + 2*I*b*x)/(1 - I*c + d + (1 - I*c - d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d}, x] && NeQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int(arctan((O_c)+((O_d)*(tan((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arctan(((O_c)+(((O_d)*(tan(((O_a)+(((O_b)*(Xv)))))))))))))+((((-1))*(O_b)*(((1)+(((im)*(O_c)))+(O_d)))*(Int(((Xv)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+(((im)*(O_c)))+((((-1))*(O_d)))+(((((1)+(((im)*(O_c)))+(O_d)))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+(((O_b)*(((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))))*(Int(((Xv)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+((((-1))*(im)*(O_c)))+(O_d)+(((((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 32 not translated: symbol I
+# Rule 32 (81 variants):
 #   Int[ArcCot[c_. + d_.*Tan[a_. + b_.*x_]], x_Symbol] := x*ArcCot[c + d*Tan[a + b*x]] + b*(1 + I*c + d)* Int[x*E^(2*I*a + 2*I*b*x)/(1 + I*c - d + (1 + I*c + d)*E^(2*I*a + 2*I*b*x)), x] - b*(1 - I*c - d)* Int[x*E^(2*I*a + 2*I*b*x)/(1 - I*c + d + (1 - I*c - d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d}, x] && NeQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int(arccot((O_c)+((O_d)*(tan((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arccot(((O_c)+(((O_d)*(tan(((O_a)+(((O_b)*(Xv)))))))))))))+(((O_b)*(((1)+(((im)*(O_c)))+(O_d)))*(Int(((Xv)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+(((im)*(O_c)))+((((-1))*(O_d)))+(((((1)+(((im)*(O_c)))+(O_d)))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+((((-1))*(O_b)*(((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))))*(Int(((Xv)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+((((-1))*(im)*(O_c)))+(O_d)+(((((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 33 not translated: symbol I
+# Rule 33 (81 variants):
 #   Int[ArcTan[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := x*ArcTan[c + d*Cot[a + b*x]] + b*(1 + I*c - d)* Int[x*E^(2*I*a + 2*I*b*x)/(1 + I*c + d - (1 + I*c - d)*E^(2*I*a + 2*I*b*x)), x] - b*(1 - I*c + d)* Int[x*E^(2*I*a + 2*I*b*x)/(1 - I*c - d - (1 - I*c + d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d}, x] && NeQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int(arctan((O_c)+((O_d)*(cot((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arctan(((O_c)+(((O_d)*(cot(((O_a)+(((O_b)*(Xv)))))))))))))+(((O_b)*(((1)+(((im)*(O_c)))+((((-1))*(O_d)))))*(Int(((Xv)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+(((im)*(O_c)))+(O_d)+((((-1))*(((1)+(((im)*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+((((-1))*(O_b)*(((1)+((((-1))*(im)*(O_c)))+(O_d)))*(Int(((Xv)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))+((((-1))*(((1)+((((-1))*(im)*(O_c)))+(O_d)))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 34 not translated: symbol I
+# Rule 34 (81 variants):
 #   Int[ArcCot[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := x*ArcCot[c + d*Cot[a + b*x]] - b*(1 + I*c - d)* Int[x*E^(2*I*a + 2*I*b*x)/(1 + I*c + d - (1 + I*c - d)*E^(2*I*a + 2*I*b*x)), x] + b*(1 - I*c + d)* Int[x*E^(2*I*a + 2*I*b*x)/(1 - I*c - d - (1 - I*c + d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d}, x] && NeQ[(c - I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_c)+((((-1))*(im)*(O_d)))))^(2)),(-1))) Int(arccot((O_c)+((O_d)*(cot((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arccot(((O_c)+(((O_d)*(cot(((O_a)+(((O_b)*(Xv)))))))))))))+((((-1))*(O_b)*(((1)+(((im)*(O_c)))+((((-1))*(O_d)))))*(Int(((Xv)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+(((im)*(O_c)))+(O_d)+((((-1))*(((1)+(((im)*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+(((O_b)*(((1)+((((-1))*(im)*(O_c)))+(O_d)))*(Int(((Xv)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))+((((-1))*(((1)+((((-1))*(im)*(O_c)))+(O_d)))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 35 not translated: symbol I
+# Rule 35 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcTan[c_. + d_.*Tan[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcTan[c + d*Tan[a + b*x]]/(f*(m + 1)) - I*b/(f*(m + 1))* Int[(e + f*x)^(m + 1)/(c + I*d + c*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && EqQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (eqq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arctan((O_c)+((O_d)*(tan((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arctan(((O_c)+(((O_d)*(tan(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(im)*(O_b)*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(((((O_c)+(((im)*(O_d)))+(((O_c)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 36 not translated: symbol I
+# Rule 36 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcCot[c_. + d_.*Tan[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcCot[c + d*Tan[a + b*x]]/(f*(m + 1)) + I*b/(f*(m + 1))* Int[(e + f*x)^(m + 1)/(c + I*d + c*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && EqQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (eqq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arccot((O_c)+((O_d)*(tan((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arccot(((O_c)+(((O_d)*(tan(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((im)*(O_b)*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(((((O_c)+(((im)*(O_d)))+(((O_c)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 37 not translated: symbol I
+# Rule 37 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcTan[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcTan[c + d*Cot[a + b*x]]/(f*(m + 1)) - I*b/(f*(m + 1))* Int[(e + f*x)^(m + 1)/(c - I*d - c*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && EqQ[(c - I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (eqq(((((O_c)+((((-1))*(im)*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arctan((O_c)+((O_d)*(cot((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arctan(((O_c)+(((O_d)*(cot(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(im)*(O_b)*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(((((O_c)+((((-1))*(im)*(O_d)))+((((-1))*(O_c)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 38 not translated: symbol I
+# Rule 38 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcCot[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcCot[c + d*Cot[a + b*x]]/(f*(m + 1)) + I*b/(f*(m + 1))* Int[(e + f*x)^(m + 1)/(c - I*d - c*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && EqQ[(c - I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (eqq(((((O_c)+((((-1))*(im)*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arccot((O_c)+((O_d)*(cot((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arccot(((O_c)+(((O_d)*(cot(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((im)*(O_b)*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(((((O_c)+((((-1))*(im)*(O_d)))+((((-1))*(O_c)*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 39 not translated: symbol I
+# Rule 39 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcTan[c_. + d_.*Tan[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcTan[c + d*Tan[a + b*x]]/(f*(m + 1)) - b*(1 + I*c + d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 + I*c - d + (1 + I*c + d)*E^(2*I*a + 2*I*b*x)), x] + b*(1 - I*c - d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 - I*c + d + (1 - I*c - d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (neq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arctan((O_c)+((O_d)*(tan((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arctan(((O_c)+(((O_d)*(tan(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(((1)+(((im)*(O_c)))+(O_d)))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+(((im)*(O_c)))+((((-1))*(O_d)))+(((((1)+(((im)*(O_c)))+(O_d)))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+(((O_b)*(((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+((((-1))*(im)*(O_c)))+(O_d)+(((((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 40 not translated: symbol I
+# Rule 40 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcCot[c_. + d_.*Tan[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcCot[c + d*Tan[a + b*x]]/(f*(m + 1)) + b*(1 + I*c + d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 + I*c - d + (1 + I*c + d)*E^(2*I*a + 2*I*b*x)), x] - b*(1 - I*c - d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 - I*c + d + (1 - I*c - d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c + I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (neq(((((O_c)+(((im)*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arccot((O_c)+((O_d)*(tan((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arccot(((O_c)+(((O_d)*(tan(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((O_b)*(((1)+(((im)*(O_c)))+(O_d)))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+(((im)*(O_c)))+((((-1))*(O_d)))+(((((1)+(((im)*(O_c)))+(O_d)))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+((((-1))*(O_b)*(((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+((((-1))*(im)*(O_c)))+(O_d)+(((((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 41 not translated: symbol I
+# Rule 41 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcTan[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcTan[c + d*Cot[a + b*x]]/(f*(m + 1)) + b*(1 + I*c - d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 + I*c + d - (1 + I*c - d)*E^(2*I*a + 2*I*b*x)), x] - b*(1 - I*c + d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 - I*c - d - (1 - I*c + d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c - I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (neq(((((O_c)+((((-1))*(im)*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arctan((O_c)+((O_d)*(cot((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arctan(((O_c)+(((O_d)*(cot(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((O_b)*(((1)+(((im)*(O_c)))+((((-1))*(O_d)))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+(((im)*(O_c)))+(O_d)+((((-1))*(((1)+(((im)*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+((((-1))*(O_b)*(((1)+((((-1))*(im)*(O_c)))+(O_d)))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))+((((-1))*(((1)+((((-1))*(im)*(O_c)))+(O_d)))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 42 not translated: symbol I
+# Rule 42 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcCot[c_. + d_.*Cot[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcCot[c + d*Cot[a + b*x]]/(f*(m + 1)) - b*(1 + I*c - d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 + I*c + d - (1 + I*c - d)*E^(2*I*a + 2*I*b*x)), x] + b*(1 - I*c + d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*I*a + 2*I*b*x)/(1 - I*c - d - (1 - I*c + d)*E^(2*I*a + 2*I*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c - I*d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (neq(((((O_c)+((((-1))*(im)*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arccot((O_c)+((O_d)*(cot((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arccot(((O_c)+(((O_d)*(cot(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(((1)+(((im)*(O_c)))+((((-1))*(O_d)))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+(((im)*(O_c)))+(O_d)+((((-1))*(((1)+(((im)*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+(((O_b)*(((1)+((((-1))*(im)*(O_c)))+(O_d)))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))*(((((1)+((((-1))*(im)*(O_c)))+((((-1))*(O_d)))+((((-1))*(((1)+((((-1))*(im)*(O_c)))+(O_d)))*((eE^(((((2)*(im)*(O_a)))+(((2)*(im)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
 # Rule 43 (9 variants):
 #   Int[ArcTan[Tanh[a_. + b_.*x_]], x_Symbol] := x*ArcTan[Tanh[a + b*x]] - b*Int[x*Sech[2*a + 2*b*x], x] /; FreeQ[{a, b}, x]
@@ -200,17 +222,21 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (eqq(((((O_c)+((((-1))*(O_d)))))
 #   Int[ArcCot[c_. + d_.*Coth[a_. + b_.*x_]], x_Symbol] := x*ArcCot[c + d*Coth[a + b*x]] + b*Int[x/(c - d - c*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d}, x] && EqQ[(c - d)^2, -1]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (eqq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int(arccot((O_c)+((O_d)*(coth((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arccot(((O_c)+(((O_d)*(coth(((O_a)+(((O_b)*(Xv)))))))))))))+(((O_b)*(Int(((Xv)*(((((O_c)+((((-1))*(O_d)))+((((-1))*(O_c)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 55 not translated: symbol I
+# Rule 55 (81 variants):
 #   Int[ArcTan[c_. + d_.*Tanh[a_. + b_.*x_]], x_Symbol] := x*ArcTan[c + d*Tanh[a + b*x]] + I*b*(I - c - d)* Int[x*E^(2*a + 2*b*x)/(I - c + d + (I - c - d)*E^(2*a + 2*b*x)), x] - I*b*(I + c + d)* Int[x*E^(2*a + 2*b*x)/(I + c - d + (I + c + d)*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d}, x] && NeQ[(c - d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int(arctan((O_c)+((O_d)*(tanh((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arctan(((O_c)+(((O_d)*(tanh(((O_a)+(((O_b)*(Xv)))))))))))))+(((im)*(O_b)*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*(Int(((Xv)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+((((-1))*(O_c)))+(O_d)+(((((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+((((-1))*(im)*(O_b)*(((im)+(O_c)+(O_d)))*(Int(((Xv)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+(O_c)+((((-1))*(O_d)))+(((((im)+(O_c)+(O_d)))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 56 not translated: symbol I
+# Rule 56 (81 variants):
 #   Int[ArcCot[c_. + d_.*Tanh[a_. + b_.*x_]], x_Symbol] := x*ArcCot[c + d*Tanh[a + b*x]] - I*b*(I - c - d)* Int[x*E^(2*a + 2*b*x)/(I - c + d + (I - c - d)*E^(2*a + 2*b*x)), x] + I*b*(I + c + d)* Int[x*E^(2*a + 2*b*x)/(I + c - d + (I + c + d)*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d}, x] && NeQ[(c - d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int(arccot((O_c)+((O_d)*(tanh((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arccot(((O_c)+(((O_d)*(tanh(((O_a)+(((O_b)*(Xv)))))))))))))+((((-1))*(im)*(O_b)*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*(Int(((Xv)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+((((-1))*(O_c)))+(O_d)+(((((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+(((im)*(O_b)*(((im)+(O_c)+(O_d)))*(Int(((Xv)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+(O_c)+((((-1))*(O_d)))+(((((im)+(O_c)+(O_d)))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 57 not translated: symbol I
+# Rule 57 (81 variants):
 #   Int[ArcTan[c_. + d_.*Coth[a_. + b_.*x_]], x_Symbol] := x*ArcTan[c + d*Coth[a + b*x]] - I*b*(I - c - d)* Int[x*E^(2*a + 2*b*x)/(I - c + d - (I - c - d)*E^(2*a + 2*b*x)), x] + I*b*(I + c + d)* Int[x*E^(2*a + 2*b*x)/(I + c - d - (I + c + d)*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d}, x] && NeQ[(c - d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int(arctan((O_c)+((O_d)*(coth((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arctan(((O_c)+(((O_d)*(coth(((O_a)+(((O_b)*(Xv)))))))))))))+((((-1))*(im)*(O_b)*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*(Int(((Xv)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+((((-1))*(O_c)))+(O_d)+((((-1))*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+(((im)*(O_b)*(((im)+(O_c)+(O_d)))*(Int(((Xv)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+(O_c)+((((-1))*(O_d)))+((((-1))*(((im)+(O_c)+(O_d)))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 58 not translated: symbol I
+# Rule 58 (81 variants):
 #   Int[ArcCot[c_. + d_.*Coth[a_. + b_.*x_]], x_Symbol] := x*ArcCot[c + d*Coth[a + b*x]] + I*b*(I - c - d)* Int[x*E^(2*a + 2*b*x)/(I - c + d - (I - c - d)*E^(2*a + 2*b*x)), x] - I*b*(I + c + d)* Int[x*E^(2*a + 2*b*x)/(I + c - d - (I + c + d)*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d}, x] && NeQ[(c - d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (neq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int(arccot((O_c)+((O_d)*(coth((O_a)+((O_b)*(Xv)))))),Xv) = ((((Xv)*(arccot(((O_c)+(((O_d)*(coth(((O_a)+(((O_b)*(Xv)))))))))))))+(((im)*(O_b)*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*(Int(((Xv)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+((((-1))*(O_c)))+(O_d)+((((-1))*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+((((-1))*(im)*(O_b)*(((im)+(O_c)+(O_d)))*(Int(((Xv)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+(O_c)+((((-1))*(O_d)))+((((-1))*(((im)+(O_c)+(O_d)))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
 # Rule 59 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcTan[c_. + d_.*Tanh[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcTan[c + d*Tanh[a + b*x]]/(f*(m + 1)) - b/(f*(m + 1))* Int[(e + f*x)^(m + 1)/(c - d + c*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && EqQ[(c - d)^2, -1]
@@ -228,17 +254,21 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (eqq(((((
 #   Int[(e_. + f_.*x_)^m_.*ArcCot[c_. + d_.*Coth[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcCot[c + d*Coth[a + b*x]]/(f*(m + 1)) + b/(f*(m + 1))* Int[(e + f*x)^(m + 1)/(c - d - c*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && EqQ[(c - d)^2, -1]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (eqq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arccot((O_c)+((O_d)*(coth((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arccot(((O_c)+(((O_d)*(coth(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((O_b)*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(((((O_c)+((((-1))*(O_d)))+((((-1))*(O_c)*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 63 not translated: symbol I
+# Rule 63 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcTan[c_. + d_.*Tanh[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcTan[c + d*Tanh[a + b*x]]/(f*(m + 1)) + I*b*(I - c - d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*a + 2*b*x)/(I - c + d + (I - c - d)*E^(2*a + 2*b*x)), x] - I*b*(I + c + d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*a + 2*b*x)/(I + c - d + (I + c + d)*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c - d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (neq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arctan((O_c)+((O_d)*(tanh((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arctan(((O_c)+(((O_d)*(tanh(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((im)*(O_b)*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+((((-1))*(O_c)))+(O_d)+(((((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+((((-1))*(im)*(O_b)*(((im)+(O_c)+(O_d)))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+(O_c)+((((-1))*(O_d)))+(((((im)+(O_c)+(O_d)))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 64 not translated: symbol I
+# Rule 64 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcCot[c_. + d_.*Tanh[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcCot[c + d*Tanh[a + b*x]]/(f*(m + 1)) - I*b*(I - c - d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*a + 2*b*x)/(I - c + d + (I - c - d)*E^(2*a + 2*b*x)), x] + I*b*(I + c + d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*a + 2*b*x)/(I + c - d + (I + c + d)*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c - d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (neq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arccot((O_c)+((O_d)*(tanh((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arccot(((O_c)+(((O_d)*(tanh(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(im)*(O_b)*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+((((-1))*(O_c)))+(O_d)+(((((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+(((im)*(O_b)*(((im)+(O_c)+(O_d)))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+(O_c)+((((-1))*(O_d)))+(((((im)+(O_c)+(O_d)))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 65 not translated: symbol I
+# Rule 65 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcTan[c_. + d_.*Coth[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcTan[c + d*Coth[a + b*x]]/(f*(m + 1)) - I*b*(I - c - d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*a + 2*b*x)/(I - c + d - (I - c - d)*E^(2*a + 2*b*x)), x] + I*b*(I + c + d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*a + 2*b*x)/(I + c - d - (I + c + d)*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c - d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (neq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arctan((O_c)+((O_d)*(coth((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arctan(((O_c)+(((O_d)*(coth(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(im)*(O_b)*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+((((-1))*(O_c)))+(O_d)+((((-1))*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+(((im)*(O_b)*(((im)+(O_c)+(O_d)))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+(O_c)+((((-1))*(O_d)))+((((-1))*(((im)+(O_c)+(O_d)))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
-# Rule 66 not translated: symbol I
+# Rule 66 (2916 variants):
 #   Int[(e_. + f_.*x_)^m_.*ArcCot[c_. + d_.*Coth[a_. + b_.*x_]], x_Symbol] := (e + f*x)^(m + 1)*ArcCot[c + d*Coth[a + b*x]]/(f*(m + 1)) + I*b*(I - c - d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*a + 2*b*x)/(I - c + d - (I - c - d)*E^(2*a + 2*b*x)), x] - I*b*(I + c + d)/(f*(m + 1))* Int[(e + f*x)^(m + 1)* E^(2*a + 2*b*x)/(I + c - d - (I + c + d)*E^(2*a + 2*b*x)), x] /; FreeQ[{a, b, c, d, e, f}, x] && IGtQ[m, 0] && NeQ[(c - d)^2, -1]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f), (igtq(O_m,0)), (neq(((((O_c)+((((-1))*(O_d)))))^(2)),(-1))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(arccot((O_c)+((O_d)*(coth((O_a)+((O_b)*(Xv))))))),Xv) = ((((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*(arccot(((O_c)+(((O_d)*(coth(((O_a)+(((O_b)*(Xv)))))))))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((im)*(O_b)*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+((((-1))*(O_c)))+(O_d)+((((-1))*(((im)+((((-1))*(O_c)))+((((-1))*(O_d)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv))))+((((-1))*(im)*(O_b)*(((im)+(O_c)+(O_d)))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)+(((O_f)*(Xv)))))^(((O_m)+(1)))))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))*(((((im)+(O_c)+((((-1))*(O_d)))+((((-1))*(((im)+(O_c)+(O_d)))*((eE^(((((2)*(O_a)))+(((2)*(O_b)*(Xv)))))))))))^((-1))))),Xv)))))
 
 # Rule 67 (1 variants):
 #   Int[ArcTan[u_], x_Symbol] := x*ArcTan[u] - Int[SimplifyIntegrand[x*D[u, x]/(1 + u^2), x], x] /; InverseFunctionFreeQ[u, x]
@@ -260,8 +290,9 @@ ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)) Int(arccot(P_u),Xv) = ((((
 # Rule 72 not translated: function FunctionOfLinear
 #   Int[v_*(a_. + b_.*ArcCot[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcCot[u]), w, x] + b*Int[SimplifyIntegrand[w*D[u, x]/(1 + u^2), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]] && FalseQ[FunctionOfLinear[v*(a + b*ArcCot[u]), x]]
 
-# Rule 73 not translated: symbol I
+# Rule 73 (36 variants):
 #   Int[ArcTan[v_]*Log[w_]/(a_. + b_.*x_), x_Symbol] := I/2*Int[Log[1 - I*v]*Log[w]/(a + b*x), x] - I/2*Int[Log[1 + I*v]*Log[w]/(a + b*x), x] /; FreeQ[{a, b}, x] && LinearQ[v, x] && LinearQ[w, x] && EqQ[Simplify[D[v/(a + b*x), x]], 0] && EqQ[Simplify[D[w/(a + b*x), x]], 0]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b), (linearq(P_v,Xv)), (linearq(P_w,Xv)), (eqq(simplify(deriv(((P_v)*(((((O_a)+(((O_b)*(Xv)))))^((-1))))),Xv)),0)), (eqq(simplify(deriv(((P_w)*(((((O_a)+(((O_b)*(Xv)))))^((-1))))),Xv)),0)) Int((arctan(P_v))*(ln(P_w))*(((O_a)+((O_b)*(Xv)))^(K_1)),Xv) = ((((im)*((1/2))*(Int(((ln(((1)+((((-1))*(im)*(P_v))))))*(ln(P_w))*(((((O_a)+(((O_b)*(Xv)))))^((-1))))),Xv))))+((((-(1/2)))*(im)*(Int(((ln(((1)+(((im)*(P_v))))))*(ln(P_w))*(((((O_a)+(((O_b)*(Xv)))))^((-1))))),Xv)))))
 
 # Rule 74 (2 variants):
 #   Int[ArcTan[v_]*Log[w_], x_Symbol] := x*ArcTan[v]*Log[w] - Int[SimplifyIntegrand[x*Log[w]*D[v, x]/(1 + v^2), x], x] - Int[SimplifyIntegrand[x*ArcTan[v]*D[w, x]/w, x], x] /; InverseFunctionFreeQ[v, x] && InverseFunctionFreeQ[w, x]

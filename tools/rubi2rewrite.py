@@ -372,7 +372,7 @@ PREDICATES = {
     'AlgebraicFunctionQ': 'algebraicfunctionq',
 }
 ORDER = {'GtQ': '>', 'LtQ': '<', 'GeQ': '>=', 'LeQ': '<='}
-CONSTANTS = {'Pi': 'pi', 'E': 'eE', 'True': '1', 'False': '0'}
+CONSTANTS = {'Pi': 'pi', 'E': 'eE', 'I': 'im', 'True': '1', 'False': '0'}
 
 
 def fmt_num(q):
@@ -514,6 +514,8 @@ def tr_rhs(e, ctx):
             and len(args[0][2]) == 2 and args[0][2][1] == args[1]):
         # Subst[Int[u, x], x, v]: integrate in a fresh variable (nonneg for roots)
         return 'intsubst' + paren(','.join(tr_rhs(a, ctx) for a in [args[0][2][0], args[1], args[2]]))
+    if head == 'Complex' and len(args) == 2:          # Complex[a, b] = a + b*I
+        return paren(paren(tr_rhs(args[0], ctx)) + '+' + paren(tr_rhs(args[1], ctx)) + '*im')
     if head == 'ReplaceAll' and len(args) == 2 and args[1][0] == 'call' and args[1][1] == 'Rule':
         return 'replaceall' + paren(','.join(tr_rhs(a, ctx) for a in [args[0]] + args[1][2]))
     if head == 'RemoveContent' and len(args) == 2:
@@ -1172,6 +1174,7 @@ FIXINERT_HEADER = """# r4_0_fixinert
 # (symfkt.c) calls it after Mathematica's 1/sin = csc.
 ALG FixInert
 FUNC fixinert : real,real >> real ATT RULES FixInert
+OTHER fixinert : number,number >> number ATT RULES FixInert
 """
 
 
@@ -1389,8 +1392,8 @@ def main():
 
     with open(os.path.join(out_dir, 'declarations'), 'w', newline='\n') as f:
         f.write('# Declarations for the translated Rubi rules (rubi2rewrite.py)\n')
-        f.write('VAR %s : real\n' % ','.join(sorted(all_vars['P'])))
-        f.write('VAR %s : real\n' % ','.join(sorted(all_vars['O'])))
+        f.write('VAR %s : number\n' % ','.join(sorted(all_vars['P'])))
+        f.write('VAR %s : number\n' % ','.join(sorted(all_vars['O'])))
         f.write('OPT %s\n' % ','.join(sorted(all_vars['O'])))
         if all_vars['K']:
             f.write('NUM %s : real\n' % ','.join(sorted(all_vars['K'], key=lambda k: int(k[2:]))))

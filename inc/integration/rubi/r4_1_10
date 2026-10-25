@@ -44,11 +44,13 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_c,O_d,O_e,O_f), (neq(((((O_d)*(O_
 # Rule 11 not translated: predicate ComplexFreeQ
 #   Int[sin[e_. + f_.*x_]/Sqrt[c_. + d_.*x_], x_Symbol] := Cos[(d*e - c*f)/d]*Int[Sin[c*f/d + f*x]/Sqrt[c + d*x], x] + Sin[(d*e - c*f)/d]*Int[Cos[c*f/d + f*x]/Sqrt[c + d*x], x] /; FreeQ[{c, d, e, f}, x] && ComplexFreeQ[f] && NeQ[d*e - c*f, 0]
 
-# Rule 12 not translated: symbol I
+# Rule 12 (1944 variants):
 #   Int[(c_. + d_.*x_)^m_.*sin[e_. + k_.*Pi + f_.*x_], x_Symbol] := I/2*Int[(c + d*x)^m*E^(-I*k*Pi)*E^(-I*(e + f*x)), x] - I/2*Int[(c + d*x)^m*E^(I*k*Pi)*E^(I*(e + f*x)), x] /; FreeQ[{c, d, e, f, m}, x] && IntegerQ[2*k]
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_f,O_m), (integerq(((2)*(O_k)))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(sin((O_e)+((O_k)*(3.141592653589793))+((O_f)*(Xv)))),Xv) = ((((im)*((1/2))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*((eE^((((-1))*(im)*(O_k)*(pi)))))*((eE^((((-1))*(im)*(((O_e)+(((O_f)*(Xv)))))))))),Xv))))+((((-(1/2)))*(im)*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*((eE^(((im)*(O_k)*(pi)))))*((eE^(((im)*(((O_e)+(((O_f)*(Xv)))))))))),Xv)))))
 
-# Rule 13 not translated: symbol I
+# Rule 13 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*sin[e_. + f_.*x_], x_Symbol] := I/2*Int[(c + d*x)^m*E^(-I*(e + f*x)), x] - I/2*Int[(c + d*x)^m*E^(I*(e + f*x)), x] /; FreeQ[{c, d, e, f, m}, x]
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_f,O_m) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(sin((O_e)+((O_f)*(Xv)))),Xv) = ((((im)*((1/2))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*((eE^((((-1))*(im)*(((O_e)+(((O_f)*(Xv)))))))))),Xv))))+((((-(1/2)))*(im)*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*((eE^(((im)*(((O_e)+(((O_f)*(Xv)))))))))),Xv)))))
 
 # Rule 14 (648 variants):
 #   Int[(c_. + d_.*x_)^m_.*sin[e_. + f_.*x_/2]^2, x_Symbol] := 1/2*Int[(c + d*x)^m, x] - 1/2*Int[(c + d*x)^m*Cos[2*e + f*x], x] /; FreeQ[{c, d, e, f, m}, x]
@@ -97,14 +99,16 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,O_m), (eqq(((((P_a)^(2)))+
 # Rule 25 not translated: function Complex in pattern
 #   Int[(c_. + d_.*x_)^ m_./(a_ + b_.*sin[e_. + k_.*Pi + f_.*Complex[0, fz_]*x_]), x_Symbol] := 2*Int[(c + d*x)^m*E^(-I*Pi*(k - 1/2))* E^(-I*e + f*fz*x)/(b + 2*a*E^(-I*Pi*(k - 1/2))*E^(-I*e + f*fz*x) - b*E^(-2*I*k*Pi)*E^(2*(-I*e + f*fz*x))), x] /; FreeQ[{a, b, c, d, e, f, fz}, x] && IntegerQ[2*k] && NeQ[a^2 - b^2, 0] && IGtQ[m, 0]
 
-# Rule 26 not translated: symbol I
+# Rule 26 (11664 variants):
 #   Int[(c_. + d_.*x_)^m_./(a_ + b_.*sin[e_. + k_.*Pi + f_.*x_]), x_Symbol] := 2*Int[(c + d*x)^m*E^(I*Pi*(k - 1/2))* E^(I*(e + f*x))/(b + 2*a*E^(I*Pi*(k - 1/2))*E^(I*(e + f*x)) - b*E^(2*I*k*Pi)*E^(2*I*(e + f*x))), x] /; FreeQ[{a, b, c, d, e, f}, x] && IntegerQ[2*k] && NeQ[a^2 - b^2, 0] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f), (integerq(((2)*(O_k)))), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((P_a)+((O_b)*(sin((O_e)+((O_k)*(3.141592653589793))+((O_f)*(Xv))))))^(K_1)),Xv) = ((2)*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*((eE^(((im)*(pi)*(((O_k)+((-(1/2)))))))))*((eE^(((im)*(((O_e)+(((O_f)*(Xv)))))))))*(((((O_b)+(((2)*(P_a)*((eE^(((im)*(pi)*(((O_k)+((-(1/2)))))))))*((eE^(((im)*(((O_e)+(((O_f)*(Xv)))))))))))+((((-1))*(O_b)*((eE^(((2)*(im)*(O_k)*(pi)))))*((eE^(((2)*(im)*(((O_e)+(((O_f)*(Xv)))))))))))))^((-1))))),Xv)))
 
 # Rule 27 not translated: function Complex in pattern
 #   Int[(c_. + d_.*x_)^m_./(a_ + b_.*sin[e_. + f_.*Complex[0, fz_]*x_]), x_Symbol] := 2*Int[(c + d*x)^m* E^(-I*e + f*fz*x)/(-I*b + 2*a*E^(-I*e + f*fz*x) + I*b*E^(2*(-I*e + f*fz*x))), x] /; FreeQ[{a, b, c, d, e, f, fz}, x] && NeQ[a^2 - b^2, 0] && IGtQ[m, 0]
 
-# Rule 28 not translated: symbol I
+# Rule 28 (1944 variants):
 #   Int[(c_. + d_.*x_)^m_./(a_ + b_.*sin[e_. + f_.*x_]), x_Symbol] := 2*Int[(c + d*x)^m* E^(I*(e + f*x))/(I*b + 2*a*E^(I*(e + f*x)) - I*b*E^(2*I*(e + f*x))), x] /; FreeQ[{a, b, c, d, e, f}, x] && NeQ[a^2 - b^2, 0] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((P_a)+((O_b)*(sin((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((2)*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*((eE^(((im)*(((O_e)+(((O_f)*(Xv)))))))))*(((((((im)*(O_b)))+(((2)*(P_a)*((eE^(((im)*(((O_e)+(((O_f)*(Xv)))))))))))+((((-1))*(im)*(O_b)*((eE^(((2)*(im)*(((O_e)+(((O_f)*(Xv)))))))))))))^((-1))))),Xv)))
 
 # Rule 29 (1944 variants):
 #   Int[(c_. + d_.*x_)^m_./(a_ + b_.*sin[e_. + f_.*x_])^2, x_Symbol] := b*(c + d*x)^m*Cos[e + f*x]/(f*(a^2 - b^2)*(a + b*Sin[e + f*x])) + a/(a^2 - b^2)*Int[(c + d*x)^m/(a + b*Sin[e + f*x]), x] - b*d*m/(f*(a^2 - b^2))* Int[(c + d*x)^(m - 1)*Cos[e + f*x]/(a + b*Sin[e + f*x]), x] /; FreeQ[{a, b, c, d, e, f}, x] && NeQ[a^2 - b^2, 0] && IGtQ[m, 0]

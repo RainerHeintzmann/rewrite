@@ -73,8 +73,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,O_e,O_f,P_m), (neq(((((O_b)*(P_c))
 #   Int[(b_.*tan[e_. + f_.*x_])^m_*(c_ + d_.*tan[e_. + f_.*x_]), x_Symbol] := c*Int[(b*Tan[e + f*x])^m, x] + d/b*Int[(b*Tan[e + f*x])^(m + 1), x] /; FreeQ[{b, c, d, e, f, m}, x] && NeQ[c^2 + d^2, 0] && Not[IntegerQ[2*m]]
 ADDSPEC RubiRules : IF NIN(Xv,O_b,P_c,O_d,O_e,O_f,P_m), (neq(((((P_c)^(2)))+(((O_d)^(2)))),0)), (not(integerq(((2)*(P_m))))) Int((((O_b)*(tan((O_e)+((O_f)*(Xv)))))^(P_m))*((P_c)+((O_d)*(tan((O_e)+((O_f)*(Xv)))))),Xv) = ((((P_c)*(Int(((((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))^(P_m)),Xv))))+(((O_d)*(((O_b)^((-1))))*(Int(((((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))^(((P_m)+(1)))),Xv)))))
 
-# Rule 18 not translated: symbol I
+# Rule 18 (13122 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^m_*(c_. + d_.*tan[e_. + f_.*x_]), x_Symbol] := (c + I*d)/2*Int[(a + b*Tan[e + f*x])^m*(1 - I*Tan[e + f*x]), x] + (c - I*d)/2*Int[(a + b*Tan[e + f*x])^m*(1 + I*Tan[e + f*x]), x] /; FreeQ[{a, b, c, d, e, f, m}, x] && NeQ[b*c - a*d, 0] && NeQ[a^2 + b^2, 0] && NeQ[c^2 + d^2, 0] && Not[IntegerQ[m]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,P_m), (neq(((((O_b)*(O_c)))+((((-1))*(O_a)*(O_d)))),0)), (neq(((((O_a)^(2)))+(((O_b)^(2)))),0)), (neq(((((O_c)^(2)))+(((O_d)^(2)))),0)), (not(integerq(P_m))) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(P_m))*((O_c)+((O_d)*(tan((O_e)+((O_f)*(Xv)))))),Xv) = ((((((O_c)+(((im)*(O_d)))))*((1/2))*(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(P_m)))*(((1)+((((-1))*(im)*(tan(((O_e)+(((O_f)*(Xv))))))))))),Xv))))+(((((O_c)+((((-1))*(im)*(O_d)))))*((1/2))*(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(P_m)))*(((1)+(((im)*(tan(((O_e)+(((O_f)*(Xv))))))))))),Xv)))))
 
 # Rule 19 (8748 variants):
 #   Int[(a_ + b_.*tan[e_. + f_.*x_])^m_*(c_. + d_.*tan[e_. + f_.*x_])^2, x_Symbol] := -b*(a*c + b*d)^2*(a + b*Tan[e + f*x])^m/(2*a^3*f*m) + 1/(2*a^2)* Int[(a + b*Tan[e + f*x])^(m + 1)* Simp[a*c^2 - 2*b*c*d + a*d^2 - 2*b*d^2*Tan[e + f*x], x], x] /; FreeQ[{a, b, c, d, e, f}, x] && NeQ[b*c - a*d, 0] && LeQ[m, -1] && EqQ[a^2 + b^2, 0]

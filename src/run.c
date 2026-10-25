@@ -879,6 +879,23 @@ void * realcalk(Node * term,int * perr)
 		return * perr ? NULL : v;
 		}
 
+  if (term->type == Func && ! hasval(term->l) && ! exe_always(term->l)
+      && kette((Symbol *) term->l) != NULL)
+		{	/* 2026: a symbolic variant (e.g. > : number,number in a rule with
+			   variables of sort number): the variant for the sorts of the
+			   actual arguments may be calculable */
+		Node * c = tcopy(term);
+		void * v = NULL;
+		retype_term(c);
+		if (TERM_HEAD(c) != TERM_HEAD(term) && hasval(TERM_HEAD(c)))
+			{
+			v = realcalk(c, perr);
+			delete(c);
+			return v;
+			}
+		delete(c);
+		}
+
   if (!hasval(term->l) || exe_always(term->l))  /* symbol of the function */
 		{
 		if (exe_always(term->l) && (term->type == Func)) /* user-defined function */
@@ -1051,6 +1068,11 @@ Node * calkulate (Node * term) /* gets a pointer to a calculable function */
 				sp=mknum(erg,rtypes((Symbol *) (term->l)));
 
 				rtypes(sp)=rtypes((Symbol *)(term->l)); /* result type of the function */
+				/* 2026: calculated by a narrower variant (realcalk: e.g. + :
+				   integer,integer for + : number,number): its sort */
+				if (term->type == Func && lastsym && rtypes(lastsym) != rtypes(sp)
+				    && sort_dist(rtypes(lastsym), rtypes(sp)) > 0)
+					rtypes(sp)=rtypes(lastsym);
 				}
 			else
 				{

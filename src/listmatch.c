@@ -242,7 +242,7 @@ static BOOLEAN lm_solve (Goal * g)
 		{
 		int n = term_nargs(p);
 		if (t->type == Func && term_nargs(t) == n
-		    && IS_follows(TERM_HEAD(t), TERM_HEAD(p)))
+		    && (IS_follows(TERM_HEAD(t), TERM_HEAD(p)) || variant_fits(TERM_HEAD(t), TERM_HEAD(p))))
 			{
 			if (goal(TERM_ARGS(p), TERM_ARGS(t), g->next))
 				return TRUE;

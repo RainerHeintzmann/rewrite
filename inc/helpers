@@ -68,8 +68,9 @@ FUNC normpoly  : real,real >> real        ATT SYMBOLIC normpoly   # polynomials:
 ALG DerivDef
 ALG DerivConst
 FUNC deriv     : real,real >> real        ATT RULES DerivDef,(DerivConst,Linear,diff)
-SPEC DerivDef : deriv(X,Y) = D(X,Y)
-SPEC DerivConst : IF NIN(Z,X) D(X,Z) = 0
+OTHER deriv    : number,number >> number  ATT RULES DerivDef,(DerivConst,Linear,diff)
+SPEC DerivDef : deriv(Xnu,Ynu) = D(Xnu,Ynu)
+SPEC DerivConst : IF NIN(Znu,Xnu) D(Xnu,Znu) = 0
 FUNC collect   : real >> real             ATT SYMBOLIC collect    # collect like summands
 # 2026: more helper functions of Rubi
 FUNC replaceall : real,real,real >> real  ATT SYMBOLIC replaceall   # u with x -> v (at once)
@@ -106,3 +107,96 @@ FUNC functionofq : real++ >> bool       ATT SYMBOLIC functionofq   # Rubi: Funct
 FUNC substfor : real++ >> real           ATT SYMBOLIC substfor     # Rubi: SubstFor[(h,)v,u,x]
 FUNC derivdivides : real,real,real >> real ATT SYMBOLIC derivdivides # Rubi: DerivativeDivides[y,u,x]
 FUNC falseq : real >> bool               ATT SYMBOLIC falseq       # Rubi: FalseQ (helper not applicable)
+
+# 2026: the variants for the sort number (inc/alg), e.g. for terms with the
+# imaginary unit im of inc/integration/base; the same C functions
+OTHER freeq             : number,number >> bool ATT SYMBOLIC freeq
+OTHER integerq          : number >> bool ATT SYMBOLIC integerq
+OTHER integersq         : number++ >> bool ATT SYMBOLIC integersq
+OTHER rationalq         : number++ >> bool ATT SYMBOLIC rationalq
+OTHER posq              : number >> bool ATT SYMBOLIC posq
+OTHER negq              : number >> bool ATT SYMBOLIC negq
+OTHER eqq               : number,number >> bool ATT SYMBOLIC eqq
+OTHER neq               : number,number >> bool ATT SYMBOLIC neq
+OTHER igtq              : number,number >> bool ATT SYMBOLIC igtq
+OTHER iltq              : number,number >> bool ATT SYMBOLIC iltq
+OTHER polyq             : number,number >> bool ATT SYMBOLIC polyq
+OTHER polyq             : number,number,number >> bool ATT SYMBOLIC polyq
+OTHER linearq           : number,number >> bool ATT SYMBOLIC linearq
+OTHER sumq              : number >> bool ATT SYMBOLIC sumq
+OTHER nonsumq           : number >> bool ATT SYMBOLIC nonsumq
+OTHER gtq               : number,number >> bool ATT SYMBOLIC gtq
+OTHER ltq               : number,number >> bool ATT SYMBOLIC ltq
+OTHER geq               : number,number >> bool ATT SYMBOLIC geq
+OTHER leq               : number,number >> bool ATT SYMBOLIC leq
+OTHER productq          : number >> bool ATT SYMBOLIC productq
+OTHER powerq            : number >> bool ATT SYMBOLIC powerq
+OTHER fractionq         : number++ >> bool ATT SYMBOLIC fractionq
+OTHER halfintegerq      : number++ >> bool ATT SYMBOLIC halfintegerq
+OTHER nicesqrtq         : number >> bool ATT SYMBOLIC nicesqrtq
+OTHER expand            : number >> number ATT SYMBOLIC expand
+OTHER expand            : number,number >> number ATT SYMBOLIC expand
+OTHER expandintegrand   : number,number >> number ATT SYMBOLIC expandintegrand
+OTHER expandintegrand   : number,number,number >> number ATT SYMBOLIC expandintegrand
+OTHER coeff             : number,number,number >> number ATT SYMBOLIC coeff
+OTHER coeff             : number,number >> number ATT SYMBOLIC coeff
+OTHER expon             : number,number >> number ATT SYMBOLIC expon
+OTHER subst             : number,number,number >> number ATT SYMBOLIC subst
+OTHER simp              : number,number >> number ATT SYMBOLIC simp
+OTHER simp              : number >> number ATT SYMBOLIC simp
+OTHER simplify          : number >> number ATT SYMBOLIC simplify
+OTHER dist              : number,number,number >> number ATT SYMBOLIC dist
+OTHER dist              : number,number >> number ATT SYMBOLIC dist
+OTHER rt                : number,number >> number ATT SYMBOLIC rt
+OTHER intpart           : number >> number ATT SYMBOLIC intpart
+OTHER fracpart          : number >> number ATT SYMBOLIC fracpart
+OTHER gcd               : number,number >> number ATT SYMBOLIC gcd
+OTHER numerator         : number >> number ATT SYMBOLIC numerator
+OTHER denominator       : number >> number ATT SYMBOLIC denominator
+OTHER freefactors       : number,number >> number ATT SYMBOLIC freefactors
+OTHER nonfreefactors    : number,number >> number ATT SYMBOLIC nonfreefactors
+OTHER removecontent     : number,number >> number ATT SYMBOLIC removecontent
+OTHER trignorm          : number,number >> number ATT SYMBOLIC trignorm
+OTHER trigexpand        : number,number >> number ATT SYMBOLIC trigexpand
+OTHER substfracpow      : number,number >> number ATT SYMBOLIC substfracpow
+OTHER substsqrtquad     : number,number >> number ATT SYMBOLIC substsqrtquad
+OTHER expandtosum       : number,number >> number ATT SYMBOLIC expandtosum
+OTHER expandtosum       : number,number,number >> number ATT SYMBOLIC expandtosum
+OTHER polyquotient      : number,number,number >> number ATT SYMBOLIC polyquotient
+OTHER polyremainder     : number,number,number >> number ATT SYMBOLIC polyremainder
+OTHER normpoly          : number,number >> number ATT SYMBOLIC normpoly
+OTHER collect           : number >> number ATT SYMBOLIC collect
+OTHER replaceall        : number,number,number >> number ATT SYMBOLIC replaceall
+OTHER binomialq         : number,number >> bool ATT SYMBOLIC binomialq
+OTHER binomialq         : number,number,number >> bool ATT SYMBOLIC binomialq
+OTHER binomialdegree    : number,number >> number ATT SYMBOLIC binomialdegree
+OTHER quadraticq        : number,number >> bool ATT SYMBOLIC quadraticq
+OTHER rationalfunctionq : number,number >> bool ATT SYMBOLIC rationalfunctionq
+OTHER inversefunctionfreeq: number,number >> bool ATT SYMBOLIC inversefunctionfreeq
+OTHER leafcount         : number >> number ATT SYMBOLIC leafcount
+OTHER simplerq          : number,number >> bool ATT SYMBOLIC simplerq
+OTHER sumsimplerq       : number,number >> bool ATT SYMBOLIC sumsimplerq
+OTHER simplersqrtq      : number,number >> bool ATT SYMBOLIC simplersqrtq
+OTHER knownsineintegrandq: number,number >> bool ATT SYMBOLIC knownsineintegrandq
+OTHER knowntangentintegrandq: number,number >> bool ATT SYMBOLIC knowntangentintegrandq
+OTHER knowncotangentintegrandq: number,number >> bool ATT SYMBOLIC knowncotangentintegrandq
+OTHER knownsecantintegrandq: number,number >> bool ATT SYMBOLIC knownsecantintegrandq
+OTHER piecewiselinearq  : number,number >> bool ATT SYMBOLIC piecewiselinearq
+OTHER piecewiselinearq  : number,number,number >> bool ATT SYMBOLIC piecewiselinearq
+OTHER expandtrigreduce  : number,number >> number ATT SYMBOLIC expandtrigreduce
+OTHER expandtrigreduce  : number,number,number >> number ATT SYMBOLIC expandtrigreduce
+OTHER trinomialq        : number,number >> bool ATT SYMBOLIC trinomialq
+OTHER linearpairq       : number,number,number >> bool ATT SYMBOLIC linearpairq
+OTHER algebraicfunctionq: number++ >> bool ATT SYMBOLIC algebraicfunctionq
+OTHER intsubst          : number,number,number >> number ATT SYMBOLIC intsubst
+OTHER hyp2exp           : number,number >> number ATT SYMBOLIC hyp2exp
+OTHER functionofexponentialq: number,number >> bool ATT SYMBOLIC functionofexponentialq
+OTHER normform          : number >> number ATT SYMBOLIC normform
+OTHER substexp          : number,number >> number ATT SYMBOLIC substexp
+OTHER binomsum          : number,number >> number ATT SYMBOLIC binomsum
+OTHER matchq            : number,number >> bool ATT SYMBOLIC HOLD matchq
+OTHER matchq            : number,number,bool >> bool ATT SYMBOLIC HOLD matchq
+OTHER functionofq       : number++ >> bool ATT SYMBOLIC functionofq
+OTHER substfor          : number++ >> number ATT SYMBOLIC substfor
+OTHER derivdivides      : number,number,number >> number ATT SYMBOLIC derivdivides
+OTHER falseq            : number >> bool ATT SYMBOLIC falseq

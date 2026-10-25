@@ -7,6 +7,7 @@
 # (symfkt.c) calls it after Mathematica's 1/sin = csc.
 ALG FixInert
 FUNC fixinert : real,real >> real ATT RULES FixInert
+OTHER fixinert : number,number >> number ATT RULES FixInert
 
 # Definition 1:
 #   FixInertTrigFunction[a_*u_,x_] := a*FixInertTrigFunction[u,x] /; FreeQ[a,x]

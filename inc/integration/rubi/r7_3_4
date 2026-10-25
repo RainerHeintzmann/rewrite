@@ -86,11 +86,13 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_p), (eqq(((((
 #   Int[(a_. + b_.*ArcCoth[c_.*x_])^p_./(d_ + e_.*x_^2), x_Symbol] := (a + b*ArcCoth[c*x])^(p + 1)/(b*c*d*(p + 1)) /; FreeQ[{a, b, c, d, e, p}, x] && EqQ[c^2*d + e, 0] && NeQ[p, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_p), (eqq(((((((O_c)^(2)))*(P_d)))+(O_e)),0)), (neq(O_p,(-1))) Int((((O_a)+((O_b)*(arccoth((O_c)*(Xv)))))^(O_p))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = ((((((O_a)+(((O_b)*(arccoth(((O_c)*(Xv))))))))^(((O_p)+(1)))))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((P_d)^((-1))))*(((((O_p)+(1)))^((-1)))))
 
-# Rule 21 not translated: symbol I
+# Rule 21 (324 variants):
 #   Int[(a_. + b_.*ArcTanh[c_.*x_])/Sqrt[d_ + e_.*x_^2], x_Symbol] := -2*(a + b*ArcTanh[c*x])* ArcTan[Sqrt[1 - c*x]/Sqrt[1 + c*x]]/(c*Sqrt[d]) - I*b*PolyLog[2, -I*Sqrt[1 - c*x]/Sqrt[1 + c*x]]/(c*Sqrt[d]) + I*b*PolyLog[2, I*Sqrt[1 - c*x]/Sqrt[1 + c*x]]/(c*Sqrt[d]) /; FreeQ[{a, b, c, d, e}, x] && EqQ[c^2*d + e, 0] && GtQ[d, 0]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((((O_c)^(2)))*(P_d)))+(O_e)),0)), (((gtq(P_d,0)))) Int(((O_a)+((O_b)*(arctanh((O_c)*(Xv)))))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = (((((-2))*(((O_a)+(((O_b)*(arctanh(((O_c)*(Xv))))))))*(arctan(((((((1)+((((-1))*(O_c)*(Xv)))))^((1/2))))*(((((1)+(((O_c)*(Xv)))))^((-(1/2))))))))*(((O_c)^((-1))))*(((P_d)^((-(1/2)))))))+((((-1))*(im)*(O_b)*(polylog(2,(((-1))*(im)*(((((1)+((((-1))*(O_c)*(Xv)))))^((1/2))))*(((((1)+(((O_c)*(Xv)))))^((-(1/2))))))))*(((O_c)^((-1))))*(((P_d)^((-(1/2)))))))+(((im)*(O_b)*(polylog(2,((im)*(((((1)+((((-1))*(O_c)*(Xv)))))^((1/2))))*(((((1)+(((O_c)*(Xv)))))^((-(1/2))))))))*(((O_c)^((-1))))*(((P_d)^((-(1/2))))))))
 
-# Rule 22 not translated: symbol I
+# Rule 22 (324 variants):
 #   Int[(a_. + b_.*ArcCoth[c_.*x_])/Sqrt[d_ + e_.*x_^2], x_Symbol] := -2*(a + b*ArcCoth[c*x])* ArcTan[Sqrt[1 - c*x]/Sqrt[1 + c*x]]/(c*Sqrt[d]) - I*b*PolyLog[2, -I*Sqrt[1 - c*x]/Sqrt[1 + c*x]]/(c*Sqrt[d]) + I*b*PolyLog[2, I*Sqrt[1 - c*x]/Sqrt[1 + c*x]]/(c*Sqrt[d]) /; FreeQ[{a, b, c, d, e}, x] && EqQ[c^2*d + e, 0] && GtQ[d, 0]
+ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((((O_c)^(2)))*(P_d)))+(O_e)),0)), (((gtq(P_d,0)))) Int(((O_a)+((O_b)*(arccoth((O_c)*(Xv)))))*(((P_d)+((O_e)*((Xv)^(2))))^(K_1)),Xv) = (((((-2))*(((O_a)+(((O_b)*(arccoth(((O_c)*(Xv))))))))*(arctan(((((((1)+((((-1))*(O_c)*(Xv)))))^((1/2))))*(((((1)+(((O_c)*(Xv)))))^((-(1/2))))))))*(((O_c)^((-1))))*(((P_d)^((-(1/2)))))))+((((-1))*(im)*(O_b)*(polylog(2,(((-1))*(im)*(((((1)+((((-1))*(O_c)*(Xv)))))^((1/2))))*(((((1)+(((O_c)*(Xv)))))^((-(1/2))))))))*(((O_c)^((-1))))*(((P_d)^((-(1/2)))))))+(((im)*(O_b)*(polylog(2,((im)*(((((1)+((((-1))*(O_c)*(Xv)))))^((1/2))))*(((((1)+(((O_c)*(Xv)))))^((-(1/2))))))))*(((O_c)^((-1))))*(((P_d)^((-(1/2))))))))
 
 # Rule 23 (648 variants):
 #   Int[(a_. + b_.*ArcTanh[c_.*x_])^p_./Sqrt[d_ + e_.*x_^2], x_Symbol] := 1/(c*Sqrt[d])*Subst[Int[(a + b*x)^p*Sech[x], x], x, ArcTanh[c*x]] /; FreeQ[{a, b, c, d, e}, x] && EqQ[c^2*d + e, 0] && IGtQ[p, 0] && GtQ[d, 0]

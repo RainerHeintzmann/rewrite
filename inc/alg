@@ -37,6 +37,20 @@ ATT complex show_complex,cmp_complex,cpy_complex,del_complex
 # but a variant that fits exactly, like + : real,complex below, is chosen
 # first; the conversion is the fallback (fewest conversions wins).
 SUBSORT real,complex ATT real2cpx
+# 2026: number, the sort of symbolic scalar expressions, above real and
+# complex (as Number in Julia). Rules with variables of sort number apply
+# to real and complex terms as well, and a function variant on number in a
+# pattern also matches its real and complex variants. Terms only become of
+# sort number when one of their parts is (like the imaginary unit im of
+# inc/integration/base); a term of reals keeps the real variants. The values
+# of number are complex numbers, but the variants on number below have no C
+# function: they only stand for the symbolic term.
+SORT number
+ATT number show_complex,cmp_complex,cpy_complex,del_complex
+SUBSORT real,number ATT real2cpx
+SUBSORT complex,number ATT cpx2num
+# variables of sort number: they match terms of every sort below number
+VAR Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
 
 VAR A,B,C,X,Y,Z : real
 VAR As,Bs,Cs,Xs,Ys,Zs : sort
@@ -234,6 +248,84 @@ FUNC Sub    : real,real,real >> real      # substitute(in term,var .,replace by 
 FUNC Sum    : real,real,real,real >> real # sum(variable,start,end,term)
 FUNC I      : real,real,real,real >> real # Integral
 
+# 2026: the symbolic variants on number (see SORT number above); the rules
+# for the derivative (ALG diff) are written for number
+OTHER >         : number,number >> bool
+OTHER >=        : number,number >> bool
+OTHER <         : number,number >> bool
+OTHER <=        : number,number >> bool
+OTHER ==        : number,number >> bool
+OTHER !=        : number,number >> bool
+OTHER is_int    : number >> bool
+OTHER sqrt      : number >> number
+OTHER lg        : number >> number
+OTHER ln        : number >> number
+OTHER exp       : number >> number
+OTHER sin       : number >> number
+OTHER arcsin    : number >> number
+OTHER sinh      : number >> number
+OTHER cos       : number >> number
+OTHER arccos    : number >> number
+OTHER cosh      : number >> number
+OTHER tan       : number >> number
+OTHER arctan    : number >> number
+OTHER arctan    : number,number >> number
+OTHER tanh      : number >> number
+OTHER csc       : number >> number
+OTHER sec       : number >> number
+OTHER cot       : number >> number
+OTHER arccot    : number >> number
+OTHER coth      : number >> number
+OTHER sech      : number >> number
+OTHER csch      : number >> number
+OTHER arcsinh   : number >> number
+OTHER arccosh   : number >> number
+OTHER arctanh   : number >> number
+OTHER arccoth   : number >> number
+OTHER polylog   : number,number >> number
+OTHER productlog: number >> number
+OTHER arcsec    : number >> number
+OTHER arccsc    : number >> number
+OTHER arcsech   : number >> number
+OTHER arccsch   : number >> number
+OTHER erf       : number >> number
+OTHER erfc      : number >> number
+OTHER erfi      : number >> number
+OTHER fresnels  : number >> number
+OTHER fresnelc  : number >> number
+OTHER sinint    : number >> number
+OTHER cosint    : number >> number
+OTHER sinhint   : number >> number
+OTHER coshint   : number >> number
+OTHER expint    : number >> number
+OTHER expinte   : number,number >> number
+OTHER logint    : number >> number
+OTHER Gamma     : number >> number
+OTHER Gamma     : number,number >> number
+OTHER loggamma  : number >> number
+OTHER polygamma : number,number >> number
+OTHER zeta      : number >> number
+OTHER zeta      : number,number >> number
+OTHER elliptick : number >> number
+OTHER ellipticf : number,number >> number
+OTHER elliptice : number >> number
+OTHER elliptice : number,number >> number
+OTHER ellipticpi: number,number >> number
+OTHER ellipticpi: number,number,number >> number
+OTHER hyp2f1    : number,number,number,number >> number
+OTHER appellf1  : number,number,number,number,number,number >> number
+OTHER besselj   : number,number >> number
+OTHER -         : number,number >> number
+OTHER +         : number,number >> number
+OTHER *         : number,number >> number
+OTHER /         : number,number >> number
+OTHER -         : number >> number
+OTHER mi        : number >> number
+OTHER ^         : number,number >> number
+OTHER abs       : number >> number
+OTHER sgn       : number >> number
+OTHER D         : number,number >> number
+
 LIFT (_F(As)) TO (_Fg(Ag))
 LIFT (_Fg(Ag)) TO (_Fr(Ar))
 LIFT (_Fr(Ar)) TO (_Fre(A))
@@ -373,79 +465,84 @@ ADDSPEC     Addord : Y+N*X+M*X = Y+(N+M)*X
 
 # ++++++++++++++++++++++++ DIFFERENTIAL CALCULUS ++++++++++++++++++++++++++
 ALG diff
-SPEC        diff : D(e,X) = 0         # order matters (first check e, then replace X)
-ADDSPEC     diff : D(pi,X)= 0
-ADDSPEC     diff : D(_x,X)= 0
-ADDSPEC     diff : D(N,X) = 0         # numbers are constant
-ADDSPEC     diff : D(X,X) = 1         # special constants
+SPEC        diff : D(e,Xnu) = 0         # order matters (first check e, then replace X)
+ADDSPEC     diff : D(pi,Xnu)= 0
+ADDSPEC     diff : D(_x,Xnu)= 0
+ADDSPEC     diff : D(N,Xnu) = 0         # numbers are constant
+ADDSPEC     diff : D(Xnu,Xnu) = 1         # special constants
+# 2026: linearity for terms of sort number (Linear of the real terms
+# works through _lFre)
+ADDSPEC     diff : D(Xnu+Ynu,Znu) = D(Xnu,Znu)+D(Ynu,Znu)
+ADDSPEC     diff : D(Xnu-Ynu,Znu) = D(Xnu,Znu)-D(Ynu,Znu)
+ADDSPEC     diff : D(-Xnu,Znu) = -D(Xnu,Znu)
 
 ADDSPEC     diff : Dn(X,Y,0) = X
 ADDSPEC     diff : Dn(X,Y,N) = Dn(D(X,Y),Y,N-1)
 
-ADDSPEC     diff : D(mi X,Y) = - D(X,Y)*mi(X^2)
-ADDSPEC     diff : D(ln X,Z) = D(X,Z)*mi X
-ADDSPEC     diff : D(lg X,Z) = D(X,Z)*mi (X*ln 10)
-ADDSPEC     diff : D(sin X,Z)= D(X,Z)*cos X
-ADDSPEC     diff : D(arcsin X,Z)= D(X,Z)*mi((1+(-(X^2)))^.5)   # 2026: was (1+X^2)
-ADDSPEC     diff : D(cos X,Z)   = - D(X,Z)*sin X
-ADDSPEC     diff : D(arccos X,Z)= - D(X,Z)*mi((1+(-(X^2)))^.5) # 2026: was (1+X^2)
-ADDSPEC     diff : D(tan X,Z)   = D(X,Z)*mi(cos(X)^2)
-ADDSPEC     diff : D(arctan X,Z)= D(X,Z)*mi(1+X^2)
-ADDSPEC     diff : D(exp X,Z)   = D(X,Z)*exp X                  # 2026 added
-ADDSPEC     diff : D(sqrt X,Z)  = D(X,Z)*mi(2*sqrt X)           # 2026 added
-ADDSPEC     diff : D(sinh X,Z)  = D(X,Z)*cosh X                 # 2026 added
-ADDSPEC     diff : D(cosh X,Z)  = D(X,Z)*sinh X                 # 2026 added
-ADDSPEC     diff : D(tanh X,Z)  = D(X,Z)*mi(cosh(X)^2)          # 2026 added
-ADDSPEC     diff : D(abs X,Z)   = D(X,Z)*X*mi(abs X)            # 2026 added (X not equal to 0)
-ADDSPEC     diff : D(csc X,Z)     = - D(X,Z)*cot(X)*csc(X)      # 2026 added
-ADDSPEC     diff : D(sec X,Z)     = D(X,Z)*tan(X)*sec(X)        # 2026 added
-ADDSPEC     diff : D(cot X,Z)     = - D(X,Z)*csc(X)^2           # 2026 added
-ADDSPEC     diff : D(arccot X,Z)  = - D(X,Z)*mi(1+X^2)          # 2026 added
-ADDSPEC     diff : D(coth X,Z)    = - D(X,Z)*csch(X)^2          # 2026 added
-ADDSPEC     diff : D(sech X,Z)    = - D(X,Z)*tanh(X)*sech(X)    # 2026 added
-ADDSPEC     diff : D(csch X,Z)    = - D(X,Z)*coth(X)*csch(X)    # 2026 added
-ADDSPEC     diff : D(arcsinh X,Z) = D(X,Z)*mi((1+X^2)^.5)       # 2026 added
-ADDSPEC     diff : D(arccosh X,Z) = D(X,Z)*mi((X^2+(-1))^.5)    # 2026 added
-ADDSPEC     diff : D(arctanh X,Z) = D(X,Z)*mi(1+(-(X^2)))       # 2026 added
-ADDSPEC     diff : D(arccoth X,Z) = D(X,Z)*mi(1+(-(X^2)))       # 2026 added
-ADDSPEC     diff : D(polylog(N,X),Z)  = D(X,Z)*polylog(N+(-1),X)*mi(X)                  # 2026 added
-ADDSPEC     diff : D(productlog X,Z)  = D(X,Z)*productlog(X)*mi(X*(1+productlog(X)))  # 2026 added
+ADDSPEC     diff : D(mi Xnu,Ynu) = - D(Xnu,Ynu)*mi(Xnu^2)
+ADDSPEC     diff : D(ln Xnu,Znu) = D(Xnu,Znu)*mi Xnu
+ADDSPEC     diff : D(lg Xnu,Znu) = D(Xnu,Znu)*mi (Xnu*ln 10)
+ADDSPEC     diff : D(sin Xnu,Znu)= D(Xnu,Znu)*cos Xnu
+ADDSPEC     diff : D(arcsin Xnu,Znu)= D(Xnu,Znu)*mi((1+(-(Xnu^2)))^.5)   # 2026: was (1+X^2)
+ADDSPEC     diff : D(cos Xnu,Znu)   = - D(Xnu,Znu)*sin Xnu
+ADDSPEC     diff : D(arccos Xnu,Znu)= - D(Xnu,Znu)*mi((1+(-(Xnu^2)))^.5) # 2026: was (1+X^2)
+ADDSPEC     diff : D(tan Xnu,Znu)   = D(Xnu,Znu)*mi(cos(Xnu)^2)
+ADDSPEC     diff : D(arctan Xnu,Znu)= D(Xnu,Znu)*mi(1+Xnu^2)
+ADDSPEC     diff : D(exp Xnu,Znu)   = D(Xnu,Znu)*exp Xnu                  # 2026 added
+ADDSPEC     diff : D(sqrt Xnu,Znu)  = D(Xnu,Znu)*mi(2*sqrt Xnu)           # 2026 added
+ADDSPEC     diff : D(sinh Xnu,Znu)  = D(Xnu,Znu)*cosh Xnu                 # 2026 added
+ADDSPEC     diff : D(cosh Xnu,Znu)  = D(Xnu,Znu)*sinh Xnu                 # 2026 added
+ADDSPEC     diff : D(tanh Xnu,Znu)  = D(Xnu,Znu)*mi(cosh(Xnu)^2)          # 2026 added
+ADDSPEC     diff : D(abs Xnu,Znu)   = D(Xnu,Znu)*Xnu*mi(abs Xnu)            # 2026 added (X not equal to 0)
+ADDSPEC     diff : D(csc Xnu,Znu)     = - D(Xnu,Znu)*cot(Xnu)*csc(Xnu)      # 2026 added
+ADDSPEC     diff : D(sec Xnu,Znu)     = D(Xnu,Znu)*tan(Xnu)*sec(Xnu)        # 2026 added
+ADDSPEC     diff : D(cot Xnu,Znu)     = - D(Xnu,Znu)*csc(Xnu)^2           # 2026 added
+ADDSPEC     diff : D(arccot Xnu,Znu)  = - D(Xnu,Znu)*mi(1+Xnu^2)          # 2026 added
+ADDSPEC     diff : D(coth Xnu,Znu)    = - D(Xnu,Znu)*csch(Xnu)^2          # 2026 added
+ADDSPEC     diff : D(sech Xnu,Znu)    = - D(Xnu,Znu)*tanh(Xnu)*sech(Xnu)    # 2026 added
+ADDSPEC     diff : D(csch Xnu,Znu)    = - D(Xnu,Znu)*coth(Xnu)*csch(Xnu)    # 2026 added
+ADDSPEC     diff : D(arcsinh Xnu,Znu) = D(Xnu,Znu)*mi((1+Xnu^2)^.5)       # 2026 added
+ADDSPEC     diff : D(arccosh Xnu,Znu) = D(Xnu,Znu)*mi((Xnu^2+(-1))^.5)    # 2026 added
+ADDSPEC     diff : D(arctanh Xnu,Znu) = D(Xnu,Znu)*mi(1+(-(Xnu^2)))       # 2026 added
+ADDSPEC     diff : D(arccoth Xnu,Znu) = D(Xnu,Znu)*mi(1+(-(Xnu^2)))       # 2026 added
+ADDSPEC     diff : D(polylog(N,Xnu),Znu)  = D(Xnu,Znu)*polylog(N+(-1),Xnu)*mi(Xnu)                  # 2026 added
+ADDSPEC     diff : D(productlog Xnu,Znu)  = D(Xnu,Znu)*productlog(Xnu)*mi(Xnu*(1+productlog(Xnu)))  # 2026 added
 # 2026: derivatives of the special functions (w.r.t. the argument that depends on Z)
-ADDSPEC     diff : D(arcsec X,Z)  = D(X,Z)*mi(X^2*(1+(-(mi(X^2))))^.5)
-ADDSPEC     diff : D(arccsc X,Z)  = - D(X,Z)*mi(X^2*(1+(-(mi(X^2))))^.5)
-ADDSPEC     diff : D(arcsech X,Z) = - D(X,Z)*mi(X*(1+(-(X^2)))^.5)
-ADDSPEC     diff : D(arccsch X,Z) = - D(X,Z)*mi(X^2*(1+mi(X^2))^.5)
-ADDSPEC     diff : D(erf X,Z)     = D(X,Z)*2*mi(pi^.5)*exp(-(X^2))
-ADDSPEC     diff : D(erfc X,Z)    = - D(X,Z)*2*mi(pi^.5)*exp(-(X^2))
-ADDSPEC     diff : D(erfi X,Z)    = D(X,Z)*2*mi(pi^.5)*exp(X^2)
-ADDSPEC     diff : D(fresnels X,Z) = D(X,Z)*sin(pi*X^2*.5)
-ADDSPEC     diff : D(fresnelc X,Z) = D(X,Z)*cos(pi*X^2*.5)
-ADDSPEC     diff : D(sinint X,Z)  = D(X,Z)*sin(X)*mi(X)
-ADDSPEC     diff : D(cosint X,Z)  = D(X,Z)*cos(X)*mi(X)
-ADDSPEC     diff : D(sinhint X,Z) = D(X,Z)*sinh(X)*mi(X)
-ADDSPEC     diff : D(coshint X,Z) = D(X,Z)*cosh(X)*mi(X)
-ADDSPEC     diff : D(expint X,Z)  = D(X,Z)*exp(X)*mi(X)
-ADDSPEC     diff : D(logint X,Z)  = D(X,Z)*mi(ln X)
-ADDSPEC     diff : IF NIN(Z,Y) D(expinte(Y,X),Z) = - D(X,Z)*expinte(Y+(-1),X)
-ADDSPEC     diff : D(Gamma X,Z)   = D(X,Z)*Gamma(X)*polygamma(0,X)
-ADDSPEC     diff : IF NIN(Z,Y) D(Gamma(Y,X),Z) = - D(X,Z)*X^(Y+(-1))*exp(-X)
-ADDSPEC     diff : D(loggamma X,Z) = D(X,Z)*polygamma(0,X)
-ADDSPEC     diff : IF NIN(Z,Y) D(polygamma(Y,X),Z) = D(X,Z)*polygamma(Y+1,X)
-ADDSPEC     diff : IF NIN(Z,Y) D(zeta(Y,X),Z) = - D(X,Z)*Y*zeta(Y+1,X)
-ADDSPEC     diff : D(elliptice X,Z) = D(X,Z)*(elliptice(X)+(-(elliptick(X))))*mi(2*X)
-ADDSPEC     diff : D(elliptick X,Z) = D(X,Z)*(elliptice(X)+(-((1+(-X))*elliptick(X))))*mi(2*X*(1+(-X)))
-ADDSPEC     diff : IF NIN(Z,Y) D(ellipticf(X,Y),Z) = D(X,Z)*mi((1+(-(Y*sin(X)^2)))^.5)
-ADDSPEC     diff : IF NIN(Z,Y) D(elliptice(X,Y),Z) = D(X,Z)*(1+(-(Y*sin(X)^2)))^.5
-ADDSPEC     diff : IF NIN(Z,A,Y) D(ellipticpi(A,X,Y),Z) = D(X,Z)*mi((1+(-(A*sin(X)^2)))*(1+(-(Y*sin(X)^2)))^.5)
-ADDSPEC     diff : IF NIN(Z,A,B,C) D(hyp2f1(A,B,C,X),Z) = D(X,Z)*A*B*mi(C)*hyp2f1(A+1,B+1,C+1,X)
-ADDSPEC     diff : IF NIN(Z,Y) D(besselj(Y,X),Z) = D(X,Z)*(besselj(Y+(-1),X)+(-(besselj(Y+1,X))))*.5
+ADDSPEC     diff : D(arcsec Xnu,Znu)  = D(Xnu,Znu)*mi(Xnu^2*(1+(-(mi(Xnu^2))))^.5)
+ADDSPEC     diff : D(arccsc Xnu,Znu)  = - D(Xnu,Znu)*mi(Xnu^2*(1+(-(mi(Xnu^2))))^.5)
+ADDSPEC     diff : D(arcsech Xnu,Znu) = - D(Xnu,Znu)*mi(Xnu*(1+(-(Xnu^2)))^.5)
+ADDSPEC     diff : D(arccsch Xnu,Znu) = - D(Xnu,Znu)*mi(Xnu^2*(1+mi(Xnu^2))^.5)
+ADDSPEC     diff : D(erf Xnu,Znu)     = D(Xnu,Znu)*2*mi(pi^.5)*exp(-(Xnu^2))
+ADDSPEC     diff : D(erfc Xnu,Znu)    = - D(Xnu,Znu)*2*mi(pi^.5)*exp(-(Xnu^2))
+ADDSPEC     diff : D(erfi Xnu,Znu)    = D(Xnu,Znu)*2*mi(pi^.5)*exp(Xnu^2)
+ADDSPEC     diff : D(fresnels Xnu,Znu) = D(Xnu,Znu)*sin(pi*Xnu^2*.5)
+ADDSPEC     diff : D(fresnelc Xnu,Znu) = D(Xnu,Znu)*cos(pi*Xnu^2*.5)
+ADDSPEC     diff : D(sinint Xnu,Znu)  = D(Xnu,Znu)*sin(Xnu)*mi(Xnu)
+ADDSPEC     diff : D(cosint Xnu,Znu)  = D(Xnu,Znu)*cos(Xnu)*mi(Xnu)
+ADDSPEC     diff : D(sinhint Xnu,Znu) = D(Xnu,Znu)*sinh(Xnu)*mi(Xnu)
+ADDSPEC     diff : D(coshint Xnu,Znu) = D(Xnu,Znu)*cosh(Xnu)*mi(Xnu)
+ADDSPEC     diff : D(expint Xnu,Znu)  = D(Xnu,Znu)*exp(Xnu)*mi(Xnu)
+ADDSPEC     diff : D(logint Xnu,Znu)  = D(Xnu,Znu)*mi(ln Xnu)
+ADDSPEC     diff : IF NIN(Znu,Ynu) D(expinte(Ynu,Xnu),Znu) = - D(Xnu,Znu)*expinte(Ynu+(-1),Xnu)
+ADDSPEC     diff : D(Gamma Xnu,Znu)   = D(Xnu,Znu)*Gamma(Xnu)*polygamma(0,Xnu)
+ADDSPEC     diff : IF NIN(Znu,Ynu) D(Gamma(Ynu,Xnu),Znu) = - D(Xnu,Znu)*Xnu^(Ynu+(-1))*exp(-Xnu)
+ADDSPEC     diff : D(loggamma Xnu,Znu) = D(Xnu,Znu)*polygamma(0,Xnu)
+ADDSPEC     diff : IF NIN(Znu,Ynu) D(polygamma(Ynu,Xnu),Znu) = D(Xnu,Znu)*polygamma(Ynu+1,Xnu)
+ADDSPEC     diff : IF NIN(Znu,Ynu) D(zeta(Ynu,Xnu),Znu) = - D(Xnu,Znu)*Ynu*zeta(Ynu+1,Xnu)
+ADDSPEC     diff : D(elliptice Xnu,Znu) = D(Xnu,Znu)*(elliptice(Xnu)+(-(elliptick(Xnu))))*mi(2*Xnu)
+ADDSPEC     diff : D(elliptick Xnu,Znu) = D(Xnu,Znu)*(elliptice(Xnu)+(-((1+(-Xnu))*elliptick(Xnu))))*mi(2*Xnu*(1+(-Xnu)))
+ADDSPEC     diff : IF NIN(Znu,Ynu) D(ellipticf(Xnu,Ynu),Znu) = D(Xnu,Znu)*mi((1+(-(Ynu*sin(Xnu)^2)))^.5)
+ADDSPEC     diff : IF NIN(Znu,Ynu) D(elliptice(Xnu,Ynu),Znu) = D(Xnu,Znu)*(1+(-(Ynu*sin(Xnu)^2)))^.5
+ADDSPEC     diff : IF NIN(Znu,Anu,Ynu) D(ellipticpi(Anu,Xnu,Ynu),Znu) = D(Xnu,Znu)*mi((1+(-(Anu*sin(Xnu)^2)))*(1+(-(Ynu*sin(Xnu)^2)))^.5)
+ADDSPEC     diff : IF NIN(Znu,Anu,Bnu,Cnu) D(hyp2f1(Anu,Bnu,Cnu,Xnu),Znu) = D(Xnu,Znu)*Anu*Bnu*mi(Cnu)*hyp2f1(Anu+1,Bnu+1,Cnu+1,Xnu)
+ADDSPEC     diff : IF NIN(Znu,Ynu) D(besselj(Ynu,Xnu),Znu) = D(Xnu,Znu)*(besselj(Ynu+(-1),Xnu)+(-(besselj(Ynu+1,Xnu))))*.5
 
-ADDSPEC     diff : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # general differentiation rules
+ADDSPEC     diff : D(Xnu*Ynu,Znu)=D(Xnu,Znu)*Ynu+D(Ynu,Znu)*Xnu   # general differentiation rules
 ADDSPEC     diff : IF NIN (Z,X) D(_Fre(X),Z)=D(X,Z)*D(_Fre(X),X)  # chain rule
 
-ADDSPEC     diff : D(e^X,Z)  = D(X,Z)*e^X
-ADDSPEC     diff : D(X^N,X)=N*X^(N-1)      # this is faster
-ADDSPEC     diff : D(X^Y,Z)=D(X,Z)*Y*X^(Y+(-1))+D(Y,Z)*ln X*X^Y
+ADDSPEC     diff : D(e^Xnu,Znu)  = D(Xnu,Znu)*e^Xnu
+ADDSPEC     diff : D(Xnu^N,Xnu)=N*Xnu^(N-1)      # this is faster
+ADDSPEC     diff : D(Xnu^Ynu,Znu)=D(Xnu,Znu)*Ynu*Xnu^(Ynu+(-1))+D(Ynu,Znu)*ln Xnu*Xnu^Ynu
 
 ADDSPEC     diff : D(I(A,B,C,_x),Z)=Sub(C,_x,B)*D(B,Z)-Sub(C,_x,A)*D(A,Z)+I(A,B,D(C,Z),_x) # Leibnitz
 

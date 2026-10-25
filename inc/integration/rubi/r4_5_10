@@ -9,14 +9,16 @@
 # Rule 1 not translated: function Complex in pattern
 #   Int[(c_. + d_.*x_)^m_.*csc[e_. + k_.*Pi + f_.*Complex[0, fz_]*x_], x_Symbol] := -2*(c + d*x)^m*ArcTanh[E^(-I*k*Pi)*E^(-I*e + f*fz*x)]/(f*fz*I) - d*m/(f*fz*I)* Int[(c + d*x)^(m - 1)*Log[1 - E^(-I*k*Pi)*E^(-I*e + f*fz*x)], x] + d*m/(f*fz*I)* Int[(c + d*x)^(m - 1)*Log[1 + E^(-I*k*Pi)*E^(-I*e + f*fz*x)], x] /; FreeQ[{c, d, e, f, fz}, x] && IntegerQ[2*k] && IGtQ[m, 0]
 
-# Rule 2 not translated: symbol I
+# Rule 2 (1944 variants):
 #   Int[(c_. + d_.*x_)^m_.*csc[e_. + k_.*Pi + f_.*x_], x_Symbol] := -2*(c + d*x)^m*ArcTanh[E^(I*k*Pi)*E^(I*(e + f*x))]/f - d*m/f* Int[(c + d*x)^(m - 1)*Log[1 - E^(I*k*Pi)*E^(I*(e + f*x))], x] + d*m/f* Int[(c + d*x)^(m - 1)*Log[1 + E^(I*k*Pi)*E^(I*(e + f*x))], x] /; FreeQ[{c, d, e, f}, x] && IntegerQ[2*k] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_f), (integerq(((2)*(O_k)))), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(csc((O_e)+((O_k)*(3.141592653589793))+((O_f)*(Xv)))),Xv) = (((((-2))*(((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(arctanh((((eE^(((im)*(O_k)*(pi)))))*((eE^(((im)*(((O_e)+(((O_f)*(Xv))))))))))))*(((O_f)^((-1))))))+((((-1))*(O_d)*(O_m)*(((O_f)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(ln(((1)+((((-1))*((eE^(((im)*(O_k)*(pi)))))*((eE^(((im)*(((O_e)+(((O_f)*(Xv))))))))))))))),Xv))))+(((O_d)*(O_m)*(((O_f)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(ln(((1)+((((eE^(((im)*(O_k)*(pi)))))*((eE^(((im)*(((O_e)+(((O_f)*(Xv))))))))))))))),Xv)))))
 
 # Rule 3 not translated: function Complex in pattern
 #   Int[(c_. + d_.*x_)^m_.*csc[e_. + f_.*Complex[0, fz_]*x_], x_Symbol] := -2*(c + d*x)^m*ArcTanh[E^(-I*e + f*fz*x)]/(f*fz*I) - d*m/(f*fz*I)* Int[(c + d*x)^(m - 1)*Log[1 - E^(-I*e + f*fz*x)], x] + d*m/(f*fz*I)* Int[(c + d*x)^(m - 1)*Log[1 + E^(-I*e + f*fz*x)], x] /; FreeQ[{c, d, e, f, fz}, x] && IGtQ[m, 0]
 
-# Rule 4 not translated: symbol I
+# Rule 4 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*csc[e_. + f_.*x_], x_Symbol] := -2*(c + d*x)^m*ArcTanh[E^(I*(e + f*x))]/f - d*m/f*Int[(c + d*x)^(m - 1)*Log[1 - E^(I*(e + f*x))], x] + d*m/f*Int[(c + d*x)^(m - 1)*Log[1 + E^(I*(e + f*x))], x] /; FreeQ[{c, d, e, f}, x] && IGtQ[m, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d,O_e,O_f), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(csc((O_e)+((O_f)*(Xv)))),Xv) = (((((-2))*(((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(arctanh((eE^(((im)*(((O_e)+(((O_f)*(Xv))))))))))*(((O_f)^((-1))))))+((((-1))*(O_d)*(O_m)*(((O_f)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(ln(((1)+((((-1))*((eE^(((im)*(((O_e)+(((O_f)*(Xv))))))))))))))),Xv))))+(((O_d)*(O_m)*(((O_f)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(ln(((1)+((eE^(((im)*(((O_e)+(((O_f)*(Xv))))))))))))),Xv)))))
 
 # Rule 5 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*csc[e_. + f_.*x_]^2, x_Symbol] := -(c + d*x)^m*Cot[e + f*x]/f + d*m/f*Int[(c + d*x)^(m - 1)*Cot[e + f*x], x] /; FreeQ[{c, d, e, f}, x] && GtQ[m, 0]

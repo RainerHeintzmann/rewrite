@@ -418,13 +418,18 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - SUBSORT real,complex: komplexe Funktionen nehmen auch reelle Argumente; eine
    genau passende Variante hat Vorrang vor Umwandlungen, die wenigsten
    Umwandlungen gewinnen, gleich gute Varianten werden gemeldet.
+ - Die Sorte number fuer symbolische Ausdruecke, oberhalb von real und complex
+   (wie Number in Julia): Regeln mit Variablen der Sorte number gelten auch
+   fuer reelle und komplexe Terme; ein Term aus reellen Teilen behaelt seine
+   reellen Operatoren. Die Integration kennt die imaginaere Einheit im
+   (im^2 = -1, Mathematicas I).
  - Funktionen, die durch Regellisten definiert sind: FUNC f ... ATT RULES Alg
    (f(..) = REWR f(..) : Alg, auch in Bedingungen und aus C). deriv und Rubis
    FixInertTrigFunction sind jetzt Regeln statt C-Tabellen.
  - Exakte Wurzeln: 4^(1/2) = 2, 8^(1/2) = 2*2^(1/2), (2^(1/2))^2 = 2; nicht
    exakte Wurzeln bleiben Terme (Normalform wie in Mathematica). Eine reelle
    Zahl macht den Ausdruck numerisch (x*2^(1/2)*0.5 = 0.707107*x).
- - tools/rubi2rewrite.py uebersetzt etwa 90% der Rubi-Regeln
+ - tools/rubi2rewrite.py uebersetzt etwa 96% der Rubi-Regeln
    automatisch nach inc/integration/rubi (RubiIntegrate); tools/rubitest.py
    prueft sie mit Rubis Testsammlung.
 

@@ -321,6 +321,7 @@ RW_TO_PY = {
 }
 RW_TO_PY.update({n: n for n in SPECIAL if not n.startswith('a')})
 RW_TO_PY.update({'arcsec': 'asec', 'arccsc': 'acsc', 'arcsech': 'asech', 'arccsch': 'acsch'})
+RW_TO_PY['im'] = '1j'           # the imaginary unit of the integration
 
 OUT_TOKEN = re.compile(r'\s*(?:(?P<num>(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?)|(?P<id>[A-Za-z_][A-Za-z0-9_]*)|(?P<op>[-+*/^(),]))')
 
@@ -417,7 +418,7 @@ HEAD = '''INC "inc/all"
 INC "inc/integration/all"
 INC "inc/integration/rubi/all"
 PRTNUM "%.15g "
-TERM FF : real
+TERM FF : number
 CONST yy : real
 x = yy
 '''

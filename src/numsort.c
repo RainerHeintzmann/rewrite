@@ -222,6 +222,14 @@ BOOLEAN num_to_double (Symbol * num, double * v)
 	return TRUE;
 }
 
+BOOLEAN sort_top (Node * s)		/* no wider sort (number, bool, ...) */
+{
+	int i;
+	for (i = 0; i < nsub; i++)
+		if (sub[i].from == s) return FALSE;
+	return TRUE;
+}
+
 BOOLEAN var_sort_ok (Node * vsort, Node * term)
 {
 	int i;

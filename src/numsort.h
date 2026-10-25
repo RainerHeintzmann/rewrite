@@ -60,6 +60,9 @@ Symbol * make_exact_rat (void * q);
  * matches any term, as before. */
 BOOLEAN var_sort_ok (Node * vsort, Node * term);
 
+/* the sort has no wider sort (SUBSORT) */
+BOOLEAN sort_top (Node * s);
+
 /* sort of an argument node (as eq_rtypes sees it) */
 Node * arg_sort (Node * a);
 

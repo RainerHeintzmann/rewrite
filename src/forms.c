@@ -446,6 +446,9 @@ BOOLEAN match2 (Node * term,Node * Baum)
 				if (term->type == Func)
 					{	
 					Node * tmpchain = NULL;
+					if (term->l != Baum->l && variant_fits((Symbol *) term->l,(Symbol *) Baum->l)
+					    && ! IS_follows((Symbol *) term->l,(Symbol *) Baum->l))
+						return match2(term->r,Baum->r);	/* 2026: + : real,real for + : number,number */
 					if (IS_follows((Symbol *) term->l,(Symbol *) Baum->l))
 						if (lock_rtypes((Symbol *) Baum->l,(Symbol *) term->l,& tmpchain))
 							if (match2(term->r,Baum->r))

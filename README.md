@@ -378,6 +378,33 @@ tst(-2.5)            # prints 2.5: the real variant fits exactly
 tst(-2.5+i)          # prints -2.5: the complex one
 ```
 
+**The sort `number`.** [inc/alg](inc/alg) also declares the sort `number`
+for symbolic scalar expressions, above `real` and `complex` (`SUBSORT
+real,number`, `SUBSORT complex,number`), like `Number` in Julia. The
+arithmetic and the elementary and special functions have variants on
+`number` without a C function; they only stand for the symbolic term.
+A term becomes of sort `number` only when one of its parts is, such as the
+imaginary unit `im` of [inc/integration/base](inc/integration/base); a term
+of reals keeps its real variants and is calculated as before. Rules written
+with variables of sort `number` apply to every term below it:
+
+- A variable whose sort has no wider sort (`number`) matches any term, and
+  a function in a pattern whose variant is declared on such sorts
+  (`+ : number,number`) also matches its narrower variants (`+ :
+  real,real`, `+ : complex,real`), as a method for `Number` in Julia
+  applies to `Float64`. Variants on sorts below others (`real`, `integer`)
+  still match only themselves, so the older libraries are unchanged.
+- After a rule is applied, the operators of the new term are chosen again
+  for the sorts of the actual arguments, and a condition such as `m > 0`
+  or `integerq(2*m)` is calculated with the real or exact variant, so
+  `Int(3,x)` satisfies a rule `IF (Uq > 2) Int(Uq,Xv) = ...` written for
+  `number`.
+
+The derivative rules (ALG `diff`) and the Rubi rules are written for
+`number` in this way, so `deriv(sin(im*x),x)` gives `im*cos(im*x)` and
+`REWR Int(sin(im*x),x) : RubiIntegrate` gives `im * cos (im * x )`. The
+general simplification `All` is still written for `real`.
+
 **Roots.** A power of exact numbers is exact when the result is
 rational: `4^(1/2)` is 2, `(8/27)^(2/3)` is `(4/9)`. Otherwise it stays a
 term inside a term, in the normal form Mathematica uses: perfect powers
@@ -812,7 +839,7 @@ where the library [inc/](inc) and the tests are used from.
 - Rule lists with a backtracking matcher for rules with `OPT`, `DEFAULT`
   and `COMM`, instead of expanding each rule into its variants. Rules that
   make no progress or give NaN are skipped, and `REWR` has a step limit.
-- [tools/rubi2rewrite.py](tools/rubi2rewrite.py) translates about 90% of
+- [tools/rubi2rewrite.py](tools/rubi2rewrite.py) translates 96% of
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
@@ -820,6 +847,9 @@ where the library [inc/](inc) and the tests are used from.
   `select`, ...
 - `SUBSORT real,complex`: complex functions take real arguments; exact
   variants keep precedence over conversions, ties are reported.
+- The sort `number` above `real` and `complex` for symbolic expressions:
+  rules written for `number` apply to real and complex terms, and the
+  integration rules know the imaginary unit `im` (`im^2 = -1`).
 - Functions defined by rule lists (`ATT RULES`), also usable in conditions
   and from C: the derivative `deriv` and Rubi's `FixInertTrigFunction`
   are rules now instead of C tables.

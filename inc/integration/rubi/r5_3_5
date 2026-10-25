@@ -54,11 +54,13 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,O_e,O_f,O_m,P_p), (not(igtq(P_p,0)
 #   Int[(e_. + f_.*x_)^m_.*(a_. + b_.*ArcCot[c_ + d_.*x_])^p_, x_Symbol] := Unintegrable[(e + f*x)^m*(a + b*ArcCot[c + d*x])^p, x] /; FreeQ[{a, b, c, d, e, f, m, p}, x] && Not[IGtQ[p, 0]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_c,O_d,O_e,O_f,O_m,P_p), (not(igtq(P_p,0))) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(((O_a)+((O_b)*(arccot((P_c)+((O_d)*(Xv))))))^(P_p)),Xv) = unintegrable(((((((O_e)+(((O_f)*(Xv)))))^(O_m)))*(((((O_a)+(((O_b)*(arccot(((P_c)+(((O_d)*(Xv))))))))))^(P_p)))),Xv)
 
-# Rule 13 not translated: symbol I
+# Rule 13 (144 variants):
 #   Int[ArcTan[a_ + b_.*x_]/(c_ + d_.*x_^n_.), x_Symbol] := I/2*Int[Log[1 - I*a - I*b*x]/(c + d*x^n), x] - I/2*Int[Log[1 + I*a + I*b*x]/(c + d*x^n), x] /; FreeQ[{a, b, c, d}, x] && RationalQ[n]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (rationalq(O_n)) Int((arctan((P_a)+((O_b)*(Xv))))*(((P_c)+((O_d)*((Xv)^(O_n))))^(K_1)),Xv) = ((((im)*((1/2))*(Int(((ln(((1)+((((-1))*(im)*(P_a)))+((((-1))*(im)*(O_b)*(Xv))))))*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^((-1))))),Xv))))+((((-(1/2)))*(im)*(Int(((ln(((1)+(((im)*(P_a)))+(((im)*(O_b)*(Xv))))))*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^((-1))))),Xv)))))
 
-# Rule 14 not translated: symbol I
+# Rule 14 (144 variants):
 #   Int[ArcCot[a_ + b_.*x_]/(c_ + d_.*x_^n_.), x_Symbol] := I/2*Int[Log[(-I + a + b*x)/(a + b*x)]/(c + d*x^n), x] - I/2*Int[Log[(I + a + b*x)/(a + b*x)]/(c + d*x^n), x] /; FreeQ[{a, b, c, d}, x] && RationalQ[n]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_c,O_d), (rationalq(O_n)) Int((arccot((P_a)+((O_b)*(Xv))))*(((P_c)+((O_d)*((Xv)^(O_n))))^(K_1)),Xv) = ((((im)*((1/2))*(Int(((ln((((((((-1))*(im)))+(P_a)+(((O_b)*(Xv)))))*(((((P_a)+(((O_b)*(Xv)))))^((-1)))))))*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^((-1))))),Xv))))+((((-(1/2)))*(im)*(Int(((ln(((((im)+(P_a)+(((O_b)*(Xv)))))*(((((P_a)+(((O_b)*(Xv)))))^((-1)))))))*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^((-1))))),Xv)))))
 
 # Rule 15 (72 variants):
 #   Int[ArcTan[a_ + b_.*x_]/(c_ + d_.*x_^n_), x_Symbol] := Unintegrable[ArcTan[a + b*x]/(c + d*x^n), x] /; FreeQ[{a, b, c, d, n}, x] && Not[RationalQ[n]]

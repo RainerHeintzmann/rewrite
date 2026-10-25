@@ -224,23 +224,29 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n), (neq(O_m,(-1))) Int(
 #   Int[(e_.*x_)^m_.*Erfi[d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := (e*x)^(m + 1)*Erfi[d*(a + b*Log[c*x^n])]/(e*(m + 1)) - 2*b*d*n/(Sqrt[Pi]*(m + 1))* Int[(e*x)^m*E^(d*(a + b*Log[c*x^n]))^2, x] /; FreeQ[{a, b, c, d, e, m, n}, x] && NeQ[m, -1]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n), (neq(O_m,(-1))) Int((((O_e)*(Xv))^(O_m))*(erfi((O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))))),Xv) = ((((((((O_e)*(Xv)))^(((O_m)+(1)))))*(erfi(((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))*(((O_e)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-2))*(O_b)*(O_d)*(O_n)*(((pi)^((-(1/2)))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_e)*(Xv)))^(O_m)))*((eE^(((((O_d)^(2)))*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(2)))))))),Xv)))))
 
-# Rule 56 not translated: symbol I
+# Rule 56 (54 variants):
 #   Int[Sin[c_. + d_.*x_^2]*Erf[b_.*x_], x_Symbol] := I/2*Int[E^(-I*c - I*d*x^2)*Erf[b*x], x] - I/2*Int[E^(I*c + I*d*x^2)*Erf[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (eqq(((O_d)^(2)),(((-1))*(((O_b)^(4)))))) Int((sin((O_c)+((O_d)*((Xv)^(2)))))*(erf((O_b)*(Xv))),Xv) = ((((im)*((1/2))*(Int((((eE^((((((-1))*(im)*(O_c)))+((((-1))*(im)*(O_d)*(((Xv)^(2)))))))))*(erf(((O_b)*(Xv))))),Xv))))+((((-(1/2)))*(im)*(Int((((eE^(((((im)*(O_c)))+(((im)*(O_d)*(((Xv)^(2)))))))))*(erf(((O_b)*(Xv))))),Xv)))))
 
-# Rule 57 not translated: symbol I
+# Rule 57 (54 variants):
 #   Int[Sin[c_. + d_.*x_^2]*Erfc[b_.*x_], x_Symbol] := I/2*Int[E^(-I*c - I*d*x^2)*Erfc[b*x], x] - I/2*Int[E^(I*c + I*d*x^2)*Erfc[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (eqq(((O_d)^(2)),(((-1))*(((O_b)^(4)))))) Int((sin((O_c)+((O_d)*((Xv)^(2)))))*(erfc((O_b)*(Xv))),Xv) = ((((im)*((1/2))*(Int((((eE^((((((-1))*(im)*(O_c)))+((((-1))*(im)*(O_d)*(((Xv)^(2)))))))))*(erfc(((O_b)*(Xv))))),Xv))))+((((-(1/2)))*(im)*(Int((((eE^(((((im)*(O_c)))+(((im)*(O_d)*(((Xv)^(2)))))))))*(erfc(((O_b)*(Xv))))),Xv)))))
 
-# Rule 58 not translated: symbol I
+# Rule 58 (54 variants):
 #   Int[Sin[c_. + d_.*x_^2]*Erfi[b_.*x_], x_Symbol] := I/2*Int[E^(-I*c - I*d*x^2)*Erfi[b*x], x] - I/2*Int[E^(I*c + I*d*x^2)*Erfi[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (eqq(((O_d)^(2)),(((-1))*(((O_b)^(4)))))) Int((sin((O_c)+((O_d)*((Xv)^(2)))))*(erfi((O_b)*(Xv))),Xv) = ((((im)*((1/2))*(Int((((eE^((((((-1))*(im)*(O_c)))+((((-1))*(im)*(O_d)*(((Xv)^(2)))))))))*(erfi(((O_b)*(Xv))))),Xv))))+((((-(1/2)))*(im)*(Int((((eE^(((((im)*(O_c)))+(((im)*(O_d)*(((Xv)^(2)))))))))*(erfi(((O_b)*(Xv))))),Xv)))))
 
-# Rule 59 not translated: symbol I
+# Rule 59 (54 variants):
 #   Int[Cos[c_. + d_.*x_^2]*Erf[b_.*x_], x_Symbol] := 1/2*Int[E^(-I*c - I*d*x^2)*Erf[b*x], x] + 1/2*Int[E^(I*c + I*d*x^2)*Erf[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (eqq(((O_d)^(2)),(((-1))*(((O_b)^(4)))))) Int((cos((O_c)+((O_d)*((Xv)^(2)))))*(erf((O_b)*(Xv))),Xv) = (((((1/2))*(Int((((eE^((((((-1))*(im)*(O_c)))+((((-1))*(im)*(O_d)*(((Xv)^(2)))))))))*(erf(((O_b)*(Xv))))),Xv))))+((((1/2))*(Int((((eE^(((((im)*(O_c)))+(((im)*(O_d)*(((Xv)^(2)))))))))*(erf(((O_b)*(Xv))))),Xv)))))
 
-# Rule 60 not translated: symbol I
+# Rule 60 (54 variants):
 #   Int[Cos[c_. + d_.*x_^2]*Erfc[b_.*x_], x_Symbol] := 1/2*Int[E^(-I*c - I*d*x^2)*Erfc[b*x], x] + 1/2*Int[E^(I*c + I*d*x^2)*Erfc[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (eqq(((O_d)^(2)),(((-1))*(((O_b)^(4)))))) Int((cos((O_c)+((O_d)*((Xv)^(2)))))*(erfc((O_b)*(Xv))),Xv) = (((((1/2))*(Int((((eE^((((((-1))*(im)*(O_c)))+((((-1))*(im)*(O_d)*(((Xv)^(2)))))))))*(erfc(((O_b)*(Xv))))),Xv))))+((((1/2))*(Int((((eE^(((((im)*(O_c)))+(((im)*(O_d)*(((Xv)^(2)))))))))*(erfc(((O_b)*(Xv))))),Xv)))))
 
-# Rule 61 not translated: symbol I
+# Rule 61 (54 variants):
 #   Int[Cos[c_. + d_.*x_^2]*Erfi[b_.*x_], x_Symbol] := 1/2*Int[E^(-I*c - I*d*x^2)*Erfi[b*x], x] + 1/2*Int[E^(I*c + I*d*x^2)*Erfi[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, -b^4]
+ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (eqq(((O_d)^(2)),(((-1))*(((O_b)^(4)))))) Int((cos((O_c)+((O_d)*((Xv)^(2)))))*(erfi((O_b)*(Xv))),Xv) = (((((1/2))*(Int((((eE^((((((-1))*(im)*(O_c)))+((((-1))*(im)*(O_d)*(((Xv)^(2)))))))))*(erfi(((O_b)*(Xv))))),Xv))))+((((1/2))*(Int((((eE^(((((im)*(O_c)))+(((im)*(O_d)*(((Xv)^(2)))))))))*(erfi(((O_b)*(Xv))))),Xv)))))
 
 # Rule 62 (54 variants):
 #   Int[Sinh[c_. + d_.*x_^2]*Erf[b_.*x_], x_Symbol] := 1/2*Int[E^(c + d*x^2)*Erf[b*x], x] - 1/2*Int[E^(-c - d*x^2)*Erf[b*x], x] /; FreeQ[{b, c, d}, x] && EqQ[d^2, b^4]

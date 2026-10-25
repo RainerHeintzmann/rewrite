@@ -14,11 +14,13 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (igtq(O_p,0)), (((eqq(O_n,1)) ||
 #   Int[(a_. + b_.*ArcCot[c_.*x_^n_.])^p_., x_Symbol] := x*(a + b*ArcCot[c*x^n])^p + b*c*n*p* Int[x^n*(a + b*ArcCot[c*x^n])^(p - 1)/(1 + c^2*x^(2*n)), x] /; FreeQ[{a, b, c, n}, x] && IGtQ[p, 0] && (EqQ[n, 1] || EqQ[p, 1])
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (igtq(O_p,0)), (((eqq(O_n,1)) || (eqq(O_p,1)))) Int(((O_a)+((O_b)*(arccot((O_c)*((Xv)^(O_n))))))^(O_p),Xv) = ((((Xv)*(((((O_a)+(((O_b)*(arccot(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))))+(((O_b)*(O_c)*(O_n)*(O_p)*(Int(((((Xv)^(O_n)))*(((((O_a)+(((O_b)*(arccot(((O_c)*(((Xv)^(O_n))))))))))^(((O_p)+((-1))))))*(((((1)+(((((O_c)^(2)))*(((Xv)^(((2)*(O_n)))))))))^((-1))))),Xv)))))
 
-# Rule 3 not translated: symbol I
+# Rule 3 (27 variants):
 #   Int[(a_. + b_.*ArcTan[c_.*x_^n_])^p_, x_Symbol] := Int[ExpandIntegrand[(a + (I*b*Log[1 - I*c*x^n])/ 2 - (I*b*Log[1 + I*c*x^n])/2)^p, x], x] /; FreeQ[{a, b, c}, x] && IGtQ[p, 1] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (igtq(P_p,1)), (igtq(P_n,0)) Int(((O_a)+((O_b)*(arctan((O_c)*((Xv)^(P_n))))))^(P_p),Xv) = Int(expandintegrand(((((O_a)+(((im)*(O_b)*(ln(((1)+((((-1))*(im)*(O_c)*(((Xv)^(P_n))))))))*((1/2))))+((((-(1/2)))*(im)*(O_b)*(ln(((1)+(((im)*(O_c)*(((Xv)^(P_n))))))))))))^(P_p)),Xv),Xv)
 
-# Rule 4 not translated: symbol I
+# Rule 4 (27 variants):
 #   Int[(a_. + b_.*ArcCot[c_.*x_^n_])^p_, x_Symbol] := Int[ExpandIntegrand[(a + (I*b*Log[1 - I*x^(-n)/c])/ 2 - (I*b*Log[1 + I*x^(-n)/c])/2)^p, x], x] /; FreeQ[{a, b, c}, x] && IGtQ[p, 1] && IGtQ[n, 0]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (igtq(P_p,1)), (igtq(P_n,0)) Int(((O_a)+((O_b)*(arccot((O_c)*((Xv)^(P_n))))))^(P_p),Xv) = Int(expandintegrand(((((O_a)+(((im)*(O_b)*(ln(((1)+((((-1))*(im)*(((Xv)^((((-1))*(P_n)))))*(((O_c)^((-1)))))))))*((1/2))))+((((-(1/2)))*(im)*(O_b)*(ln(((1)+(((im)*(((Xv)^((((-1))*(P_n)))))*(((O_c)^((-1)))))))))))))^(P_p)),Xv),Xv)
 
 # Rule 5 (27 variants):
 #   Int[(a_. + b_.*ArcTan[c_.*x_^n_])^p_, x_Symbol] := Int[(a + b*ArcCot[x^(-n)/c])^p, x] /; FreeQ[{a, b, c}, x] && IGtQ[p, 1] && ILtQ[n, 0]

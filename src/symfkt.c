@@ -215,6 +215,9 @@ static Symbol * role_find (const char * role)	/* symbol of a role or NULL */
 	return find_symbol(role_symbol_name(role));
 }
 
+static int is_imag_unit (Node * t);
+static int imag_reduce (double e, double * rest);
+
 static int is_head (Node * t, const char * h, int nargs)
 {
 	t = deref(t);
@@ -548,8 +551,16 @@ Node * exact_pow_pow (Node * t)
 	double n;
 	Symbol * sb, * se;
 	t = deref(t);
-	if (! t || ! is_head(t, "^", 2) || ! exact_numbers()) return NULL;
+	if (! t || ! is_head(t, "^", 2)) return NULL;
 	b = deref(arg(t, 0));
+	if (is_imag_unit(b) && is_num(arg(t, 1), & n) && n == floor(n))	/* im^3 = -im */
+		{
+		double rest;
+		int sg = imag_reduce(n, & rest);
+		Node * r = rest ? tcpy(b) : mk_int(1);
+		return sg < 0 ? mk_mul(mk_int(-1), r) : r;
+		}
+	if (! exact_numbers()) return NULL;
 	if ((sb = num_sym(b)) && (se = num_sym(arg(t, 1))) && num_exact(sb) && num_exact(se))
 		{
 		double vb, ve, p, q;
@@ -719,6 +730,36 @@ static void mono_flatten (Node * t, Mono * m)	/* t is a product */
 
 /* a root of an integer and the coefficient, as in Mathematica: 2*2^(-1/2) =
  * 2^(1/2), (1/2)*2^(1/2) = 2^(-1/2) */
+/* the imaginary unit of the integration (role "im", inc/integration/base):
+ * a symbol without value, im^2 = -1 when collecting and simplifying */
+static int is_imag_unit (Node * t)
+{
+	Symbol * s = role_find("im");
+	t = deref(t);
+	return s && t && (atom_sym(t) == s);
+}
+
+/* im^e with an integer e: the sign (+1 or -1) and the remaining power 0 or 1 */
+static int imag_reduce (double e, double * rest)
+{
+	int k = (int) fmod(e, 4.0);
+	if (k < 0) k += 4;
+	* rest = k % 2;
+	return k >= 2 ? -1 : 1;
+}
+
+static void mono_imag (Mono * m)		/* c * im^e: im^2 = -1 */
+{
+	int i;
+	double rest;
+	for (i = 0; i < m->nf; i++)
+		if (is_imag_unit(m->f[i].base) && m->f[i].e == floor(m->f[i].e))
+			{
+			m->c *= imag_reduce(m->f[i].e, & rest);
+			m->f[i].e = rest;
+			}
+}
+
 static void mono_roots (Mono * m)
 {
 	int i;
@@ -740,6 +781,7 @@ static void mono_normalize (Mono * m)	/* drop x^0, sort the bases */
 {
 	int i, j, k = 0;
 	mono_roots(m);
+	mono_imag(m);
 	for (i = 0; i < m->nf; i++)
 		if (m->f[i].e != 0) m->f[k++] = m->f[i];
 	m->nf = k;
@@ -1212,6 +1254,14 @@ static Node * simp_product (Node * u)
 	int n = 0, i, pass, nown = 0;
 	pf_merged = pf_numbers = 0;
 	if (! pf_collect(u, 1, pf, & n, & coef)) { delete(coef); return tcpy(u); }
+	for (i = 0; i < n; i++)	/* im^2 = -1 */
+		if (is_imag_unit(pf[i].base) && pf[i].e == floor(pf[i].e) && (pf[i].e < 0 || pf[i].e > 1))
+			{
+			double rest;
+			if (imag_reduce(pf[i].e, & rest) < 0) coef = mk_mul(coef, mk_int(-1));
+			pf[i].e = rest;
+			pf_merged++;
+			}
 	for (i = 0; i < n; i++)	/* 2*2^(-1/2) = 2^(1/2), (1/3)*3^(1/2) = 3^(-1/2) */
 		{
 		Node * b = deref(pf[i].base);

@@ -13,13 +13,19 @@
 #   several conditions are separated by commas:  IF NIN(Xv,Pm), (Pm != -1)
 # Factors and summands may appear in any order (COMM +,*).
 
+# 2026: the rules are written for the sort number (inc/alg), so that they
+# also apply to terms with the imaginary unit im; a term of reals keeps the
+# real variants of the functions.
 FUNC Int : real,real >> real
+OTHER Int : number,number >> number
 FUNC inthide      : real,real >> real ATT SYMBOLIC inthide       # Rubi IntHide = Int
+OTHER inthide     : number,number >> number ATT SYMBOLIC inthide
 FUNC unintegrable : real,real >> real                   # Rubi Unintegrable: stays as is, IntOut turns it into Int
+OTHER unintegrable : number,number >> number
 
-VAR Uv,Vv,Wv,Xv : real                    # arbitrary terms
-VAR Pa,Pb,Pc,Pd,Pe,Pf,Pm,Pn : real        # Rubi a_ , b_ , ...
-VAR Qa,Qb,Qc,Qd,Qe,Qf,Qm,Qn : real        # Rubi a_., b_., ...
+VAR Uv,Vv,Wv,Xv : number                  # arbitrary terms
+VAR Pa,Pb,Pc,Pd,Pe,Pf,Pm,Pn : number      # Rubi a_ , b_ , ...
+VAR Qa,Qb,Qc,Qd,Qe,Qf,Qm,Qn : number      # Rubi a_., b_., ...
 NUM Kc,Kd,Kf : real                       # numbers only
 
 # ---------------- Normal form as in Mathematica ----------------
@@ -61,6 +67,11 @@ ADDSPEC IntNorm : (Vv+Wv)*Uv = Vv*Uv+Wv*Uv
 # out products with sums by itself).
 # 2026: e as a symbol without numeric value (like E in Mathematica); ln(eE) = 1
 CONST eE : positive
+# 2026: the imaginary unit as a symbol without numeric value (Mathematica's
+# I, Julia's im; the name I is the definite integral of inc/alg and i the
+# complex number of inc/alg). Its sort is number, the sort above real and
+# complex; the C helpers know im^2 = -1 (role "im").
+CONST im : number
 
 ALG RubiNorm
 SPEC    RubiNorm : Uv-Vv   = Uv+(-1)*Vv

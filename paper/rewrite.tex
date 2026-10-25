@@ -71,7 +71,7 @@ integers and fractions as sorts below the real numbers without changing
 any rule of the library, and sorts of non-negative and positive numbers
 for which rules like $\sqrt{x^2}=x$ hold. As a case study, the rule-based
 integrator Rubi was translated into \texttt{rewrite}. A translator converts
-92\% of Rubi's rules automatically; for this, the language gained ordered rule lists
+96\% of Rubi's rules automatically; for this, the language gained ordered rule lists
 with a backtracking matcher for optional pattern parts, commutative
 operators and condition lists, symbolic helper functions and special
 functions. On \nproblems{} integration problems from four independent
@@ -251,6 +251,22 @@ rules of \texttt{real}, and a second one does the same for
 \texttt{integer}; \texttt{x*1+0*x+(1/2)*x} simplifies to \texttt{(3/2) * x}
 with the unchanged rules for real numbers.
 
+\paragraph{Symbolic numbers.} Above \texttt{real} and \texttt{complex}
+the library declares the sort \texttt{number} of symbolic scalar
+expressions, like \texttt{Number} in Julia. Its operator variants have no
+C function; a term is of sort \texttt{number} only when one of its parts
+is, for example the imaginary unit \texttt{im}, which has no numerical
+value and of which the symbolic helpers only know $\mathit{im}^2=-1$. A
+meta variable of sort \texttt{number} matches any term, and a function in
+a pattern whose variant is declared on such top sorts also matches its
+variants on narrower sorts, as a method for \texttt{Number} in Julia
+applies to \texttt{Float64}. The right-hand side and the conditions of a
+rule are evaluated with the variants for the actual sorts, so a rule
+written for \texttt{number} still calculates \texttt{m > 0} for a real
+\texttt{m}. The derivative and the translated Rubi rules are written this
+way and apply to real integrands and to integrands with \texttt{im}
+alike, while a real integrand keeps its real operators.
+
 \paragraph{Sorts with a known sign.} A sort may have several wider sorts,
 and the conversion follows the shortest path in the resulting graph. The
 library declares
@@ -268,8 +284,8 @@ simplification rules are valid only for non-negative or positive
 arguments: $\sqrt{t^2}=t$, $(t^a)^b=t^{ab}$, $\ln(pq)=\ln p+\ln q$. They
 are now written with meta variables of these sorts. A meta variable whose
 sort is a subsort of another only matches terms of that sort or below it,
-whereas a variable of sort \texttt{real} still matches any term as in the
-original language. Thus \texttt{sqrt(t\^{}2)} simplifies to \texttt{t} for
+whereas a variable of a sort without a wider sort still matches any term
+as in the original language. Thus \texttt{sqrt(t\^{}2)} simplifies to \texttt{t} for
 \texttt{CONST t : nonneg}, but \texttt{sqrt(x\^{}2)} stays as it is for a
 real \texttt{x}.
 
@@ -566,9 +582,9 @@ from a file that the translator writes along with the rules.
 
 \subsection{Results}
 
-The translator converts 6897 of Rubi's 7432 rules (93\%; rules that Rubi
+The translator converts 7183 of Rubi's 7492 rules (96\%; rules that Rubi
 writes in two variants, with and without \texttt{ShowStep}, count twice),
-which become 7385 \texttt{rewrite} rules after the expansion of function
+which become 7627 \texttt{rewrite} rules after the expansion of function
 variables. Rules that Rubi writes as small programs (\texttt{Module} with
 several statements, \texttt{Sum}, lists) are replaced by C functions: the
 substitutions of section 9.3 and the partial fractions of
@@ -738,8 +754,8 @@ for Newton's method.
 \paragraph{Limitations.} Commutative matching only swaps the two operands
 of one binary operator. Associativity is handled by normalization, so the
 integrand must be brought into a fixed form before the rules are tried.
-Complex numbers exist as a sort of the library, but not yet as part of the
-number tower, so rules that need the imaginary unit are not translated,
+The imaginary unit is a symbol of the sort \texttt{number}, but the
+general simplification of the library is still written for real numbers,
 and logarithms of negative arguments evaluate to NaN although their
 derivatives are correct. The sign of a term is only known through the
 sorts of its operator variants, so for example $e^x$ is not known to be
@@ -772,7 +788,7 @@ derived expressions into compiled numerical code.
 \texttt{rewrite} shows that a small interpreter can host a complete
 computer algebra library when the mathematics is expressed as rewrite rules
 and rule sets can be combined and lifted between algebraic structures and
-number sorts. The automatic translation of 91\% of Rubi demonstrates that
+number sorts. The automatic translation of 96\% of Rubi demonstrates that
 established rule-based algorithms can be imported, and it clarifies which
 matching features and which implicit simplifications of the host system
 such an import requires.

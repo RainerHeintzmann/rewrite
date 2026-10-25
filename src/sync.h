@@ -65,6 +65,7 @@ extern void rewrite_fkt (Node * np);
 extern void quit_fkt (Node * np);
 
 extern BOOLEAN IS_follows (Symbol * from,Symbol * to);
+extern BOOLEAN variant_fits (Symbol * t,Symbol * p);	/* 2026: + : real,real fits + : number,number */
 
 extern Symbol * IS_search (Symbol * from,Symbol * to);
 
