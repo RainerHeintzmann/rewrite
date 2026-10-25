@@ -1,0 +1,32 @@
+# matchq(u, pattern, cond): Rubi's MatchQ with the matcher of the rule
+# lists. The pattern variables are bound only during the test; the
+# condition refers to them. Declared ATT SYMBOLIC HOLD in inc/helpers.
+INC "inc/all"
+INC "inc/helpers"
+VAR Uu,Xx : real
+VAR Mc,Md,Mm : real
+OPT Md,Mm
+DEFAULT + = 0
+DEFAULT * = 1
+DEFAULT RIGHT ^ = 1
+COMM +,*
+FUNC lin : real,real >> real
+ALG tm
+SPEC tm : IF (matchq(Uu, (Mc+Md*Xx)^Mm, freeq(Mc,Xx) && freeq(Md,Xx) && freeq(Mm,Xx))) lin(Uu,Xx) = 1
+ADDSPEC tm : lin(Uu,Xx) = 0
+CONST zz : real
+# c required: (3+2x)^5 and zz+2x match, x^5 and x do not
+REWR lin((3+2*x)^5,x) : tm
+REWR lin(2*x+zz,x) : tm
+REWR lin(x^5,x) : tm
+REWR lin(x,x) : tm
+REWR lin(sin(x),x) : tm
+REWR lin((x^2+1)^3,x) : tm
+REWR lin((3+2*x)^x,x) : tm
+# a variable of the rule in the pattern: the same x as in lin(u,x)
+FUNC lin2 : real,real,real >> real
+ALG tm2
+SPEC tm2 : IF (matchq(Uu, Md*Xx^Mm)) lin2(Uu,Xx,Mc) = 1
+ADDSPEC tm2 : lin2(Uu,Xx,Mc) = 0
+REWR lin2(3*x^4,x,0) : tm2
+REWR lin2(3*zz^4,x,0) : tm2

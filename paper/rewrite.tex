@@ -412,11 +412,29 @@ sides use about a hundred helper functions, such as \texttt{ExpandIntegrand},
 \texttt{ExpandTrigReduce}. They cannot be ordinary \texttt{rewrite}
 functions, which are only evaluated when all arguments are numbers. We
 added symbolic C functions instead: they receive the argument terms and
-return a new term, or nothing if they do not apply. About 60 of them are
+return a new term, or nothing if they do not apply. About 90 of them are
 implemented, from predicates on the form of a term to polynomial division,
 the product-to-sum reduction of trigonometric powers, and Rubi's measures
 of simplicity based on the size of a term. Their results are exact when
-their inputs are. \texttt{ExpandIntegrand} splits rational functions into
+their inputs are.
+
+Such functions break with the principle that the interpreter knows nothing
+about the meaning of an operator: a C function that expands a product must
+know which symbol is the product. To keep this dependence explicit, the
+helpers are declared with \texttt{ATT SYMBOLIC} and refer to the library
+only through \emph{roles} such as \texttt{"+"}, \texttt{"cos"} or
+\texttt{"pi"}. By default a role is played by the symbol of the same name;
+a library with other names maps them (\texttt{SYMBOLIC "cos" = "kos"}). A
+head is recognized by its function family, so that the variants of an
+operator for different sorts count as one. What the roles cannot express are
+the algebraic properties the C code relies on, such as the commutativity of
+\texttt{+}; these are documented as the contract of each role. Where a
+helper only tests the form of a term, the matcher can do the work instead:
+\texttt{matchq(u,~pattern,~cond)}, Rubi's \texttt{MatchQ}, runs the
+backtracking matcher of the rule lists on a pattern with its own variables
+and checks the condition with their bindings. It is declared with
+\texttt{HOLD}, so that the pattern and the condition reach it unevaluated,
+and it made 28 more rules translatable. \texttt{ExpandIntegrand} splits rational functions into
 partial fractions, as Mathematica's \texttt{Apart}: with GMP rationals, the
 denominator is split into square-free parts, rational roots and the factors
 given in the input, and the extended Euclidean algorithm gives the
@@ -521,9 +539,9 @@ from a file that the translator writes along with the rules.
 
 \subsection{Results}
 
-The translator converts 6845 of Rubi's 7432 rules (92\%; rules that Rubi
+The translator converts 6873 of Rubi's 7432 rules (92\%; rules that Rubi
 writes in two variants, with and without \texttt{ShowStep}, count twice),
-which become 7333 \texttt{rewrite} rules after the expansion of function
+which become 7367 \texttt{rewrite} rules after the expansion of function
 variables. Rules that Rubi writes as small programs (\texttt{Module} with
 several statements, \texttt{Sum}, lists) are replaced by C functions: the
 substitutions of section 9.3 and the partial fractions of

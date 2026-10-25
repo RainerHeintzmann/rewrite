@@ -1,0 +1,25 @@
+# SYMBOLIC "role" = "symbol": the helpers of symfkt.c recognize and build
+# terms with roles ("+", "cos", "pi", ...). By default a role is the symbol
+# of the same name; a library with other names maps them.
+INC "inc/all"
+INC "inc/helpers"
+TERM T : real
+CONST yy : real
+x = yy
+FUNC kos : real >> real ATT cosinus
+FUNC sinus2 : real >> real ATT sinus
+# without roles kos is unknown to the helpers: no derivative
+T = REWR deriv(kos(x)^2,x) : All
+T
+# kos plays the role of the cosine, sinus2 that of the sine
+SYMBOLIC "cos" = "kos"
+SYMBOLIC "sin" = "sinus2"
+T = REWR deriv(kos(x)^2,x) : All
+T
+# cos is now no cosine for the helpers
+T = REWR deriv(cos(x),x) : All
+T
+# back to the names
+SYMBOLIC
+T = REWR deriv(cos(x)^2,x) : All
+T

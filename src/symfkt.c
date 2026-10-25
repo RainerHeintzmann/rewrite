@@ -55,6 +55,7 @@
 #include "numsort.h"	/* 2026: integer, rational */
 #include "exact.h"
 #include "apart.h"	/* partial fractions */
+#include "listmatch.h"	/* matchq */
 
 /* ================= basic term helpers ================= */
 
@@ -145,10 +146,78 @@ static int num_value_exact (Node * t)
 	return ex;
 }
 
+/* ---- roles: the functions and constants the helpers know ----
+ * The helpers recognize and build terms with the operators and functions
+ * of the library (inc/alg): "+", "*", "^", "-", "/", "mi" (1/x), "sin",
+ * "cos", ..., "ln", "exp", the constants "pi" and "eE", "Int", "D". These
+ * strings are roles. By default a role is played by the symbol of the
+ * same name; a library with other names declares
+ *     SYMBOLIC "cos" = "cosinus"
+ * The helpers assume the usual properties: "+" and "*" are commutative and
+ * associative, "mi(x)" is 1/x, "cos" is the cosine, and so on. */
+
+#define MAXROLES 128
+static struct { char * role, * sym; } roles[MAXROLES];
+static int nroles = 0;
+
+void role_fkt (Node * np)	/* SYMBOLIC "role" = "symbol"; SYMBOLIC alone: clear */
+{
+	const char * r, * sy;
+	int i;
+	np = np->r;			/* the statement: FUNC(role_fkt, PARAM(role, symbol)) */
+	if (! np)
+		{
+		for (i = 0; i < nroles; i++) { free(roles[i].role); free(roles[i].sym); }
+		nroles = 0;
+		return;
+		}
+	r = name((Symbol *) np->l);
+	sy = name((Symbol *) np->r);
+	if (! find_symbol(sy))
+		printfErr("SYMBOLIC : %s is not declared (role %s)\n", sy, r);
+	for (i = 0; i < nroles; i++)
+		if (strcmp(roles[i].role, r) == 0) break;
+	if (i == nroles)
+		{
+		if (nroles == MAXROLES) { printfErr("SYMBOLIC : too many roles\n"); return; }
+		roles[nroles++].role = strdup(r);
+		}
+	else
+		free(roles[i].sym);
+	roles[i].sym = strdup(sy);
+}
+
+static const char * role_symbol_name (const char * role)	/* the symbol playing a role */
+{
+	int i;
+	for (i = 0; i < nroles; i++)
+		if (strcmp(roles[i].role, role) == 0) return roles[i].sym;
+	return role;
+}
+
+/* the role of a function symbol: its name, unless a role is mapped to it,
+ * or its name is a role that another symbol plays ("" then) */
+static const char * role_of (Symbol * f)
+{
+	const char * n = name(f);
+	int i;
+	if (nroles == 0) return n;		/* the usual case: names are roles */
+	for (i = 0; i < nroles; i++)
+		if (strcmp(roles[i].sym, n) == 0) return roles[i].role;
+	for (i = 0; i < nroles; i++)
+		if (strcmp(roles[i].role, n) == 0) return "";
+	return n;
+}
+
+static Symbol * role_find (const char * role)	/* symbol of a role or NULL */
+{
+	return find_symbol(role_symbol_name(role));
+}
+
 static int is_head (Node * t, const char * h, int nargs)
 {
 	t = deref(t);
-	return t && t->type == Func && strcmp(name(TERM_HEAD(t)), h) == 0
+	return t && t->type == Func && strcmp(role_of(TERM_HEAD(t)), h) == 0
 	       && (nargs < 0 || term_nargs(t) == nargs);
 }
 
@@ -194,7 +263,7 @@ static int tequal (Node * a, Node * b)
 	sa = atom_sym(a); sb = atom_sym(b);
 	if (sa || sb) return sa == sb && sa != NULL;
 	if (a->type != Func || b->type != Func) return 0;
-	if (strcmp(name(TERM_HEAD(a)), name(TERM_HEAD(b))) != 0) return 0;
+	if (strcmp(role_of(TERM_HEAD(a)), role_of(TERM_HEAD(b))) != 0) return 0;
 	n = term_nargs(a);
 	if (n != term_nargs(b)) return 0;
 	for (i = 0; i < n; i++)
@@ -402,10 +471,10 @@ Node * term_copy (Node * t)	/* exported tcpy */
 	return tcpy(t);
 }
 
-static Symbol * fsym (const char * f)
+static Symbol * fsym (const char * f)	/* f: a role */
 {
-	Symbol * s = find_symbol(f);
-	if (! s) fatal("symfkt : function %s is not declared", f);
+	Symbol * s = role_find(f);
+	if (! s) fatal("symfkt : function %s is not declared (SYMBOLIC role)", role_symbol_name(f));
 	return s;
 }
 
@@ -1066,7 +1135,7 @@ static int contains_head (Node * t, const char * h)	/* is h(...) somewhere in t?
 	int i, n;
 	t = deref(t);
 	if (! t || t->type != Func) return 0;
-	if (strcmp(name(TERM_HEAD(t)), h) == 0) return 1;
+	if (strcmp(role_of(TERM_HEAD(t)), h) == 0) return 1;
 	n = term_nargs(t);
 	for (i = 0; i < n; i++)
 		if (contains_head(arg(t, i), h)) return 1;
@@ -1241,7 +1310,7 @@ static Node * s_fracpart (Node * a[], int n, Symbol * f)
 
 static Node * s_inthide (Node * a[], int n, Symbol * f)	/* inthide */
 {
-	if (n != 2 || ! find_symbol("Int")) return NULL;
+	if (n != 2 || ! role_find("Int")) return NULL;
 	return mk_f2("Int", tcpy(a[0]), tcpy(a[1]));
 }
 
@@ -1526,9 +1595,9 @@ static const char * trig_sum_func (Node * w, Node * x)
 			Node * t = deref(fl.t[j]);
 			if (! contains(t, x)) continue;
 			if (is_head(t, "^", 2)) t = arg(t, 0);
-			if (t->type != Func || term_nargs(t) != 1 || ! trig_recip(name(TERM_HEAD(t)))
-			    || (g && strcmp(g, name(TERM_HEAD(t))))) { ok = 0; break; }
-			g = name(TERM_HEAD(t));
+			if (t->type != Func || term_nargs(t) != 1 || ! trig_recip(role_of(TERM_HEAD(t)))
+			    || (g && strcmp(g, role_of(TERM_HEAD(t))))) { ok = 0; break; }
+			g = role_of(TERM_HEAD(t));
 			nt++;
 			}
 		if (nt != 1) ok = 0;
@@ -1562,7 +1631,7 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 			ie = num_value(arg(t, 1), & e) && e == floor(e);
 			}
 		if (b0->type == Func && term_nargs(b0) == 1 && contains(b0, x)
-		    && trig_recip(name(TERM_HEAD(b0))))
+		    && trig_recip(role_of(TERM_HEAD(b0))))
 			{
 			Node * b;
 			nt++;
@@ -1571,8 +1640,8 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 				fb[nf] = tcpy(t); fe[nf] = 1; trig[nf++] = 2;
 				continue;
 				}
-			if (is_canon_trig(name(TERM_HEAD(b0)))) b = tcpy(b0);
-			else { b = mk_f1(trig_recip(name(TERM_HEAD(b0))), tcpy(arg(b0, 0))); e = -e; }
+			if (is_canon_trig(role_of(TERM_HEAD(b0)))) b = tcpy(b0);
+			else { b = mk_f1(trig_recip(role_of(TERM_HEAD(b0))), tcpy(arg(b0, 0))); e = -e; }
 			for (j = 0; j < nf; j++)		/* sin^a * csc^b = sin^(a-b) */
 				if (trig[j] == 1 && tequal(fb[j], b)) break;
 			if (j < nf) { fe[j] += e; delete(b); continue; }
@@ -1591,7 +1660,7 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 			{
 			if (trig[i] == 1 && fe[i] < 0)
 				{
-				Node * g = mk_f1(trig_recip(name(TERM_HEAD(fb[i]))), tcpy(arg(fb[i], 0)));
+				Node * g = mk_f1(trig_recip(role_of(TERM_HEAD(fb[i]))), tcpy(arg(fb[i], 0)));
 				delete(fb[i]);
 				fb[i] = g;
 				fe[i] = -fe[i];
@@ -1601,13 +1670,13 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 	if (ntrig == 2 && nother == 0)		/* Rubi's FixInertTrigFunction for f1^m*f2^n */
 		{
 		Node * h1 = trig[t1] == 2 ? arg(fb[t1], 0) : fb[t1], * h2 = trig[t2] == 2 ? arg(fb[t2], 0) : fb[t2];
-		int first = strcmp(name(TERM_HEAD(h1)), name(TERM_HEAD(h2))) <= 0 ? t1 : t2;
+		int first = strcmp(role_of(TERM_HEAD(h1)), role_of(TERM_HEAD(h2))) <= 0 ? t1 : t2;
 		int second = first == t1 ? t2 : t1;
 		Node * hs = second == t1 ? h1 : h2;
 		if (trig[first] == 1)
 			for (k = 0; k < 18; k++)
-				if (! strcmp(fix_inert[k][0], name(TERM_HEAD(fb[first])))
-				    && ! strcmp(fix_inert[k][1], name(TERM_HEAD(hs))))
+				if (! strcmp(fix_inert[k][0], role_of(TERM_HEAD(fb[first])))
+				    && ! strcmp(fix_inert[k][1], role_of(TERM_HEAD(hs))))
 					{
 					Node * g = mk_f1(fix_inert[k][2], tcpy(arg(fb[first], 0)));
 					delete(fb[first]);
@@ -1624,7 +1693,7 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 			for (i = 0; i < nf; i++)
 				if (trig[i] == 1 && fe[i] != 0)
 					for (k = 0; k < 16; k++)
-						if (! strcmp(fix_inert_sum[k][0], name(TERM_HEAD(fb[i])))
+						if (! strcmp(fix_inert_sum[k][0], role_of(TERM_HEAD(fb[i])))
 						    && ! strcmp(fix_inert_sum[k][1], g))
 							{
 							Node * h = mk_f1(fix_inert_sum[k][2], tcpy(arg(fb[i], 0)));
@@ -1758,7 +1827,7 @@ static Node * tx_repl (Node * u, Node * x, TrigExp * s, Node * w)
 	if (! contains(u, x) || u->type != Func) return tcpy(u);
 	if (is_circ(u) && tx_coeff(u, x, & c))
 		{
-		const char * h = name(TERM_HEAD(u));
+		const char * h = role_of(TERM_HEAD(u));
 		int m = (int) floor(fabs(c) / s->g + 0.5);
 		double sg = c < 0 ? -1 : 1;		/* sin(-kw) = -sin(kw) */
 		Node * sk = mk_mul(mk_int(sg), tx_multiple(1, m, w)), * ck = tx_multiple(0, m, w);
@@ -2294,7 +2363,7 @@ static Node * deriv (Node * u, Node * x)
 	a = arg(u, 0);
 	if (! (da = deriv(a, x))) return NULL;
 	{
-	const char * h = name(TERM_HEAD(u));
+	const char * h = role_of(TERM_HEAD(u));
 	Node * g = NULL;		/* outer derivative at a */
 	#define A tcpy(a)
 	#define SQ(t) mk_pow(t, mk_int(2))
@@ -2656,7 +2725,7 @@ static int leafcount (Node * u)
 	if (is_num(u, & v))
 		return (v != floor(v) && rat_approx(v, & p, & q)) ? 3 : 1;
 	if (u->type != Func) return 1;
-	h = name(TERM_HEAD(u));
+	h = role_of(TERM_HEAD(u));
 	n = term_nargs(u);
 	c = 1;
 	for (k = 0; k < n; k++)
@@ -3188,7 +3257,7 @@ static int nonnegq (Node * v)
 	if (! v) return 0;
 	if (num_value_r(v, & e)) return e >= 0;
 	s = arg_sort(v);
-	if (s && find_symbol("nonneg") && sort_dist(s, (Node *) find_symbol("nonneg")) >= 0) return 1;
+	if (s && role_find("nonneg") && sort_dist(s, (Node *) role_find("nonneg")) >= 0) return 1;
 	if (is_head(v, "sqrt", 1) || is_head(v, "exp", 1) || is_head(v, "abs", 1)) return 1;
 	if (is_head(v, "^", 2) && num_value(arg(v, 1), & e))
 		{
@@ -3197,8 +3266,8 @@ static int nonnegq (Node * v)
 		return nonnegq(arg(v, 0));
 		}
 	if (is_head(v, "^", 2) && num_value_r(arg(v, 0), & e) && e > 0) return 1;	/* e^u, 2^u */
-	if (is_head(v, "^", 2) && (s = arg_sort(arg(v, 0))) && find_symbol("nonneg")
-	    && sort_dist(s, (Node *) find_symbol("nonneg")) >= 0) return 1;	/* eE^u */
+	if (is_head(v, "^", 2) && (s = arg_sort(arg(v, 0))) && role_find("nonneg")
+	    && sort_dist(s, (Node *) role_find("nonneg")) >= 0) return 1;	/* eE^u */
 	if (is_head(v, "*", 2) || is_head(v, "+", 2) || is_head(v, "/", 2))
 		return nonnegq(arg(v, 0)) && nonnegq(arg(v, 1));
 	return 0;
@@ -3212,7 +3281,7 @@ static Node * mk_f3 (const char * f, Node * a, Node * b, Node * c)
 
 static Node * s_substint (Node * a[], int n, Symbol * f)
 {
-	Symbol * xnn = find_symbol("Xnn"), * xre = find_symbol("Xre"), * ws = NULL;
+	Symbol * xnn = role_find("Xnn"), * xre = role_find("Xre"), * ws = NULL;
 	Node * w, * u;
 	if (n != 3) return NULL;
 	if (xnn && nonnegq(a[2])) ws = xnn;
@@ -3231,7 +3300,7 @@ static Node * s_substint (Node * a[], int n, Symbol * f)
 static Node * ex_pow (Node * u, int k)		/* e^(k u) */
 {
 	Node * arg = (k == 1) ? tcpy(u) : mk_mul(mk_int(k), tcpy(u));
-	Symbol * es = find_symbol("eE");	/* symbolic e of the integration */
+	Symbol * es = role_find("eE");	/* symbolic e of the integration */
 	return mk_pow(es ? mknod(Const, (Node *) es, NULL) : mk_num(M_E), arg);
 }
 
@@ -3243,7 +3312,7 @@ static Node * hyp2exp (Node * u, Node * x, int * changed)
 	if (! u || u->type != Func || ! contains(u, x)) return tcpy(u);
 	if (term_nargs(u) == 1 && contains(arg(u, 0), x))
 		{
-		const char * h = name(TERM_HEAD(u));
+		const char * h = role_of(TERM_HEAD(u));
 		Node * inner = hyp2exp(arg(u, 0), x, changed), * r = NULL;
 		if (! strcmp(h, "sinh"))
 			r = mk_mul(mk_num_ex(0.5, 1), mk_add(ex_pow(inner, 1), mk_neg(ex_pow(inner, -1))));
@@ -3429,7 +3498,7 @@ static Node * expo_repl (Node * u, Node * x, Node * g, ExpoState * s)
 		else t = mk_mul(mk_pow(tcpy(base), c0), t);
 		if (! is_hyp(u)) return t;
 		{
-		const char * h = name(TERM_HEAD(u));
+		const char * h = role_of(TERM_HEAD(u));
 		Node * half = mk_num_ex(0.5, 1), * ti = mk_pow(tcpy(t), mk_int(-1));
 		if (! strcmp(h, "sinh")) r = mk_mul(half, mk_add(t, mk_neg(ti)));
 		else if (! strcmp(h, "cosh")) r = mk_mul(half, mk_add(t, ti));
@@ -3466,7 +3535,7 @@ static Node * expo_repl (Node * u, Node * x, Node * g, ExpoState * s)
 static Node * s_substexp (Node * a[], int n, Symbol * f)
 {
 	ExpoState s = {0};
-	Symbol * es = find_symbol("eE");
+	Symbol * es = role_find("eE");
 	Node * g = NULL, * w, * v, * fac, * r = NULL;
 	int i;
 	if (n != 2) return NULL;
@@ -3520,7 +3589,7 @@ static Node * cos_pi (long p, long q)	/* cos(p/q*pi), exact for q = 1..6 */
 			if (p == 3) return mk_mul(mk_num_ex(0.25, 1), mk_add(mk_int(1), mk_neg(r5)));
 			return mk_mul(mk_num_ex(-0.25, 1), mk_add(mk_int(1), r5));
 		}
-	ps = find_symbol("pi");
+	ps = role_find("pi");
 	if (! ps) return mk_num(cos(M_PI * p / q));
 	return mk_f1("cos", mk_mul(mk_num_ex((double) p / q, 1), mknod(Const, (Node *) ps, NULL)));
 }
@@ -4092,6 +4161,8 @@ void term_simplify_trivial (Node ** p)
 
 /* ================= table and call ================= */
 
+static Node * s_matchq (Node * a[], int n, Symbol * f);
+
 static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "freeq",           s_freeq },
 	{ "integerq",        s_integerq },
@@ -4147,6 +4218,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "hyp2exp", s_hyp2exp },
 	{ "substexp", s_substexp },
 	{ "binomsum", s_binomsum },
+	{ "matchq", s_matchq },
 	{ "functionofq", s_functionofq },
 	{ "substfor", s_substfor },
 	{ "derivdivides", s_derivdivides },
@@ -4193,6 +4265,21 @@ static int has_builtin (Node * t)	/* is a builtin call somewhere in t? */
 	return has_builtin(t->l) || has_builtin(t->r);
 }
 
+/* matchq(u, pattern [, cond]): Rubi's MatchQ, with the matcher of the rule
+ * lists (listmatch.c). Declared with HOLD: the pattern and the condition
+ * arrive unevaluated (the condition refers to the pattern variables), u is
+ * calculated here. */
+static Node * s_matchq (Node * a[], int n, Symbol * f)
+{
+	Node * u;
+	int ok;
+	if (n != 2 && n != 3) return NULL;
+	u = has_builtin(a[0]) ? tcalc(tcpy(a[0])) : NULL;
+	ok = lm_matchq(a[1], u ? deref(u) : a[0], n == 3 ? a[2] : NULL);
+	delete(u);
+	return mk_bool(ok, f);
+}
+
 Node * call_builtin (Node * term)
 {
 	Symbol * f = TERM_HEAD(term);
@@ -4204,7 +4291,8 @@ Node * call_builtin (Node * term)
 	for (a = TERM_ARGS(term); a && n < MAXARGS; a = ARGS_NEXT(a))
 		{
 		Node * t = deref(ARGS_ITEM(a));
-		own[n] = has_builtin(t) ? tcalc(tcpy(t)) : NULL;
+		/* HOLD (matchq): a pattern and its condition stay as they are */
+		own[n] = builtin(f) != 2 && has_builtin(t) ? tcalc(tcpy(t)) : NULL;
 		args[n] = own[n] ? deref(own[n]) : t;
 		n++;
 		}

@@ -40,6 +40,7 @@ static const Reserved words [] = {	/* sortiert */
 	{ "FOR",    FOR },
 	{ "FUNC",   FUNC },
 	{ "GRAPH",  GRAPH },
+	{ "HOLD",   HOLD },     /* ATT SYMBOLIC HOLD: Argumente unausgewertet (2026) */
 	{ "IF",     IF  },
 	{ "IN",     IN  },
 	{ "INC",    INC },      /* Include */
@@ -72,6 +73,7 @@ static const Reserved words [] = {	/* sortiert */
 	{ "STEP",   STEP },
 	{ "STEPS",  STEPS },    /* Loesungsweg einer Regelliste (2026) */
 	{ "SUBSORT",SUBSORT },  /* Untersorte mit Umwandlung (2026) */
+	{ "SYMBOLIC",SYMBOLIC },/* ATT SYMBOLIC: C-Funktion auf Termen (2026) */
 	{ "SYS",    SYS },
 	{ "TERM",   TERM },
 	{ "TO",     TO },

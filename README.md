@@ -153,7 +153,7 @@ x+y*2                                       # prints 4 + y * 2
 | `VAR name [,..] : sort` | Declares a meta variable. It is a placeholder for any term in rewrite rules, for example `A+0=A`. |
 | `NUM name [,..] : sort` | Declares a meta variable that only matches numbers. |
 | `TERM name [,..] : sort` | Declares a term variable, which stores a whole expression. |
-| `FUNC name : sorts >> sort [LA1..LA5\|RA\|RU] [ATT name]` | Defines a function or operator, see below. |
+| `FUNC name : sorts >> sort [LA1..LA5\|RA\|RU] [ATT [SYMBOLIC [HOLD]] name]` | Defines a function or operator, see below. |
 | `OTHER name : sorts >> sort [ATT name]` | Adds another meaning to an existing function name, for other argument types. Example: `OTHER + : vector,vector >> vector`. |
 | `BRA open close : sorts >> sort [ATT name]` | Defines a function written with brackets, like `<a,b>` for a scalar product. `a[b,c]` may be used for `[a,b,c]`, so vectors can be indexed with `v[1]`. |
 | `ATT sort show,cmp,cpy,del` | Assigns the C functions that print, compare, copy and delete values of a sort. Example: `ATT complex show_complex,cmp_complex,cpy_complex,del_complex`. |
@@ -173,6 +173,10 @@ how the function is written:
 `ATT name` connects the function to a C function in the list
 `userfunction` in [userfkt.c](src/userfkt.c). It is called when all arguments
 have numerical values. Otherwise the function stays symbolic.
+`ATT SYMBOLIC name` connects it to a symbolic C function in
+[symfkt.c](src/symfkt.c) instead, which gets the argument terms (see
+[Symbolic helper functions](#symbolic-helper-functions));
+`ATT SYMBOLIC HOLD name` passes them unevaluated.
 
 A function can also be written in the rewrite language itself, with
 `ATT ( argument definitions ) block`:
@@ -421,6 +425,7 @@ This prints `10 20 30`.
 | `DATA Const` | Reads the next number from the data file into `Const`. Non-numeric text up to the end of the line is skipped. |
 | `SYS "command"` | Runs a shell command. |
 | `DEBUG n` | Sets the debug level of the interpreter. |
+| `SYMBOLIC "role" = "symbol"` | The symbolic C functions (helpers) use `symbol` where they need the function or constant `role` (`"cos"`, `"+"`, `"pi"`, ...), see [Symbolic helper functions](#symbolic-helper-functions). `SYMBOLIC` alone clears the mapping. |
 | `STEPS Alg "file"` | Shows each applied rule of the rule list of `Alg` (solution steps), labelled from `file` (lines `index<TAB>label<TAB>text`); `STEPS Alg ""` switches it off. |
 | `QUIT` | Ends the program. |
 
@@ -507,9 +512,43 @@ derivative rule:
 ### Symbolic helper functions
 
 [inc/helpers](inc/helpers) declares helper functions written in C
-([symfkt.c](src/symfkt.c)). Unlike numerical functions, they work on the terms
-themselves. Their names follow the helpers of Rubi in lower case. They are
-loaded by the integration rules and can also be used on their own:
+([symfkt.c](src/symfkt.c)) with `ATT SYMBOLIC`. Unlike numerical functions,
+they work on the terms themselves: they get the argument terms and return a
+new term, or nothing if they do not apply (then the call stays as it is).
+Their names follow the helpers of Rubi in lower case. They are loaded by the
+integration rules and can also be used on their own.
+
+The helpers know the operators and functions of the library through
+**roles**: `"+"`, `"*"`, `"^"`, `"-"`, `"/"`, `"mi"` (1/x), `"sin"`, `"cos"`,
+..., `"ln"`, `"exp"`, the constants `"pi"` and `"eE"`, `"Int"` and `"D"`. By
+default a role is played by the symbol of the same name, which fits
+[inc/alg](inc/alg). A library with other names maps them; all variants of an
+operator for different sorts count as the same function:
+
+```text
+FUNC kos : real >> real ATT cosinus
+SYMBOLIC "cos" = "kos"          # kos is the cosine for the helpers
+REWR deriv(kos(x)^2,x) : All    # prints -2 * kos (x )* sin (x )
+SYMBOLIC                        # back to the names
+```
+
+The helpers assume the usual properties of these roles: `+` and `*` are
+commutative and associative, `mi(x)` is 1/x, `cos` is the cosine, and so on.
+The rules themselves make no such assumptions.
+
+`matchq(u, pattern, cond)` is Rubi's `MatchQ[u, pattern /; cond]`: it tests
+`u` against a pattern with the matcher of the rule lists (optional operands,
+commutative operators, see [Rule sets](#rule-sets-algebras-and-rewriting)),
+then the condition with the bindings, and undoes the bindings afterwards.
+It is declared with `HOLD`, so that the pattern and the condition arrive
+unevaluated; its pattern variables must not be bound by the rule that
+calls it:
+
+```text
+SPEC tm : IF (matchq(Uu, (Mc+Md*Xx)^Mm, freeq(Mc,Xx) && freeq(Md,Xx))) lin(Uu,Xx) = 1
+```
+
+The helpers are:
 
 | Function | Meaning |
 | --- | --- |
@@ -595,8 +634,11 @@ connected with `ATT` in a `FUNC` or `OTHER` declaration.
 
 Symbolic functions, which work on terms instead of numbers, are entered in
 the list `symfunction` in [symfkt.c](src/symfkt.c). They get the argument terms
-and return a new term, or `NULL` if they do not apply. `ATT name` finds them
-in the same way.
+and return a new term, or `NULL` if they do not apply, and are connected with
+`ATT SYMBOLIC name` (or `ATT SYMBOLIC HOLD name` for unevaluated arguments;
+plain `ATT name` also finds them if no numerical function has that name). To
+recognize or build a term they use roles, not symbols: `is_head(t, "+", 2)`,
+`fsym("cos")`, `role_find("pi")`; `SYMBOLIC "role" = "symbol"` maps them.
 
 ## Source files
 
@@ -683,6 +725,10 @@ where the library [inc/](inc) and the tests are used from.
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
+- Symbolic C functions are connected with `ATT SYMBOLIC` (`HOLD` for
+  unevaluated arguments) and know the library's operators through roles,
+  which `SYMBOLIC "role" = "symbol"` maps; `matchq` gives Rubi's `MatchQ`
+  with the matcher of the rule lists.
 - Internal cleanup: named accessors for the node structures
   ([nodes.h](src/nodes.h)) instead of chains like `np->r->r->l`.
 - [LiNbO3/abso1](LiNbO3/abso1) runs again, and the test suite was added.

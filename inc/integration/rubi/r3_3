@@ -252,8 +252,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_g,O_h,O_n), (polyq(O_Px,
 
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_g,O_h,O_n), (polyq(O_Px,Xv)) Int((O_Px)*(arccoth((O_f)*((O_g)+((O_h)*(Xv)))))*((O_a)+((O_b)*(ln((O_c)*(((P_d)+((O_e)*(Xv)))^(O_n)))))),Xv) = ((dist(((O_a)+(((O_b)*(ln(((O_c)*(((((P_d)+(((O_e)*(Xv)))))^(O_n))))))))),inthide(((O_Px)*(arccoth(((O_f)*(((O_g)+(((O_h)*(Xv))))))))),Xv),Xv))+((((-1))*(O_b)*(O_e)*(O_n)*(Int(simp(((inthide(((O_Px)*(arccoth(((O_f)*(((O_g)+(((O_h)*(Xv))))))))),Xv))*(((((P_d)+(((O_e)*(Xv)))))^((-1))))),Xv),Xv)))))
 
-# Regel 59 nicht uebersetzt: predicate MatchQ
+# Regel 59 (324 Varianten):
 #   Int[u_.*(a_. + b_.*Log[c_.*v_^n_.])^p_., x_Symbol] := Int[u*(a + b*Log[c*ExpandToSum[v, x]^n])^p, x] /; FreeQ[{a, b, c, n, p}, x] && LinearQ[v, x] && Not[LinearMatchQ[v, x]] && Not[EqQ[n, 1] && MatchQ[c*v, e_.*(f_ + g_.*x) /; FreeQ[{e, f, g}, x]]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n,O_p), (linearq(P_v,Xv)), (not(linearmatchq(P_v,Xv))), (not(((eqq(O_n,1)) && (matchq(((O_c)*(P_v)),(O_mq_e)*((P_mq_f)+((O_mq_g)*(Xv))),((freeq(O_mq_e,Xv) && freeq(P_mq_f,Xv) && freeq(O_mq_g,Xv)))))))) Int((O_u)*(((O_a)+((O_b)*(ln((O_c)*((P_v)^(O_n))))))^(O_p)),Xv) = Int(((O_u)*(((((O_a)+(((O_b)*(ln(((O_c)*(((expandtosum(P_v,Xv))^(O_n))))))))))^(O_p)))),Xv)
 
 # Regel 60 nicht uebersetzt: predicate IntegralFreeQ
 #   Int[u_.*(a_. + b_.*Log[c_.*(d_.*(e_. + f_. x_)^m_.)^n_])^p_., x_Symbol] := Subst[Int[u*(a + b*Log[c*d^n*(e + f*x)^(m*n)])^p, x], c*d^n*(e + f*x)^(m*n), c*(d*(e + f*x)^m)^n] /; FreeQ[{a, b, c, d, e, f, m, n, p}, x] && Not[IntegerQ[n]] && Not[EqQ[d, 1] && EqQ[m, 1]] && IntegralFreeQ[IntHide[u*(a + b*Log[c*d^n*(e + f*x)^(m*n)])^p, x]]

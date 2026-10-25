@@ -47,6 +47,8 @@ mknod(FUNC,(Node *) declare, \
 	mknod(lexv,Idlist, \
 	mknod(hasv,rtps,atps)))
 
+static Node * sym_att (Node * id, int hold);	/* below */
+
 %}
 
 %union	{
@@ -59,7 +61,7 @@ mknod(FUNC,(Node *) declare, \
 %token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -153,6 +155,10 @@ att 		: /* NULL */		{ $$ = NULL;}
 			                    { printfErr(" --ERROR ATT : C-Function %s not Implemented \n",name((Symbol *) $2));
 			                      $$ = mknod(ATT,NULL,NULL); }
 			                }
+			  | ATT SYMBOLIC namedId	{ /* 2026: symbolische C-Funktion (symfkt.c): bekommt Terme */
+			                  $$ = sym_att($3, 0); }
+			  | ATT SYMBOLIC HOLD namedId	{ /* 2026: dazu Argumente unausgewertet (matchq) */
+			                  $$ = sym_att($4, 1); }
 				| ATT '(' {block_begin();no_protect();}
 								 d_list ')' instruction {protect();block_end();$$ =mknod(PARAM,$4,$6);};
 
@@ -249,6 +255,8 @@ aninstruction	: /* Nichts */ 	{$$=NULL;}
 			| LIFT '(' termlist ')' TO '(' termlist ')'	{$$=mknod(FUNC,(Node *) termlist_is_termlist,mknod(PARAM,(Node *) $7,(Node *) $3));}
 			| DBG Const 	      	{$$=mknod(FUNC,(Node *) setdebug,(Node *) ($2));}
 			| STEPS Alg String		{$$=mknod(FUNC,(Node *) steps_fkt,mknod(PARAM,(Node *) $2,(Node *) $3));} /* 2026 */
+			| SYMBOLIC String EQ String	{$$=mknod(FUNC,(Node *) role_fkt,mknod(PARAM,(Node *) $2,(Node *) $4));} /* 2026: Rolle */
+			| SYMBOLIC			{$$=mknod(FUNC,(Node *) role_fkt,NULL);  /* Rollen loeschen */}
 			| RETURN term								{$$=mknod(FUNC,(Node *) return_fkt,$2);}
 			| QUIT                      {$$=mknod(FUNC,(Node *) quit_fkt,NULL);}
 			| OPT idlist                {$$=mknod(FUNC,(Node *) opt_fkt,$2);}
@@ -345,3 +353,16 @@ formlist	: cformula					{$$ = mknod(Forms,$1,NULL); /* NULL dient zum Einhaengen
 															};
 
 %%
+
+/* 2026: ATT SYMBOLIC [HOLD] name: a symbolic C function (symfkt.c), which
+   gets the argument terms; with HOLD they are passed unevaluated */
+static Node * sym_att (Node * id, int hold)
+{
+	s_function * s = give_sfkt(name((Symbol *) id));
+	if (! s)
+		{
+		printfErr(" --ERROR ATT SYMBOLIC : C-Function %s not Implemented \n",name((Symbol *) id));
+		return mknod(ATT,NULL,NULL);
+		}
+	return mknod(ATT,(Node *) s,mknod(PARAM,NULL,hold ? mknod(PARAM,NULL,NULL) : NULL));
+}

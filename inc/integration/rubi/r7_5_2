@@ -138,8 +138,10 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_m), (eqq(((O_b)+(
 # Regel 34 nicht uebersetzt: predicate FunctionOfExponentialQ
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcCsch[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcCsch[u])/(d*(m + 1)) - b*u/(d*(m + 1)*Sqrt[-u^2])* Int[SimplifyIntegrand[(c + d*x)^(m + 1)* D[u, x]/(u*Sqrt[-1 - u^2]), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && Not[FunctionOfExponentialQ[u, x]]
 
-# Regel 35 nicht uebersetzt: predicate MatchQ
+# Regel 35 (18 Varianten):
 #   Int[v_*(a_. + b_.*ArcSech[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcSech[u]), w, x] + b*Sqrt[1 - u^2]/(u*Sqrt[-1 + 1/u]*Sqrt[1 + 1/u])* Int[SimplifyIntegrand[w*D[u, x]/(u*Sqrt[1 - u^2]), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b), (inversefunctionfreeq(P_u,Xv)), (not(matchq(P_v,((O_mq_c)+((O_mq_d)*(Xv)))^(O_mq_m),((freeq(O_mq_c,Xv) && freeq(O_mq_d,Xv) && freeq(O_mq_m,Xv)))))), (inversefunctionfreeq(inthide(P_v,Xv),Xv)) Int((P_v)*((O_a)+((O_b)*(arcsech(P_u)))),Xv) = ((dist(((O_a)+(((O_b)*(arcsech(P_u))))),inthide(P_v,Xv),Xv))+(((O_b)*(((((1)+((((-1))*(((P_u)^(2)))))))^((1/2))))*(((P_u)^((-1))))*((((((-1))+(((P_u)^((-1))))))^((-(1/2)))))*(((((1)+(((P_u)^((-1))))))^((-(1/2)))))*(Int(simp(((inthide(P_v,Xv))*(deriv(P_u,Xv))*(((P_u)^((-1))))*(((((1)+((((-1))*(((P_u)^(2)))))))^((-(1/2)))))),Xv),Xv)))))
 
-# Regel 36 nicht uebersetzt: predicate MatchQ
+# Regel 36 (18 Varianten):
 #   Int[v_*(a_. + b_.*ArcCsch[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcCsch[u]), w, x] - b*u/Sqrt[-u^2]* Int[SimplifyIntegrand[w*D[u, x]/(u*Sqrt[-1 - u^2]), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b), (inversefunctionfreeq(P_u,Xv)), (not(matchq(P_v,((O_mq_c)+((O_mq_d)*(Xv)))^(O_mq_m),((freeq(O_mq_c,Xv) && freeq(O_mq_d,Xv) && freeq(O_mq_m,Xv)))))), (inversefunctionfreeq(inthide(P_v,Xv),Xv)) Int((P_v)*((O_a)+((O_b)*(arccsch(P_u)))),Xv) = ((dist(((O_a)+(((O_b)*(arccsch(P_u))))),inthide(P_v,Xv),Xv))+((((-1))*(O_b)*(P_u)*((((((-1))*(((P_u)^(2)))))^((-(1/2)))))*(Int(simp(((inthide(P_v,Xv))*(deriv(P_u,Xv))*(((P_u)^((-1))))*((((((-1))+((((-1))*(((P_u)^(2)))))))^((-(1/2)))))),Xv),Xv)))))

@@ -158,10 +158,10 @@ ADDSPEC RubiRules : IF NIN(Xv,O_b,O_e,O_f,O_p), (integerq(((((O_m)+((-1))))*((1/
 #   Int[tan[e_. + f_.*x_]^m_.*(b_.*(c_.*sin[e_. + f_.*x_])^n_)^p_., x_Symbol] := With[{ff = FreeFactors[Sin[e + f*x], x]}, ff^(m + 1)/f* Subst[Int[x^m*(b*(c*ff*x)^n)^p/(1 - ff^2*x^2)^((m + 1)/2), x], x, Sin[e + f*x]/ff]] /; FreeQ[{b, c, e, f, n, p}, x] && ILtQ[(m - 1)/2, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_e,O_f,P_n,O_p), (iltq(((((O_m)+((-1))))*((1/2))),0)) Int(((tan((O_e)+((O_f)*(Xv))))^(O_m))*(((O_b)*(((O_c)*(sin((O_e)+((O_f)*(Xv)))))^(P_n)))^(O_p)),Xv) = ((((freefactors(sin(((O_e)+(((O_f)*(Xv))))),Xv))^(((O_m)+(1)))))*(((O_f)^((-1))))*(intsubst(((((Xv)^(O_m)))*(((((O_b)*(((((O_c)*(freefactors(sin(((O_e)+(((O_f)*(Xv))))),Xv))*(Xv)))^(P_n)))))^(O_p)))*(((((((1)+((((-1))*(((freefactors(sin(((O_e)+(((O_f)*(Xv))))),Xv))^(2)))*(((Xv)^(2)))))))^(((((O_m)+(1)))*((1/2))))))^((-1))))),Xv,((sin(((O_e)+(((O_f)*(Xv))))))*(((freefactors(sin(((O_e)+(((O_f)*(Xv))))),Xv))^((-1))))))))
 
-# Regel 39 nicht uebersetzt: predicate MatchQ
+# Regel 39 nicht uebersetzt: function ?trig in pattern
 #   Int[u_.*(b_.*sin[e_. + f_.*x_]^n_)^p_, x_Symbol] := With[{ff = FreeFactors[Sin[e + f*x], x]}, (b*ff^n)^ IntPart[p]*(b*Sin[e + f*x]^n)^ FracPart[p]/(Sin[e + f*x]/ff)^(n*FracPart[p])* Int[ActivateTrig[u]*(Sin[e + f*x]/ff)^(n*p), x]] /; FreeQ[{b, e, f, n, p}, x] && Not[IntegerQ[p]] && IntegerQ[n] && (EqQ[u, 1] || MatchQ[u, (d_.*trig_[e + f*x])^m_. /; FreeQ[{d, m}, x] && MemberQ[{sin, cos, tan, cot, sec, csc}, trig]])
 
-# Regel 40 nicht uebersetzt: predicate MatchQ
+# Regel 40 nicht uebersetzt: function ?trig in pattern
 #   Int[u_.*(b_.*(c_.*sin[e_. + f_.*x_])^n_)^p_, x_Symbol] := b^IntPart[p]*(b*(c*Sin[e + f*x])^n)^ FracPart[p]/(c*Sin[e + f*x])^(n*FracPart[p])* Int[ActivateTrig[u]*(c*Sin[e + f*x])^(n*p), x] /; FreeQ[{b, c, e, f, n, p}, x] && Not[IntegerQ[p]] && Not[IntegerQ[n]] && (EqQ[u, 1] || MatchQ[u, (d_.*trig_[e + f*x])^m_. /; FreeQ[{d, m}, x] && MemberQ[{sin, cos, tan, cot, sec, csc}, trig]])
 
 # Regel 41 (108 Varianten):

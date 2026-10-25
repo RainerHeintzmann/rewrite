@@ -10,8 +10,9 @@
 #   Int[Pq_*(a_+b_.*x_^2)^p_.,x_Symbol] := Int[ExpandIntegrand[Pq*(a+b*x^2)^p,x],x] /; FreeQ[{a,b},x] && PolyQ[Pq,x] && IGtQ[p,-2]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (polyq(P_Pq,Xv)), (igtq(O_p,(-2))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(2))))^(O_p)),Xv) = Int(expandintegrand(((P_Pq)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(O_p)))),Xv),Xv)
 
-# Regel 2 nicht uebersetzt: predicate MatchQ
+# Regel 2 (12 Varianten):
 #   Int[Pq_*(a_+b_.*x_^2)^p_,x_Symbol] := Int[x*PolynomialQuotient[Pq,x,x]*(a+b*x^2)^p,x] /; FreeQ[{a,b,p},x] && PolyQ[Pq,x] && EqQ[Coeff[Pq,x,0],0] && Not[MatchQ[Pq,x^m_.*u_. /; IntegerQ[m]]]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_p), (polyq(P_Pq,Xv)), (eqq(coeff(P_Pq,Xv,0),0)), (not(matchq(P_Pq,((Xv)^(O_mq_m))*(O_mq_u),(integerq(O_mq_m))))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = Int(((Xv)*(polyquotient(P_Pq,Xv,Xv))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)))),Xv)
 
 # Regel 3 (24 Varianten):
 #   Int[Px_*(a_+b_.*x_^2)^p_.,x_Symbol] := Int[PolynomialQuotient[Px,a+b*x^2,x]*(a+b*x^2)^(p+1),x] /; FreeQ[{a,b,p},x] && PolyQ[Px,x] && EqQ[PolynomialRemainder[Px,a+b*x^2,x],0]

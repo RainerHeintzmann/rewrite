@@ -196,6 +196,8 @@ static Node * group (Node * head, Node ** f, int n, unsigned mask)	/* subset */
 
 static BOOLEAN regroup (Node * p, Node * t, Goal * next);
 
+static Node mq_end;	/* last goal of matchq: t is its condition */
+
 static BOOLEAN lm_solve (Goal * g)
 {
 	Node * p, * t, * d;
@@ -204,6 +206,8 @@ static BOOLEAN lm_solve (Goal * g)
 
 	if (! g)			/* everything matched: check the condition */
 		return COND_CALL(RES_COND(cur_res));
+	if (g->p == & mq_end)		/* matchq: its own condition */
+		return ! g->t || isnt_zero(g->t);
 
 	p = g->p;
 	t = g->t;
@@ -532,6 +536,23 @@ static Node * match_rules (Node * term, Node * list)
 		restore_to(cp);
 		}
 	return NULL;
+}
+
+/* ---------------- matchq ----------------
+ * Rubi's MatchQ[u, pattern /; cond]: does term match pattern (with the
+ * settings of the current rule list: optional operands, commutativity), and
+ * is cond true for the bindings? The bindings are undone afterwards, so the
+ * pattern variables must be others than those of the rule being tried. */
+BOOLEAN lm_matchq (Node * pattern, Node * term, Node * cond)
+{
+	Node * cp = chain_pos, * res = cur_res;
+	Goal end;
+	BOOLEAN ok;
+	end.p = & mq_end; end.t = cond; end.next = NULL;
+	ok = goal(pattern, term, & end);
+	restore_to(cp);
+	cur_res = res;
+	return ok;
 }
 
 /* last element of each rule list, so that adding a rule does not walk the list */

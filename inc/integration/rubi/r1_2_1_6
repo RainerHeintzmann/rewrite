@@ -10,8 +10,9 @@
 #   Int[Pq_*(a_+b_.*x_+c_.*x_^2)^p_.,x_Symbol] := Int[ExpandIntegrand[Pq*(a+b*x+c*x^2)^p,x],x] /; FreeQ[{a,b,c},x] && PolyQ[Pq,x] && IGtQ[p,-2]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c), (polyq(P_Pq,Xv)), (igtq(O_p,(-2))) Int((P_Pq)*(((P_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))^(O_p)),Xv) = Int(expandintegrand(((P_Pq)*(((((P_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(O_p)))),Xv),Xv)
 
-# Regel 2 nicht uebersetzt: predicate MatchQ
+# Regel 2 (108 Varianten):
 #   Int[Pq_*(a_.+b_.*x_+c_.*x_^2)^p_,x_Symbol] := Int[x*PolynomialQuotient[Pq,x,x]*(a+b*x+c*x^2)^p,x] /; FreeQ[{a,b,c,p},x] && PolyQ[Pq,x] && EqQ[Coeff[Pq,x,0],0] && Not[MatchQ[Pq,x^m_.*u_. /; IntegerQ[m]]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_p), (polyq(P_Pq,Xv)), (eqq(coeff(P_Pq,Xv,0),0)), (not(matchq(P_Pq,((Xv)^(O_mq_m))*(O_mq_u),(integerq(O_mq_m))))) Int((P_Pq)*(((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))^(P_p)),Xv) = Int(((Xv)*(polyquotient(P_Pq,Xv,Xv))*(((((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))^(P_p)))),Xv)
 
 # Regel 3 (72 Varianten):
 #   Int[Pq_*(a_+b_.*x_+c_.*x_^2)^p_,x_Symbol] := (a+b*x+c*x^2)^FracPart[p]/((4*c)^IntPart[p]*(b+2*c*x)^(2*FracPart[p])) \[Star] Int[Pq*(b+2*c*x)^(2*p),x] /; FreeQ[{a,b,c,p},x] && PolyQ[Pq,x] && EqQ[b^2-4*a*c,0]

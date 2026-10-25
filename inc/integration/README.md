@@ -196,6 +196,11 @@ have it, so a few steps are added:
   the C function `binomsum` gives the same sum of integrals of linear and
   quadratic partial fractions, with `cos(k*pi/n)` exact for `n` up to 6:
   `Int(1/(1+x^5),x)` is exact, `Int(1/(1+x^7),x)` has real coefficients.
+- `MatchQ[u, pattern /; cond]` in a condition becomes
+  `matchq(u, pattern, cond)`, which uses the matcher of the rule lists.
+  Its pattern variables get new names (`P_mq_c`, `O_mq_d` for `c_`, `d_.`),
+  since the rule's own variables are bound at that time; other symbols in
+  the pattern, like `m` in `(d_.+e_.*x)^m`, refer to the rule's variables.
 - Rubi's `GtQ[u,v]` (also `LtQ`, `GeQ`, `LeQ`) is false unless both are
   numbers, so that `Not[GtQ[a^2,0]]` is true for a symbol `a`. The
   translator writes `gtq(u,v)`, ... instead of `u > v`, which cannot be

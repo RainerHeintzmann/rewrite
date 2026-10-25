@@ -14,7 +14,7 @@
 # Faktoren und Summanden duerfen in jeder Reihenfolge stehen (COMM +,*).
 
 FUNC Int : real,real >> real
-FUNC inthide      : real,real >> real ATT inthide       # Rubi IntHide = Int
+FUNC inthide      : real,real >> real ATT SYMBOLIC inthide       # Rubi IntHide = Int
 FUNC unintegrable : real,real >> real                   # Rubi Unintegrable: bleibt stehen, IntOut macht Int daraus
 
 VAR Uv,Vv,Wv,Xv : real                    # beliebige Terme

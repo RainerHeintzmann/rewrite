@@ -260,8 +260,8 @@ ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)) Int(arccoth(P_u),Xv) = (((
 # Regel 68 nicht uebersetzt: function PowerVariableExpn
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcCoth[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcCoth[u])/(d*(m + 1)) - b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(1 - u^2), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && FalseQ[PowerVariableExpn[u, m + 1, x]]
 
-# Regel 69 nicht uebersetzt: predicate MatchQ
+# Regel 69 nicht uebersetzt: function FunctionOfLinear
 #   Int[v_*(a_. + b_.*ArcTanh[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcTanh[u]), w, x] - b*Int[SimplifyIntegrand[w*D[u, x]/(1 - u^2), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]] && FalseQ[FunctionOfLinear[v*(a + b*ArcTanh[u]), x]]
 
-# Regel 70 nicht uebersetzt: predicate MatchQ
+# Regel 70 nicht uebersetzt: function FunctionOfLinear
 #   Int[v_*(a_. + b_.*ArcCoth[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcCoth[u]), w, x] - b*Int[SimplifyIntegrand[w*D[u, x]/(1 - u^2), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]] && FalseQ[FunctionOfLinear[v*(a + b*ArcCoth[u]), x]]

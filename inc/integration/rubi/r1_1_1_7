@@ -6,8 +6,9 @@
 # siehe inc/integration/LICENSE.Rubi.
 # Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
 
-# Regel 1 nicht uebersetzt: predicate MatchQ
+# Regel 1 (12 Varianten):
 #   Int[Px_*(a_ + b_.*x_^n_)^p_, x_Symbol] := Coeff[Px, x, n - 1]*(a + b*x^n)^(p + 1)/(b*n*(p + 1)) + Int[(Px - Coeff[Px, x, n - 1]*x^(n - 1))*(a + b*x^n)^p, x] /; FreeQ[{a, b}, x] && PolyQ[Px, x] && IGtQ[p, 1] && IGtQ[n, 1] && NeQ[Coeff[Px, x, n - 1], 0] && NeQ[Px, Coeff[Px, x, n - 1]*x^(n - 1)] && Not[MatchQ[Px, Qx_.*(c_ + d_.*x^m_)^q_ /; FreeQ[{c, d}, x] && PolyQ[Qx, x] && IGtQ[q, 1] && IGtQ[m, 1] && NeQ[Coeff[Qx*(a + b*x^n)^p, x, m - 1], 0] && GtQ[m*q, n*p]]]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (polyq(P_Px,Xv)), (igtq(P_p,1)), (igtq(P_n,1)), (neq(coeff(P_Px,Xv,((P_n)+((-1)))),0)), (neq(P_Px,((coeff(P_Px,Xv,((P_n)+((-1)))))*(((Xv)^(((P_n)+((-1))))))))), (not(matchq(P_Px,(O_mq_Qx)*(((P_mq_c)+((O_mq_d)*((Xv)^(P_mq_m))))^(P_mq_q)),((((freeq(P_mq_c,Xv) && freeq(O_mq_d,Xv))) && (polyq(O_mq_Qx,Xv)) && (igtq(P_mq_q,1)) && (igtq(P_mq_m,1)) && (neq(coeff(((O_mq_Qx)*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)))),Xv,((P_mq_m)+((-1)))),0)) && (((gtq(((P_mq_m)*(P_mq_q)),((P_n)*(P_p))))))))))) Int((P_Px)*(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p)),Xv) = ((((coeff(P_Px,Xv,((P_n)+((-1)))))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_p)+(1)))))*(((O_b)^((-1))))*(((P_n)^((-1))))*(((((P_p)+(1)))^((-1))))))+(Int(((((P_Px)+((((-1))*(coeff(P_Px,Xv,((P_n)+((-1)))))*(((Xv)^(((P_n)+((-1))))))))))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)))),Xv)))
 
 # Regel 2 (96 Varianten):
 #   Int[Px_*x_^m_.*(a_ + b_.*x_^n_.)^p_, x_Symbol] := Coeff[Px, x, n - m - 1]*(a + b*x^n)^(p + 1)/(b*n*(p + 1)) + Int[(Px - Coeff[Px, x, n - m - 1]*x^(n - m - 1))* x^m*(a + b*x^n)^p, x] /; FreeQ[{a, b, m, n}, x] && PolyQ[Px, x] && IGtQ[p, 1] && IGtQ[n - m, 0] && NeQ[Coeff[Px, x, n - m - 1], 0]

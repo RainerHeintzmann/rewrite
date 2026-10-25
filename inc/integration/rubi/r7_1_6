@@ -76,8 +76,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_f), (igtq(O_m,0)), (igtq(O_n,0)) Int
 # Regel 18 nicht uebersetzt: predicate FunctionOfExponentialQ
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcSinh[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcSinh[u])/(d*(m + 1)) - b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/Sqrt[1 + u^2], x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && Not[FunctionOfExponentialQ[u, x]]
 
-# Regel 19 nicht uebersetzt: predicate MatchQ
+# Regel 19 (18 Varianten):
 #   Int[v_*(a_. + b_.*ArcSinh[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcSinh[u]), w, x] - b*Int[SimplifyIntegrand[w*D[u, x]/Sqrt[1 + u^2], x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b), (inversefunctionfreeq(P_u,Xv)), (not(matchq(P_v,((O_mq_c)+((O_mq_d)*(Xv)))^(O_mq_m),((freeq(O_mq_c,Xv) && freeq(O_mq_d,Xv) && freeq(O_mq_m,Xv)))))), (inversefunctionfreeq(inthide(P_v,Xv),Xv)) Int((P_v)*((O_a)+((O_b)*(arcsinh(P_u)))),Xv) = ((dist(((O_a)+(((O_b)*(arcsinh(P_u))))),inthide(P_v,Xv),Xv))+((((-1))*(O_b)*(Int(simp(((inthide(P_v,Xv))*(deriv(P_u,Xv))*(((((1)+(((P_u)^(2)))))^((-(1/2)))))),Xv),Xv)))))
 
 # Regel 20 (3 Varianten):
 #   Int[E^(n_.*ArcSinh[u_]), x_Symbol] := Int[(u + Sqrt[1 + u^2])^n, x] /; IntegerQ[n] && PolyQ[u, x]

@@ -393,11 +393,37 @@ class Ctx:
             self.pvars[name] = ('O_' if optional else 'P_') + name
         return self.pvars[name]
 
+    def patvar(self, name, optional):
+        """a pattern a_ or a_. on the left side"""
+        return self.var(name, optional)
+
     def knum(self, q):
         k = 'K_%d' % (len(self.kvars) + 1)
         self.kvars.append(k)
         self.extra.append('(%s == %s)' % (k, fmt_rhs_num(q)))
         return k
+
+
+class MatchCtx(Ctx):
+    """the pattern of MatchQ[u, pattern /; cond] inside a condition: its
+    pattern variables are new ones (P_mq_a, O_mq_a), since the matcher
+    binds them while the variables of the rule are bound; other symbols
+    refer to the rule's variables"""
+
+    def __init__(self, outer):
+        Ctx.__init__(self)
+        self.outer = outer
+        self.xname = outer.xname
+        self.pvars = dict(outer.pvars)
+        self.kvars = outer.kvars         # shared: unique K_ names
+
+    def patvar(self, name, optional):
+        if name == self.xname:
+            return 'Xv'
+        v = ('O_mq_' if optional else 'P_mq_') + name
+        self.pvars[name] = v
+        self.outer.pvars['#mq:' + v] = v     # declared with the rule's variables
+        return v
 
 
 def fmt_rhs_num(q):
@@ -427,7 +453,7 @@ def tr_lhs(e, ctx):
             return 'Xv'
         if head is not None:
             raise Untranslatable("typed pattern %s_%s" % (name, head))
-        return ctx.var(name, optional)
+        return ctx.patvar(name, optional)
     if kind == 'sym':
         if e[1] in ctx.pvars or e[1] == ctx.xname:
             return ctx.var(e[1], False)
@@ -516,6 +542,18 @@ def tr_bool(e, ctx):
         items = args[0][2] if args[0][0] == 'call' and args[0][1] == 'List' else [args[0]]
         x = tr_rhs(args[1], ctx)
         return paren(' && '.join('freeq(%s,%s)' % (tr_rhs(i, ctx), x) for i in items))
+    if head == 'MatchQ' and len(args) == 2:
+        # matchq(u, pattern, cond) with the matcher of the rule lists
+        pat, cond = args[1], None
+        if pat[0] == 'call' and pat[1] == 'Condition':
+            pat, cond = pat[2][0], pat[2][1]
+        sub = MatchCtx(ctx)
+        p = tr_lhs(pat, sub)
+        conds = sub.extra + ([tr_bool(simplify_bool(cond), sub)] if cond is not None else [])
+        u = tr_rhs(args[0], ctx)
+        if not conds:
+            return 'matchq(%s,%s)' % (u, p)
+        return 'matchq(%s,%s,%s)' % (u, p, ' && '.join(paren(c) for c in conds))
     if head in ('EqQ', 'NeQ') and len(args) != 2:
         # invalid in Rubi too (CheckArguments gives Null): the rule never applies
         raise Untranslatable("%s with %d arguments (never true in Rubi either)" % (head, len(args)))

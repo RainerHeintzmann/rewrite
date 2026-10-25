@@ -409,6 +409,11 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Exakte Zahlen (inc/exact, exact.c mit GMP): Sorten integer und rational,
    Untersorten mit SUBSORT, ganze Literale mit INTNUM; Operatorvarianten
    werden nach den Sorten der Argumente gewaehlt.
+ - Symbolische C-Funktionen (symfkt.c) werden mit ATT SYMBOLIC name angebunden
+   (ATT SYMBOLIC HOLD: Argumente unausgewertet, fuer matchq). Sie kennen die
+   Operatoren der Bibliothek ueber Rollen ("+", "cos", "pi", ...); eine
+   Bibliothek mit anderen Namen ordnet sie zu: SYMBOLIC "cos" = "kos".
+ - matchq(u, Muster, Bedingung): Rubis MatchQ mit dem Matcher der Regellisten.
  - Exakte Wurzeln: 4^(1/2) = 2, 8^(1/2) = 2*2^(1/2), (2^(1/2))^2 = 2; nicht
    exakte Wurzeln bleiben Terme (Normalform wie in Mathematica). Eine reelle
    Zahl macht den Ausdruck numerisch (x*2^(1/2)*0.5 = 0.707107*x).

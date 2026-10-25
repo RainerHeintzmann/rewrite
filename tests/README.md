@@ -50,6 +50,8 @@ can be used in scripts and CI.
 | `20_exact` | Exact numbers from `inc/exact`: integers and fractions, widening to real, LIFTed rules, exact roots and numeric contagion. |
 | `21_specfun` | Special functions (erf, Fresnel, sine and cosine integrals, Ei, Gamma, zeta, elliptic integrals, 2F1, ...): values and derivative rules. |
 | `22_steps` | Solution steps of the Rubi rules (`STEPS RubiRules "inc/integration/rubi/steps"`), and switching them off. |
+| `23_matchq` | `matchq(u, pattern, cond)` (Rubi's `MatchQ`) in rule conditions: optional operands, the condition with the bindings, variables of the rule in the pattern. |
+| `24_roles` | `SYMBOLIC "role" = "symbol"`: the symbolic helpers with other function names, and back. |
 | `ex_*` | The example programs of the original project, for example `LiNbO3/abso1`. |
 
 Files used by the tests are in [data](data). All paths in the tests are

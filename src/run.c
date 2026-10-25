@@ -1025,6 +1025,16 @@ Node * tcalc (Node * term)   /* Traversiert Baum und berechnet */
 {
 if (! term)
 	return NULL;
+if (term->type == Func && builtin(term->l) == 2)	/* 2026: HOLD (matchq): arguments unevaluated */
+	{
+	Node * res = call_builtin(term);
+	if (res)
+		{
+		delete(term);
+		return tcalc(res);
+		}
+	return term;
+	}
 term->l = tcalc(term->l);
 term->r = tcalc(term->r);
 

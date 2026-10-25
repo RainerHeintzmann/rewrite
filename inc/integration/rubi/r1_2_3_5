@@ -22,8 +22,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_d,O_f,O_n,O_p), (eqq(O_n2,((2)*(O_n)
 #   Int[Pq_*(a_ + b_.*x_^n_. + c_.*x_^n2_.)^p_, x_Symbol] := (a + b*x^n + c*x^(2*n))^ FracPart[p]/((4*c)^IntPart[p]*(b + 2*c*x^n)^(2*FracPart[p]))* Int[Pq*(b + 2*c*x^n)^(2*p), x] /; FreeQ[{a, b, c, n, p}, x] && EqQ[n2, 2*n] && PolyQ[Pq, x] && EqQ[b^2 - 4*a*c, 0] && Not[IntegerQ[2*p]]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_n,P_p), (eqq(O_n2,((2)*(O_n)))), (polyq(P_Pq,Xv)), (eqq(((((O_b)^(2)))+((((-4))*(P_a)*(O_c)))),0)), (not(integerq(((2)*(P_p))))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(O_n)))+((O_c)*((Xv)^(O_n2))))^(P_p)),Xv) = ((((((P_a)+(((O_b)*(((Xv)^(O_n)))))+(((O_c)*(((Xv)^(((2)*(O_n)))))))))^(fracpart(P_p))))*(((((((4)*(O_c)))^(intpart(P_p))))^((-1))))*(((((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(fracpart(P_p))))))^((-1))))*(Int(((P_Pq)*(((((O_b)+(((2)*(O_c)*(((Xv)^(O_n)))))))^(((2)*(P_p)))))),Xv)))
 
-# Regel 5 nicht uebersetzt: predicate MatchQ
+# Regel 5 (288 Varianten):
 #   Int[Pq_*(a_ + b_.*x_^n_. + c_.*x_^n2_.)^p_, x_Symbol] := Int[x*PolynomialQuotient[Pq, x, x]*(a + b*x^n + c*x^(2*n))^p, x] /; FreeQ[{a, b, c, n, p}, x] && EqQ[n2, 2*n] && PolyQ[Pq, x] && EqQ[Coeff[Pq, x, 0], 0] && Not[MatchQ[Pq, x^m_.*u_. /; IntegerQ[m]]]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_n,P_p), (eqq(O_n2,((2)*(O_n)))), (polyq(P_Pq,Xv)), (eqq(coeff(P_Pq,Xv,0),0)), (not(matchq(P_Pq,((Xv)^(O_mq_m))*(O_mq_u),(integerq(O_mq_m))))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(O_n)))+((O_c)*((Xv)^(O_n2))))^(P_p)),Xv) = Int(((Xv)*(polyquotient(P_Pq,Xv,Xv))*(((((P_a)+(((O_b)*(((Xv)^(O_n)))))+(((O_c)*(((Xv)^(((2)*(O_n)))))))))^(P_p)))),Xv)
 
 # Regel 6 (248832 Varianten):
 #   Int[(d_ + e_.*x_^n_ + f_.*x_^n2_. + g_.*x_^n3_.)*(a_ + b_.*x_^n_ + c_.*x_^n2_.)^p_., x_Symbol] := x*(a*d*(n + 1) + (a*e - b*d*(n*(p + 1) + 1))* x^n)*(a + b*x^n + c*x^(2*n))^(p + 1)/(a^2*(n + 1)) /; FreeQ[{a, b, c, d, e, f, g, n, p}, x] && EqQ[n2, 2*n] && EqQ[n3, 3*n] && NeQ[b^2 - 4*a*c, 0] && EqQ[ a^2*g*(n + 1) - c*(n*(2*p + 3) + 1)*(a*e - b*d*(n*(p + 1) + 1)), 0] && EqQ[ a^2*f*(n + 1) - a*c*d*(n + 1)*(2*n*(p + 1) + 1) - b*(n*(p + 2) + 1)*(a*e - b*d*(n*(p + 1) + 1)), 0]

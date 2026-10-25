@@ -10,8 +10,9 @@
 #   Int[Pq_*(a_ + b_.*x_^2 + c_.*x_^4)^p_., x_Symbol] := Int[ExpandIntegrand[Pq*(a + b*x^2 + c*x^4)^p, x], x] /; FreeQ[{a, b, c}, x] && PolyQ[Pq, x] && IGtQ[p, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c), (polyq(P_Pq,Xv)), (igtq(O_p,0)) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(O_p)),Xv) = Int(expandintegrand(((P_Pq)*(((((P_a)+(((O_b)*(((Xv)^(2)))))+(((O_c)*(((Xv)^(4)))))))^(O_p)))),Xv),Xv)
 
-# Regel 2 nicht uebersetzt: predicate MatchQ
+# Regel 2 (72 Varianten):
 #   Int[Pq_*(a_ + b_.*x_^2 + c_.*x_^4)^p_, x_Symbol] := Int[x*PolynomialQuotient[Pq, x, x]*(a + b*x^2 + c*x^4)^p, x] /; FreeQ[{a, b, c, p}, x] && PolyQ[Pq, x] && EqQ[Coeff[Pq, x, 0], 0] && Not[MatchQ[Pq, x^m_.*u_. /; IntegerQ[m]]]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_p), (polyq(P_Pq,Xv)), (eqq(coeff(P_Pq,Xv,0),0)), (not(matchq(P_Pq,((Xv)^(O_mq_m))*(O_mq_u),(integerq(O_mq_m))))) Int((P_Pq)*(((P_a)+((O_b)*((Xv)^(2)))+((O_c)*((Xv)^(4))))^(P_p)),Xv) = Int(((Xv)*(polyquotient(P_Pq,Xv,Xv))*(((((P_a)+(((O_b)*(((Xv)^(2)))))+(((O_c)*(((Xv)^(4)))))))^(P_p)))),Xv)
 
 # Regel 3 nicht uebersetzt: Module with a local variable without value
 #   Int[Pq_*(a_ + b_.*x_^2 + c_.*x_^4)^p_, x_Symbol] := Module[{q = Expon[Pq, x], k}, Int[ Sum[Coeff[Pq, x, 2*k]*x^(2*k), {k, 0, q/2}]*(a + b*x^2 + c*x^4)^ p, x] + Int[ x*Sum[Coeff[Pq, x, 2*k + 1]*x^(2*k), {k, 0, (q - 1)/2}]*(a + b*x^2 + c*x^4)^p, x]] /; FreeQ[{a, b, c, p}, x] && PolyQ[Pq, x] && Not[PolyQ[Pq, x^2]]

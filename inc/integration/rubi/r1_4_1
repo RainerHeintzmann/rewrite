@@ -18,7 +18,7 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,P_d,O_e,O_q), (eqq(((((O_c)*(((P_d)^(2
 #   Int[x_^m_.*(a_+b_.*x_^n_)^p_.*Fx_,x_Symbol] := Int[x^(m+n*p)*(b+a*x^(-n))^p*Fx,x] /; FreeQ[{a,b,m,n},x] && IntegerQ[p] && NegQ[n]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_m,P_n), (integerq(O_p)), (negq(P_n)) Int(((Xv)^(O_m))*(((P_a)+((O_b)*((Xv)^(P_n))))^(O_p))*(P_Fx),Xv) = Int(((((Xv)^(((O_m)+(((P_n)*(O_p)))))))*(((((O_b)+(((P_a)*(((Xv)^((((-1))*(P_n)))))))))^(O_p)))*(P_Fx)),Xv)
 
-# Regel 4 nicht uebersetzt: predicate MatchQ
+# Regel 4 nicht uebersetzt: function Expon in pattern
 #   Int[u_.*Px_,x_Symbol] := With[{a=Rt[Coeff[Px,x,0],Expon[Px,x]],b=Rt[Coeff[Px,x,Expon[Px,x]],Expon[Px,x]]}, Int[u*(a+b*x)^Expon[Px,x],x] /; EqQ[Px,(a+b*x)^Expon[Px,x]]] /; PolyQ[Px,x] && GtQ[Expon[Px,x],1] && NeQ[Coeff[Px,x,0],0] && Not[MatchQ[Px,a_.*v_^Expon[Px,x] /; FreeQ[a,x] && LinearQ[v,x]]]
 
 # Regel 5 (3 Varianten):
@@ -35,7 +35,7 @@ ADDSPEC RubiRules : IF (not(integerq(P_p))), (polyq(P_Px,Xv)), (((gtq(expon(P_Px
 # Regel 8 nicht uebersetzt: function IntSum
 #   Int[u_,x_Symbol] := IntSum[u,x] /; SumQ[u]
 
-# Regel 9 nicht uebersetzt: predicate MatchQ
+# Regel 9 nicht uebersetzt: predicate InverseFunctionQ
 #   Int[(c_.*x_)^m_.*u_,x_Symbol] := Int[ExpandIntegrand[(c*x)^m*u,x],x] /; FreeQ[{c,m},x] && SumQ[u] && Not[LinearQ[u,x]] && Not[MatchQ[u,a_+b_.*v_ /; FreeQ[{a,b},x] && InverseFunctionQ[v]]]
 
 # Regel 10 (864 Varianten):
@@ -62,8 +62,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d,O_m,O_n), (eqq(O_q,(((-1))*(O_n)))
 #   Int[u_.*(a_+b_.*x_^n_.)^m_.*(c_+d_.*x_^j_)^p_.,x_Symbol] := (-b^2/d)^m \[Star] Int[u*(a-b*x^n)^(-m),x] /; FreeQ[{a,b,c,d,m,n,p},x] && EqQ[j,2*n] && EqQ[p,-m] && EqQ[b^2*c+a^2*d,0] && GtQ[a,0] && LtQ[d,0] && GtQ[b^2,0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d,O_m,O_n,O_p), (eqq(P_j,((2)*(O_n)))), (eqq(O_p,(((-1))*(O_m)))), (eqq(((((((O_b)^(2)))*(P_c)))+(((((P_a)^(2)))*(O_d)))),0)), (((gtq(P_a,0)))), (((ltq(O_d,0)))), (((gtq(((O_b)^(2)),0)))) Int((O_u)*(((P_a)+((O_b)*((Xv)^(O_n))))^(O_m))*(((P_c)+((O_d)*((Xv)^(P_j))))^(O_p)),Xv) = (((((((-1))*(((O_b)^(2)))*(((O_d)^((-1))))))^(O_m)))*(Int(((O_u)*(((((P_a)+((((-1))*(O_b)*(((Xv)^(O_n)))))))^((((-1))*(O_m)))))),Xv)))
 
-# Regel 16 nicht uebersetzt: predicate MatchQ
+# Regel 16 (12 Varianten):
 #   Int[Px_*(a_+b_.*x_^n_)^p_,x_Symbol] := Coeff[Px,x,n-1]*(a+b*x^n)^(p+1)/(b*n*(p+1)) + Int[(Px-Coeff[Px,x,n-1]*x^(n-1))*(a+b*x^n)^p,x] /; FreeQ[{a,b},x] && PolyQ[Px,x] && IGtQ[p,1] && IGtQ[n,1] && NeQ[Coeff[Px,x,n-1],0] && NeQ[Px,Coeff[Px,x,n-1]*x^(n-1)] && Not[MatchQ[Px,Qx_.*(c_+d_.*x^m_)^q_ /; FreeQ[{c,d},x] && PolyQ[Qx,x] && IGtQ[q,1] && IGtQ[m,1] && NeQ[Coeff[Qx*(a+b*x^n)^p,x,m-1],0] && GtQ[m*q,n*p]]]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b), (polyq(P_Px,Xv)), (igtq(P_p,1)), (igtq(P_n,1)), (neq(coeff(P_Px,Xv,((P_n)+((-1)))),0)), (neq(P_Px,((coeff(P_Px,Xv,((P_n)+((-1)))))*(((Xv)^(((P_n)+((-1))))))))), (not(matchq(P_Px,(O_mq_Qx)*(((P_mq_c)+((O_mq_d)*((Xv)^(P_mq_m))))^(P_mq_q)),((((freeq(P_mq_c,Xv) && freeq(O_mq_d,Xv))) && (polyq(O_mq_Qx,Xv)) && (igtq(P_mq_q,1)) && (igtq(P_mq_m,1)) && (neq(coeff(((O_mq_Qx)*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)))),Xv,((P_mq_m)+((-1)))),0)) && (((gtq(((P_mq_m)*(P_mq_q)),((P_n)*(P_p))))))))))) Int((P_Px)*(((P_a)+((O_b)*((Xv)^(P_n))))^(P_p)),Xv) = ((((coeff(P_Px,Xv,((P_n)+((-1)))))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(((P_p)+(1)))))*(((O_b)^((-1))))*(((P_n)^((-1))))*(((((P_p)+(1)))^((-1))))))+(Int(((((P_Px)+((((-1))*(coeff(P_Px,Xv,((P_n)+((-1)))))*(((Xv)^(((P_n)+((-1))))))))))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(P_p)))),Xv)))
 
 # Regel 17 (96 Varianten):
 #   Int[Px_*x_^m_.*(a_+b_.*x_^n_.)^p_,x_Symbol] := Coeff[Px,x,n-m-1]*(a+b*x^n)^(p+1)/(b*n*(p+1)) + Int[(Px-Coeff[Px,x,n-m-1]*x^(n-m-1))*x^m*(a+b*x^n)^p,x] /; FreeQ[{a,b,m,n},x] && PolyQ[Px,x] && IGtQ[p,1] && IGtQ[n-m,0] && NeQ[Coeff[Px,x,n-m-1],0]
@@ -264,7 +265,7 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d,O_e,P_n,P_p), (eqq(
 #   Int[u_.*(e_.*(a_+b_.*x_^n_.)^r_.)^p_*(f_.*(c_+d_.*x_^n_.)^s_)^q_,x_Symbol] := (e*(a+b*x^n)^r)^p*(f*(c+d*x^n)^s)^q/((a+b*x^n)^(p*r)*(c+d*x^n)^(q*s)) \[Star] Int[u*(a+b*x^n)^(p*r)*(c+d*x^n)^(q*s),x] /; FreeQ[{a,b,c,d,e,f,n,p,q,r,s},x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d,O_e,O_f,O_n,P_p,P_q,O_r,P_s) Int((O_u)*(((O_e)*(((P_a)+((O_b)*((Xv)^(O_n))))^(O_r)))^(P_p))*(((O_f)*(((P_c)+((O_d)*((Xv)^(O_n))))^(P_s)))^(P_q)),Xv) = ((((((O_e)*(((((P_a)+(((O_b)*(((Xv)^(O_n)))))))^(O_r)))))^(P_p)))*(((((O_f)*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^(P_s)))))^(P_q)))*(((((((P_a)+(((O_b)*(((Xv)^(O_n)))))))^(((P_p)*(O_r)))))^((-1))))*(((((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^(((P_q)*(P_s)))))^((-1))))*(Int(((O_u)*(((((P_a)+(((O_b)*(((Xv)^(O_n)))))))^(((P_p)*(O_r)))))*(((((P_c)+(((O_d)*(((Xv)^(O_n)))))))^(((P_q)*(P_s)))))),Xv)))
 
-# Regel 68 nicht uebersetzt: predicate MatchQ
+# Regel 68 nicht uebersetzt: function Expon in pattern
 #   Int[u_.*Px_,x_Symbol] := With[{a=Rt[Coeff[Px,x^2,0],Expon[Px,x^2]],b=Rt[Coeff[Px,x^2,Expon[Px,x^2]],Expon[Px,x^2]]}, Int[u*(a+b*x^2)^Expon[Px,x^2],x] /; EqQ[Px,(a+b*x^2)^Expon[Px,x^2]]] /; PolyQ[Px,x^2] && GtQ[Expon[Px,x^2],1] && NeQ[Coeff[Px,x^2,0],0] && Not[MatchQ[Px,a_.*v_^Expon[Px,x^2] /; FreeQ[a,x] && BinomialQ[v,x,2]]]
 
 # Regel 69 (3 Varianten):

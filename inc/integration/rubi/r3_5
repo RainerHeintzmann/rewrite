@@ -81,8 +81,9 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_f,O_g,O_m), (eqq(((((O_e)^(2
 #   Int[(g_.*x_)^m_.*Log[d_. + e_.*x_ + f_.*Sqrt[a_. + c_.*x_^2]], x_Symbol] := (g*x)^(m + 1)*Log[d + e*x + f*Sqrt[a + c*x^2]]/(g*(m + 1)) - a*c*f^2/(g*(m + 1))* Int[(g*x)^(m + 1)/(d*e*(a + c*x^2) + f*(a*e - c*d*x)*Sqrt[a + c*x^2]), x] /; FreeQ[{a, c, d, e, f, g, m}, x] && EqQ[e^2 - c*f^2, 0] && NeQ[m, -1] && IntegerQ[2*m]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_d,O_e,O_f,O_g,O_m), (eqq(((((O_e)^(2)))+((((-1))*(O_c)*(((O_f)^(2)))))),0)), (neq(O_m,(-1))), (integerq(((2)*(O_m)))) Int((((O_g)*(Xv))^(O_m))*(ln((O_d)+((O_e)*(Xv))+((O_f)*(((O_a)+((O_c)*((Xv)^(2))))^(0.5))))),Xv) = ((((((((O_g)*(Xv)))^(((O_m)+(1)))))*(ln(((O_d)+(((O_e)*(Xv)))+(((O_f)*(((((O_a)+(((O_c)*(((Xv)^(2)))))))^((1/2)))))))))*(((O_g)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_a)*(O_c)*(((O_f)^(2)))*(((O_g)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_g)*(Xv)))^(((O_m)+(1)))))*(((((((O_d)*(O_e)*(((O_a)+(((O_c)*(((Xv)^(2)))))))))+(((O_f)*(((((O_a)*(O_e)))+((((-1))*(O_c)*(O_d)*(Xv)))))*(((((O_a)+(((O_c)*(((Xv)^(2)))))))^((1/2))))))))^((-1))))),Xv)))))
 
-# Regel 20 nicht uebersetzt: predicate MatchQ
+# Regel 20 (162 Varianten):
 #   Int[v_.*Log[d_. + e_.*x_ + f_.*Sqrt[u_]], x_Symbol] := Int[v*Log[d + e*x + f*Sqrt[ExpandToSum[u, x]]], x] /; FreeQ[{d, e, f}, x] && QuadraticQ[u, x] && Not[QuadraticMatchQ[u, x]] && (EqQ[v, 1] || MatchQ[v, (g_.*x)^m_. /; FreeQ[{g, m}, x]])
+ADDSPEC RubiRules : IF NIN(Xv,O_d,O_e,O_f), (quadraticq(P_u,Xv)), (not(quadraticmatchq(P_u,Xv))), (((eqq(O_v,1)) || (matchq(O_v,((O_mq_g)*(Xv))^(O_mq_m),((freeq(O_mq_g,Xv) && freeq(O_mq_m,Xv))))))) Int((O_v)*(ln((O_d)+((O_e)*(Xv))+((O_f)*((P_u)^(0.5))))),Xv) = Int(((O_v)*(ln(((O_d)+(((O_e)*(Xv)))+(((O_f)*(((expandtosum(P_u,Xv))^((1/2)))))))))),Xv)
 
 # Regel 21 (10368 Varianten):
 #   Int[Log[c_.*x_^n_.]^r_./(x_*(a_.*x_^m_. + b_.*Log[c_.*x_^n_.]^q_)), x_Symbol] := Log[a*x^m + b*Log[c*x^n]^q]/(b*n*q) - a*m/(b*n*q)*Int[x^(m - 1)/(a*x^m + b*Log[c*x^n]^q), x] /; FreeQ[{a, b, c, m, n, q, r}, x] && EqQ[r, q - 1]
