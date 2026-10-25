@@ -411,6 +411,22 @@ void * rat_numer (void * q)
 
 /* rational ^ rational: exact if the root is exact ((8/27)^(2/3) = 4/9),
  * else NULL: the term stays as it is (2^(1/2)), as in Mathematica */
+/* natural^rational: the base as a fraction, then rat_qpow (the variant for
+ * natural,rational resolves the tie between rational^rational and
+ * nonneg^real, see inc/exact) */
+void * rat_qpow (void * arg[]);
+
+void * nat_qpow (void * arg[])
+{
+	void * a1[2], * a2[3], * q, * r;
+	a1[0] = arg[0]; a1[1] = NULL;
+	q = int2rat(a1);
+	a2[0] = q; a2[1] = arg[1]; a2[2] = NULL;
+	r = rat_qpow(a2);
+	del_rat(q);
+	return r;
+}
+
 void * rat_qpow (void * arg[])
 {
 	mpq_ptr e = Q(1), root, r;

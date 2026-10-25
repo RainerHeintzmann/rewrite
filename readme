@@ -414,6 +414,9 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    Operatoren der Bibliothek ueber Rollen ("+", "cos", "pi", ...); eine
    Bibliothek mit anderen Namen ordnet sie zu: SYMBOLIC "cos" = "kos".
  - matchq(u, Muster, Bedingung): Rubis MatchQ mit dem Matcher der Regellisten.
+ - SUBSORT real,complex: komplexe Funktionen nehmen auch reelle Argumente; eine
+   genau passende Variante hat Vorrang vor Umwandlungen, die wenigsten
+   Umwandlungen gewinnen, gleich gute Varianten werden gemeldet.
  - Funktionen, die durch Regellisten definiert sind: FUNC f ... ATT RULES Alg
    (f(..) = REWR f(..) : Alg, auch in Bedingungen und aus C). deriv und Rubis
    FixInertTrigFunction sind jetzt Regeln statt C-Tabellen.

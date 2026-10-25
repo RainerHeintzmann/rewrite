@@ -240,7 +240,13 @@ fit, the one with the fewest conversions is chosen, and the values are
 converted only when the function is calculated. Thus \texttt{1/3+1/6}
 uses the rational \texttt{+} and prints \texttt{(1/2)}, \texttt{2\^{}100}
 is exact, and \texttt{1/3+0.5} uses the real \texttt{+} and prints
-\texttt{0.833333}. The \texttt{LIFT} line lets \texttt{rational} inherit all
+\texttt{0.833333}. A variant that fits exactly is always preferred, so that
+conversions are only a fallback, as the most specific method in Julia: the
+library declares \texttt{real} a subsort of \texttt{complex}, and the
+hand-written variant for \texttt{real + complex} still wins over converting
+the real number. Two variants that need equally many conversions (a
+natural number fits both an \texttt{integer} and a \texttt{nonneg}
+variant) are reported, and a more specific variant resolves the tie. The \texttt{LIFT} line lets \texttt{rational} inherit all
 rules of \texttt{real}, and a second one does the same for
 \texttt{integer}; \texttt{x*1+0*x+(1/2)*x} simplifies to \texttt{(3/2) * x}
 with the unchanged rules for real numbers.

@@ -350,6 +350,25 @@ to `(3/2) * x`. When a rule is applied, the operators of the new term are
 chosen again for the sorts of their actual arguments, so a rule written
 for `real` gives exact results for exact numbers.
 
+**Precedence of variants.** A variant that fits the argument sorts exactly
+is always used; conversions are only the fallback, and among the variants
+reached by conversions the one with the fewest wins, like the most
+specific method in Julia. [inc/alg](inc/alg) declares `real < complex`
+(`SUBSORT real,complex ATT real2cpx`): functions for complex numbers also
+take real ones (`Re(2.5)` is 2.5), while the explicit mixed variants such as
+`+ : real,complex` keep precedence over converting the real number. If two
+variants need equally many conversions (a `natural` argument fits both an
+`integer` and a `nonneg` variant), the first declared one is used and a
+warning names the function and the argument sorts, once; a more specific
+variant resolves it, as `/ : natural,natural` in [inc/exact](inc/exact):
+
+```text
+FUNC tst : complex >> real ATT c_real
+OTHER tst : real >> real ATT r_abs
+tst(-2.5)            # prints 2.5: the real variant fits exactly
+tst(-2.5+i)          # prints -2.5: the complex one
+```
+
 **Roots.** A power of exact numbers is exact when the result is
 rational: `4^(1/2)` is 2, `(8/27)^(2/3)` is `(4/9)`. Otherwise it stays a
 term inside a term, in the normal form Mathematica uses: perfect powers
@@ -752,6 +771,8 @@ where the library [inc/](inc) and the tests are used from.
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
+- `SUBSORT real,complex`: complex functions take real arguments; exact
+  variants keep precedence over conversions, ties are reported.
 - Functions defined by rule lists (`ATT RULES`), also usable in conditions
   and from C: the derivative `deriv` and Rubi's `FixInertTrigFunction`
   are rules now instead of C tables.

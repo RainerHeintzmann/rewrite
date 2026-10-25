@@ -80,6 +80,11 @@ FUNC  denom : rational >> integer        ATT rat_den   # denominator
 OTHER +  : natural,natural >> natural   ATT int_plus
 OTHER *  : natural,natural >> natural   ATT int_mal
 OTHER ^  : natural,natural >> natural   ATT nat_pow
+# natural is a subsort of integer and of nonneg; these two would fit equally
+# well (as many conversions), so the exact variants are given explicitly:
+OTHER /  : natural,natural >> rational  ATT int_div    # not nonneg / nonneg
+OTHER ^  : natural,rational >> rational ATT nat_qpow   # 2^(1/2) stays exact
+OTHER ^  : natural,integer >> rational  ATT int_pow    # 2^-1 = (1/2)
 
 # ---------------- nonneg, positive ----------------
 OTHER +  : nonneg,nonneg >> nonneg      ATT plus
@@ -103,6 +108,7 @@ LIFT (A+A,A-A,A*A,A/A,-A,mi(A),A^A) TO (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,mi(Aq),Aq^Az
 LIFT (A^A) TO (Aq^Aq)                    # 2^(1/2) inherits the rules for powers
 LIFT (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,Aq^Az) TO (Az+Az,Az-Az,Az*Az,Az/Az,-Az,Az^Az)
 LIFT (Az+Az,Az*Az,Az^Az) TO (Anat+Anat,Anat*Anat,Anat^Anat)
+LIFT (Aq^Aq,Az^Az,Az/Az) TO (Anat^Aq,Anat^Az,Anat/Anat)   # the variants that resolve ties
 LIFT (A+A,A*A,A/A,mi(A),A^A,sqrt(A)) TO (An+An,An*An,An/An,mi(An),An^A,sqrt(An))
 LIFT (An+An,An*An,An/An,mi(An),An^A,sqrt(An)) TO (Ap+Ap,Ap*Ap,Ap/Ap,mi(Ap),Ap^A,sqrt(Ap))
 LIFT (Ap+Ap,Ap+Ap) TO (Ap+An,An+Ap)

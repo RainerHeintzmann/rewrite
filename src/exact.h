@@ -46,6 +46,7 @@ void * rat_abs (void * arg[]);
 void * rat_mi (void * arg[]);
 void * rat_pow (void * arg[]);
 void * rat_qpow (void * arg[]);      /* NULL if not exact */
+void * nat_qpow (void * arg[]);      /* natural^rational, NULL if not exact */
 void * int_pow (void * arg[]);
 void * rat_num (void * arg[]);
 void * int2int (void * arg[]);

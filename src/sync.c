@@ -711,10 +711,35 @@ static int variant_cost (Symbol * sym, Node * termlist)
 	return cost + c;
 }
 
-/* variant with the fewest extensions, or NULL */
+/* variant with the fewest extensions, or NULL. A variant that fits exactly
+   has cost 0, so a specific variant (+ : real,complex) always wins over a
+   general one reached by conversions (+ : complex,complex), as the most
+   specific method in Julia. If two variants need equally few conversions,
+   the first declared one is used, and this is reported once per function. */
+#define MAXAMBIG 64
+static Symbol * ambig_reported[MAXAMBIG];
+static int nambig = 0;
+
+static void report_ambiguous (Symbol * a, Symbol * b, Node * termlist)
+{
+	Node * t;
+	int i;
+	for (i = 0; i < nambig; i++)
+		if (ambig_reported[i] == urs_fkt(a)) return;
+	if (nambig < MAXAMBIG) ambig_reported[nambig++] = urs_fkt(a);
+	printfErr("warning : ambiguous variants of '%s' for the argument sorts (", name(a));
+	for (t = termlist; t; t = (t->type == Terms) ? t->r : NULL)
+		{
+		Node * s = arg_sort(t->type == Terms ? t->l : t);
+		printfErr("%s%s", s ? name((Symbol *) s) : "?", (t->type == Terms && t->r) ? "," : "");
+		}
+	printfErr("): the results %s and %s need equally many conversions; the first is used\n",
+	          name(rtypes(a) ? (Symbol *) rtypes(a) : a), name(rtypes(b) ? (Symbol *) rtypes(b) : b));
+}
+
 Symbol * getsymbol_widen (Symbol * symbol,Node * termlist)
 {
-	Symbol * sym = symbol, * best = NULL;
+	Symbol * sym = symbol, * best = NULL, * tie = NULL;
 	int bestc = -1, c;
 	if (! termlist) return NULL;
 	do	{
@@ -723,9 +748,13 @@ Symbol * getsymbol_widen (Symbol * symbol,Node * termlist)
 			{
 			bestc = c;
 			best = sym;
+			tie = NULL;
 			}
+		else if (c >= 0 && c == bestc && ! tie)
+			tie = sym;
 		sym = kette(sym);
 		} while ((sym != (Symbol *) NULL) && (sym != symbol));
+	if (tie && bestc > 0) report_ambiguous(best, tie, termlist);
 	return best;
 }
 

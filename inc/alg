@@ -32,6 +32,11 @@ SORT vkoerper   # complete field
 SORT complex
 
 ATT complex show_complex,cmp_complex,cpy_complex,del_complex
+# 2026: every real number is also a complex one. A function for complex
+# arguments then also takes real ones (converted when it is calculated),
+# but a variant that fits exactly, like + : real,complex below, is chosen
+# first; the conversion is the fallback (fewest conversions wins).
+SUBSORT real,complex ATT real2cpx
 
 VAR A,B,C,X,Y,Z : real
 VAR As,Bs,Cs,Xs,Ys,Zs : sort

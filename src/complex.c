@@ -54,6 +54,8 @@ free(x);
 return;
 }
 
+/* 2026: SUBSORT real,complex: a real number as a complex one */
+complex * real2cpx (double * arg[])		{return mkcomplex((* arg[0]),0.0);}
 complex * cpx (double * arg[]) 					{return mkcomplex((* arg[0]),(* arg[1]));}
 complex * c_plus (complex * arg[]) 			{return mkcomplex(Re(arg[0]) + Re(arg[1]),Im(arg[0]) + Im(arg[1]));}
 complex * c_plus_r (complex * arg[]) 		{return mkcomplex(Re(arg[0]) + Db(arg[1]),Im(arg[0]));}

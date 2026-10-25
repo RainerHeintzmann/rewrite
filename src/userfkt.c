@@ -65,6 +65,7 @@ t_funct (userfunction [])  = {
 	FKT(rat_mi),
 	FKT(rat_pow),
 	FKT(rat_qpow),
+	FKT(nat_qpow),
 	FKT(int_pow),
 	FKT(int2int),
 	FKT(int2real),
@@ -125,6 +126,7 @@ t_funct (userfunction [])  = {
 	FKT(cmp_complex),	
 	FKT(cpy_complex),	
 	FKT(del_complex),	
+	FKT(real2cpx),		/* 2026: SUBSORT real,complex */
 	FKT(cpx),					
 	FKT(c_plus),			
 	FKT(c_plus_r),		
