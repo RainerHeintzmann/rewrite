@@ -1,139 +1,139 @@
 # r4_1_1_1
-# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
-# mit tools/rubi2rewrite.py, Abschnitt
+# Translated automatically from Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# by tools/rubi2rewrite.py, section
 #   4.1.1.1 (a+b sin)^n
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi.
-# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi.
+# Do not edit by hand: changes belong in the translator.
 
-# Regel 1 (9 Varianten):
+# Rule 1 (9 variants):
 #   Int[sin[c_. + d_.*x_]^n_, x_Symbol] := -1/d*Subst[Int[Expand[(1 - x^2)^((n - 1)/2), x], x], x, Cos[c + d*x]] /; FreeQ[{c, d}, x] && IGtQ[(n - 1)/2, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d), (igtq(((((P_n)+((-1))))*((1/2))),0)) Int((sin((O_c)+((O_d)*(Xv))))^(P_n),Xv) = (((-1))*(((O_d)^((-1))))*(intsubst(expand(((((1)+((((-1))*(((Xv)^(2)))))))^(((((P_n)+((-1))))*((1/2))))),Xv),Xv,cos(((O_c)+(((O_d)*(Xv))))))))
 
-# Regel 2 (18 Varianten):
+# Rule 2 (18 variants):
 #   Int[sin[c_. + d_.*x_/2]^2, x_Symbol] := x/2 - Sin[2*c + d*x]/(2*d) /; FreeQ[{c, d}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d) Int((sin((O_c)+((O_d)*(Xv)*(0.5))))^(2),Xv) = ((((Xv)*((1/2))))+((((-(1/2)))*(sin(((((2)*(O_c)))+(((O_d)*(Xv))))))*(((O_d)^((-1)))))))
 
-# Regel 3 (27 Varianten):
+# Rule 3 (27 variants):
 #   Int[(b_.*sin[c_. + d_.*x_])^n_, x_Symbol] :=   -b*Cos[c + d*x]*(b*Sin[c + d*x])^(n - 1)/(d*n) + b^2*(n - 1)/n*Int[(b*Sin[c + d*x])^(n - 2), x] /; FreeQ[{b, c, d}, x] && GtQ[n, 1] && IntegerQ[2*n]
 ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (((gtq(P_n,1)))), (integerq(((2)*(P_n)))) Int(((O_b)*(sin((O_c)+((O_d)*(Xv)))))^(P_n),Xv) = (((((-1))*(O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))^(((P_n)+((-1))))))*(((O_d)^((-1))))*(((P_n)^((-1))))))+(((((O_b)^(2)))*(((P_n)+((-1))))*(((P_n)^((-1))))*(Int(((((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))^(((P_n)+((-2))))),Xv)))))
 
-# Regel 4 (27 Varianten):
+# Rule 4 (27 variants):
 #   Int[(b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := Cos[c + d*x]*(b*Sin[c + d*x])^(n + 1)/(b*d*(n + 1)) + (n + 2)/(b^2*(n + 1))*Int[(b*Sin[c + d*x])^(n + 2), x] /; FreeQ[{b, c, d}, x] && LtQ[n, -1] && IntegerQ[2*n]
 ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d), (((ltq(P_n,(-1))))), (integerq(((2)*(P_n)))) Int(((O_b)*(sin((O_c)+((O_d)*(Xv)))))^(P_n),Xv) = ((((cos(((O_c)+(((O_d)*(Xv))))))*(((((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))^(((P_n)+(1)))))*(((O_b)^((-1))))*(((O_d)^((-1))))*(((((P_n)+(1)))^((-1))))))+(((((P_n)+(2)))*(((O_b)^((-2))))*(((((P_n)+(1)))^((-1))))*(Int(((((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))^(((P_n)+(2)))),Xv)))))
 
-# Regel 5 (36 Varianten):
+# Rule 5 (36 variants):
 #   Int[sin[c_. + Pi/2 + d_.*x_], x_Symbol] := Sin[c + d*x]/d /; FreeQ[{c, d}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d) Int(sin((O_c)+((3.141592653589793)*(0.5))+((O_d)*(Xv))),Xv) = ((sin(((O_c)+(((O_d)*(Xv))))))*(((O_d)^((-1)))))
 
-# Regel 6 (9 Varianten):
+# Rule 6 (9 variants):
 #   Int[sin[c_. + d_.*x_], x_Symbol] := -Cos[c + d*x]/d /; FreeQ[{c, d}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d) Int(sin((O_c)+((O_d)*(Xv))),Xv) = (((-1))*(cos(((O_c)+(((O_d)*(Xv))))))*(((O_d)^((-1)))))
 
-# Regel 7 (9 Varianten):
+# Rule 7 (9 variants):
 #   Int[Sqrt[sin[c_. + d_.*x_]], x_Symbol] := 2/d*EllipticE[1/2*(c - Pi/2 + d*x), 2] /; FreeQ[{c, d}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_c,O_d) Int((sin((O_c)+((O_d)*(Xv))))^(0.5),Xv) = ((2)*(((O_d)^((-1))))*(elliptice((((1/2))*(((O_c)+((((-(1/2)))*(pi)))+(((O_d)*(Xv)))))),2)))
 
-# Regel 8 (9 Varianten):
+# Rule 8 (9 variants):
 #   Int[1/Sqrt[sin[c_. + d_.*x_]], x_Symbol] := 2/d*EllipticF[1/2*(c - Pi/2 + d*x), 2] /; FreeQ[{c, d}, x]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,O_c,O_d) Int((sin((O_c)+((O_d)*(Xv))))^(K_1),Xv) = ((2)*(((O_d)^((-1))))*(ellipticf((((1/2))*(((O_c)+((((-(1/2)))*(pi)))+(((O_d)*(Xv)))))),2)))
 
-# Regel 9 (18 Varianten):
+# Rule 9 (18 variants):
 #   Int[(b_*sin[c_. + d_.*x_])^n_, x_Symbol] := (b*Sin[c + d*x])^n/Sin[c + d*x]^n*Int[Sin[c + d*x]^n, x] /; FreeQ[{b, c, d}, x] && LtQ[-1, n, 1] && IntegerQ[2*n]
 ADDSPEC RubiRules : IF NIN(Xv,P_b,O_c,O_d), (((ltq((-1),P_n)) && (ltq(P_n,1)))), (integerq(((2)*(P_n)))) Int(((P_b)*(sin((O_c)+((O_d)*(Xv)))))^(P_n),Xv) = ((((((P_b)*(sin(((O_c)+(((O_d)*(Xv))))))))^(P_n)))*(((((sin(((O_c)+(((O_d)*(Xv))))))^(P_n)))^((-1))))*(Int(((sin(((O_c)+(((O_d)*(Xv))))))^(P_n)),Xv)))
 
-# Regel 10 (27 Varianten):
+# Rule 10 (27 variants):
 #   Int[(b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := Cos[c + d*x]*(b*Sin[c + d*x])^(n + 1)/(b*d*(n + 1)*Sqrt[Cos[c + d*x]^2])* Hypergeometric2F1[1/2, (n + 1)/2, (n + 3)/2, Sin[c + d*x]^2] /; FreeQ[{b, c, d, n}, x] && Not[IntegerQ[2*n]]
 ADDSPEC RubiRules : IF NIN(Xv,O_b,O_c,O_d,P_n), (not(integerq(((2)*(P_n))))) Int(((O_b)*(sin((O_c)+((O_d)*(Xv)))))^(P_n),Xv) = ((cos(((O_c)+(((O_d)*(Xv))))))*(((((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))^(((P_n)+(1)))))*(((O_b)^((-1))))*(((O_d)^((-1))))*(((((P_n)+(1)))^((-1))))*(((((cos(((O_c)+(((O_d)*(Xv))))))^(2)))^((-(1/2)))))*(hyp2f1((1/2),((((P_n)+(1)))*((1/2))),((((P_n)+(3)))*((1/2))),((sin(((O_c)+(((O_d)*(Xv))))))^(2)))))
 
-# Regel 11 (54 Varianten):
+# Rule 11 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^2, x_Symbol] := (2*a^2 + b^2)*x/2 - 2*a*b*Cos[c + d*x]/d - b^2*Cos[c + d*x]*Sin[c + d*x]/(2*d) /; FreeQ[{a, b, c, d}, x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(2),Xv) = ((((((((2)*(((P_a)^(2)))))+(((O_b)^(2)))))*(Xv)*((1/2))))+((((-2))*(P_a)*(O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))))+((((-(1/2)))*(((O_b)^(2)))*(cos(((O_c)+(((O_d)*(Xv))))))*(sin(((O_c)+(((O_d)*(Xv))))))*(((O_d)^((-1)))))))
 
-# Regel 12 (54 Varianten):
+# Rule 12 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := Int[ExpandTrig[(a + b*sin[c + d*x])^n, x], x] /; FreeQ[{a, b, c, d, n}, x] && EqQ[a^2 - b^2, 0] && IGtQ[n, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_n), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (igtq(P_n,0)) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = Int(expandintegrand(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(P_n)),Xv),Xv)
 
-# Regel 13 (54 Varianten):
+# Rule 13 (54 variants):
 #   Int[Sqrt[a_ + b_.*sin[c_. + d_.*x_]], x_Symbol] := -2*b*Cos[c + d*x]/(d*Sqrt[a + b*Sin[c + d*x]]) /; FreeQ[{a, b, c, d}, x] && EqQ[a^2 - b^2, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(0.5),Xv) = (((-2))*(O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-(1/2))))))
 
-# Regel 14 (54 Varianten):
+# Rule 14 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := -b*Cos[c + d*x]*(a + b*Sin[c + d*x])^(n - 1)/(d*n) + a*(2*n - 1)/n*Int[(a + b*Sin[c + d*x])^(n - 1), x] /; FreeQ[{a, b, c, d}, x] && EqQ[a^2 - b^2, 0] && IGtQ[n - 1/2, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (igtq(((P_n)+((-(1/2)))),0)) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = (((((-1))*(O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(((P_n)+((-1))))))*(((O_d)^((-1))))*(((P_n)^((-1))))))+(((P_a)*(((((2)*(P_n)))+((-1))))*(((P_n)^((-1))))*(Int(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(((P_n)+((-1))))),Xv)))))
 
-# Regel 15 (54 Varianten):
+# Rule 15 (54 variants):
 #   Int[1/(a_ + b_.*sin[c_. + d_.*x_]), x_Symbol] := -Cos[c + d*x]/(d*(b + a*Sin[c + d*x])) /; FreeQ[{a, b, c, d}, x] && EqQ[a^2 - b^2, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = (((-1))*(cos(((O_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))*(((((O_b)+(((P_a)*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-1)))))
 
-# Regel 16 (54 Varianten):
+# Rule 16 (54 variants):
 #   Int[1/Sqrt[a_ + b_.*sin[c_. + d_.*x_]], x_Symbol] := -2/d*Subst[Int[1/(2*a - x^2), x], x, b*Cos[c + d*x]/Sqrt[a + b*Sin[c + d*x]]] /; FreeQ[{a, b, c, d}, x] && EqQ[a^2 - b^2, 0]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b,O_c,O_d), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = (((-2))*(((O_d)^((-1))))*(intsubst(((((((2)*(P_a)))+((((-1))*(((Xv)^(2)))))))^((-1))),Xv,((O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-(1/2)))))))))
 
-# Regel 17 (54 Varianten):
+# Rule 17 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := b*Cos[c + d*x]*(a + b*Sin[c + d*x])^n/(a*d*(2*n + 1)) + (n + 1)/(a*(2*n + 1))*Int[(a + b*Sin[c + d*x])^(n + 1), x] /; FreeQ[{a, b, c, d}, x] && EqQ[a^2 - b^2, 0] && LtQ[n, -1] && IntegerQ[2*n]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (((ltq(P_n,(-1))))), (integerq(((2)*(P_n)))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = ((((O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(P_n)))*(((P_a)^((-1))))*(((O_d)^((-1))))*(((((((2)*(P_n)))+(1)))^((-1))))))+(((((P_n)+(1)))*(((P_a)^((-1))))*(((((((2)*(P_n)))+(1)))^((-1))))*(Int(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(((P_n)+(1)))),Xv)))))
 
-# Regel 18 (54 Varianten):
+# Rule 18 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := -2^(n + 1/2)*a^(n - 1/2)*b* Cos[c + d*x]/(d*Sqrt[a + b*Sin[c + d*x]])* Hypergeometric2F1[1/2, 1/2 - n, 3/2, 1/2*(1 - b*Sin[c + d*x]/a)] /; FreeQ[{a, b, c, d, n}, x] && EqQ[a^2 - b^2, 0] && Not[IntegerQ[2*n]] && GtQ[a, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_n), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (not(integerq(((2)*(P_n))))), (((gtq(P_a,0)))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = (((-1))*(((2)^(((P_n)+((1/2))))))*(((P_a)^(((P_n)+((-(1/2)))))))*(O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-(1/2)))))*(hyp2f1((1/2),(((1/2))+((((-1))*(P_n)))),(3/2),(((1/2))*(((1)+((((-1))*(O_b)*(sin(((O_c)+(((O_d)*(Xv))))))*(((P_a)^((-1))))))))))))
 
-# Regel 19 (54 Varianten):
+# Rule 19 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := a^IntPart[n]*(a + b*Sin[c + d*x])^ FracPart[n]/(1 + b/a*Sin[c + d*x])^FracPart[n]* Int[(1 + b/a*Sin[c + d*x])^n, x] /; FreeQ[{a, b, c, d, n}, x] && EqQ[a^2 - b^2, 0] && Not[IntegerQ[2*n]] && Not[GtQ[a, 0]]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_n), (eqq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (not(integerq(((2)*(P_n))))), (not(((gtq(P_a,0))))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = ((((P_a)^(intpart(P_n))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(fracpart(P_n))))*(((((((1)+(((O_b)*(((P_a)^((-1))))*(sin(((O_c)+(((O_d)*(Xv))))))))))^(fracpart(P_n))))^((-1))))*(Int(((((1)+(((O_b)*(((P_a)^((-1))))*(sin(((O_c)+(((O_d)*(Xv))))))))))^(P_n)),Xv)))
 
-# Regel 20 (54 Varianten):
+# Rule 20 (54 variants):
 #   Int[Sqrt[a_ + b_.*sin[c_. + d_.*x_]], x_Symbol] := 2*Sqrt[a + b]/d*EllipticE[1/2*(c - Pi/2 + d*x), 2*b/(a + b)] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && GtQ[a + b, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (((gtq(((P_a)+(O_b)),0)))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(0.5),Xv) = ((2)*(((((P_a)+(O_b)))^((1/2))))*(((O_d)^((-1))))*(elliptice((((1/2))*(((O_c)+((((-(1/2)))*(pi)))+(((O_d)*(Xv)))))),((2)*(O_b)*(((((P_a)+(O_b)))^((-1))))))))
 
-# Regel 21 (54 Varianten):
+# Rule 21 (54 variants):
 #   Int[Sqrt[a_ + b_.*sin[c_. + d_.*x_]], x_Symbol] := 2*Sqrt[a - b]/d*EllipticE[1/2*(c + Pi/2 + d*x), -2*b/(a - b)] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && GtQ[a - b, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (((gtq(((P_a)+((((-1))*(O_b)))),0)))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(0.5),Xv) = ((2)*(((((P_a)+((((-1))*(O_b)))))^((1/2))))*(((O_d)^((-1))))*(elliptice((((1/2))*(((O_c)+(((pi)*((1/2))))+(((O_d)*(Xv)))))),(((-2))*(O_b)*(((((P_a)+((((-1))*(O_b)))))^((-1))))))))
 
-# Regel 22 (54 Varianten):
+# Rule 22 (54 variants):
 #   Int[Sqrt[a_ + b_.*sin[c_. + d_.*x_]], x_Symbol] := Sqrt[a + b*Sin[c + d*x]]/Sqrt[(a + b*Sin[c + d*x])/(a + b)]* Int[Sqrt[a/(a + b) + b/(a + b)*Sin[c + d*x]], x] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && Not[GtQ[a + b, 0]]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (not(((gtq(((P_a)+(O_b)),0))))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(0.5),Xv) = ((((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^((1/2))))*(((((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))*(((((P_a)+(O_b)))^((-1))))))^((-(1/2)))))*(Int(((((((P_a)*(((((P_a)+(O_b)))^((-1))))))+(((O_b)*(((((P_a)+(O_b)))^((-1))))*(sin(((O_c)+(((O_d)*(Xv))))))))))^((1/2))),Xv)))
 
-# Regel 23 (54 Varianten):
+# Rule 23 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := -b*Cos[c + d*x]*(a + b*Sin[c + d*x])^(n - 1)/(d*n) + 1/n* Int[(a + b*Sin[c + d*x])^(n - 2)* Simp[a^2*n + b^2*(n - 1) + a*b*(2*n - 1)*Sin[c + d*x], x], x] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && GtQ[n, 1] && IntegerQ[2*n]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (((gtq(P_n,1)))), (integerq(((2)*(P_n)))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = (((((-1))*(O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(((P_n)+((-1))))))*(((O_d)^((-1))))*(((P_n)^((-1))))))+(((((P_n)^((-1))))*(Int(((((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(((P_n)+((-2))))))*(simp(((((((P_a)^(2)))*(P_n)))+(((((O_b)^(2)))*(((P_n)+((-1))))))+(((P_a)*(O_b)*(((((2)*(P_n)))+((-1))))*(sin(((O_c)+(((O_d)*(Xv))))))))),Xv))),Xv)))))
 
-# Regel 24 (54 Varianten):
+# Rule 24 (54 variants):
 #   Int[1/(a_ + b_.*sin[c_. + d_.*x_]), x_Symbol] := With[{q = Rt[a^2 - b^2, 2]}, x/q + 2/(d*q)*ArcTan[b*Cos[c + d*x]/(a + q + b*Sin[c + d*x])]] /; FreeQ[{a, b, c, d}, x] && GtQ[a^2 - b^2, 0] && PosQ[a]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d), (((gtq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)))), (posq(P_a)) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = ((((Xv)*(((rt(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),2))^((-1))))))+(((2)*(((O_d)^((-1))))*(((rt(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),2))^((-1))))*(arctan(((O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((((P_a)+(rt(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),2))+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-1))))))))))
 
-# Regel 25 (54 Varianten):
+# Rule 25 (54 variants):
 #   Int[1/(a_ + b_.*sin[c_. + d_.*x_]), x_Symbol] := With[{q = Rt[a^2 - b^2, 2]}, -x/q - 2/(d*q)*ArcTan[b*Cos[c + d*x]/(a - q + b*Sin[c + d*x])]] /; FreeQ[{a, b, c, d}, x] && GtQ[a^2 - b^2, 0] && NegQ[a]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d), (((gtq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)))), (negq(P_a)) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = (((((-1))*(Xv)*(((rt(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),2))^((-1))))))+((((-2))*(((O_d)^((-1))))*(((rt(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),2))^((-1))))*(arctan(((O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((((P_a)+((((-1))*(rt(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),2))))+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-1))))))))))
 
-# Regel 26 (216 Varianten):
+# Rule 26 (216 variants):
 #   Int[1/(a_ + b_.*sin[c_. + Pi/2 + d_.*x_]), x_Symbol] := With[{e = FreeFactors[Tan[(c + d*x)/2], x]}, 2*e/d* Subst[Int[1/(a + b + (a - b)*e^2*x^2), x], x, Tan[(c + d*x)/2]/e]] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int(((P_a)+((O_b)*(sin((O_c)+((3.141592653589793)*(0.5))+((O_d)*(Xv))))))^(K_1),Xv) = ((2)*(freefactors(tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))),Xv))*(((O_d)^((-1))))*(intsubst(((((P_a)+(O_b)+(((((P_a)+((((-1))*(O_b)))))*(((freefactors(tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))),Xv))^(2)))*(((Xv)^(2)))))))^((-1))),Xv,((tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))))*(((freefactors(tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))),Xv))^((-1))))))))
 
-# Regel 27 (54 Varianten):
+# Rule 27 (54 variants):
 #   Int[1/(a_ + b_.*sin[c_. + d_.*x_]), x_Symbol] := With[{e = FreeFactors[Tan[(c + d*x)/2], x]}, 2*e/d* Subst[Int[1/(a + 2*b*e*x + a*e^2*x^2), x], x, Tan[(c + d*x)/2]/e]] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = ((2)*(freefactors(tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))),Xv))*(((O_d)^((-1))))*(intsubst(((((P_a)+(((2)*(O_b)*(freefactors(tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))),Xv))*(Xv)))+(((P_a)*(((freefactors(tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))),Xv))^(2)))*(((Xv)^(2)))))))^((-1))),Xv,((tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))))*(((freefactors(tan(((((O_c)+(((O_d)*(Xv)))))*((1/2)))),Xv))^((-1))))))))
 
-# Regel 28 (54 Varianten):
+# Rule 28 (54 variants):
 #   Int[1/Sqrt[a_ + b_.*sin[c_. + d_.*x_]], x_Symbol] := 2/(d*Sqrt[a + b])*EllipticF[1/2*(c - Pi/2 + d*x), 2*b/(a + b)] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && GtQ[a + b, 0]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (((gtq(((P_a)+(O_b)),0)))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = ((2)*(((O_d)^((-1))))*(((((P_a)+(O_b)))^((-(1/2)))))*(ellipticf((((1/2))*(((O_c)+((((-(1/2)))*(pi)))+(((O_d)*(Xv)))))),((2)*(O_b)*(((((P_a)+(O_b)))^((-1))))))))
 
-# Regel 29 (54 Varianten):
+# Rule 29 (54 variants):
 #   Int[1/Sqrt[a_ + b_.*sin[c_. + d_.*x_]], x_Symbol] := 2/(d*Sqrt[a - b])*EllipticF[1/2*(c + Pi/2 + d*x), -2*b/(a - b)] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && GtQ[a - b, 0]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (((gtq(((P_a)+((((-1))*(O_b)))),0)))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = ((2)*(((O_d)^((-1))))*(((((P_a)+((((-1))*(O_b)))))^((-(1/2)))))*(ellipticf((((1/2))*(((O_c)+(((pi)*((1/2))))+(((O_d)*(Xv)))))),(((-2))*(O_b)*(((((P_a)+((((-1))*(O_b)))))^((-1))))))))
 
-# Regel 30 (54 Varianten):
+# Rule 30 (54 variants):
 #   Int[1/Sqrt[a_ + b_.*sin[c_. + d_.*x_]], x_Symbol] := Sqrt[(a + b*Sin[c + d*x])/(a + b)]/Sqrt[a + b*Sin[c + d*x]]* Int[1/Sqrt[a/(a + b) + b/(a + b)*Sin[c + d*x]], x] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && Not[GtQ[a + b, 0]]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (not(((gtq(((P_a)+(O_b)),0))))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(K_1),Xv) = ((((((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))*(((((P_a)+(O_b)))^((-1))))))^((1/2))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-(1/2)))))*(Int(((((((P_a)*(((((P_a)+(O_b)))^((-1))))))+(((O_b)*(((((P_a)+(O_b)))^((-1))))*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-(1/2)))),Xv)))
 
-# Regel 31 (54 Varianten):
+# Rule 31 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := -b*Cos[ c + d*x]*(a + b*Sin[c + d*x])^(n + 1)/(d*(n + 1)*(a^2 - b^2)) + 1/((n + 1)*(a^2 - b^2))* Int[(a + b*Sin[c + d*x])^(n + 1)* Simp[a*(n + 1) - b*(n + 2)*Sin[c + d*x], x], x] /; FreeQ[{a, b, c, d}, x] && NeQ[a^2 - b^2, 0] && LtQ[n, -1] && IntegerQ[2*n]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (((ltq(P_n,(-1))))), (integerq(((2)*(P_n)))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = (((((-1))*(O_b)*(cos(((O_c)+(((O_d)*(Xv))))))*(((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(((P_n)+(1)))))*(((O_d)^((-1))))*(((((P_n)+(1)))^((-1))))*(((((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))))^((-1))))))+(((((((P_n)+(1)))^((-1))))*(((((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))))^((-1))))*(Int(((((((P_a)+(((O_b)*(sin(((O_c)+(((O_d)*(Xv))))))))))^(((P_n)+(1)))))*(simp(((((P_a)*(((P_n)+(1)))))+((((-1))*(O_b)*(((P_n)+(2)))*(sin(((O_c)+(((O_d)*(Xv))))))))),Xv))),Xv)))))
 
-# Regel 32 (54 Varianten):
+# Rule 32 (54 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_])^n_, x_Symbol] := Cos[c + d*x]/(d*Sqrt[1 + Sin[c + d*x]]*Sqrt[1 - Sin[c + d*x]])* Subst[Int[(a + b*x)^n/(Sqrt[1 + x]*Sqrt[1 - x]), x], x, Sin[c + d*x]] /; FreeQ[{a, b, c, d, n}, x] && NeQ[a^2 - b^2, 0] && Not[IntegerQ[2*n]]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_n), (neq(((((P_a)^(2)))+((((-1))*(((O_b)^(2)))))),0)), (not(integerq(((2)*(P_n))))) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = ((cos(((O_c)+(((O_d)*(Xv))))))*(((O_d)^((-1))))*(((((1)+(sin(((O_c)+(((O_d)*(Xv))))))))^((-(1/2)))))*(((((1)+((((-1))*(sin(((O_c)+(((O_d)*(Xv))))))))))^((-(1/2)))))*(intsubst(((((((P_a)+(((O_b)*(Xv)))))^(P_n)))*(((((1)+(Xv)))^((-(1/2)))))*(((((1)+((((-1))*(Xv)))))^((-(1/2)))))),Xv,sin(((O_c)+(((O_d)*(Xv))))))))
 
-# Regel 33 (972 Varianten):
+# Rule 33 (972 variants):
 #   Int[(a_ + b_.*sin[c_. + d_.*x_]*cos[c_. + d_.*x_])^n_, x_Symbol] := Int[(a + b*Sin[2*c + 2*d*x]/2)^n, x] /; FreeQ[{a, b, c, d, n}, x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_n) Int(((P_a)+((O_b)*(sin((O_c)+((O_d)*(Xv))))*(cos((O_c)+((O_d)*(Xv))))))^(P_n),Xv) = Int(((((P_a)+(((O_b)*(sin(((((2)*(O_c)))+(((2)*(O_d)*(Xv))))))*((1/2))))))^(P_n)),Xv)

@@ -1,18 +1,18 @@
 # inc/exact (2026)
-# Exakte Zahlen: die Sorten integer (beliebig gross) und rational (Brueche),
-# in C mit GMP (exact.c). Nach inc/all laden:
+# Exact numbers: the sorts integer (arbitrarily large) and rational (fractions),
+# in C with GMP (exact.c). Load after inc/all:
 #     INC "inc/all"
 #     INC "inc/exact"
-# Danach sind ganze Zahlen ohne Punkt (3, 12) vom Typ integer, 1/3 ist der
-# Bruch (1/3), und 0.5 bleibt eine reelle Zahl.
+# After that, whole numbers without a point (3, 12) are of type integer, 1/3 is the
+# fraction (1/3), and 0.5 stays a real number.
 #
-# Untersorten (eine Sorte kann mehrere Obersorten haben):
+# Subsorts (a sort can have several supersorts):
 #     natural < integer < rational < real
 #     natural < nonneg < real,   positive < nonneg
-# Eine Funktion fuer real nimmt auch die Untersorten (die Werte werden beim
-# Rechnen umgewandelt), und die Regeln fuer real gelten auch fuer sie (LIFT).
-# nonneg (>= 0) und positive (> 0) sind reelle Zahlen mit bekanntem
-# Vorzeichen; fuer sie gelten Regeln wie sqrt(x^2) = x.
+# A function for real also accepts the subsorts (the values are converted
+# during calculation), and the rules for real also apply to them (LIFT).
+# nonneg (>= 0) and positive (> 0) are real numbers with known
+# sign; rules like sqrt(x^2) = x hold for them.
 
 SORT natural
 SORT integer
@@ -53,8 +53,8 @@ OTHER <  : integer,integer >> bool      ATT int_lt
 OTHER <= : integer,integer >> bool      ATT int_le
 OTHER == : integer,integer >> bool      ATT int_eq
 OTHER != : integer,integer >> bool      ATT int_ne
-FUNC  mod  : integer,integer >> integer ATT int_mod    # Rest, Vorzeichen des Teilers
-FUNC  quot : integer,integer >> integer ATT int_quot   # ganzzahliger Quotient
+FUNC  mod  : integer,integer >> integer ATT int_mod    # remainder, sign of the divisor
+FUNC  quot : integer,integer >> integer ATT int_quot   # integer quotient
 FUNC  gcd_int : integer,integer >> integer ATT int_gcd
 
 # ---------------- rational ----------------
@@ -65,7 +65,7 @@ OTHER /  : rational,rational >> rational ATT rat_div
 OTHER -  : rational >> rational          ATT rat_neg
 OTHER mi : rational >> rational          ATT rat_mi
 OTHER ^  : rational,integer >> rational  ATT rat_pow
-OTHER ^  : rational,rational >> rational ATT rat_qpow  # 4^(1/2) = 2; 2^(1/2) bleibt stehen
+OTHER ^  : rational,rational >> rational ATT rat_qpow  # 4^(1/2) = 2; 2^(1/2) stays as is
 OTHER abs : rational >> rational         ATT rat_abs
 OTHER >  : rational,rational >> bool     ATT rat_gt
 OTHER >= : rational,rational >> bool     ATT rat_ge
@@ -73,8 +73,8 @@ OTHER <  : rational,rational >> bool     ATT rat_lt
 OTHER <= : rational,rational >> bool     ATT rat_le
 OTHER == : rational,rational >> bool     ATT rat_eq
 OTHER != : rational,rational >> bool     ATT rat_ne
-FUNC  numer : rational >> integer        ATT rat_num   # Zaehler
-FUNC  denom : rational >> integer        ATT rat_den   # Nenner
+FUNC  numer : rational >> integer        ATT rat_num   # numerator
+FUNC  denom : rational >> integer        ATT rat_den   # denominator
 
 # ---------------- natural ----------------
 OTHER +  : natural,natural >> natural   ATT int_plus
@@ -97,19 +97,19 @@ OTHER ^  : positive,real >> positive    ATT hoch
 OTHER mi : positive >> positive         ATT mi
 OTHER sqrt : positive >> positive       ATT r_sqrt
 
-# ---------------- Regeln uebernehmen ----------------
-# rational erbt die Regeln von real, integer die von rational
+# ---------------- inherit rules ----------------
+# rational inherits the rules of real, integer those of rational
 LIFT (A+A,A-A,A*A,A/A,-A,mi(A),A^A) TO (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,mi(Aq),Aq^Az)
-LIFT (A^A) TO (Aq^Aq)                    # 2^(1/2) erbt die Regeln fuer Potenzen
+LIFT (A^A) TO (Aq^Aq)                    # 2^(1/2) inherits the rules for powers
 LIFT (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,Aq^Az) TO (Az+Az,Az-Az,Az*Az,Az/Az,-Az,Az^Az)
 LIFT (Az+Az,Az*Az,Az^Az) TO (Anat+Anat,Anat*Anat,Anat^Anat)
 LIFT (A+A,A*A,A/A,mi(A),A^A,sqrt(A)) TO (An+An,An*An,An/An,mi(An),An^A,sqrt(An))
 LIFT (An+An,An*An,An/An,mi(An),An^A,sqrt(An)) TO (Ap+Ap,Ap*Ap,Ap/Ap,mi(Ap),Ap^A,sqrt(Ap))
 LIFT (Ap+Ap,Ap+Ap) TO (Ap+An,An+Ap)
 
-# ---------------- Regeln, die ein Vorzeichen brauchen ----------------
-# Fuer beliebige reelle Zahlen sind sie falsch (sqrt((-2)^2) ist nicht -2);
-# hier gelten sie fuer Terme der Sorten nonneg und positive.
+# ---------------- rules that need a sign ----------------
+# For arbitrary real numbers they are wrong (sqrt((-2)^2) is not -2);
+# here they hold for terms of the sorts nonneg and positive.
 ADDSPEC Real : (An^Y)^Z = An^(Y*Z)
 ADDSPEC Real : (An*Bn)^Z = An^Z*Bn^Z
 ADDSPEC Real : sqrt(An^2) = An
@@ -117,10 +117,10 @@ ADDSPEC Real : abs(An) = An
 ADDSPEC Real : ln(Ap*Y) = ln(Ap) + ln(Y)
 ADDSPEC Real : ln(Y*Ap) = ln(Y) + ln(Ap)
 
-# Ein Term der Sorte rational ohne exakten Wert (2+3^(1/2)) enthaelt keine
-# Variable (die sind reell): eine Konstante
+# A term of sort rational without an exact value (2+3^(1/2)) contains no
+# variable (those are real): a constant
 ADDSPEC diff : D(Aq,X) = 0
 
-# Zahlen ohne Punkt sind ab hier natuerliche Zahlen (natural); -3 ist
-# -(3) und damit integer
+# from here on, numbers without a point are natural numbers (natural); -3 is
+# -(3) and therefore integer
 INTNUM natural ATT read_int

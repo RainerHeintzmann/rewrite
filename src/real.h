@@ -4,8 +4,8 @@
 /*
  * real.h V1.00
  * Copyright (c) : Rainer Heintzmann
- * 
- * Benutzerfunktionen fuer 'rewrite' (Resultattyp real)
+ *
+ * User functions for 'rewrite' (result type real)
  *
  */
 

@@ -1,12 +1,12 @@
 # inc/integration/1.1.1.2_linear_products
-# Uebersetzung von Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi,
-# Commit 61e9c18), Abschnitt
+# Translation of Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi,
+# commit 61e9c18), section
 #   1 Algebraic functions / 1.1 Binomial products / 1.1.1 Linear /
-#   1.1.1.2 (a+b x)^m (c+d x)^n          (Regel 1 von 30)
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi. Uebersetzung 2026.
-# Schreibweise der Muster: siehe inc/integration/base.
-# Benutzt die Hilfsfunktionen aus inc/helpers (expandintegrand, neq, igtq, ...).
+#   1.1.1.2 (a+b x)^m (c+d x)^n          (rule 1 of 30)
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi. Translated 2026.
+# Notation of the patterns: see inc/integration/base.
+# Uses the helper functions from inc/helpers (expandintegrand, neq, igtq, ...).
 
 # Int[(a_. + b_.*x_)^m_.*(c_. + d_.*x_)^n_., x_Symbol] :=
 #    Int[ExpandIntegrand[(a + b*x)^m*(c + d*x)^n, x], x] /;

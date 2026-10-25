@@ -434,7 +434,10 @@ helper only tests the form of a term, the matcher can do the work instead:
 backtracking matcher of the rule lists on a pattern with its own variables
 and checks the condition with their bindings. It is declared with
 \texttt{HOLD}, so that the pattern and the condition reach it unevaluated,
-and it made 28 more rules translatable. \texttt{ExpandIntegrand} splits rational functions into
+and it made 28 more rules translatable. Rubi's own form tests, such as
+\texttt{LinearMatchQ} or \texttt{TrinomialMatchQ}, are defined in its
+utility file with \texttt{MatchQ}; the translator now inlines these
+definitions instead of using C functions for them. \texttt{ExpandIntegrand} splits rational functions into
 partial fractions, as Mathematica's \texttt{Apart}: with GMP rationals, the
 denominator is split into square-free parts, rational roots and the factors
 given in the input, and the extended Euclidean algorithm gives the
@@ -539,9 +542,9 @@ from a file that the translator writes along with the rules.
 
 \subsection{Results}
 
-The translator converts 6873 of Rubi's 7432 rules (92\%; rules that Rubi
+The translator converts 6880 of Rubi's 7432 rules (93\%; rules that Rubi
 writes in two variants, with and without \texttt{ShowStep}, count twice),
-which become 7367 \texttt{rewrite} rules after the expansion of function
+which become 7368 \texttt{rewrite} rules after the expansion of function
 variables. Rules that Rubi writes as small programs (\texttt{Module} with
 several statements, \texttt{Sum}, lists) are replaced by C functions: the
 substitutions of section 9.3 and the partial fractions of

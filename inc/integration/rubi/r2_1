@@ -1,61 +1,61 @@
 # r2_1
-# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
-# mit tools/rubi2rewrite.py, Abschnitt
+# Translated automatically from Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# by tools/rubi2rewrite.py, section
 #   2.1 (c+d x)^m (a+b (F^(g (e+f x)))^n)^p
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi.
-# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi.
+# Do not edit by hand: changes belong in the translator.
 
-# Regel 1 (5832 Varianten):
+# Rule 1 (5832 variants):
 #   Int[(c_. + d_.*x_)^m_.*(b_.*F_^(g_.*(e_. + f_.*x_)))^n_., x_Symbol] := (c + d*x)^m*(b*F^(g*(e + f*x)))^n/(f*g*n*Log[F]) - d*m/(f*g*n*Log[F])* Int[(c + d*x)^(m - 1)*(b*F^(g*(e + f*x)))^n, x] /; FreeQ[{F, b, c, d, e, f, g, n}, x] && GtQ[m, 0] && IntegerQ[2*m] && Not[TrueQ[$UseGamma]]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,O_b,O_c,O_d,O_e,O_f,O_g,O_n), (((gtq(O_m,0)))), (integerq(((2)*(O_m)))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((O_b)*((P_F)^((O_g)*((O_e)+((O_f)*(Xv))))))^(O_n)),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(((((O_b)*(((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))))^(O_n)))*(((O_f)^((-1))))*(((O_g)^((-1))))*(((O_n)^((-1))))*(((ln(P_F))^((-1))))))+((((-1))*(O_d)*(O_m)*(((O_f)^((-1))))*(((O_g)^((-1))))*(((O_n)^((-1))))*(((ln(P_F))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(((((O_b)*(((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))))^(O_n)))),Xv)))))
 
-# Regel 2 (2916 Varianten):
+# Rule 2 (2916 variants):
 #   Int[(c_. + d_.*x_)^m_*(b_.*F_^(g_.*(e_. + f_.*x_)))^n_., x_Symbol] := (c + d*x)^(m + 1)*(b*F^(g*(e + f*x)))^n/(d*(m + 1)) - f*g*n*Log[F]/(d*(m + 1))* Int[(c + d*x)^(m + 1)*(b*F^(g*(e + f*x)))^n, x] /; FreeQ[{F, b, c, d, e, f, g, n}, x] && LtQ[m, -1] && IntegerQ[2*m] && Not[TrueQ[$UseGamma]]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,O_b,O_c,O_d,O_e,O_f,O_g,O_n), (((ltq(P_m,(-1))))), (integerq(((2)*(P_m)))) Int((((O_c)+((O_d)*(Xv)))^(P_m))*(((O_b)*((P_F)^((O_g)*((O_e)+((O_f)*(Xv))))))^(O_n)),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((P_m)+(1)))))*(((((O_b)*(((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))))^(O_n)))*(((O_d)^((-1))))*(((((P_m)+(1)))^((-1))))))+((((-1))*(O_f)*(O_g)*(O_n)*(ln(P_F))*(((O_d)^((-1))))*(((((P_m)+(1)))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((P_m)+(1)))))*(((((O_b)*(((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))))^(O_n)))),Xv)))))
 
-# Regel 3 (486 Varianten):
+# Rule 3 (486 variants):
 #   Int[F_^(g_.*(e_. + f_.*x_))/(c_. + d_.*x_), x_Symbol] := F^(g*(e - c*f/d))/d*ExpIntegralEi[f*g*(c + d*x)*Log[F]/d] /; FreeQ[{F, c, d, e, f, g}, x] && Not[TrueQ[$UseGamma]]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_F,O_c,O_d,O_e,O_f,O_g) Int(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = ((((P_F)^(((O_g)*(((O_e)+((((-1))*(O_c)*(O_f)*(((O_d)^((-1))))))))))))*(((O_d)^((-1))))*(expint(((O_f)*(O_g)*(((O_c)+(((O_d)*(Xv)))))*(ln(P_F))*(((O_d)^((-1))))))))
 
-# Regel 4 (972 Varianten):
+# Rule 4 (972 variants):
 #   Int[(c_. + d_.*x_)^m_.*F_^(g_.*(e_. + f_.*x_)), x_Symbol] := (-d)^m*F^(g*(e - c*f/d))/(f^(m + 1)*g^(m + 1)*Log[F]^(m + 1))* Gamma[m + 1, -f*g*Log[F]/d*(c + d*x)] /; FreeQ[{F, c, d, e, f, g}, x] && IntegerQ[m]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,O_c,O_d,O_e,O_f,O_g), (integerq(O_m)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((P_F)^((O_g)*((O_e)+((O_f)*(Xv))))),Xv) = (((((((-1))*(O_d)))^(O_m)))*(((P_F)^(((O_g)*(((O_e)+((((-1))*(O_c)*(O_f)*(((O_d)^((-1))))))))))))*(((((O_f)^(((O_m)+(1)))))^((-1))))*(((((O_g)^(((O_m)+(1)))))^((-1))))*(((((ln(P_F))^(((O_m)+(1)))))^((-1))))*(Gamma(((O_m)+(1)),(((-1))*(O_f)*(O_g)*(ln(P_F))*(((O_d)^((-1))))*(((O_c)+(((O_d)*(Xv)))))))))
 
-# Regel 5 (486 Varianten):
+# Rule 5 (486 variants):
 #   Int[F_^(g_.*(e_. + f_.*x_))/Sqrt[c_. + d_.*x_], x_Symbol] := 2/d*Subst[Int[F^(g*(e - c*f/d) + f*g*x^2/d), x], x, Sqrt[c + d*x]] /; FreeQ[{F, c, d, e, f, g}, x] && Not[TrueQ[$UseGamma]]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), NIN(Xv,P_F,O_c,O_d,O_e,O_f,O_g) Int(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = ((2)*(((O_d)^((-1))))*(intsubst(((P_F)^(((((O_g)*(((O_e)+((((-1))*(O_c)*(O_f)*(((O_d)^((-1))))))))))+(((O_f)*(O_g)*(((Xv)^(2)))*(((O_d)^((-1))))))))),Xv,((((O_c)+(((O_d)*(Xv)))))^((1/2))))))
 
-# Regel 6 (486 Varianten):
+# Rule 6 (486 variants):
 #   Int[(c_. + d_.*x_)^m_*F_^(g_.*(e_. + f_.*x_)), x_Symbol] := -F^(g*(e - c*f/d))*(c + d*x)^ FracPart[ m]/(d*(-f*g*Log[F]/d)^(IntPart[m] + 1)*(-f*g* Log[F]*(c + d*x)/d)^FracPart[m])* Gamma[m + 1, (-f*g*Log[F]/d)*(c + d*x)] /; FreeQ[{F, c, d, e, f, g, m}, x] && Not[IntegerQ[m]]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,O_c,O_d,O_e,O_f,O_g,P_m), (not(integerq(P_m))) Int((((O_c)+((O_d)*(Xv)))^(P_m))*((P_F)^((O_g)*((O_e)+((O_f)*(Xv))))),Xv) = (((-1))*(((P_F)^(((O_g)*(((O_e)+((((-1))*(O_c)*(O_f)*(((O_d)^((-1))))))))))))*(((((O_c)+(((O_d)*(Xv)))))^(fracpart(P_m))))*(((O_d)^((-1))))*((((((((-1))*(O_f)*(O_g)*(ln(P_F))*(((O_d)^((-1))))))^(((intpart(P_m))+(1)))))^((-1))))*((((((((-1))*(O_f)*(O_g)*(ln(P_F))*(((O_c)+(((O_d)*(Xv)))))*(((O_d)^((-1))))))^(fracpart(P_m))))^((-1))))*(Gamma(((P_m)+(1)),(((-1))*(O_f)*(O_g)*(ln(P_F))*(((O_d)^((-1))))*(((O_c)+(((O_d)*(Xv)))))))))
 
-# Regel 7 (2916 Varianten):
+# Rule 7 (2916 variants):
 #   Int[(c_. + d_.*x_)^m_.*(b_.*F_^(g_.*(e_. + f_.*x_)))^n_, x_Symbol] := (b*F^(g*(e + f*x)))^n/F^(g*n*(e + f*x))* Int[(c + d*x)^m*F^(g*n*(e + f*x)), x] /; FreeQ[{F, b, c, d, e, f, g, m, n}, x]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,O_b,O_c,O_d,O_e,O_f,O_g,O_m,P_n) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((O_b)*((P_F)^((O_g)*((O_e)+((O_f)*(Xv))))))^(P_n)),Xv) = ((((((O_b)*(((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))))^(P_n)))*(((((P_F)^(((O_g)*(P_n)*(((O_e)+(((O_f)*(Xv)))))))))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(((P_F)^(((O_g)*(P_n)*(((O_e)+(((O_f)*(Xv)))))))))),Xv)))
 
-# Regel 8 (23328 Varianten):
+# Rule 8 (23328 variants):
 #   Int[(c_. + d_.*x_)^m_.*(a_ + b_.*(F_^(g_.*(e_. + f_.*x_)))^n_.)^p_., x_Symbol] := Int[ExpandIntegrand[(c + d*x)^m, (a + b*(F^(g*(e + f*x)))^n)^p, x], x] /; FreeQ[{F, a, b, c, d, e, f, g, m, n}, x] && IGtQ[p, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,P_a,O_b,O_c,O_d,O_e,O_f,O_g,O_m,O_n), (igtq(O_p,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((P_a)+((O_b)*(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))^(O_n))))^(O_p)),Xv) = Int(expandintegrand(((((O_c)+(((O_d)*(Xv)))))^(O_m)),((((P_a)+(((O_b)*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))))))^(O_p)),Xv),Xv)
 
-# Regel 9 (11664 Varianten):
+# Rule 9 (11664 variants):
 #   Int[(c_. + d_.*x_)^m_./(a_ + b_.*(F_^(g_.*(e_. + f_.*x_)))^n_.), x_Symbol] := (c + d*x)^(m + 1)/(a*d*(m + 1)) - b/a*Int[(c + d*x)^ m*(F^(g*(e + f*x)))^n/(a + b*(F^(g*(e + f*x)))^n), x] /; FreeQ[{F, a, b, c, d, e, f, g, n}, x] && IGtQ[m, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_F,P_a,O_b,O_c,O_d,O_e,O_f,O_g,O_n), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((P_a)+((O_b)*(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))^(O_n))))^(K_1)),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(((P_a)^((-1))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(((P_a)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))*(((((P_a)+(((O_b)*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))))))^((-1))))),Xv)))))
 
-# Regel 10 (11664 Varianten):
+# Rule 10 (11664 variants):
 #   Int[(c_. + d_.*x_)^m_.*(a_ + b_.*(F_^(g_.*(e_. + f_.*x_)))^n_.)^p_, x_Symbol] := 1/a*Int[(c + d*x)^m*(a + b*(F^(g*(e + f*x)))^n)^(p + 1), x] - b/a* Int[(c + d*x)^m*(F^(g*(e + f*x)))^n*(a + b*(F^(g*(e + f*x)))^n)^p, x] /; FreeQ[{F, a, b, c, d, e, f, g, n}, x] && ILtQ[p, 0] && IGtQ[m, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,P_a,O_b,O_c,O_d,O_e,O_f,O_g,O_n), (iltq(P_p,0)), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((P_a)+((O_b)*(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))^(O_n))))^(P_p)),Xv) = ((((((P_a)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(((((P_a)+(((O_b)*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))))))^(((P_p)+(1)))))),Xv))))+((((-1))*(O_b)*(((P_a)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))*(((((P_a)+(((O_b)*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))))))^(P_p)))),Xv)))))
 
-# Regel 11 (11664 Varianten):
+# Rule 11 (11664 variants):
 #   Int[(c_. + d_.*x_)^m_.*(a_ + b_.*(F_^(g_.*(e_. + f_.*x_)))^n_.)^p_, x_Symbol] := With[{u = IntHide[(a + b*(F^(g*(e + f*x)))^n)^p, x]}, Dist[(c + d*x)^m, u, x] - d*m*Int[(c + d*x)^(m - 1)*u, x]] /; FreeQ[{F, a, b, c, d, e, f, g, n}, x] && IGtQ[m, 0] && LtQ[p, -1]
 ADDSPEC RubiRules : IF NIN(Xv,P_F,P_a,O_b,O_c,O_d,O_e,O_f,O_g,O_n), (igtq(O_m,0)), (((ltq(P_p,(-1))))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((P_a)+((O_b)*(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))^(O_n))))^(P_p)),Xv) = ((dist(((((O_c)+(((O_d)*(Xv)))))^(O_m)),inthide(((((P_a)+(((O_b)*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))))))^(P_p)),Xv),Xv))+((((-1))*(O_d)*(O_m)*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(inthide(((((P_a)+(((O_b)*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))))))^(P_p)),Xv))),Xv)))))
 
-# Regel 12 nicht uebersetzt: function NormalizePowerOfLinear
+# Rule 12 not translated: function NormalizePowerOfLinear
 #   Int[u_^m_.*(a_. + b_.*(F_^(g_.*v_))^n_.)^p_., x_Symbol] := Int[NormalizePowerOfLinear[u, x]^ m*(a + b*(F^(g*ExpandToSum[v, x]))^n)^p, x] /; FreeQ[{F, a, b, g, n, p}, x] && LinearQ[v, x] && PowerOfLinearQ[u, x] && Not[LinearMatchQ[v, x] && PowerOfLinearMatchQ[u, x]] && IntegerQ[m]
 
-# Regel 13 nicht uebersetzt: If
+# Rule 13 not translated: If
 #   Int[u_^m_.*(a_. + b_.*(F_^(g_.*v_))^n_.)^p_., x_Symbol] := Module[{uu = NormalizePowerOfLinear[u, x], z}, z = If[PowerQ[uu] && FreeQ[uu[[2]], x], uu[[1]]^(m*uu[[2]]), uu^m]; uu^m/z*Int[z*(a + b*(F^(g*ExpandToSum[v, x]))^n)^p, x]] /; FreeQ[{F, a, b, g, m, n, p}, x] && LinearQ[v, x] && PowerOfLinearQ[u, x] && Not[LinearMatchQ[v, x] && PowerOfLinearMatchQ[u, x]] && Not[IntegerQ[m]]
 
-# Regel 14 (23328 Varianten):
+# Rule 14 (23328 variants):
 #   Int[(c_. + d_.*x_)^m_.*(a_ + b_.*(F_^(g_.*(e_. + f_.*x_)))^n_.)^p_., x_Symbol] := Unintegrable[(c + d*x)^m*(a + b*(F^(g*(e + f*x)))^n)^p, x] /; FreeQ[{a, b, c, d, e, f, g, m, n, p}, x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,O_e,O_f,O_g,O_m,O_n,O_p) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(((P_a)+((O_b)*(((P_F)^((O_g)*((O_e)+((O_f)*(Xv)))))^(O_n))))^(O_p)),Xv) = unintegrable(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(((((P_a)+(((O_b)*(((((P_F)^(((O_g)*(((O_e)+(((O_f)*(Xv)))))))))^(O_n)))))))^(O_p)))),Xv)

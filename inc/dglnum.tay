@@ -1,6 +1,6 @@
-# Numerisches Loesen von expliziten Diff-gleichungen
-# Eingabe : f(x,y) = y'
-# tiefe = Taylorverfahren der Ornung tiefe
+# numerical solution of explicit differential equations
+# input : f(x,y) = y'
+# tiefe = Taylor method of order tiefe
 # f : y' = f(x,y)
 
 merk=dx

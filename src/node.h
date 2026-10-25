@@ -5,7 +5,7 @@
  *	node.h V1.00
  *	Copyright (c) Rainer Heintzmann 1992
  *
- *	Include fuer node.c (Speicherverwaltung fuer Knoten)
+ *	Include for node.c (memory management for nodes)
  */
 
 void std_show_real(double * x);
@@ -33,11 +33,11 @@ void delsym (Symbol * sp);
 
 void delnum (Symbol * number,int delvalue); /* Flag delvalue */
 
-BOOLEAN symeq (Symbol * a,Symbol * b); /* Vergleicht zwei Symbole auf Gleichheit */
+BOOLEAN symeq (Symbol * a,Symbol * b); /* Compares two symbols for equality */
 
 Symbol * clonesym(Symbol * s);
 
-BOOLEAN is_shared_num (Symbol * sp); /* 0 und 1: statischer Wert, nicht freigeben */
+BOOLEAN is_shared_num (Symbol * sp); /* 0 and 1: static value, do not free */
 
 void cpysym(Symbol * s1,Symbol * s2);
 

@@ -3,10 +3,10 @@
 
 /*
  *	inout.h  V1.00
- * 
+ *
  *	Copyright (c)  Rainer Heintzmann 	(1992)
  *
- *	Schnittstelle fuer EinAusgabe
+ *	Interface for input/output
  */
 
 extern int changeOut(const char * filename); /* "stdout" -> stdout */

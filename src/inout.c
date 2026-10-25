@@ -1,9 +1,9 @@
 /*
  *	inout.c  V1.00
- * 
+ *
  *	Copyright (c)  Rainer Heintzmann 	(1992)
  *
- *	EinAusgabe Funktionen
+ *	Input/output functions
  */
 
 #include <stdio.h>
@@ -20,8 +20,8 @@ extern int display(const char * text);
 char buf[MAXLINE];
 char tmpline[MAXLINE];
 
-FILE * fp= 0;    /* Fuer Ausgabe-Umlenkung */
-FILE * datafp= 0; /* Zum Einlesen von Daten */
+FILE * fp= 0;    /* for output redirection */
+FILE * datafp= 0; /* for reading data */
 
 static int debug=0;
 

@@ -196,6 +196,10 @@ have it, so a few steps are added:
   the C function `binomsum` gives the same sum of integrals of linear and
   quadratic partial fractions, with `cos(k*pi/n)` exact for `n` up to 6:
   `Int(1/(1+x^5),x)` is exact, `Int(1/(1+x^7),x)` has real coefficients.
+- Rubi's form tests `LinearMatchQ`, `BinomialMatchQ`, `QuadraticMatchQ`,
+  `TrinomialMatchQ` and the others are defined in its utility file as
+  `MatchQ[u, pattern /; cond]`; the translator reads these definitions
+  (`--util`) and inlines them, so they are no C functions.
 - `MatchQ[u, pattern /; cond]` in a condition becomes
   `matchq(u, pattern, cond)`, which uses the matcher of the rule lists.
   Its pattern variables get new names (`P_mq_c`, `O_mq_d` for `c_`, `d_.`),
@@ -278,7 +282,15 @@ the derivative of the result must equal the integrand at several points.
 
 ```text
 python3 tools/rubitest.py SUITE --files Apostol --report report.txt
+python3 tools/rubitest.py SUITE --every 5 --files Apostol --files Hearn         --files Stewart --files Timofeev            # development set
 ```
+
+It runs 8 rewrite processes in parallel (`--jobs N`); the four collections
+below take about 2 minutes. `--every 5` takes every fifth problem of each
+file (309 problems, about 30 seconds) and is meant for development, with
+the full set as the final check. The numerical check of special functions
+needs the Python package mpmath (MSYS2: `pacman -S mingw-w64-ucrt-x86_64-python-mpmath`);
+without it, such results count as not verifiable.
 
 On the four collections of independent problems in the test suite
 (textbooks of Apostol, Hearn, Stewart and Timofeev, 1540 problems), the

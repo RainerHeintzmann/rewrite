@@ -1,8 +1,8 @@
 /*
  * matrix.c V1.00
  * Copyright (c) : Rainer Heintzmann
- * 
- * Benutzerfunktionen fuer 'rewrite' (Resultattyp matrix)
+ *
+ * User functions for 'rewrite' (result type matrix)
  *
  */
 
@@ -18,7 +18,7 @@
 void show_mat (matrix * mp)
 {
 int i,j;
-double * dp; /* Lattice schnallt's sonst nicht */
+double * dp; /* otherwise Lattice does not get it */
 
 /* printfOut("mat( "); */
 /* printfOut("size %d %d ",Ze,Sp); */
@@ -80,15 +80,15 @@ int i,j;
 
 	mp=mkmat((int) * arg[0],(int) * arg[1]);
 
-	dp=Matrix(mp); /* eine Struktur weiter ! */
+	dp=Matrix(mp); /* next structure ! */
 
 	for(i=0;i<Zeilen(mp);i++)
 		for(j=0;j<Spalten(mp);j++)
-			(* (dp++)) = (double) 0.0; /* auf Null setzen */
+			(* (dp++)) = (double) 0.0; /* set to zero */
 	return mp;
 }
 
-matrix * eins_mat (double * arg[]) /* Eins-Matrix mit Minimumdiagonale */
+matrix * eins_mat (double * arg[]) /* identity matrix with the minimum diagonal */
 {
 matrix * rt = null_mat(arg);
 double * dp = Matrix(rt);
@@ -145,7 +145,7 @@ double * l1=m1, * l2=m2,sum;
 
 	for (i=0;i<Ze;i++)
 	{
-	for (k=0;k<Sp2;k++) /* Spalten der 2. Matrix */
+	for (k=0;k<Sp2;k++) /* columns of the 2nd matrix */
 		{
 		l1 = m1;
 		l2 = m2+k;
@@ -154,7 +154,7 @@ double * l1=m1, * l2=m2,sum;
 			{
 			/* printfOut("l1 : %g l2 : %g ",* l1,* l2); */
 			sum += *(l1++) * *(l2);
-			l2 += Sp2; /* == Spalten(m2) */
+			l2 += Sp2; /* == columns(m2) */
 			}
 		* (m3++) = sum;
 		}

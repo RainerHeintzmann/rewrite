@@ -3,19 +3,19 @@
 
 /*
  *	userfkt.h  V1.00
- * 
+ *
  *	Copyright (c)  Rainer Heintzmann 	(1992)
  *
- *	Schnittstelle fuer benutzerdefinierte numerische Funktionen
+ *	Interface for user-defined numeric functions
  */
 
 typedef void * u_function (void * []);
 
 extern u_function * give_ufkt (char * name);
-extern u_function * give_ufkt_quiet (char * name);  /* 2026: ohne Fehlermeldung */
+extern u_function * give_ufkt_quiet (char * name);  /* 2026: without an error message */
 
-#define MAXARGS 32  /* Maximalzahl an Funktionsargumenten (bei Aenderung run.c neu uebersetzen !!) */
+#define MAXARGS 32  /* maximum number of function arguments (recompile run.c after changing it !!) */
 
-/* extern Node * calkulate(Node *); /* Prototyp fuer Fkt. aus run.c */
+/* extern Node * calkulate(Node *); /* prototype for the function from run.c */
 
 #endif

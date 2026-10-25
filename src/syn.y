@@ -1,14 +1,14 @@
 /*
  *	syn.y V1.00
  *	Copyright (c)  Rainer Heintzmann (1992)
- *	Grundgeruesst : Prof. Axel T. Schreiner
+ *	Basic framework : Prof. Axel T. Schreiner
  *
- *	Variablen
+ *	Variables
  */
 
 %{
 
-#include <string.h> /* fuer memcpy,strcmp */
+#include <string.h> /* for memcpy,strcmp */
 #include <stdlib.h>
 
 #include "inout.h"
@@ -106,7 +106,7 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	VORRANG att {	$$=mknod(FUNC,(
                                               mknod(PARAM,(Node *) give_ufkt(name($5)),
                                               mknod(PARAM,(Node *) give_ufkt(name($7)),
                                               (Node *) give_ufkt(name($9)))))));	}
-			| BRA Id Id	':'  vsortlist PFEIL Sort	att {Node * fkts;  /* Klammern */
+			| BRA Id Id	':'  vsortlist PFEIL Sort	att {Node * fkts;  /* Brackets */
 							            				if (($2)==($3))
 							            					fkts=mknod(PARAM,DECLARE((Node *) $2,Bra,(Node *) $7,$5,FALSE),
 																				mknod(PARAM,mknod(FUNC,(Node *) att_fkt,mknod(PARAM,(Node *) $2,$8)),NULL));
@@ -118,12 +118,12 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	VORRANG att {	$$=mknod(FUNC,(
 																	$$=mknod(FUNC,(Node *) sequence,fkts);
 																	}
 			| VAR idlist ':' Sort			 {$$=DECLARE($2,Var,(Node *) $4,NULL,FALSE);}
-			| NUM Sort	 			  			 {$$=mknod(FUNC,(Node *) set_numbertype,(Node *) ($2)); /* setzt numbertype fuer mknum */}
-			| SUBSORT Sort ',' Sort ATT Id	 {$$=mknod(FUNC,(Node *) subsort_def,   /* 2026: Untersorte */
+			| NUM Sort	 			  			 {$$=mknod(FUNC,(Node *) set_numbertype,(Node *) ($2)); /* sets numbertype for mknum */}
+			| SUBSORT Sort ',' Sort ATT Id	 {$$=mknod(FUNC,(Node *) subsort_def,   /* 2026: subsort */
 										      mknod(PARAM,(Node *) $2,mknod(PARAM,(Node *) $4,(Node *) give_ufkt(name($6)))));}
-			| INTNUM Sort ATT Id		 {$$=mknod(FUNC,(Node *) intnum_def,    /* 2026: Sorte ganzer Zahlen */
+			| INTNUM Sort ATT Id		 {$$=mknod(FUNC,(Node *) intnum_def,    /* 2026: sort of integers */
 										      mknod(PARAM,(Node *) $2,(Node *) give_ufkt(name($4))));}
-			| NUM idlist ':' Sort			 { /* Variablen fuer Numerische Zahlen */
+			| NUM idlist ':' Sort			 { /* Variables for numeric numbers */
 									                $$=DECLARE($2,Var,(Node *) $4,NULL,TRUE);}
 			| CST idlist ':' Sort			 {$$=DECLARE($2,Const,(Node *) $4,NULL,FALSE);}
 			| SPEC Alg ':' alglist	   {$$ = mknod(FUNC,(Node *) spec,mknod(PARAM,(Node *) $2,(Node *) $4));}
@@ -144,20 +144,20 @@ l_list	: l_thing			     {$$ = mknod(PARAM,(Node *) $1,NULL);}
 			| l_thing ',' l_list {$$ = mknod(PARAM,(Node *) $1,$3);};
 
 att 		: /* NULL */		{ $$ = NULL;}
-			  | ATT namedId		{ /* numerische C-Funktion (userfkt.c), sonst symbolische (symfkt.c) */
+			  | ATT namedId		{ /* numeric C function (userfkt.c), otherwise symbolic (symfkt.c) */
 			                  u_function * u = give_ufkt_quiet(name((Symbol *) $2));
 			                  s_function * s = u ? NULL : give_sfkt(name((Symbol *) $2));
 			                  if (u)
 			                    $$ = mknod(ATT,(Node *) u,NULL);
 			                  else if (s)
-			                    $$ = mknod(ATT,(Node *) s,mknod(PARAM,NULL,NULL)); /* r: symbolisch */
+			                    $$ = mknod(ATT,(Node *) s,mknod(PARAM,NULL,NULL)); /* r: symbolic */
 			                  else
 			                    { printfErr(" --ERROR ATT : C-Function %s not Implemented \n",name((Symbol *) $2));
 			                      $$ = mknod(ATT,NULL,NULL); }
 			                }
-			  | ATT SYMBOLIC namedId	{ /* 2026: symbolische C-Funktion (symfkt.c): bekommt Terme */
+			  | ATT SYMBOLIC namedId	{ /* 2026: symbolic C function (symfkt.c): gets terms */
 			                  $$ = sym_att($3, 0); }
-			  | ATT SYMBOLIC HOLD namedId	{ /* 2026: dazu Argumente unausgewertet (matchq) */
+			  | ATT SYMBOLIC HOLD namedId	{ /* 2026: plus arguments unevaluated (matchq) */
 			                  $$ = sym_att($4, 1); }
 				| ATT '(' {block_begin();no_protect();}
 								 d_list ')' instruction {protect();block_end();$$ =mknod(PARAM,$4,$6);};
@@ -172,16 +172,16 @@ namedId : Id           { $$ = (Node *) $1;}
 
 
 VORRANG		: /* nothing */				{$$ = Func;}
-			| LA1						{$$ = La1;	/* Linksassoziativ */}
-			| LA2						{$$ = La2;	/* Linksassoziativ */}
-			| LA3						{$$ = La3;	/* Linksassoziativ */}
-			| LA4						{$$ = La4;	/* Linksassoziativ */}
-			| LA5						{$$ = La5;	/* Linksassoziativ */}
-			| RA						{$$ = Ra;  	/* Rechtsassoziativ */}
-			| RU						{$$ = Ru;	  /* Rechts Unaer */};
+			| LA1						{$$ = La1;	/* Left-associative */}
+			| LA2						{$$ = La2;	/* Left-associative */}
+			| LA3						{$$ = La3;	/* Left-associative */}
+			| LA4						{$$ = La4;	/* Left-associative */}
+			| LA5						{$$ = La5;	/* Left-associative */}
+			| RA						{$$ = Ra;  	/* Right-associative */}
+			| RU						{$$ = Ru;	  /* Right unary */};
 
 condition : condfunc					{$$ = $1;}
-			| condfunc ',' condition	{$$ = mknod(Cond,(Node *) and_cond,mknod(PARAM,$1,$3));}; /* alle muessen gelten */
+			| condfunc ',' condition	{$$ = mknod(Cond,(Node *) and_cond,mknod(PARAM,$1,$3));}; /* all must hold */
 
 condfunc : LB '(' termlist ')'{$$ = mknod(Cond,(Node *) lower_between,$3);}
 			| IN '(' termlist ')' 	{$$ = mknod(Cond,(Node *) in_tree,$3);}
@@ -196,13 +196,13 @@ tinstructions : oinstructions	{if ($1) $$ = mknod(PARAM,$1,NULL); else $$=NULL;}
 
 oinstructions : instructions			{if($1) $$=mknod(FUNC,(Node *) sequence,$1); else $$=$1;};
 
-trenner : '\n' {/* oder ; , bringt aber shift-reduce conflicts wegen alglist: Alg;alglist */}
+trenner : '\n' {/* or ; , but gives shift-reduce conflicts because of alglist: Alg;alglist */}
 				| ';';
 
 d_list : definition						 {$$ = mknod(PARAM,in_block_def($1),NULL);}
 			 | definition ';' d_list {$$ = mknod(PARAM,in_block_def($1),$3);};
 
-instruction : aninstruction     {$$ = in_block_instruct($1); /* Locale Variablen pruefen ! */ }
+instruction : aninstruction     {$$ = in_block_instruct($1); /* Check local variables ! */ }
 			| definition		    			{$$ = in_block_def($1);}
 			| '{' 										{block_begin();no_protect();}
 				tinstructions '}' 			{protect();block_end();
@@ -210,7 +210,7 @@ instruction : aninstruction     {$$ = in_block_instruct($1); /* Locale Variablen
 																mknod(PARAM,mknod(FUNC,(Node *) do_block_begin,NULL),
 																mknod(PARAM,mknod(FUNC,(Node *) sequence,$3),
 																mknod(PARAM,mknod(FUNC,(Node *) do_block_end,NULL),NULL))));}
-			| WHILE condition instruction	{Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,$2,NULL /* wird dann $3 */)));
+			| WHILE condition instruction	{Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,$2,NULL /* then becomes $3 */)));
 																		WHILE_BODY(merk) = $3;$$=rtw;}
 
 			| IF condition instruction	{Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,$2,mknod(PARAM,NULL,NULL))));
@@ -227,7 +227,7 @@ instruction : aninstruction     {$$ = in_block_instruct($1); /* Locale Variablen
 														FOR_BODY(merk) = $9;$$=rtw;};
 
 
-aninstruction	: /* Nichts */ 	{$$=NULL;}
+aninstruction	: /* Nothing */ 	{$$=NULL;}
 			| SYS String					{$$=mknod(FUNC,(Node *) system_fkt,(Node *) ($2));}
 			| INC String					{/* include(name($2));$$=NULL;*/ $$=mknod(FUNC,(Node *) include_fkt,(Node *) ($2)); }
 			| INFO namedId				{$$=mknod(FUNC,(Node *) info_fkt,(Node *) ($2)); }
@@ -235,9 +235,9 @@ aninstruction	: /* Nichts */ 	{$$=NULL;}
 														 rtypes(lastterm)=get_type($2);}
 			| prntlist						{$$=mknod(FUNC,(Node *) printnl,mknod(FUNC,(Node *) sequence,$1));}
 			| PRTNUM String				{$$=mknod(FUNC,(Node *) prt_num,(Node *) ($2));}
-			| PRT prntlist				{$$=mknod(FUNC,(Node *) sequence,$2); /* ohne \n */ }
+			| PRT prntlist				{$$=mknod(FUNC,(Node *) sequence,$2); /* without \n */ }
 			| OUT String					{$$=mknod(FUNC,(Node *) changeout,(Node *) ($2));}
-			| DATA String					{$$=mknod(FUNC,(Node *) changedata,(Node *) ($2));} /* Besser : String !! */
+			| DATA String					{$$=mknod(FUNC,(Node *) changedata,(Node *) ($2));} /* Better : String !! */
 			| DATA Const					{if (rtypes($2) != get_numbertype())
                                {printfErr("error : DATA-Const must be of real-type !\n");
                                $$=NULL;}
@@ -255,15 +255,15 @@ aninstruction	: /* Nichts */ 	{$$=NULL;}
 			| LIFT '(' termlist ')' TO '(' termlist ')'	{$$=mknod(FUNC,(Node *) termlist_is_termlist,mknod(PARAM,(Node *) $7,(Node *) $3));}
 			| DBG Const 	      	{$$=mknod(FUNC,(Node *) setdebug,(Node *) ($2));}
 			| STEPS Alg String		{$$=mknod(FUNC,(Node *) steps_fkt,mknod(PARAM,(Node *) $2,(Node *) $3));} /* 2026 */
-			| SYMBOLIC String EQ String	{$$=mknod(FUNC,(Node *) role_fkt,mknod(PARAM,(Node *) $2,(Node *) $4));} /* 2026: Rolle */
-			| SYMBOLIC			{$$=mknod(FUNC,(Node *) role_fkt,NULL);  /* Rollen loeschen */}
+			| SYMBOLIC String EQ String	{$$=mknod(FUNC,(Node *) role_fkt,mknod(PARAM,(Node *) $2,(Node *) $4));} /* 2026: role */
+			| SYMBOLIC			{$$=mknod(FUNC,(Node *) role_fkt,NULL);  /* delete roles */}
 			| RETURN term								{$$=mknod(FUNC,(Node *) return_fkt,$2);}
 			| QUIT                      {$$=mknod(FUNC,(Node *) quit_fkt,NULL);}
 			| OPT idlist                {$$=mknod(FUNC,(Node *) opt_fkt,$2);}
-			| OPT                       {$$=mknod(FUNC,(Node *) opt_fkt,NULL);   /* loeschen */}
+			| OPT                       {$$=mknod(FUNC,(Node *) opt_fkt,NULL);   /* delete */}
 			| COMM funclist             {$$=mknod(FUNC,(Node *) comm_fkt,$2);}
-			| COMM                      {$$=mknod(FUNC,(Node *) comm_fkt,NULL);  /* loeschen */}
-			| DEFAULT                   {$$=mknod(FUNC,(Node *) default_fkt,NULL); /* loeschen */}
+			| COMM                      {$$=mknod(FUNC,(Node *) comm_fkt,NULL);  /* delete */}
+			| DEFAULT                   {$$=mknod(FUNC,(Node *) default_fkt,NULL); /* delete */}
 			| DEFAULT func EQ term      {$$=mknod(FUNC,(Node *) default_fkt,
 			                                  mknod(PARAM,mknod(PARAM,$2,NULL),$4));}
 			| DEFAULT RIGHT func EQ term {$$=mknod(FUNC,(Node *) default_fkt,
@@ -282,7 +282,7 @@ alglist		: Alg2						{$$ = mknod(Algs,($1),NULL);}
 			| Alg2 ',' alglist		{$$ = mknod(Algs,($1),($3));};
 
 Alg2 : Alg									{$$ = (Node *) ($1);}
-			| '(' alglist ')'			{$$ = mknod(Alg,($2),NULL);} /* Standart muss alle alg passieren (Verkettung) */;
+			| '(' alglist ')'			{$$ = mknod(Alg,($2),NULL);} /* Standard must pass all algs (chaining) */;
 
 sortlist	: Sort							{$$ = (Node *) ($1);}
 			| Sort ',' sortlist			{$$ = mknod(Sorts,(Node *) ($1),$3);};
@@ -304,10 +304,10 @@ func		: Func				{$$ = (Node *) ($1);}
 funclist	: func						{$$ = $1;}
 			| func ',' funclist		{$$ = mknod(Functs,$1,$3);};
 
-term		: Term							{	$$ = (Node *) $1; /* tcopy(); merkt sich keine Abhaengigkeiten und funktioniert nicht in Bloecken */ 
+term		: Term							{	$$ = (Node *) $1; /* tcopy(); does not remember dependencies and does not work in blocks */ 
 														}
 			| LAST								{$$ = (Node *) lastterm;}
-			| Const								{$$ = mknod(Const,(Node *) ($1),NULL);} /* Wichtig fuer spaeteres Ersetzen von Variablen */
+			| Const								{$$ = mknod(Const,(Node *) ($1),NULL);} /* Important for later replacement of variables */
 			| Const	Bra1 termlist Bra2 {nphilf=mknod(Terms,mknod(Const,(Node *) ($1),NULL),$3);
 														 $$ = mknod(Func,(Node *) getsymbol(($2),nphilf), nphilf);} 
 			| Var				      		{$$ = (Node *) $1;}
@@ -348,8 +348,8 @@ cformula	: formula	vinstr					{(($1)->r)=mknod(PARAM,mknod(Cond2,mknod(Cond,(Nod
           | IF condition formula	vinstr {(($3)->r)=mknod(PARAM,mknod(Cond2,$2,($3)->r),
 																									 $4);$$ = $3;};
 
-formlist	: cformula					{$$ = mknod(Forms,$1,NULL); /* NULL dient zum Einhaengen weiterer Formeln !! */
-			/* | cformula ';' formlist {$$ = mknod(Forms,$1,$3);}  shift-red. wegen SPEC real : A+B=C;a=3 */
+formlist	: cformula					{$$ = mknod(Forms,$1,NULL); /* NULL serves for hooking in further formulas !! */
+			/* | cformula ';' formlist {$$ = mknod(Forms,$1,$3);}  shift-red. because of SPEC real : A+B=C;a=3 */
 															};
 
 %%

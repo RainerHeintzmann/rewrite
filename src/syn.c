@@ -70,7 +70,7 @@
 #line 9 "syn.y"
 
 
-#include <string.h> /* fuer memcpy,strcmp */
+#include <string.h> /* for memcpy,strcmp */
 #include <stdlib.h>
 
 #include "inout.h"
@@ -1556,7 +1556,7 @@ yyreduce:
 
   case 8: /* definition: BRA Id Id ':' vsortlist PFEIL Sort att  */
 #line 109 "syn.y"
-                                                                            {Node * fkts;  /* Klammern */
+                                                                            {Node * fkts;  /* Brackets */
 							            				if (((yyvsp[-6].y_sym))==((yyvsp[-5].y_sym)))
 							            					fkts=mknod(PARAM,DECLARE((Node *) (yyvsp[-6].y_sym),Bra,(Node *) (yyvsp[-1].y_sym),(yyvsp[-3].y_nod),FALSE),
 																				mknod(PARAM,mknod(FUNC,(Node *) att_fkt,mknod(PARAM,(Node *) (yyvsp[-6].y_sym),(yyvsp[0].y_nod))),NULL));
@@ -1578,27 +1578,27 @@ yyreduce:
 
   case 10: /* definition: NUM Sort  */
 #line 121 "syn.y"
-                                                                                         {(yyval.y_nod)=mknod(FUNC,(Node *) set_numbertype,(Node *) ((yyvsp[0].y_sym))); /* setzt numbertype fuer mknum */}
+                                                                                         {(yyval.y_nod)=mknod(FUNC,(Node *) set_numbertype,(Node *) ((yyvsp[0].y_sym))); /* sets numbertype for mknum */}
 #line 1583 "syn.tab.c"
     break;
 
   case 11: /* definition: SUBSORT Sort ',' Sort ATT Id  */
 #line 122 "syn.y"
-                                                         {(yyval.y_nod)=mknod(FUNC,(Node *) subsort_def,   /* 2026: Untersorte */
+                                                         {(yyval.y_nod)=mknod(FUNC,(Node *) subsort_def,   /* 2026: subsort */
 										      mknod(PARAM,(Node *) (yyvsp[-4].y_sym),mknod(PARAM,(Node *) (yyvsp[-2].y_sym),(Node *) give_ufkt(name((yyvsp[0].y_sym))))));}
 #line 1590 "syn.tab.c"
     break;
 
   case 12: /* definition: INTNUM Sort ATT Id  */
 #line 124 "syn.y"
-                                                         {(yyval.y_nod)=mknod(FUNC,(Node *) intnum_def,    /* 2026: Sorte ganzer Zahlen */
+                                                         {(yyval.y_nod)=mknod(FUNC,(Node *) intnum_def,    /* 2026: sort of integers */
 										      mknod(PARAM,(Node *) (yyvsp[-2].y_sym),(Node *) give_ufkt(name((yyvsp[0].y_sym)))));}
 #line 1597 "syn.tab.c"
     break;
 
   case 13: /* definition: NUM idlist ':' Sort  */
 #line 126 "syn.y"
-                                                                 { /* Variablen fuer Numerische Zahlen */
+                                                                 { /* Variables for numeric numbers */
 									                (yyval.y_nod)=DECLARE((yyvsp[-2].y_nod),Var,(Node *) (yyvsp[0].y_sym),NULL,TRUE);}
 #line 1604 "syn.tab.c"
     break;
@@ -1665,13 +1665,13 @@ yyreduce:
 
   case 24: /* att: ATT namedId  */
 #line 147 "syn.y"
-                                                { /* numerische C-Funktion (userfkt.c), sonst symbolische (symfkt.c) */
+                                                { /* numeric C function (userfkt.c), otherwise symbolic (symfkt.c) */
 			                  u_function * u = give_ufkt_quiet(name((Symbol *) (yyvsp[0].y_nod)));
 			                  s_function * s = u ? NULL : give_sfkt(name((Symbol *) (yyvsp[0].y_nod)));
 			                  if (u)
 			                    (yyval.y_nod) = mknod(ATT,(Node *) u,NULL);
 			                  else if (s)
-			                    (yyval.y_nod) = mknod(ATT,(Node *) s,mknod(PARAM,NULL,NULL)); /* r: symbolisch */
+			                    (yyval.y_nod) = mknod(ATT,(Node *) s,mknod(PARAM,NULL,NULL)); /* r: symbolic */
 			                  else
 			                    { printfErr(" --ERROR ATT : C-Function %s not Implemented \n",name((Symbol *) (yyvsp[0].y_nod)));
 			                      (yyval.y_nod) = mknod(ATT,NULL,NULL); }
@@ -1681,14 +1681,14 @@ yyreduce:
 
   case 25: /* att: ATT SYMBOLIC namedId  */
 #line 158 "syn.y"
-                                                        { /* 2026: symbolische C-Funktion (symfkt.c): bekommt Terme */
+                                                        { /* 2026: symbolic C function (symfkt.c): gets terms */
 			                  (yyval.y_nod) = sym_att((yyvsp[0].y_nod), 0); }
 #line 1687 "syn.tab.c"
     break;
 
   case 26: /* att: ATT SYMBOLIC HOLD namedId  */
 #line 160 "syn.y"
-                                                        { /* 2026: dazu Argumente unausgewertet (matchq) */
+                                                        { /* 2026: plus arguments unevaluated (matchq) */
 			                  (yyval.y_nod) = sym_att((yyvsp[0].y_nod), 1); }
 #line 1694 "syn.tab.c"
     break;
@@ -1755,43 +1755,43 @@ yyreduce:
 
   case 37: /* VORRANG: LA1  */
 #line 175 "syn.y"
-                                                                        {(yyval.y_int) = La1;	/* Linksassoziativ */}
+                                                                        {(yyval.y_int) = La1;	/* Left-associative */}
 #line 1760 "syn.tab.c"
     break;
 
   case 38: /* VORRANG: LA2  */
 #line 176 "syn.y"
-                                                                        {(yyval.y_int) = La2;	/* Linksassoziativ */}
+                                                                        {(yyval.y_int) = La2;	/* Left-associative */}
 #line 1766 "syn.tab.c"
     break;
 
   case 39: /* VORRANG: LA3  */
 #line 177 "syn.y"
-                                                                        {(yyval.y_int) = La3;	/* Linksassoziativ */}
+                                                                        {(yyval.y_int) = La3;	/* Left-associative */}
 #line 1772 "syn.tab.c"
     break;
 
   case 40: /* VORRANG: LA4  */
 #line 178 "syn.y"
-                                                                        {(yyval.y_int) = La4;	/* Linksassoziativ */}
+                                                                        {(yyval.y_int) = La4;	/* Left-associative */}
 #line 1778 "syn.tab.c"
     break;
 
   case 41: /* VORRANG: LA5  */
 #line 179 "syn.y"
-                                                                        {(yyval.y_int) = La5;	/* Linksassoziativ */}
+                                                                        {(yyval.y_int) = La5;	/* Left-associative */}
 #line 1784 "syn.tab.c"
     break;
 
   case 42: /* VORRANG: RA  */
 #line 180 "syn.y"
-                                                                        {(yyval.y_int) = Ra;  	/* Rechtsassoziativ */}
+                                                                        {(yyval.y_int) = Ra;  	/* Right-associative */}
 #line 1790 "syn.tab.c"
     break;
 
   case 43: /* VORRANG: RU  */
 #line 181 "syn.y"
-                                                                        {(yyval.y_int) = Ru;	  /* Rechts Unaer */}
+                                                                        {(yyval.y_int) = Ru;	  /* Right unary */}
 #line 1796 "syn.tab.c"
     break;
 
@@ -1875,7 +1875,7 @@ yyreduce:
 
   case 57: /* instruction: aninstruction  */
 #line 205 "syn.y"
-                                {(yyval.y_nod) = in_block_instruct((yyvsp[0].y_nod)); /* Locale Variablen pruefen ! */ }
+                                {(yyval.y_nod) = in_block_instruct((yyvsp[0].y_nod)); /* Check local variables ! */ }
 #line 1880 "syn.tab.c"
     break;
 
@@ -1903,7 +1903,7 @@ yyreduce:
 
   case 61: /* instruction: WHILE condition instruction  */
 #line 213 "syn.y"
-                                                        {Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,(yyvsp[-1].y_nod),NULL /* wird dann $3 */)));
+                                                        {Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,(yyvsp[-1].y_nod),NULL /* then becomes $3 */)));
 																		WHILE_BODY(merk) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
 #line 1909 "syn.tab.c"
     break;
@@ -1936,7 +1936,7 @@ yyreduce:
 
   case 65: /* aninstruction: %empty  */
 #line 230 "syn.y"
-                                {(yyval.y_nod)=NULL;}
+                                        {(yyval.y_nod)=NULL;}
 #line 1941 "syn.tab.c"
     break;
 
@@ -1979,7 +1979,7 @@ yyreduce:
 
   case 72: /* aninstruction: PRT prntlist  */
 #line 238 "syn.y"
-                                                                {(yyval.y_nod)=mknod(FUNC,(Node *) sequence,(yyvsp[0].y_nod)); /* ohne \n */ }
+                                                                {(yyval.y_nod)=mknod(FUNC,(Node *) sequence,(yyvsp[0].y_nod)); /* without \n */ }
 #line 1984 "syn.tab.c"
     break;
 
@@ -2060,7 +2060,7 @@ yyreduce:
 
   case 84: /* aninstruction: SYMBOLIC  */
 #line 259 "syn.y"
-                                                        {(yyval.y_nod)=mknod(FUNC,(Node *) role_fkt,NULL);  /* Rollen loeschen */}
+                                                        {(yyval.y_nod)=mknod(FUNC,(Node *) role_fkt,NULL);  /* delete roles */}
 #line 2065 "syn.tab.c"
     break;
 
@@ -2084,7 +2084,7 @@ yyreduce:
 
   case 88: /* aninstruction: OPT  */
 #line 263 "syn.y"
-                                                    {(yyval.y_nod)=mknod(FUNC,(Node *) opt_fkt,NULL);   /* loeschen */}
+                                                    {(yyval.y_nod)=mknod(FUNC,(Node *) opt_fkt,NULL);   /* delete */}
 #line 2089 "syn.tab.c"
     break;
 
@@ -2096,13 +2096,13 @@ yyreduce:
 
   case 90: /* aninstruction: COMM  */
 #line 265 "syn.y"
-                                                    {(yyval.y_nod)=mknod(FUNC,(Node *) comm_fkt,NULL);  /* loeschen */}
+                                                    {(yyval.y_nod)=mknod(FUNC,(Node *) comm_fkt,NULL);  /* delete */}
 #line 2101 "syn.tab.c"
     break;
 
   case 91: /* aninstruction: DEFAULT  */
 #line 266 "syn.y"
-                                                    {(yyval.y_nod)=mknod(FUNC,(Node *) default_fkt,NULL); /* loeschen */}
+                                                    {(yyval.y_nod)=mknod(FUNC,(Node *) default_fkt,NULL); /* delete */}
 #line 2107 "syn.tab.c"
     break;
 
@@ -2278,7 +2278,7 @@ yyreduce:
 
   case 120: /* term: Term  */
 #line 307 "syn.y"
-                                                                        {	(yyval.y_nod) = (Node *) (yyvsp[0].y_sym); /* tcopy(); merkt sich keine Abhaengigkeiten und funktioniert nicht in Bloecken */ 
+                                                                        {	(yyval.y_nod) = (Node *) (yyvsp[0].y_sym); /* tcopy(); does not remember dependencies and does not work in blocks */ 
 														}
 #line 2284 "syn.tab.c"
     break;
@@ -2462,8 +2462,8 @@ yyreduce:
 
   case 149: /* formlist: cformula  */
 #line 351 "syn.y"
-                                                                {(yyval.y_nod) = mknod(Forms,(yyvsp[0].y_nod),NULL); /* NULL dient zum Einhaengen weiterer Formeln !! */
-			/* | cformula ';' formlist {$$ = mknod(Forms,$1,$3);}  shift-red. wegen SPEC real : A+B=C;a=3 */
+                                                                {(yyval.y_nod) = mknod(Forms,(yyvsp[0].y_nod),NULL); /* NULL serves for hooking in further formulas !! */
+			/* | cformula ';' formlist {$$ = mknod(Forms,$1,$3);}  shift-red. because of SPEC real : A+B=C;a=3 */
 															}
 #line 2469 "syn.tab.c"
     break;

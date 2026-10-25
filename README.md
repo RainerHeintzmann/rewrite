@@ -536,7 +536,9 @@ The helpers assume the usual properties of these roles: `+` and `*` are
 commutative and associative, `mi(x)` is 1/x, `cos` is the cosine, and so on.
 The rules themselves make no such assumptions.
 
-`matchq(u, pattern, cond)` is Rubi's `MatchQ[u, pattern /; cond]`: it tests
+`matchq(u, pattern, cond)` is Rubi's `MatchQ[u, pattern /; cond]` (the
+translator also inlines Rubi's `LinearMatchQ`, `BinomialMatchQ`, ... as
+`matchq`, from their definitions in Rubi's utility file): it tests
 `u` against a pattern with the matcher of the rule lists (optional operands,
 commutative operators, see [Rule sets](#rule-sets-algebras-and-rewriting)),
 then the condition with the bindings, and undoes the bindings afterwards.
@@ -576,7 +578,6 @@ The helpers are:
 | `replaceall(u,x,v)` | `u` with `x` replaced by `v` at once |
 | `expandtrigreduce(u,x)`, `expandtrigreduce(v,u,x)` | products and powers of `sin`, `cos`, `sinh`, `cosh` as sums of multiple angles, e.g. `sin(x)^3` gives `(3/4)*sin(x) - (1/4)*sin(3*x)`; times `v` |
 | `binomialq(u,x)`, `binomialdegree(u,x)`, `trinomialq(u,x)`, `quadraticq(u,x)` | `u` is `a+b*x^n` (and its `n`), `a+b*x^n+c*x^(2n)`, a quadratic |
-| `binomialmatchq`, `quadraticmatchq`, `linearmatchq` | `u` is literally written as `a+b*x^n`, `a+b*x+c*x^2`, `a+b*x` |
 | `rationalfunctionq(u,x)`, `algebraicfunctionq(u,x)`, `inversefunctionfreeq(u,x)` | kind of function of `x` |
 | `leafcount(u)`, `simplerq(u,v)`, `sumsimplerq(u,v)`, `simplersqrtq(u,v)` | size of a term (as Mathematica's `LeafCount`) and Rubi's simplicity comparisons |
 | `knownsineintegrandq(u,x)` (also `tangent`, `cotangent`, `secant`), `piecewiselinearq`, `linearpairq` | Rubi's tests for integrands it knows |

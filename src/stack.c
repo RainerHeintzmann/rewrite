@@ -1,4 +1,4 @@
-/* stack.c : (c) Rainer Heintzmann Juni 1992 */
+/* stack.c : (c) Rainer Heintzmann June 1992 */
 
 #include <stdlib.h>
 #include "fatal.h"
@@ -9,7 +9,7 @@ void push (STACK * p_stack,void * elem)
 STACK	top;
 	if (((void *) 0) == (top = (STACK) calloc(1,sizeof(STACKELEM))))
 		fatal("stack : No Room \n");
-	(* top).next = (* p_stack);							/* Verketten */
+	(* top).next = (* p_stack);							/* link */
 	(* top).elem = elem;
 	(* p_stack) = top;
 	return;

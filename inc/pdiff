@@ -1,15 +1,15 @@
 
-# ++++++++++++++++++++++++ DIFFERENTIALRECHNUNG ++++++++++++++++++++++++++
-FUNC Dp    : real,real      >> real           # Partielle Ableitung
-FUNC Dpn   : real,real,real >> real           # n.-te Partielle Ableitung
+# ++++++++++++++++++++++++ DIFFERENTIAL CALCULUS ++++++++++++++++++++++++++
+FUNC Dp    : real,real      >> real           # partial derivative
+FUNC Dpn   : real,real,real >> real           # n-th partial derivative
 
 ALG pdiff
 
 SPEC        pdiff : Dpn(X,Y,0) = X
 ADDSPEC     pdiff : Dpn(X,Y,N) = Dpn(Dp(X,Y),Y,N - 1)
 
-ADDSPEC     pdiff : Dp(X,X) = 1         		# spezielle Konstanten
-ADDSPEC     pdiff : IF NIN(X,Y) Dp(Y,X) = 0    # entscheidender Unterschied !!!
+ADDSPEC     pdiff : Dp(X,X) = 1         		# special constants
+ADDSPEC     pdiff : IF NIN(X,Y) Dp(Y,X) = 0    # crucial difference !!!
 
 ADDSPEC     pdiff : Dp(-X,Y) = - Dp(X,Y)
 ADDSPEC     pdiff : Dp(mi X,Y) = - mi X^2*Dp(X,Y)
@@ -18,11 +18,11 @@ ADDSPEC     pdiff : Dp(e^X,Z)  = e^X * Dp(X,Z)
 ADDSPEC     pdiff : Dp(sin X,Z)= cos X * Dp(X,Z)
 ADDSPEC     pdiff : Dp(cos X,Z)= - sin X * Dp(X,Z)
 
-ADDSPEC     pdiff : IF NIN(X,Y) Dp(D(X,Y),X) = 0      # Variable ist unabhaengig
+ADDSPEC     pdiff : IF NIN(X,Y) Dp(D(X,Y),X) = 0      # variable is independent
 
-ADDSPEC     pdiff : Dp(N*X,Z)=N*Dp(X,Z)             # wird so schneller
-ADDSPEC     pdiff : Dp(X*Y,Z)=Dp(X,Z)*Y+Dp(Y,Z)*X   # Allg. Differenziationsregeln
+ADDSPEC     pdiff : Dp(N*X,Z)=N*Dp(X,Z)             # this is faster
+ADDSPEC     pdiff : Dp(X*Y,Z)=Dp(X,Z)*Y+Dp(Y,Z)*X   # general differentiation rules
 ADDSPEC     pdiff : Dp(X+Y,Z)=Dp(X,Z)+Dp(Y,Z)
-ADDSPEC     pdiff : Dp(X^N,X)=N*X^(N - 1)      	    # wird so schneller
+ADDSPEC     pdiff : Dp(X^N,X)=N*X^(N - 1)      	    # this is faster
 ADDSPEC     pdiff : Dp(X^Y,Z)=Dp(X,Z)*Y*X^(Y-1)+Dp(Y,Z)*ln X*X^Y
 

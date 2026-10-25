@@ -23,7 +23,7 @@ FUNC *     : real,real >> real LA3		ATT  4
 DEBUG 5
 
 ALG Real
-SPEC 	      Real : 0+X   = X         # spezielle Konstanten
+SPEC 	      Real : 0+X   = X         # special constants
 ADDSPEC     Real : 0*X   = 0
 ADDSPEC     Real : X*mi X  = 1
 ADDSPEC     Real : mi X*X  = 1

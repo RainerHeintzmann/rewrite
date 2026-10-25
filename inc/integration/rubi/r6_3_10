@@ -1,15 +1,15 @@
 # r6_3_10
-# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
-# mit tools/rubi2rewrite.py, Abschnitt
+# Translated automatically from Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# by tools/rubi2rewrite.py, section
 #   6.3.10 (c+d x)^m (a+b tanh)^n
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi.
-# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi.
+# Do not edit by hand: changes belong in the translator.
 
-# Regel 1 (72 Varianten):
+# Rule 1 (72 variants):
 #   Int[u_^m_.*(a_. + b_.*Tanh[v_])^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*(a + b*Tanh[ExpandToSum[v, x]])^n, x] /; FreeQ[{a, b, m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*(((O_a)+((O_b)*(tanh(P_v))))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((((O_a)+(((O_b)*(tanh(expandtosum(P_v,Xv)))))))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((matchq(P_u,(O_mq_a)+((O_mq_b)*(Xv)),((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv))))) && (matchq(P_v,(O_mq_a)+((O_mq_b)*(Xv)),((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv)))))))) Int(((P_u)^(O_m))*(((O_a)+((O_b)*(tanh(P_v))))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((((O_a)+(((O_b)*(tanh(expandtosum(P_v,Xv)))))))^(O_n)))),Xv)
 
-# Regel 2 (72 Varianten):
+# Rule 2 (72 variants):
 #   Int[u_^m_.*(a_. + b_.*Coth[v_])^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*(a + b*Coth[ExpandToSum[v, x]])^n, x] /; FreeQ[{a, b, m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((linearmatchq(P_u,Xv)) && (linearmatchq(P_v,Xv))))) Int(((P_u)^(O_m))*(((O_a)+((O_b)*(coth(P_v))))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((((O_a)+(((O_b)*(coth(expandtosum(P_v,Xv)))))))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((matchq(P_u,(O_mq_a)+((O_mq_b)*(Xv)),((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv))))) && (matchq(P_v,(O_mq_a)+((O_mq_b)*(Xv)),((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv)))))))) Int(((P_u)^(O_m))*(((O_a)+((O_b)*(coth(P_v))))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((((O_a)+(((O_b)*(coth(expandtosum(P_v,Xv)))))))^(O_n)))),Xv)

@@ -1,5 +1,5 @@
 
-# +++++++++++++++++++++ Spezifikationen der Algebren ++++++++++++++++++++++++
+# +++++++++++++++++++++ Specifications of the algebras ++++++++++++++++++++++++
 ALG Real
 SPEC    Real : sin(pi) = 0
 ADDSPEC Real : cos(pi) = -1

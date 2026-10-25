@@ -2,7 +2,7 @@
  *	strsave.c -- 1.1 Apr 19 06:31:46 1991
  *	Copyright (c) 1991 Axel T. Schreiner
  *
- *	strsave -- String dynamisch speichern
+ *	strsave -- store a string dynamically
  */
 
 #include <string.h>

@@ -23,7 +23,7 @@ etha= e^(-alpha*d/cos theta) * ny^2 * (sin ((ny^2+Xi^2)^.5)/(ny^2+Xi^2)^.5)^2
 
 
 
-# Bsp. :
+# example :
 theta = thetaB # keeps now track ...
 
 dN = 0.5E-03 * 1E30
@@ -32,7 +32,7 @@ alpha=0
 dalpha=0
 LD = 180.6* _n # 1.920 * _A # SI 220
 # LD = 400 * _n
-E  = 11380   # eV    z.B. 11.38 keV
+E  = 11380   # eV    e.g. 11.38 keV
 # E = c*h/(e0 * 300* _n)
 # etha
 

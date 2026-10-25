@@ -1,12 +1,12 @@
 /*
  *	run.c V1.00
- * 
+ *
  *	Copyright (c)  Rainer Heintzmann 	(1992)
  *
- *	Variablen
+ *	Variables
  */
 
-#include <string.h> /* fuer strcmp */
+#include <string.h> /* for strcmp */
 #include <stdio.h>
 #include <stdlib.h>
 #include "strsave.h"
@@ -18,7 +18,7 @@
 #include "stack.h"
 #include "forms.h"
 #include "userfkt.h"
-#include "sync.h" /* fuer IS_follows,IS_search  */
+#include "sync.h" /* for IS_follows,IS_search  */
 #include "node.h"
 #include "defs.h"
 #include "nodes.h"
@@ -26,19 +26,19 @@
 #include "listmatch.h"
 #include "numsort.h"	/* 2026: SUBSORT */
 
-#define EQUAL  0	/* wichtig wegen strcmp */
+#define EQUAL  0	/* important because of strcmp */
 
-extern char * numbername; /* zur Identifizierung einer Nummer fuer delete */
+extern char * numbername; /* to identify a number for delete */
 
 Node * numbertype = NULL;
 
 static int mistake = FALSE;
 
-static BOOLEAN didrewrite = FALSE; /* fuer Verkettung der Algebren : (real;diff);more -> nicht reentrent */
+static BOOLEAN didrewrite = FALSE; /* for chaining the algebras : (real;diff);more -> not reentrant */
 
 BOOLEAN truefunc _1p (Node *);
 BOOLEAN in_tree2 _2p(Node * npl,Node * npr);
-int tcmp _2p(Node * a, Node * b);      /* forward : Vergleicht Baeume  1 : a>b */
+int tcmp _2p(Node * a, Node * b);      /* forward : compares trees  1 : a>b */
 
 
 Node var_chain =
@@ -53,7 +53,7 @@ BOOLEAN (* condfunc) (Node *);
 
 /* void tprint _2p(Node *,int); */
 
-int i;    /* zum Zwischenspeichern */
+int i;    /* for temporary storage */
 
 Node * rewrite _2a ((term,Baum) , Node * term ,Node * Baum)
 {
@@ -63,21 +63,21 @@ Node * rewrite _2a ((term,Baum) , Node * term ,Node * Baum)
 	DBFK(5,print(Baum));
 	DEBG((5,"\n"));
 
-	if (Baum && Baum->type == RULELIST)	/* Regelliste (listmatch.c) */
+	if (Baum && Baum->type == RULELIST)	/* rule list (listmatch.c) */
 		return match_list(term,Baum);
 	return match(term,Baum);
 
 }
 
-/* 2026: Schrittbegrenzung, damit eine Regelschleife REWR nicht endlos laufen laesst */
+/* 2026: step limit, so that a rule loop does not let REWR run forever */
 long max_rewrite_steps = 100000;
 static long rewrite_steps = 0;
 static int  rewrite_depth = 0;
 static BOOLEAN step_limit_hit = FALSE;
 
-/* 2026: die zuletzt von Regellisten ersetzten Terme und ihre Ergebnisse. Ein
-   Ergebnis, von dem die Kette der Ersetzungen wieder zum jetzigen Term fuehrt,
-   schliesst einen Zyklus (A -> B -> A) und gilt als kein Fortschritt. */
+/* 2026: the terms most recently replaced by rule lists and their results. A
+   result from which the chain of replacements leads back to the current term
+   closes a cycle (A -> B -> A) and counts as no progress. */
 #define NHIST 16
 static Node * hist[NHIST], * hist_to[NHIST];
 static int hist_rule[NHIST];
@@ -205,7 +205,7 @@ static void show_step (int rule, Node * old, Node * neu)
 	printfOut("\n");
 }
 
-void rewrite_begin (void)	/* vor REWR (verschachtelt: nur aussen zuruecksetzen) */
+void rewrite_begin (void)	/* before REWR (nested: reset only on the outermost level) */
 {
 	if (rewrite_depth++ == 0)
 		{
@@ -234,7 +234,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 	DBFK(4,print(* p_term));
 	DEBG((4,"\n"));
 
-    /* Zuerst lokale terme dann globale */
+    /* first local terms, then global ones */
 
 	do rewritten=(suche_Stelle (&((* p_term) -> l),Baum));
 	while (rewritten);
@@ -249,19 +249,19 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 
 				lt = (* p_term) -> l;
 				rt = (* p_term) -> r;
-				if (RES_DO(ers)) {CALLFUNCT(RES_DO(ers));} /* Ausfueher von DO-Block */
+				if (RES_DO(ers)) {CALLFUNCT(RES_DO(ers));} /* executes a DO block */
 				if (lt && lt->type == SYM_TYPE)
 					maintype=rtypes((Symbol *) lt);
 				else
 					maintype=NULL;
-				neu = tcopy(RES_RHS(ers)); /* Formel einsetzen (Es wird auch 'geliftet' !) */
-				retype_term(neu);	/* 2026: Varianten zu den Sorten der Argumente (SUBSORT) */
-				neu = tcalc(neu);  /* Formel numerisch auswerten */
+				neu = tcopy(RES_RHS(ers)); /* insert formula (it is also 'lifted' !) */
+				retype_term(neu);	/* 2026: variants matching the sorts of the arguments (SUBSORT) */
+				neu = tcalc(neu);  /* evaluate formula numerically */
 				if (Baum && Baum->type == RULELIST)
-					term_simplify_trivial(& neu);	/* x^0, 1*u, ... wie Mathematica */
-				RESTORE;					/* Symboltabelle restaurieren (auch locks beseitigen)*/
-				/* 2026: in einer Regelliste wird eine Regel ohne Fortschritt
-				   (Ergebnis gleich dem Term) uebersprungen; die naechste wird versucht */
+					term_simplify_trivial(& neu);	/* x^0, 1*u, ... like Mathematica */
+				RESTORE;					/* restore symbol table (also remove locks)*/
+				/* 2026: in a rule list a rule without progress
+				   (result equal to the term) is skipped; the next one is tried */
 				if (Baum && Baum->type == RULELIST
 				    && (term_equal(neu, old) || term_has_nan(neu) || hist_cycle(neu, old)
 				        || hist_revisit(old, found)))
@@ -281,13 +281,13 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 				delete (lt);
 				delete (rt);
 				if (old->type != SYM_TYPE)
-					delnod(old);  /* ersetzter Knoten (Kinder sind schon geloescht) */
+					delnod(old);  /* replaced node (children are already deleted) */
 				else
-					delete(old);  /* gibt nur Zahlen frei */
+					delete(old);  /* frees only numbers */
 				DEBG((2," -> "));
 				DBFK(2,print(*p_term));
 				DEBG((2,"\n"));
-				didrewrite = TRUE; /* wurde umgeschrieben */
+				didrewrite = TRUE; /* was rewritten */
 				if (++rewrite_steps > max_rewrite_steps && ! step_limit_hit)
 					{
 					step_limit_hit = TRUE;
@@ -296,7 +296,7 @@ BOOLEAN suche_Stelle _2a ((p_term,Baum), Node * * p_term, Node * Baum)
 					}
 				return TRUE;
 			}
-	RESTORE;					/* Symboltabelle restaurieren */
+	RESTORE;					/* restore symbol table */
 	lm_start = 0;
 
 	return FALSE;
@@ -310,7 +310,7 @@ Node * solve _2a ((term,alglist), Node * term ,Node * alglist)
 	Node  * algpt;
 	BOOLEAN wasbefore;
 
-	if(!alglist) return term; /* Leere Algebra (ohne SPEC) */
+	if(!alglist) return term; /* empty algebra (without SPEC) */
 
 	if (alglist -> type == Alg)
 		{
@@ -326,11 +326,11 @@ Node * solve _2a ((term,alglist), Node * term ,Node * alglist)
 		return term;
 		}
 
-	if (alglist -> type == Algs)  /* Hier liegt eine Liste vor ! */
+	if (alglist -> type == Algs)  /* this is a list ! */
 		{
 		for (algpt=alglist; algpt != NULL; algpt = algpt -> r)
 			{
-			if (algpt->l->type == Alg) /* algpt -> l ist Alg2 ,hier : Verkettung */
+			if (algpt->l->type == Alg) /* algpt -> l is Alg2 ,here : chaining */
 				term = solve(term,(algpt->l));
 			else
 				term = solve(term,atypes((Symbol *)(algpt->l)));
@@ -352,7 +352,7 @@ Node * solve _2a ((term,alglist), Node * term ,Node * alglist)
 	while (rewritten);
 
 
-	return tcalc(term);  /* Formel numerisch auswerten und zurueckgeben */
+	return tcalc(term);  /* evaluate formula numerically and return it */
 }
 
 
@@ -363,7 +363,7 @@ void print _1a((np),Node * np)
 
 void tprint _2a((np,last_func_type),Node * np,int last_func_type)
 {
-int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
+int	this_type;					/* since La1 .. La5 are entered in the tree as Func ! */
 
 	if (! np)	return;
 	this_type = (np -> type);
@@ -399,7 +399,7 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 
 	case SYM_TYPE :
 		if (lexval((Symbol *) np) == Term)
-			tprint(np->l,last_func_type); /* letzter Typ */
+			tprint(np->l,last_func_type); /* last type */
 		else
 			if ((lexval((Symbol *) np) == Const)
 				&& (hasval(np) == TRUE)) 
@@ -410,21 +410,21 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 				if (NULL==(void *) show(rtypes((Symbol *) np)))
          		printfOut("%g ",* ((double *) value(np)));
 				else
-          SHOWNUM(np,value(np));            /* Wert ausgeben */
+          SHOWNUM(np,value(np));            /* print value */
 				}
-			else    /* sonst Namen */
+			else    /* otherwise names */
       	    printfOut("%s ",name((Symbol *) np) );
       break;
 	case Var :
 		printfOut("-Fehler : Hier tritt 'Var' auf ! -");
 		break;
 	case Const :
-		tprint(np -> l,0);			/* Symboltabelleneintrag */
+		tprint(np -> l,0);			/* symbol table entry */
 		break;
 	case Func :
 		if (lexval((Symbol *) (np -> l)) == Func)
 			{
-			tprint(np -> l,0);		/* Name der Funktion ausgeben */
+			tprint(np -> l,0);		/* print name of the function */
 			printfOut("(");
 			tprint(np -> r,0);
 			printfOut(")");
@@ -432,7 +432,7 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 			}
 		else 
 			this_type = lexval((Symbol *) (np->l));
-	case Ru:											/* Im Baum als Func eingetragen ! */
+	case Ru:											/* entered in the tree as Func ! */
 		if (lexval((Symbol *) (np -> l)) == Ru)
 			{
 			if (last_func_type > this_type)
@@ -440,7 +440,7 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 			tprint(np -> r,this_type);
 			if (last_func_type > this_type)
 				printfOut(")");
-			tprint(np -> l,0);		/* Name der Funktion ausgeben */
+			tprint(np -> l,0);		/* print name of the function */
 			return;
 			}
 		/* else			; */
@@ -450,42 +450,42 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 		if ((lexval((Symbol *) (np -> l)) == Bra)
 		 || (lexval((Symbol *) (np -> l)) == Bra1))
 			{
-			tprint(np -> l,0);		/* Name der Funktion (Klammer auf) ausgeben */
-			tprint(np -> r,0);              /* Inhalt dazwischen ausgeben */
-			tprint((Node *) (((Symbol *)(np -> l))->klammer),0); /* andere Klammer */
+			tprint(np -> l,0);		/* print name of the function (opening bracket) */
+			tprint(np -> r,0);              /* print content in between */
+			tprint((Node *) (((Symbol *)(np -> l))->klammer),0); /* other bracket */
 			return;
 			}
 		/* else			; */
-	case Ra:							/* Im Baum als Func eingetragen ! */
+	case Ra:							/* entered in the tree as Func ! */
 	case La1:
 	case La2:
 	case La3:
 	case La4:
-	case La5:						/* Gleich od. Staerker -> Keine Klammern */
+	case La5:						/* equal or stronger -> no brackets */
 
 		DEBG((9,"-Vorrang : %d -",this_type));
 		if (last_func_type > this_type)
 			printfOut("(");
 
-			/* Bei einem Argument : Linksunaer sonst wie Linksassoziativ */
-			if (term_nargs(np) == 1) /* -> Ein Argument -> Links-unaer */
+			/* with one argument : left-unary, otherwise like left-associative */
+			if (term_nargs(np) == 1) /* -> one argument -> left-unary */
 				{
-				tprint((Node *) TERM_HEAD(np),0);		/* Name der Funktion ausgeben */
-				tprint(term_arg(np,0),this_type+1); /* Bei gleichem Vorrang Argument-Term klammern z.B. -(1-2) */
+				tprint((Node *) TERM_HEAD(np),0);		/* print name of the function */
+				tprint(term_arg(np,0),this_type+1); /* with equal precedence put the argument term in brackets, e.g. -(1-2) */
 				}
-			else /* links Op. rechts */
+			else /* left op. right */
 				{
-				if (lexval(TERM_HEAD(np)) == Ra) /* Rechts-assoziativ */
+				if (lexval(TERM_HEAD(np)) == Ra) /* right-associative */
 					{
-					tprint(term_arg(np,0),this_type+1);  	/* Linker Teilbaum muss bei gleichem Vorrang geklammert werden : a-(b+c) */
-					tprint((Node *) TERM_HEAD(np),0);			/* Name der Funktion ausgeben */
+					tprint(term_arg(np,0),this_type+1);  	/* left subtree must be bracketed at equal precedence : a-(b+c) */
+					tprint((Node *) TERM_HEAD(np),0);			/* print name of the function */
 					tprint(term_arg(np,1),this_type);
 					}
-				else 																	/* Links-assoziativ */
+				else 																	/* left-associative */
 					{
 					tprint(term_arg(np,0),this_type);
-					tprint((Node *) TERM_HEAD(np),0);			/* Name der Funktion ausgeben */
-					tprint(term_arg(np,1),this_type + 1); /* Rechter Teilbaum muss bei gleichem Vorrang geklammert werden : a-(b+c) */
+					tprint((Node *) TERM_HEAD(np),0);			/* print name of the function */
+					tprint(term_arg(np,1),this_type + 1); /* right subtree must be bracketed at equal precedence : a-(b+c) */
 					}
 				}
 
@@ -524,9 +524,9 @@ int	this_type;					/* Da La1 .. La5 als Func im Baum eingtragen ! */
 	return;
 }
 
-/* Liste aus rec_build_list (defs.c) freigeben. Ihre SYM_TYPE-Knoten sind
- * keine Symbole, sondern Knoten mit (Adresse, Symbol) und duerfen nicht
- * wie Symbole behandelt werden. */
+/* free the list from rec_build_list (defs.c). Its SYM_TYPE nodes are
+ * not symbols but nodes with (address, symbol) and must not be
+ * treated like symbols. */
 static void delete_locals_list (Node * p)
 {
 	if (! p) return;
@@ -546,8 +546,8 @@ void delete _1a ((p), Node * p)
 		{
 		if (((p -> type) == FUNC) && ((p->l) == (Node *) declare) && p->r)
 			{ /* FUNC declare ( lexv ( Idlist, hasv ( rtypes, atypes ) ) )
-			   * Der hasv-Knoten hat als Typ TRUE/FALSE (FALSE == SYM_TYPE !).
-			   * rtypes/atypes gehoeren jetzt den deklarierten Symbolen. */
+			   * The hasv node has type TRUE/FALSE (FALSE == SYM_TYPE !).
+			   * rtypes/atypes now belong to the declared symbols. */
 			if (DECL_HASVNODE(p))
 				delnod(DECL_HASVNODE(p));
 			delete(DECL_IDLIST(p));
@@ -556,7 +556,7 @@ void delete _1a ((p), Node * p)
 			return;
 			}
 		if (((p -> type) == FUNC) && ((p->l) == (Node *) set_locals_seq))
-			{ /* FUNC set_locals_seq ( PARAM ( Liste, Anweisung ) ) */
+			{ /* FUNC set_locals_seq ( PARAM ( list, statement ) ) */
 			delete_locals_list(LOCALS_LIST(p));
 			delete(LOCALS_INSTR(p));
 			delnod(p->r);
@@ -566,10 +566,10 @@ void delete _1a ((p), Node * p)
 		if ( ((p -> type) == Cond)
 		  || ((p -> type) == FUNC))
 			{
-			/* Frueher wurden die Terme von printterm und termassign hier nicht
-			 * geloescht. % und Term-Variablen speichern aber Kopien (tcopy in
-			 * termassign2), daher koennen die Terme geloescht werden. */
-			delete(p->r); /* nicht die Funktion zestoeren ! */
+			/* Formerly the terms of printterm and termassign were not deleted
+			 * here. But % and term variables store copies (tcopy in
+			 * termassign2), so the terms can be deleted. */
+			delete(p->r); /* do not destroy the function ! */
 
 			delnod(p);
 			p = NULL;
@@ -582,15 +582,15 @@ void delete _1a ((p), Node * p)
 				}
 		  else
 				{
-				if (name((Symbol *) p) == numbername) /* -> ist Number */
-					delnum((Symbol *) p,TRUE); /* value auch loeschen */
+				if (name((Symbol *) p) == numbername) /* -> is Number */
+					delnum((Symbol *) p,TRUE); /* delete value too */
 				}
 		}
 	return;
 }
 
 
-/* Condition-Funktionen */
+/* condition functions */
 
 BOOLEAN truefunc _1a((np),Node * np)
 {
@@ -623,7 +623,7 @@ Node * npre = npr;
 			{
 			return TRUE;
 			}
-		/* nicht Symboltabelle restaurieren !! Variablen werden speater ersetzt ,und dort wird restauriert ! */
+		/* do not restore the symbol table !! Variables are replaced later, and the restoring is done there ! */
 		}
 
 		DEBG((4," end in_tree2 \n"));
@@ -644,13 +644,13 @@ BOOLEAN isnt_zero (Node * np)
   BOOLEAN iszero=FALSE;
 	erg1=calkulate (np);
 	if (! erg1)
-		return FALSE;	/* nicht berechenbar (z.B. symbolisch): Bedingung gilt nicht */
+		return FALSE;	/* not calculable (e.g. symbolic): condition does not hold */
 	/* if (rtypes((Symbol *) erg1) != numbertype)
 		fprintf(stderr,"ERROR -- Condition with non calculatable type !\n");
 	else */
 
 		{
-		if (! num_to_double((Symbol *) erg1, & val))	/* 2026: auch integer, rational */
+		if (! num_to_double((Symbol *) erg1, & val))	/* 2026: also integer, rational */
 			val=(* ((double *) value((Symbol *) erg1)));
 		iszero=(val==0.0);
 		}
@@ -671,11 +671,11 @@ BOOLEAN lower_between _1a((np),Node * np)
 	return rtw;
 }
 
-int tcmp _2a((a,b), Node * a, Node * b) /* Vergleicht Baeume  1 : a>b */
+int tcmp _2a((a,b), Node * a, Node * b) /* compares trees  1 : a>b */
 {													 /* 0  : a == b */
 int rtn;									 /* -1 : a < b */
 
-if (a == b)						 		 /* auch NULL !! */	
+if (a == b)						 		 /* also NULL !! */	
 	return 0;
 if (a == NULL)
 	return -1;
@@ -706,13 +706,13 @@ if (a->type == SYM_TYPE)
 				else
 					return strcmp(name((Symbol *) rtypes((Symbol *) a)) ,name((Symbol *) rtypes((Symbol *) b)));
 	  		else
-	    		return -1; /* a Num ,b nicht */
+	    		return -1; /* a Num ,b not */
 		else
 			if (hasval((Symbol *) b))
-	    		return 1; /* b Num ,a nicht */
+	    		return 1; /* b Num ,a not */
 			else
 				{
-				rtn=strcmp(name((Symbol *) a),name((Symbol *) b)); /* Namen vergl. */
+				rtn=strcmp(name((Symbol *) a),name((Symbol *) b)); /* compare names */
 				DEBG((4,".. comparing Names : %s , %s : %d\n",name((Symbol *) a),name((Symbol *) b),rtn));
 				return rtn;
 				}
@@ -724,7 +724,7 @@ else
 		return 1;
 	else
 		{
-		if ((rtn=tcmp(a->l,b->l)) == 0) /* erst Fkt.Namen dann Argumente */
+		if ((rtn=tcmp(a->l,b->l)) == 0) /* first function names, then arguments */
 			return tcmp(a->r,b->r);
 		else
 			{
@@ -746,7 +746,7 @@ return numbertype;
 }
 
 
-/* 2026: deklarierte Sorte des i-ten Arguments einer Funktion (NULL: unbekannt) */
+/* 2026: declared sort of the i-th argument of a function (NULL: unknown) */
 static Node * param_sort (Symbol * f, int i)
 {
 	Node * a = atypes(f);
@@ -766,12 +766,12 @@ static Node * param_sort (Symbol * f, int i)
 	return (a->r != NULL) ? a->l : a;
 }
 
-static Symbol * lastsym = NULL;	/* Symbol mit der Sorte des letzten Werts von realcalk */
+static Symbol * lastsym = NULL;	/* symbol with the sort of the last value of realcalk */
 
 void * realcalk(Node * term,int * perr)
 {
 	Node * lterm;
-	void * erg; /* Ergebnisse der Teilbaeume */
+	void * erg; /* results of the subtrees */
 
 	DEBG((5,"realcalk : "));
 	DBFK(5,print(term));
@@ -784,23 +784,23 @@ void * realcalk(Node * term,int * perr)
 			lastsym = (Symbol *) term;
 			return CPYNUM(term,value(term));
 			}
-		if (lexval((Symbol *) term) == Term) /* ersetzter Term ? */
+		if (lexval((Symbol *) term) == Term) /* replaced term ? */
 			if (term->l) 
 				return realcalk(term->l,perr);
 		
-		* perr = TRUE; /* Z.B. VAR */
+		* perr = TRUE; /* e.g. VAR */
 		return NULL;
 		}
 
-	if (term->type == Func && builtin(term->l))	/* symbolische C-Funktion (symfkt.c) */
+	if (term->type == Func && builtin(term->l))	/* symbolic C function (symfkt.c) */
 		{
 		Node * res = call_builtin(term);
 		void * v = NULL;
 		if (res)
 			{
 			v = realcalk(res, perr);
-			/* 2026: der Wert hat die Sorte des Ergebnisses (z.B. rational); fuer
-			   den Aufrufer muss er die deklarierte Sorte der Funktion haben */
+			/* 2026: the value has the sort of the result (e.g. rational); for
+			   the caller it must have the declared sort of the function */
 			if (! * perr && v && rtypes(lastsym) != rtypes(TERM_HEAD(term)))
 				{
 				Node * from = rtypes(lastsym), * to = rtypes(TERM_HEAD(term));
@@ -813,19 +813,19 @@ void * realcalk(Node * term,int * perr)
 			}
 		else
 			* perr = TRUE;
-		lastsym = TERM_HEAD(term);	/* fuer DELNUM: Sorte des Ergebnisses */
+		lastsym = TERM_HEAD(term);	/* for DELNUM: sort of the result */
 		return * perr ? NULL : v;
 		}
 
-  if (!hasval(term->l) || exe_always(term->l))  /* Symbol der Funktion */
+  if (!hasval(term->l) || exe_always(term->l))  /* symbol of the function */
 		{
-		if (exe_always(term->l) && (term->type == Func)) /* benutzerdef. Fkt. */
+		if (exe_always(term->l) && (term->type == Func)) /* user-defined function */
 			{ Node * lterm;
 			if ((lterm=exe_function(term)) != NULL)
 				return realcalk(lterm,perr);
 			}
 
-		* perr = TRUE;       /* Funktion nicht berechenbar oder Konstante ohne Wert */
+		* perr = TRUE;       /* function not calculable or constant without value */
 		DEBG((5,"realcalk: found not calkulable symbol : "));
 		DBFK(5,print(term));
 		DEBG((5,"\n"));
@@ -838,11 +838,11 @@ void * realcalk(Node * term,int * perr)
 		return CPYNUM(term->l,value(term->l));
 		}
 
-	/* --------------------------- Bis hier auf beliebiger Num Const */
+	/* --------------------------- up to here on any Num Const */
 
 	/* if (term -> type == SYM_TYPE)	lastsym=term,return value(term); */
 
-	/* Ab jetzt ist es eine Numerische Fkt. */
+	/* from now on it is a numerical function */
 
 	if (term->type != Func) 
 		{
@@ -860,16 +860,16 @@ void * realcalk(Node * term,int * perr)
 	{
 	void * feld[MAXARGS];
 	Symbol * syms[MAXARGS];
-	Node * conv[MAXARGS];		/* 2026: Sorte nach Erweiterung (SUBSORT), sonst NULL */
+	Node * conv[MAXARGS];		/* 2026: sort after extension (SUBSORT), otherwise NULL */
 	int i=0,j;
 
 	for ( ; lterm; lterm = ARGS_NEXT(lterm))
 		{
 		Node * want;
-		feld[i]=realcalk(ARGS_ITEM(lterm),perr);/* Const oder Funct */
+		feld[i]=realcalk(ARGS_ITEM(lterm),perr);/* Const or Funct */
 		syms[i]=lastsym;
 		conv[i]=NULL;
-		/* 2026: Wert einer Untersorte in die deklarierte Sorte umwandeln */
+		/* 2026: convert the value of a subsort into the declared sort */
 		if (! * perr && feld[i] && (want = param_sort(TERM_HEAD(term), i)) != NULL
 		    && want != rtypes(syms[i]) && sort_dist(rtypes(syms[i]), want) > 0)
 			{
@@ -888,10 +888,10 @@ void * realcalk(Node * term,int * perr)
 		}
 	if (!(* perr))
 		{
-		feld[i] = NULL; /* Ende (bei variabel Argumenten) kennzeichnen */
+		feld[i] = NULL; /* mark the end (for variable arguments) */
 		lastsym = TERM_HEAD(term);
-		erg= ((void * (*) (void * [])) value(TERM_HEAD(term)))(feld); /* Aufruf der Benutzerfunktion */
-		if (erg == NULL)	/* 2026: kein Ergebnis (z.B. exakte Division durch 0) */
+		erg= ((void * (*) (void * [])) value(TERM_HEAD(term)))(feld); /* call of the user function */
+		if (erg == NULL)	/* 2026: no result (e.g. exact division by 0) */
 			* perr = TRUE;
 		}
 
@@ -899,9 +899,9 @@ void * realcalk(Node * term,int * perr)
 		{
 		if (((Node *) syms[j])->type != SYM_TYPE)
 			 fatal("run.c : Not a Symbol to delete !! j: %d, type: %d\n",j,((Node *) syms[j])->type);
-		if (feld[j] && conv[j])	/* umgewandelter Wert */
+		if (feld[j] && conv[j])	/* converted value */
 			((void (*) (void *)) del(conv[j])) (feld[j]);
-		else if (feld[j])  /* bei Fehler (perr) ist der Wert NULL: nichts freizugeben */
+		else if (feld[j])  /* on error (perr) the value is NULL: nothing to free */
 			DELNUM(syms[j],feld[j]);
 		}
 	}
@@ -912,7 +912,7 @@ void * realcalk(Node * term,int * perr)
 		return (void *) NULL;
 }
 
-void functions_execute(Node * np) /* Achtung es wird im Baum geaendert ! Voellig FALSCH (for-schleife ..) !!!!! */
+void functions_execute(Node * np) /* Caution: the tree is modified ! Completely WRONG (for loop ..) !!!!! */
 {
 if (! np) return;
 
@@ -924,21 +924,21 @@ else
 		if (! (lterm=exe_function(np)))
 			return;
 		else
-			{ /* In dem aktuellem Baum Ergebnis eintragen */
+			{ /* enter the result into the current tree */
 			delete(np->r);
 			delete(np->l);
 			if (TERM_CONTENT(lterm)->type == SYM_TYPE) fatal ("run.h fatal internal TYPE ERROR ! ");
 
-			np->type=TERM_CONTENT(lterm)->type;  /* Ueberschreiben des Func-Knoten -> Transparent nach aussen */
+			np->type=TERM_CONTENT(lterm)->type;  /* overwrite the Func node -> transparent to the outside */
 			np->r = tcopy(TERM_CONTENT(lterm)->r);
 			np->l = tcopy(TERM_CONTENT(lterm)->l);
 
-			functions_execute(np); /* Im Return-Wert suchen */
+			functions_execute(np); /* search in the return value */
 			return;
 			}
 		}
 	else
-		functions_execute(np->r); /* In Argumenten suchen */
+		functions_execute(np->r); /* search in the arguments */
 return;
 }
 
@@ -947,7 +947,7 @@ return;
    with real numbers */
 int calc_exact_only = 0;
 
-Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
+Node * calkulate (Node * term) /* gets a pointer to a calculable function */
 {
 	Symbol * sp;
 	int error = FALSE;
@@ -957,7 +957,7 @@ Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 	DBFK(4,print(term));
 	DEBG((4,"\n"));
 
-	/* functions_execute(term);  aendert im Baum ! */
+	/* functions_execute(term);  modifies the tree ! */
 
 	erg=realcalk(term,&error);
 
@@ -988,7 +988,7 @@ Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 				{
 				sp=mknum(erg,rtypes((Symbol *) (term->l)));
 
-				rtypes(sp)=rtypes((Symbol *)(term->l)); /* Resultattyp der Fkt. */
+				rtypes(sp)=rtypes((Symbol *)(term->l)); /* result type of the function */
 				}
 			else
 				{
@@ -996,8 +996,8 @@ Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 
 				if ((term->type == SYM_TYPE) && (lexval((Symbol *)term) == Term))
 					{
-					/* 2026: ein Wert einer Untersorte (z.B. integer in einem
-					   real-Term) behaelt seine Sorte */
+					/* 2026: a value of a subsort (e.g. integer in a
+					   real term) keeps its sort */
 					if (lastsym && rtypes(lastsym) != rtypes((Symbol *) term)
 					    && sort_dist(rtypes(lastsym), rtypes((Symbol *) term)) > 0)
 						rtypes(sp)=rtypes(lastsym);
@@ -1009,7 +1009,7 @@ Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 					printfOut("calkulate : Internal ERROR : unexpected term-type : ");
 					print(term);
 					printfOut("  Typenr. : %d\n",term->type);
-					delnum(sp,TRUE); /* Wert gehoert der Zahl */
+					delnum(sp,TRUE); /* the value belongs to the number */
 					return NULL;
 					}
 				}
@@ -1021,7 +1021,7 @@ Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 }
 
 
-Node * tcalc (Node * term)   /* Traversiert Baum und berechnet */
+Node * tcalc (Node * term)   /* traverses the tree and calculates */
 {
 if (! term)
 	return NULL;
@@ -1040,11 +1040,11 @@ term->r = tcalc(term->r);
 
 if ((term -> type) == Func && ! builtin(term->l))
 	{
-	exact_integers(term);	/* 2026: (1/2)*1.0 = 1/2, nicht 0.5 */
-	retype_node(term);	/* 2026: Argumente koennen jetzt exakte Zahlen sein (SUBSORT) */
+	exact_integers(term);	/* 2026: (1/2)*1.0 = 1/2, not 0.5 */
+	retype_node(term);	/* 2026: arguments can now be exact numbers (SUBSORT) */
 	}
 
-if ((term -> type) == Func && builtin(term->l))  /* symbolische C-Funktion (symfkt.c) */
+if ((term -> type) == Func && builtin(term->l))  /* symbolic C function (symfkt.c) */
 	{
 	Node * res = call_builtin(term);
 	if (res)
@@ -1052,10 +1052,10 @@ if ((term -> type) == Func && builtin(term->l))  /* symbolische C-Funktion (symf
 		delete(term);
 		return tcalc(res);
 		}
-	return term;	/* nicht anwendbar */
+	return term;	/* not applicable */
 	}
 
-if  ((term -> type) == Func) /* Rest wird darauf abgebildet */
+if  ((term -> type) == Func) /* the rest is mapped onto it */
 	{
 	Symbol * sp;
 	Node * pp = exact_pow_pow(term);	/* 2026: (2^(1/2))^2 = 2 */
@@ -1088,7 +1088,7 @@ if  ((term -> type) == Func) /* Rest wird darauf abgebildet */
 return term;
 }
 
-/* ---- Argumente von Func-Knoten (siehe nodes.h) ---- */
+/* ---- arguments of Func nodes (see nodes.h) ---- */
 
 int term_nargs (Node * t)
 {
@@ -1111,7 +1111,7 @@ Node ** term_argp (Node * t, int i)
 		i--;
 		pp = & (* pp)->r;
 		}
-	return (i == 0) ? pp : NULL;  /* letztes Argument steht direkt im r */
+	return (i == 0) ? pp : NULL;  /* last argument is directly in r */
 }
 
 Node * term_arg (Node * t, int i)
@@ -1129,7 +1129,7 @@ if (term==NULL)
 
 if (term->type == SYM_TYPE)
 	{
-	if (lexval((Symbol *) term) == Term) /* Term ersetzen */
+	if (lexval((Symbol *) term) == Term) /* replace term */
 		return tcopy(term->l);
 
 	if ((hasval((Symbol *) term)) && lexval((Symbol *) term)==Const)
@@ -1138,11 +1138,11 @@ if (term->type == SYM_TYPE)
 		}
 
 	if (IS_FUNCTION(lexval((Symbol *) term))
-			|| (lexval((Symbol *) term) == Const))  /*  'liften' */
+			|| (lexval((Symbol *) term) == Const))  /*  'lift' */
 		{Symbol * sp2=(Symbol *) term,* spnew, * spold=NULL;
-		while((sp=IS_Verbindung(rtypes(sp2))) != NULL)  /* IS_VERB. wird beim analysieren des linken Teils der Formel gesetzt */
+		while((sp=IS_Verbindung(rtypes(sp2))) != NULL)  /* IS_VERB. is set while analysing the left part of the formula */
 			{
-			if (sp == spold) break; /* laeuft im Kreis */
+			if (sp == spold) break; /* runs in a circle */
 			spold=sp;
 
 			DEBG((4,"lift : "));
@@ -1156,7 +1156,7 @@ if (term->type == SYM_TYPE)
 		return (Node *) sp2;
 		}
 
-	return term; /* Zeiger auf Symbol */
+	return term; /* pointer to symbol */
 	}
 
 return mknod(term->type,tcopy(term->l),tcopy(term->r));

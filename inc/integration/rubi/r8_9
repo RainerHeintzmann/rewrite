@@ -1,183 +1,183 @@
 # r8_9
-# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
-# mit tools/rubi2rewrite.py, Abschnitt
+# Translated automatically from Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# by tools/rubi2rewrite.py, section
 #   8.9 Product logarithm function
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi.
-# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi.
+# Do not edit by hand: changes belong in the translator.
 
-# Regel 1 (27 Varianten):
+# Rule 1 (27 variants):
 #   Int[(c_.*ProductLog[a_. + b_.*x_])^p_, x_Symbol] := (a + b*x)*(c*ProductLog[a + b*x])^p/(b*(p + 1)) + p/(c*(p + 1))* Int[(c*ProductLog[a + b*x])^(p + 1)/(1 + ProductLog[a + b*x]), x] /; FreeQ[{a, b, c}, x] && LtQ[p, -1]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (((ltq(P_p,(-1))))) Int(((O_c)*(productlog((O_a)+((O_b)*(Xv)))))^(P_p),Xv) = ((((((O_a)+(((O_b)*(Xv)))))*(((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(P_p)))*(((O_b)^((-1))))*(((((P_p)+(1)))^((-1))))))+(((P_p)*(((O_c)^((-1))))*(((((P_p)+(1)))^((-1))))*(Int(((((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(((P_p)+(1)))))*(((((1)+(productlog(((O_a)+(((O_b)*(Xv))))))))^((-1))))),Xv)))))
 
-# Regel 2 (54 Varianten):
+# Rule 2 (54 variants):
 #   Int[(c_.*ProductLog[a_. + b_.*x_])^p_., x_Symbol] := (a + b*x)*(c*ProductLog[a + b*x])^p/b - p*Int[(c*ProductLog[a + b*x])^p/(1 + ProductLog[a + b*x]), x] /; FreeQ[{a, b, c}, x] && Not[LtQ[p, -1]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c), (not(((ltq(O_p,(-1)))))) Int(((O_c)*(productlog((O_a)+((O_b)*(Xv)))))^(O_p),Xv) = ((((((O_a)+(((O_b)*(Xv)))))*(((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(O_p)))*(((O_b)^((-1))))))+((((-1))*(O_p)*(Int(((((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(O_p)))*(((((1)+(productlog(((O_a)+(((O_b)*(Xv))))))))^((-1))))),Xv)))))
 
-# Regel 3 (1296 Varianten):
+# Rule 3 (1296 variants):
 #   Int[(e_. + f_.*x_)^m_.*(c_.*ProductLog[a_ + b_.*x_])^p_., x_Symbol] := 1/b^(m + 1)* Subst[Int[ ExpandIntegrand[(c*ProductLog[x])^p, (b*e - a*f + f*x)^m, x], x], x, a + b*x] /; FreeQ[{a, b, c, e, f, p}, x] && IGtQ[m, 0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_e,O_f,O_p), (igtq(O_m,0)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(((O_c)*(productlog((P_a)+((O_b)*(Xv)))))^(O_p)),Xv) = ((((((O_b)^(((O_m)+(1)))))^((-1))))*(intsubst(expandintegrand(((((O_c)*(productlog(Xv))))^(O_p)),((((((O_b)*(O_e)))+((((-1))*(P_a)*(O_f)))+(((O_f)*(Xv)))))^(O_m)),Xv),Xv,((P_a)+(((O_b)*(Xv)))))))
 
-# Regel 4 (18 Varianten):
+# Rule 4 (18 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_])^p_., x_Symbol] := x*(c*ProductLog[a*x^n])^p - n*p*Int[(c*ProductLog[a*x^n])^p/(1 + ProductLog[a*x^n]), x] /; FreeQ[{a, c, n, p}, x] && (EqQ[n*(p - 1), -1] || IntegerQ[p - 1/2] && EqQ[n*(p - 1/2), -1])
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,P_n,O_p), (((eqq(((P_n)*(((O_p)+((-1))))),(-1))) || (((integerq(((O_p)+((-(1/2)))))) && (eqq(((P_n)*(((O_p)+((-(1/2)))))),(-1))))))) Int(((O_c)*(productlog((O_a)*((Xv)^(P_n)))))^(O_p),Xv) = ((((Xv)*(((((O_c)*(productlog(((O_a)*(((Xv)^(P_n))))))))^(O_p)))))+((((-1))*(P_n)*(O_p)*(Int(((((((O_c)*(productlog(((O_a)*(((Xv)^(P_n))))))))^(O_p)))*(((((1)+(productlog(((O_a)*(((Xv)^(P_n))))))))^((-1))))),Xv)))))
 
-# Regel 5 (18 Varianten):
+# Rule 5 (18 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_])^p_., x_Symbol] := x*(c*ProductLog[a*x^n])^p/(n*p + 1) + n*p/(c*(n*p + 1))* Int[(c*ProductLog[a*x^n])^(p + 1)/(1 + ProductLog[a*x^n]), x] /; FreeQ[{a, c, n}, x] && (IntegerQ[p] && EqQ[n*(p + 1), -1] || IntegerQ[p - 1/2] && EqQ[n*(p + 1/2), -1])
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,P_n), (((((integerq(O_p)) && (eqq(((P_n)*(((O_p)+(1)))),(-1))))) || (((integerq(((O_p)+((-(1/2)))))) && (eqq(((P_n)*(((O_p)+((1/2))))),(-1))))))) Int(((O_c)*(productlog((O_a)*((Xv)^(P_n)))))^(O_p),Xv) = ((((Xv)*(((((O_c)*(productlog(((O_a)*(((Xv)^(P_n))))))))^(O_p)))*(((((((P_n)*(O_p)))+(1)))^((-1))))))+(((P_n)*(O_p)*(((O_c)^((-1))))*(((((((P_n)*(O_p)))+(1)))^((-1))))*(Int(((((((O_c)*(productlog(((O_a)*(((Xv)^(P_n))))))))^(((O_p)+(1)))))*(((((1)+(productlog(((O_a)*(((Xv)^(P_n))))))))^((-1))))),Xv)))))
 
-# Regel 6 (18 Varianten):
+# Rule 6 (18 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_])^p_., x_Symbol] := -Subst[Int[(c*ProductLog[a*x^(-n)])^p/x^2, x], x, 1/x] /; FreeQ[{a, c, p}, x] && ILtQ[n, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_p), (iltq(P_n,0)) Int(((O_c)*(productlog((O_a)*((Xv)^(P_n)))))^(O_p),Xv) = (((-1))*(intsubst(((((((O_c)*(productlog(((O_a)*(((Xv)^((((-1))*(P_n))))))))))^(O_p)))*(((Xv)^((-2))))),Xv,((Xv)^((-1))))))
 
-# Regel 7 (144 Varianten):
+# Rule 7 (144 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^p_., x_Symbol] := x^(m + 1)*(c*ProductLog[a*x^n])^p/(m + 1) - n*p/(m + 1)* Int[x^m*(c*ProductLog[a*x^n])^p/(1 + ProductLog[a*x^n]), x] /; FreeQ[{a, c, m, n, p}, x] && NeQ[m, -1] && (IntegerQ[p - 1/2] && IGtQ[2*Simplify[p + (m + 1)/n], 0] || Not[IntegerQ[p - 1/2]] && IGtQ[Simplify[p + (m + 1)/n] + 1, 0])
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_m,O_n,O_p), (neq(O_m,(-1))), (((((integerq(((O_p)+((-(1/2)))))) && (igtq(((2)*(simplify(((O_p)+(((((O_m)+(1)))*(((O_n)^((-1)))))))))),0)))) || (((not(integerq(((O_p)+((-(1/2))))))) && (igtq(((simplify(((O_p)+(((((O_m)+(1)))*(((O_n)^((-1)))))))))+(1)),0)))))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(O_p)))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_n)*(O_p)*(((((O_m)+(1)))^((-1))))*(Int(((((Xv)^(O_m)))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(O_p)))*(((((1)+(productlog(((O_a)*(((Xv)^(O_n))))))))^((-1))))),Xv)))))
 
-# Regel 8 (144 Varianten):
+# Rule 8 (144 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^p_., x_Symbol] := x^(m + 1)*(c*ProductLog[a*x^n])^p/(m + n*p + 1) + n*p/(c*(m + n*p + 1))* Int[x^m*(c*ProductLog[a*x^n])^(p + 1)/(1 + ProductLog[a*x^n]), x] /; FreeQ[{a, c, m, n, p}, x] && (EqQ[m, -1] || IntegerQ[p - 1/2] && ILtQ[Simplify[p + (m + 1)/n] - 1/2, 0] || Not[IntegerQ[p - 1/2]] && ILtQ[Simplify[p + (m + 1)/n], 0])
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_m,O_n,O_p), (((eqq(O_m,(-1))) || (((integerq(((O_p)+((-(1/2)))))) && (iltq(((simplify(((O_p)+(((((O_m)+(1)))*(((O_n)^((-1)))))))))+((-(1/2)))),0)))) || (((not(integerq(((O_p)+((-(1/2))))))) && (iltq(simplify(((O_p)+(((((O_m)+(1)))*(((O_n)^((-1)))))))),0)))))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(O_p)))*(((((O_m)+(((O_n)*(O_p)))+(1)))^((-1))))))+(((O_n)*(O_p)*(((O_c)^((-1))))*(((((O_m)+(((O_n)*(O_p)))+(1)))^((-1))))*(Int(((((Xv)^(O_m)))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+(1)))))*(((((1)+(productlog(((O_a)*(((Xv)^(O_n))))))))^((-1))))),Xv)))))
 
-# Regel 9 (72 Varianten):
+# Rule 9 (72 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_])^p_., x_Symbol] := Int[x^m*(c*ProductLog[a*x])^p/(1 + ProductLog[a*x]), x] + 1/c* Int[x^m*(c*ProductLog[a*x])^(p + 1)/(1 + ProductLog[a*x]), x] /; FreeQ[{a, c, m}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_m) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*(Xv))))^(O_p)),Xv) = ((Int(((((Xv)^(O_m)))*(((((O_c)*(productlog(((O_a)*(Xv))))))^(O_p)))*(((((1)+(productlog(((O_a)*(Xv))))))^((-1))))),Xv))+(((((O_c)^((-1))))*(Int(((((Xv)^(O_m)))*(((((O_c)*(productlog(((O_a)*(Xv))))))^(((O_p)+(1)))))*(((((1)+(productlog(((O_a)*(Xv))))))^((-1))))),Xv)))))
 
-# Regel 10 (72 Varianten):
+# Rule 10 (72 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_])^p_., x_Symbol] := -Subst[Int[(c*ProductLog[a*x^(-n)])^p/x^(m + 2), x], x, 1/x] /; FreeQ[{a, c, p}, x] && ILtQ[n, 0] && IntegerQ[m] && NeQ[m, -1]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_c,O_p), (iltq(P_n,0)), (integerq(O_m)), (neq(O_m,(-1))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(P_n)))))^(O_p)),Xv) = (((-1))*(intsubst(((((((O_c)*(productlog(((O_a)*(((Xv)^((((-1))*(P_n))))))))))^(O_p)))*(((((Xv)^(((O_m)+(2)))))^((-1))))),Xv,((Xv)^((-1))))))
 
-# Regel 11 (54 Varianten):
+# Rule 11 (54 variants):
 #   Int[1/(d_ + d_.*ProductLog[a_. + b_.*x_]), x_Symbol] := (a + b*x)/(b*d*ProductLog[a + b*x]) /; FreeQ[{a, b, d}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,P_d) Int(((P_d)+((P_d)*(productlog((O_a)+((O_b)*(Xv))))))^(K_1),Xv) = ((((O_a)+(((O_b)*(Xv)))))*(((O_b)^((-1))))*(((P_d)^((-1))))*(((productlog(((O_a)+(((O_b)*(Xv))))))^((-1)))))
 
-# Regel 12 (972 Varianten):
+# Rule 12 (972 variants):
 #   Int[ProductLog[a_. + b_.*x_]/(d_ + d_.*ProductLog[a_. + b_.*x_]), x_Symbol] := d*x - Int[1/(d + d*ProductLog[a + b*x]), x] /; FreeQ[{a, b, d}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,P_d) Int((productlog((O_a)+((O_b)*(Xv))))*(((P_d)+((P_d)*(productlog((O_a)+((O_b)*(Xv))))))^(K_1)),Xv) = ((((P_d)*(Xv)))+((((-1))*(Int(((((P_d)+(((P_d)*(productlog(((O_a)+(((O_b)*(Xv))))))))))^((-1))),Xv)))))
 
-# Regel 13 (2916 Varianten):
+# Rule 13 (2916 variants):
 #   Int[(c_.*ProductLog[a_. + b_.*x_])^ p_/(d_ + d_.*ProductLog[a_. + b_.*x_]), x_Symbol] := c*(a + b*x)*(c*ProductLog[a + b*x])^(p - 1)/(b*d) - c*p* Int[(c*ProductLog[a + b*x])^(p - 1)/(d + d*ProductLog[a + b*x]), x] /; FreeQ[{a, b, c, d}, x] && GtQ[p, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d), (((gtq(P_p,0)))) Int((((O_c)*(productlog((O_a)+((O_b)*(Xv)))))^(P_p))*(((P_d)+((P_d)*(productlog((O_a)+((O_b)*(Xv))))))^(K_1)),Xv) = ((((O_c)*(((O_a)+(((O_b)*(Xv)))))*(((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(((P_p)+((-1))))))*(((O_b)^((-1))))*(((P_d)^((-1))))))+((((-1))*(O_c)*(P_p)*(Int(((((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(((P_p)+((-1))))))*(((((P_d)+(((P_d)*(productlog(((O_a)+(((O_b)*(Xv))))))))))^((-1))))),Xv)))))
 
-# Regel 14 (972 Varianten):
+# Rule 14 (972 variants):
 #   Int[1/(ProductLog[a_. + b_.*x_]*(d_ + d_.*ProductLog[a_. + b_.*x_])), x_Symbol] := ExpIntegralEi[ProductLog[a + b*x]]/(b*d) /; FreeQ[{a, b, d}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,O_a,O_b,P_d) Int(((productlog((O_a)+((O_b)*(Xv))))^(K_1))*(((P_d)+((P_d)*(productlog((O_a)+((O_b)*(Xv))))))^(K_2)),Xv) = ((expint(productlog(((O_a)+(((O_b)*(Xv)))))))*(((O_b)^((-1))))*(((P_d)^((-1)))))
 
-# Regel 15 (2916 Varianten):
+# Rule 15 (2916 variants):
 #   Int[1/(Sqrt[ c_.*ProductLog[a_. + b_.*x_]]*(d_ + d_.*ProductLog[a_. + b_.*x_])), x_Symbol] := Rt[Pi*c, 2]*Erfi[Sqrt[c*ProductLog[a + b*x]]/Rt[c, 2]]/(b*c*d) /; FreeQ[{a, b, c, d}, x] && PosQ[c]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), (K_2 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d), (posq(O_c)) Int((((O_c)*(productlog((O_a)+((O_b)*(Xv)))))^(K_1))*(((P_d)+((P_d)*(productlog((O_a)+((O_b)*(Xv))))))^(K_2)),Xv) = ((rt(((pi)*(O_c)),2))*(erfi(((((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^((1/2))))*(((rt(O_c,2))^((-1)))))))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((P_d)^((-1)))))
 
-# Regel 16 (2916 Varianten):
+# Rule 16 (2916 variants):
 #   Int[1/(Sqrt[ c_.*ProductLog[a_. + b_.*x_]]*(d_ + d_.*ProductLog[a_. + b_.*x_])), x_Symbol] := Rt[-Pi*c, 2]*Erf[Sqrt[c*ProductLog[a + b*x]]/Rt[-c, 2]]/(b*c*d) /; FreeQ[{a, b, c, d}, x] && NegQ[c]
 ADDSPEC RubiRules : IF (K_1 == (-(1/2))), (K_2 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d), (negq(O_c)) Int((((O_c)*(productlog((O_a)+((O_b)*(Xv)))))^(K_1))*(((P_d)+((P_d)*(productlog((O_a)+((O_b)*(Xv))))))^(K_2)),Xv) = ((rt((((-1))*(pi)*(O_c)),2))*(erf(((((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^((1/2))))*(((rt((((-1))*(O_c)),2))^((-1)))))))*(((O_b)^((-1))))*(((O_c)^((-1))))*(((P_d)^((-1)))))
 
-# Regel 17 (2916 Varianten):
+# Rule 17 (2916 variants):
 #   Int[(c_.*ProductLog[a_. + b_.*x_])^ p_/(d_ + d_.*ProductLog[a_. + b_.*x_]), x_Symbol] := (a + b*x)*(c*ProductLog[a + b*x])^p/(b*d*(p + 1)) - 1/(c*(p + 1))* Int[(c*ProductLog[a + b*x])^(p + 1)/(d + d*ProductLog[a + b*x]), x] /; FreeQ[{a, b, c, d}, x] && LtQ[p, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d), (((ltq(P_p,(-1))))) Int((((O_c)*(productlog((O_a)+((O_b)*(Xv)))))^(P_p))*(((P_d)+((P_d)*(productlog((O_a)+((O_b)*(Xv))))))^(K_1)),Xv) = ((((((O_a)+(((O_b)*(Xv)))))*(((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(P_p)))*(((O_b)^((-1))))*(((P_d)^((-1))))*(((((P_p)+(1)))^((-1))))))+((((-1))*(((O_c)^((-1))))*(((((P_p)+(1)))^((-1))))*(Int(((((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(((P_p)+(1)))))*(((((P_d)+(((P_d)*(productlog(((O_a)+(((O_b)*(Xv))))))))))^((-1))))),Xv)))))
 
-# Regel 18 (5832 Varianten):
+# Rule 18 (5832 variants):
 #   Int[(c_.*ProductLog[a_. + b_.*x_])^ p_./(d_ + d_.*ProductLog[a_. + b_.*x_]), x_Symbol] := Gamma[ p + 1, -ProductLog[a + b*x]]*(c*ProductLog[a + b*x])^ p/(b*d*(-ProductLog[a + b*x])^p) /; FreeQ[{a, b, c, d, p}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,P_d,O_p) Int((((O_c)*(productlog((O_a)+((O_b)*(Xv)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)+((O_b)*(Xv))))))^(K_1)),Xv) = ((Gamma(((O_p)+(1)),(((-1))*(productlog(((O_a)+(((O_b)*(Xv)))))))))*(((((O_c)*(productlog(((O_a)+(((O_b)*(Xv))))))))^(O_p)))*(((O_b)^((-1))))*(((P_d)^((-1))))*((((((((-1))*(productlog(((O_a)+(((O_b)*(Xv))))))))^(O_p)))^((-1)))))
 
-# Regel 19 (1296 Varianten):
+# Rule 19 (1296 variants):
 #   Int[(e_. + f_.*x_)^m_./(d_ + d_.*ProductLog[a_ + b_.*x_]), x_Symbol] := 1/b^(m + 1)* Subst[Int[ ExpandIntegrand[1/(d + d*ProductLog[x]), (b*e - a*f + f*x)^m, x], x], x, a + b*x] /; FreeQ[{a, b, d, e, f}, x] && IGtQ[m, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,P_d,O_e,O_f), (igtq(O_m,0)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(((P_d)+((P_d)*(productlog((P_a)+((O_b)*(Xv))))))^(K_1)),Xv) = ((((((O_b)^(((O_m)+(1)))))^((-1))))*(intsubst(expandintegrand(((((P_d)+(((P_d)*(productlog(Xv))))))^((-1))),((((((O_b)*(O_e)))+((((-1))*(P_a)*(O_f)))+(((O_f)*(Xv)))))^(O_m)),Xv),Xv,((P_a)+(((O_b)*(Xv)))))))
 
-# Regel 20 (93312 Varianten):
+# Rule 20 (93312 variants):
 #   Int[(e_. + f_.*x_)^ m_.*(c_.*ProductLog[a_ + b_.*x_])^ p_./(d_ + d_.*ProductLog[a_ + b_.*x_]), x_Symbol] := 1/b^(m + 1)* Subst[Int[ ExpandIntegrand[(c*ProductLog[x])^ p/(d + d*ProductLog[x]), (b*e - a*f + f*x)^m, x], x], x, a + b*x] /; FreeQ[{a, b, c, d, e, f, p}, x] && IGtQ[m, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,P_d,O_e,O_f,O_p), (igtq(O_m,0)) Int((((O_e)+((O_f)*(Xv)))^(O_m))*(((O_c)*(productlog((P_a)+((O_b)*(Xv)))))^(O_p))*(((P_d)+((P_d)*(productlog((P_a)+((O_b)*(Xv))))))^(K_1)),Xv) = ((((((O_b)^(((O_m)+(1)))))^((-1))))*(intsubst(expandintegrand(((((((O_c)*(productlog(Xv))))^(O_p)))*(((((P_d)+(((P_d)*(productlog(Xv))))))^((-1))))),((((((O_b)*(O_e)))+((((-1))*(P_a)*(O_f)))+(((O_f)*(Xv)))))^(O_m)),Xv),Xv,((P_a)+(((O_b)*(Xv)))))))
 
-# Regel 21 (18 Varianten):
+# Rule 21 (18 variants):
 #   Int[1/(d_ + d_.*ProductLog[a_.*x_^n_]), x_Symbol] := -Subst[Int[1/(x^2*(d + d*ProductLog[a*x^(-n)])), x], x, 1/x] /; FreeQ[{a, d}, x] && ILtQ[n, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,P_d), (iltq(P_n,0)) Int(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(P_n))))))^(K_1),Xv) = (((-1))*(intsubst(((((Xv)^((-2))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^((((-1))*(P_n))))))))))))^((-1))))),Xv,((Xv)^((-1))))))
 
-# Regel 22 (2592 Varianten):
+# Rule 22 (2592 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_.])^ p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := c*x*(c*ProductLog[a*x^n])^(p - 1)/d /; FreeQ[{a, c, d, n, p}, x] && EqQ[n*(p - 1), -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_n,O_p), (eqq(((O_n)*(((O_p)+((-1))))),(-1))) Int((((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((O_c)*(Xv)*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+((-1))))))*(((P_d)^((-1)))))
 
-# Regel 23 (864 Varianten):
+# Rule 23 (864 variants):
 #   Int[ProductLog[a_.*x_^n_.]^p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := a^p*ExpIntegralEi[-p*ProductLog[a*x^n]]/(d*n) /; FreeQ[{a, d}, x] && IntegerQ[p] && EqQ[n*p, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,P_d), (integerq(O_p)), (eqq(((O_n)*(O_p)),(-1))) Int(((productlog((O_a)*((Xv)^(O_n))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((((O_a)^(O_p)))*(expint((((-1))*(O_p)*(productlog(((O_a)*(((Xv)^(O_n)))))))))*(((P_d)^((-1))))*(((O_n)^((-1)))))
 
-# Regel 24 (1296 Varianten):
+# Rule 24 (1296 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_.])^p_/(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := Rt[Pi*c*n, 2]/(d*n*a^(1/n)*c^(1/n))* Erfi[Sqrt[c*ProductLog[a*x^n]]/Rt[c*n, 2]] /; FreeQ[{a, c, d}, x] && IntegerQ[1/n] && EqQ[p, 1/2 - 1/n] && PosQ[c*n]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d), (integerq(((O_n)^((-1))))), (eqq(P_p,(((1/2))+((((-1))*(((O_n)^((-1))))))))), (posq(((O_c)*(O_n)))) Int((((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(P_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((rt(((pi)*(O_c)*(O_n)),2))*(((P_d)^((-1))))*(((O_n)^((-1))))*(((((O_a)^(((O_n)^((-1))))))^((-1))))*(((((O_c)^(((O_n)^((-1))))))^((-1))))*(erfi(((((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^((1/2))))*(((rt(((O_c)*(O_n)),2))^((-1))))))))
 
-# Regel 25 (1296 Varianten):
+# Rule 25 (1296 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_.])^p_/(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := Rt[-Pi*c*n, 2]/(d*n*a^(1/n)*c^(1/n))* Erf[Sqrt[c*ProductLog[a*x^n]]/Rt[-c*n, 2]] /; FreeQ[{a, c, d}, x] && IntegerQ[1/n] && EqQ[p, 1/2 - 1/n] && NegQ[c*n]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d), (integerq(((O_n)^((-1))))), (eqq(P_p,(((1/2))+((((-1))*(((O_n)^((-1))))))))), (negq(((O_c)*(O_n)))) Int((((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(P_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((rt((((-1))*(pi)*(O_c)*(O_n)),2))*(((P_d)^((-1))))*(((O_n)^((-1))))*(((((O_a)^(((O_n)^((-1))))))^((-1))))*(((((O_c)^(((O_n)^((-1))))))^((-1))))*(erf(((((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^((1/2))))*(((rt((((-1))*(O_c)*(O_n)),2))^((-1))))))))
 
-# Regel 26 (2592 Varianten):
+# Rule 26 (2592 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_.])^ p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := c*x*(c*ProductLog[a*x^n])^(p - 1)/d - c*(n*(p - 1) + 1)* Int[(c*ProductLog[a*x^n])^(p - 1)/(d + d*ProductLog[a*x^n]), x] /; FreeQ[{a, c, d}, x] && GtQ[n, 0] && GtQ[n*(p - 1) + 1, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d), (((gtq(O_n,0)))), (((gtq(((((O_n)*(((O_p)+((-1))))))+(1)),0)))) Int((((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((((O_c)*(Xv)*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+((-1))))))*(((P_d)^((-1))))))+((((-1))*(O_c)*(((((O_n)*(((O_p)+((-1))))))+(1)))*(Int(((((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+((-1))))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^(O_n))))))))))^((-1))))),Xv)))))
 
-# Regel 27 (2592 Varianten):
+# Rule 27 (2592 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_.])^ p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := x*(c*ProductLog[a*x^n])^p/(d*(n*p + 1)) - 1/(c*(n*p + 1))* Int[(c*ProductLog[a*x^n])^(p + 1)/(d + d*ProductLog[a*x^n]), x] /; FreeQ[{a, c, d}, x] && GtQ[n, 0] && LtQ[n*p + 1, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d), (((gtq(O_n,0)))), (((ltq(((((O_n)*(O_p)))+(1)),0)))) Int((((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((((Xv)*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(O_p)))*(((P_d)^((-1))))*(((((((O_n)*(O_p)))+(1)))^((-1))))))+((((-1))*(((O_c)^((-1))))*(((((((O_n)*(O_p)))+(1)))^((-1))))*(Int(((((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+(1)))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^(O_n))))))))))^((-1))))),Xv)))))
 
-# Regel 28 (648 Varianten):
+# Rule 28 (648 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_])^p_./(d_ + d_.*ProductLog[a_.*x_^n_]), x_Symbol] := -Subst[ Int[(c*ProductLog[a*x^(-n)])^p/(x^2*(d + d*ProductLog[a*x^(-n)])), x], x, 1/x] /; FreeQ[{a, c, d, p}, x] && ILtQ[n, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_p), (iltq(P_n,0)) Int((((O_c)*(productlog((O_a)*((Xv)^(P_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(P_n))))))^(K_1)),Xv) = (((-1))*(intsubst(((((((O_c)*(productlog(((O_a)*(((Xv)^((((-1))*(P_n))))))))))^(O_p)))*(((Xv)^((-2))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^((((-1))*(P_n))))))))))))^((-1))))),Xv,((Xv)^((-1))))))
 
-# Regel 29 (72 Varianten):
+# Rule 29 (72 variants):
 #   Int[x_^m_./(d_ + d_.*ProductLog[a_.*x_]), x_Symbol] := x^(m + 1)/(d*(m + 1)*ProductLog[a*x]) - m/(m + 1)*Int[x^m/(ProductLog[a*x]*(d + d*ProductLog[a*x])), x] /; FreeQ[{a, d}, x] && GtQ[m, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,P_d), (((gtq(O_m,0)))) Int(((Xv)^(O_m))*(((P_d)+((P_d)*(productlog((O_a)*(Xv)))))^(K_1)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((P_d)^((-1))))*(((((O_m)+(1)))^((-1))))*(((productlog(((O_a)*(Xv))))^((-1))))))+((((-1))*(O_m)*(((((O_m)+(1)))^((-1))))*(Int(((((Xv)^(O_m)))*(((productlog(((O_a)*(Xv))))^((-1))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(Xv))))))))^((-1))))),Xv)))))
 
-# Regel 30 (36 Varianten):
+# Rule 30 (36 variants):
 #   Int[1/(x_*(d_ + d_.*ProductLog[a_.*x_])), x_Symbol] := Log[ProductLog[a*x]]/d /; FreeQ[{a, d}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,O_a,P_d) Int(((Xv)^(K_1))*(((P_d)+((P_d)*(productlog((O_a)*(Xv)))))^(K_2)),Xv) = ((ln(productlog(((O_a)*(Xv)))))*(((P_d)^((-1)))))
 
-# Regel 31 (72 Varianten):
+# Rule 31 (72 variants):
 #   Int[x_^m_./(d_ + d_.*ProductLog[a_.*x_]), x_Symbol] := x^(m + 1)/(d*(m + 1)) - Int[x^m*ProductLog[a*x]/(d + d*ProductLog[a*x]), x] /; FreeQ[{a, d}, x] && LtQ[m, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,P_d), (((ltq(O_m,(-1))))) Int(((Xv)^(O_m))*(((P_d)+((P_d)*(productlog((O_a)*(Xv)))))^(K_1)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((P_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(Int(((((Xv)^(O_m)))*(productlog(((O_a)*(Xv))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(Xv))))))))^((-1))))),Xv)))))
 
-# Regel 32 (72 Varianten):
+# Rule 32 (72 variants):
 #   Int[x_^m_./(d_ + d_.*ProductLog[a_.*x_]), x_Symbol] := x^m*Gamma[m + 1, -(m + 1)*ProductLog[a*x]]/ (a*d*(m + 1)* E^(m*ProductLog[a*x])*(-(m + 1)*ProductLog[a*x])^m) /; FreeQ[{a, d, m}, x] && Not[IntegerQ[m]]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,P_d,O_m), (not(integerq(O_m))) Int(((Xv)^(O_m))*(((P_d)+((P_d)*(productlog((O_a)*(Xv)))))^(K_1)),Xv) = ((((Xv)^(O_m)))*(Gamma(((O_m)+(1)),(((-1))*(((O_m)+(1)))*(productlog(((O_a)*(Xv)))))))*(((O_a)^((-1))))*(((P_d)^((-1))))*(((((O_m)+(1)))^((-1))))*((((eE^(((O_m)*(productlog(((O_a)*(Xv))))))))^((-1))))*((((((((-1))*(((O_m)+(1)))*(productlog(((O_a)*(Xv))))))^(O_m)))^((-1)))))
 
-# Regel 33 (72 Varianten):
+# Rule 33 (72 variants):
 #   Int[1/(x_*(d_ + d_.*ProductLog[a_.*x_^n_.])), x_Symbol] := Log[ProductLog[a*x^n]]/(d*n) /; FreeQ[{a, d, n}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,O_a,P_d,O_n) Int(((Xv)^(K_1))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_2)),Xv) = ((ln(productlog(((O_a)*(((Xv)^(O_n)))))))*(((P_d)^((-1))))*(((O_n)^((-1)))))
 
-# Regel 34 (72 Varianten):
+# Rule 34 (72 variants):
 #   Int[x_^m_./(d_ + d_.*ProductLog[a_.*x_^n_]), x_Symbol] := -Subst[Int[1/(x^(m + 2)*(d + d*ProductLog[a*x^(-n)])), x], x, 1/x] /; FreeQ[{a, d}, x] && IntegerQ[m] && ILtQ[n, 0] && NeQ[m, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,P_d), (integerq(O_m)), (iltq(P_n,0)), (neq(O_m,(-1))) Int(((Xv)^(O_m))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(P_n))))))^(K_1)),Xv) = (((-1))*(intsubst(((((((Xv)^(((O_m)+(2)))))^((-1))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^((((-1))*(P_n))))))))))))^((-1))))),Xv,((Xv)^((-1))))))
 
-# Regel 35 (5184 Varianten):
+# Rule 35 (5184 variants):
 #   Int[(c_.*ProductLog[a_.*x_^n_.])^ p_./(x_*(d_ + d_.*ProductLog[a_.*x_^n_.])), x_Symbol] := (c*ProductLog[a*x^n])^p/(d*n*p) /; FreeQ[{a, c, d, n, p}, x]
 ADDSPEC RubiRules : IF (K_1 == (-1)), (K_2 == (-1)), NIN(Xv,O_a,O_c,P_d,O_n,O_p) Int((((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*((Xv)^(K_1))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_2)),Xv) = ((((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(O_p)))*(((P_d)^((-1))))*(((O_n)^((-1))))*(((O_p)^((-1)))))
 
-# Regel 36 (10368 Varianten):
+# Rule 36 (10368 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^ p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := c*x^(m + 1)*(c*ProductLog[a*x^n])^(p - 1)/(d*(m + 1)) /; FreeQ[{a, c, d, m, n, p}, x] && NeQ[m, -1] && EqQ[m + n*(p - 1), -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_m,O_n,O_p), (neq(O_m,(-1))), (eqq(((O_m)+(((O_n)*(((O_p)+((-1))))))),(-1))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((O_c)*(((Xv)^(((O_m)+(1)))))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+((-1))))))*(((P_d)^((-1))))*(((((O_m)+(1)))^((-1)))))
 
-# Regel 37 (3456 Varianten):
+# Rule 37 (3456 variants):
 #   Int[x_^m_.* ProductLog[a_.*x_^n_.]^p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := a^p*ExpIntegralEi[-p*ProductLog[a*x^n]]/(d*n) /; FreeQ[{a, d, m, n}, x] && IntegerQ[p] && EqQ[m + n*p, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,P_d,O_m,O_n), (integerq(O_p)), (eqq(((O_m)+(((O_n)*(O_p)))),(-1))) Int(((Xv)^(O_m))*((productlog((O_a)*((Xv)^(O_n))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((((O_a)^(O_p)))*(expint((((-1))*(O_p)*(productlog(((O_a)*(((Xv)^(O_n)))))))))*(((P_d)^((-1))))*(((O_n)^((-1)))))
 
-# Regel 38 (5184 Varianten):
+# Rule 38 (5184 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^ p_/(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := a^(p - 1/2)*c^(p - 1/2)*Rt[Pi*c/(p - 1/2), 2]* Erf[Sqrt[c*ProductLog[a*x^n]]/Rt[c/(p - 1/2), 2]]/(d*n) /; FreeQ[{a, c, d, m, n}, x] && NeQ[m, -1] && IntegerQ[p - 1/2] && EqQ[m + n*(p - 1/2), -1] && PosQ[c/(p - 1/2)]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_m,O_n), (neq(O_m,(-1))), (integerq(((P_p)+((-(1/2)))))), (eqq(((O_m)+(((O_n)*(((P_p)+((-(1/2)))))))),(-1))), (posq(((O_c)*(((((P_p)+((-(1/2)))))^((-1))))))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(P_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((((O_a)^(((P_p)+((-(1/2)))))))*(((O_c)^(((P_p)+((-(1/2)))))))*(rt(((pi)*(O_c)*(((((P_p)+((-(1/2)))))^((-1))))),2))*(erf(((((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^((1/2))))*(((rt(((O_c)*(((((P_p)+((-(1/2)))))^((-1))))),2))^((-1)))))))*(((P_d)^((-1))))*(((O_n)^((-1)))))
 
-# Regel 39 (5184 Varianten):
+# Rule 39 (5184 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^ p_/(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := a^(p - 1/2)*c^(p - 1/2)*Rt[-Pi*c/(p - 1/2), 2]* Erfi[Sqrt[c*ProductLog[a*x^n]]/Rt[-c/(p - 1/2), 2]]/(d*n) /; FreeQ[{a, c, d, m, n}, x] && NeQ[m, -1] && IntegerQ[p - 1/2] && EqQ[m + n*(p - 1/2), -1] && NegQ[c/(p - 1/2)]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_m,O_n), (neq(O_m,(-1))), (integerq(((P_p)+((-(1/2)))))), (eqq(((O_m)+(((O_n)*(((P_p)+((-(1/2)))))))),(-1))), (negq(((O_c)*(((((P_p)+((-(1/2)))))^((-1))))))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(P_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((((O_a)^(((P_p)+((-(1/2)))))))*(((O_c)^(((P_p)+((-(1/2)))))))*(rt((((-1))*(pi)*(O_c)*(((((P_p)+((-(1/2)))))^((-1))))),2))*(erfi(((((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^((1/2))))*(((rt((((-1))*(O_c)*(((((P_p)+((-(1/2)))))^((-1))))),2))^((-1)))))))*(((P_d)^((-1))))*(((O_n)^((-1)))))
 
-# Regel 40 (10368 Varianten):
+# Rule 40 (10368 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^ p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := c*x^(m + 1)*(c*ProductLog[a*x^n])^(p - 1)/(d*(m + 1)) - c*(m + n*(p - 1) + 1)/(m + 1)* Int[x^m*(c*ProductLog[a*x^n])^(p - 1)/(d + d*ProductLog[a*x^n]), x] /; FreeQ[{a, c, d, m, n, p}, x] && NeQ[m, -1] && GtQ[Simplify[p + (m + 1)/n], 1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_m,O_n,O_p), (neq(O_m,(-1))), (((gtq(simplify(((O_p)+(((((O_m)+(1)))*(((O_n)^((-1)))))))),1)))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((((O_c)*(((Xv)^(((O_m)+(1)))))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+((-1))))))*(((P_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_c)*(((O_m)+(((O_n)*(((O_p)+((-1))))))+(1)))*(((((O_m)+(1)))^((-1))))*(Int(((((Xv)^(O_m)))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+((-1))))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^(O_n))))))))))^((-1))))),Xv)))))
 
-# Regel 41 (10368 Varianten):
+# Rule 41 (10368 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^ p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := x^(m + 1)*(c*ProductLog[a*x^n])^p/(d*(m + n*p + 1)) - (m + 1)/(c*(m + n*p + 1))* Int[x^m*(c*ProductLog[a*x^n])^(p + 1)/(d + d*ProductLog[a*x^n]), x] /; FreeQ[{a, c, d, m, n, p}, x] && NeQ[m, -1] && LtQ[Simplify[p + (m + 1)/n], 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_m,O_n,O_p), (neq(O_m,(-1))), (((ltq(simplify(((O_p)+(((((O_m)+(1)))*(((O_n)^((-1)))))))),0)))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = ((((((Xv)^(((O_m)+(1)))))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(O_p)))*(((P_d)^((-1))))*(((((O_m)+(((O_n)*(O_p)))+(1)))^((-1))))))+((((-1))*(((O_m)+(1)))*(((O_c)^((-1))))*(((((O_m)+(((O_n)*(O_p)))+(1)))^((-1))))*(Int(((((Xv)^(O_m)))*(((((O_c)*(productlog(((O_a)*(((Xv)^(O_n))))))))^(((O_p)+(1)))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^(O_n))))))))))^((-1))))),Xv)))))
 
-# Regel 42 (2592 Varianten):
+# Rule 42 (2592 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_])^p_./(d_ + d_.*ProductLog[a_.*x_]), x_Symbol] := x^m*Gamma[ m + p + 1, -(m + 1)*ProductLog[a*x]]*(c*ProductLog[a*x])^p/ (a*d*(m + 1)* E^(m*ProductLog[a*x])*(-(m + 1)*ProductLog[a*x])^(m + p)) /; FreeQ[{a, c, d, m, p}, x] && NeQ[m, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_m,O_p), (neq(O_m,(-1))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*(Xv))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*(Xv)))))^(K_1)),Xv) = ((((Xv)^(O_m)))*(Gamma(((O_m)+(O_p)+(1)),(((-1))*(((O_m)+(1)))*(productlog(((O_a)*(Xv)))))))*(((((O_c)*(productlog(((O_a)*(Xv))))))^(O_p)))*(((O_a)^((-1))))*(((P_d)^((-1))))*(((((O_m)+(1)))^((-1))))*((((eE^(((O_m)*(productlog(((O_a)*(Xv))))))))^((-1))))*((((((((-1))*(((O_m)+(1)))*(productlog(((O_a)*(Xv))))))^(((O_m)+(O_p)))))^((-1)))))
 
-# Regel 43 (10368 Varianten):
+# Rule 43 (10368 variants):
 #   Int[x_^m_.*(c_.*ProductLog[a_.*x_^n_.])^ p_./(d_ + d_.*ProductLog[a_.*x_^n_.]), x_Symbol] := -Subst[ Int[(c*ProductLog[a*x^(-n)])^ p/(x^(m + 2)*(d + d*ProductLog[a*x^(-n)])), x], x, 1/x] /; FreeQ[{a, c, d, p}, x] && NeQ[m, -1] && IntegerQ[m] && LtQ[n, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_c,P_d,O_p), (neq(O_m,(-1))), (integerq(O_m)), (((ltq(O_n,0)))) Int(((Xv)^(O_m))*(((O_c)*(productlog((O_a)*((Xv)^(O_n)))))^(O_p))*(((P_d)+((P_d)*(productlog((O_a)*((Xv)^(O_n))))))^(K_1)),Xv) = (((-1))*(intsubst(((((((O_c)*(productlog(((O_a)*(((Xv)^((((-1))*(O_n))))))))))^(O_p)))*(((((Xv)^(((O_m)+(2)))))^((-1))))*(((((P_d)+(((P_d)*(productlog(((O_a)*(((Xv)^((((-1))*(O_n))))))))))))^((-1))))),Xv,((Xv)^((-1))))))
 
-# Regel 44 (1 Varianten):
+# Rule 44 (1 variants):
 #   Int[u_, x_Symbol] := Subst[ Int[SimplifyIntegrand[(x + 1)*E^x*SubstFor[ProductLog[x], u, x], x], x], x, ProductLog[x]] /; FunctionOfQ[ProductLog[x], u, x]
 ADDSPEC RubiRules : IF (functionofq(productlog(Xv),P_u,Xv)) Int(P_u,Xv) = intsubst(simp(((((Xv)+(1)))*((eE^(Xv)))*(substfor(productlog(Xv),P_u,Xv))),Xv),Xv,productlog(Xv))

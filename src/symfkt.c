@@ -2955,22 +2955,6 @@ static Node * s_piecewiselinearq (Node * a[], int n, Symbol * f)
 	return NULL;
 }
 
-static Node * s_linearmatchq (Node * a[], int n, Symbol * f)	/* u is x, b*x, a+b*x literally */
-{
-	Node * u, * x;
-	if (n != 2) return NULL;
-	u = deref(a[0]); x = a[1];
-	if (tequal(u, x)) return mk_bool(1, f);
-	if (is_head(u, "*", 2) && tequal(arg(u, 1), x) && ! contains(arg(u, 0), x)) return mk_bool(1, f);
-	if (is_head(u, "+", 2) && ! contains(arg(u, 0), x))
-		{
-		Node * t = deref(arg(u, 1));
-		if (tequal(t, x) || (is_head(t, "*", 2) && tequal(arg(t, 1), x) && ! contains(arg(t, 0), x)))
-			return mk_bool(1, f);
-		}
-	return mk_bool(0, f);
-}
-
 /* ---- ExpandTrigReduce: products and powers of sin, cos (sinh, cosh) to
  * sums of single functions of multiple angles ---- */
 typedef struct { int hyp; int kind; Node * arg; } TrigF;	/* kind 0: sin(h), 1: cos(h) */
@@ -3101,68 +3085,6 @@ static Node * s_expandtrigreduce (Node * a[], int n, Symbol * f)	/* (v,x), (u,v,
 		r = mk_add(r, mk_mul(tcpy(a[0]), tcpy(l.t[i])));
 	tl_free(& l);
 	return r ? r : mk_int(0);
-}
-
-/* ---- BinomialMatchQ, QuadraticMatchQ: literal forms a + b x^n, a + b x + c x^2 ---- */
-
-/* t is b*x^n (b, n free of x; b or n may be missing): power of x in *pn (NULL: 1) */
-static int x_power_term (Node * t, Node * x, Node ** pn)
-{
-	t = deref(t);
-	* pn = NULL;
-	if (is_head(t, "*", 2))
-		{
-		if (! contains(arg(t, 0), x)) t = deref(arg(t, 1));
-		else if (! contains(arg(t, 1), x)) t = deref(arg(t, 0));
-		else return 0;
-		}
-	if (tequal(t, x)) return 1;
-	if (is_head(t, "^", 2) && tequal(arg(t, 0), x) && ! contains(arg(t, 1), x))
-		{
-		* pn = arg(t, 1);
-		return 1;
-		}
-	return 0;
-}
-
-static int binmatchq (Node * u, Node * x)
-{
-	Node * n;
-	u = deref(u);
-	if (x_power_term(u, x, & n)) return 1;
-	if (is_head(u, "+", 2))
-		return (! contains(arg(u, 0), x) && x_power_term(arg(u, 1), x, & n))
-		    || (! contains(arg(u, 1), x) && x_power_term(arg(u, 0), x, & n));
-	return 0;
-}
-
-static Node * s_binomialmatchq (Node * a[], int n, Symbol * f)
-{
-	if (n != 2) return NULL;
-	return mk_bool(binmatchq(a[0], a[1]), f);
-}
-
-static Node * s_quadraticmatchq (Node * a[], int n, Symbol * f)
-{
-	TList l = {0};
-	Node * pn;
-	double e;
-	int i, n0 = 0, n1 = 0, n2 = 0, ok = 1;
-	if (n != 2) return NULL;
-	summands_to(a[0], & l, 0);
-	for (i = 0; i < l.n && ok; i++)
-		{
-		if (! contains(l.t[i], a[1])) n0++;
-		else if (x_power_term(l.t[i], a[1], & pn))
-			{
-			if (! pn) n1++;
-			else if (num_value(pn, & e) && e == 2) n2++;
-			else ok = 0;
-			}
-		else ok = 0;
-		}
-	tl_free(& l);
-	return mk_bool(ok && n2 == 1 && n1 <= 1 && n0 <= 1, f);
 }
 
 /* TrinomialQ: c0 + c1 x^m + c2 x^(2m), not quadratic, not w^2 with binomial w */
@@ -4224,8 +4146,6 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "derivdivides", s_derivdivides },
 	{ "falseq", s_falseq },
 	{ "intsubst", s_substint },
-	{ "binomialmatchq", s_binomialmatchq },
-	{ "quadraticmatchq", s_quadraticmatchq },
 	{ "trinomialq", s_trinomialq },
 	{ "linearpairq", s_linearpairq },
 	{ "algebraicfunctionq", s_algebraicfunctionq },
@@ -4240,7 +4160,6 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "sumsimplerq", s_sumsimplerq },
 	{ "simplersqrtq", s_simplersqrtq },
 	{ "piecewiselinearq", s_piecewiselinearq },
-	{ "linearmatchq", s_linearmatchq },
 	{ "expandtrigreduce", s_expandtrigreduce },
 	{ "knownsineintegrandq", s_knownsine },
 	{ "knowntangentintegrandq", s_knowntangent },

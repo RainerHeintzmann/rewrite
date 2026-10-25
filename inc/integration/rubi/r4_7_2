@@ -1,83 +1,83 @@
 # r4_7_2
-# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
-# mit tools/rubi2rewrite.py, Abschnitt
+# Translated automatically from Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# by tools/rubi2rewrite.py, section
 #   4.7.2 Tangent normalization rules
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi.
-# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi.
+# Do not edit by hand: changes belong in the translator.
 
-# Regel 1 (11664 Varianten):
+# Rule 1 (11664 variants):
 #   Int[u_*(c_.*cot[a_. + b_.*x_])^m_.*(d_.*tan[a_. + b_.*x_])^n_., x_Symbol] := (c*Cot[a + b*x])^m*(d*Tan[a + b*x])^m* Int[ActivateTrig[u]*(d*Tan[a + b*x])^(n - m), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownTangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (knowntangentintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(cot((O_a)+((O_b)*(Xv)))))^(O_m))*(((O_d)*(tan((O_a)+((O_b)*(Xv)))))^(O_n)),Xv) = ((((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_d)*(tan(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(Int(((P_u)*(((((O_d)*(tan(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((((-1))*(O_m)))))))),Xv)))
 
-# Regel 2 (11664 Varianten):
+# Rule 2 (11664 variants):
 #   Int[u_*(c_.*tan[a_. + b_.*x_])^m_.*(d_.*cos[a_. + b_.*x_])^n_., x_Symbol] := (c*Tan[a + b*x])^m*(d*Cos[a + b*x])^m/(d*Sin[a + b*x])^m* Int[ActivateTrig[u]*(d*Sin[a + b*x])^m/(d*Cos[a + b*x])^(m - n), x] /; FreeQ[{a, b, c, d, m, n}, x] && KnownCotangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,O_n), (knowncotangentintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(tan((O_a)+((O_b)*(Xv)))))^(O_m))*(((O_d)*(cos((O_a)+((O_b)*(Xv)))))^(O_n)),Xv) = ((((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_d)*(cos(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_d)*(sin(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))*(Int(((P_u)*(((((O_d)*(sin(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((((O_d)*(cos(((O_a)+(((O_b)*(Xv))))))))^(((O_m)+((((-1))*(O_n)))))))^((-1))))),Xv)))
 
-# Regel 3 (108 Varianten):
+# Rule 3 (108 variants):
 #   Int[u_*(c_.*cot[a_. + b_.*x_])^m_., x_Symbol] := (c*Cot[a + b*x])^m*(c*Tan[a + b*x])^m* Int[ActivateTrig[u]/(c*Tan[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownTangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m), (not(integerq(O_m))), (knowntangentintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(cot((O_a)+((O_b)*(Xv)))))^(O_m)),Xv) = ((((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(Int(((P_u)*(((((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))),Xv)))
 
-# Regel 4 (108 Varianten):
+# Rule 4 (108 variants):
 #   Int[u_*(c_.*tan[a_. + b_.*x_])^m_., x_Symbol] := (c*Cot[a + b*x])^m*(c*Tan[a + b*x])^m* Int[ActivateTrig[u]/(c*Cot[a + b*x])^m, x] /; FreeQ[{a, b, c, m}, x] && Not[IntegerQ[m]] && KnownCotangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_m), (not(integerq(O_m))), (knowncotangentintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(tan((O_a)+((O_b)*(Xv)))))^(O_m)),Xv) = ((((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(O_m)))*(Int(((P_u)*(((((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(O_m)))^((-1))))),Xv)))
 
-# Regel 5 (11664 Varianten):
+# Rule 5 (11664 variants):
 #   Int[u_*(c_.*tan[a_. + b_.*x_])^n_.*(A_ + B_.*cot[a_. + b_.*x_]), x_Symbol] := c*Int[ ActivateTrig[u]*(c*Tan[a + b*x])^(n - 1)*(B + A*Tan[a + b*x]), x] /; FreeQ[{a, b, c, A, B, n}, x] && KnownTangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_A,O_B,O_n), (knowntangentintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(tan((O_a)+((O_b)*(Xv)))))^(O_n))*((P_A)+((O_B)*(cot((O_a)+((O_b)*(Xv)))))),Xv) = ((O_c)*(Int(((P_u)*(((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-1))))))*(((O_B)+(((P_A)*(tan(((O_a)+(((O_b)*(Xv))))))))))),Xv)))
 
-# Regel 6 (11664 Varianten):
+# Rule 6 (11664 variants):
 #   Int[u_*(c_.*cot[a_. + b_.*x_])^n_.*(A_ + B_.*tan[a_. + b_.*x_]), x_Symbol] := c*Int[ ActivateTrig[u]*(c*Cot[a + b*x])^(n - 1)*(B + A*Cot[a + b*x]), x] /; FreeQ[{a, b, c, A, B, n}, x] && KnownCotangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_A,O_B,O_n), (knowncotangentintegrandq(P_u,Xv)) Int((P_u)*(((O_c)*(cot((O_a)+((O_b)*(Xv)))))^(O_n))*((P_A)+((O_B)*(tan((O_a)+((O_b)*(Xv)))))),Xv) = ((O_c)*(Int(((P_u)*(((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-1))))))*(((O_B)+(((P_A)*(cot(((O_a)+(((O_b)*(Xv))))))))))),Xv)))
 
-# Regel 7 (108 Varianten):
+# Rule 7 (108 variants):
 #   Int[u_*(A_ + B_.*cot[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(B + A*Tan[a + b*x])/Tan[a + b*x], x] /; FreeQ[{a, b, A, B}, x] && KnownTangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_A,O_B), (knowntangentintegrandq(P_u,Xv)) Int((P_u)*((P_A)+((O_B)*(cot((O_a)+((O_b)*(Xv)))))),Xv) = Int(((P_u)*(((O_B)+(((P_A)*(tan(((O_a)+(((O_b)*(Xv))))))))))*(((tan(((O_a)+(((O_b)*(Xv))))))^((-1))))),Xv)
 
-# Regel 8 (108 Varianten):
+# Rule 8 (108 variants):
 #   Int[u_*(A_ + B_.*tan[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(B + A*Cot[a + b*x])/Cot[a + b*x], x] /; FreeQ[{a, b, A, B}, x] && KnownCotangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_A,O_B), (knowncotangentintegrandq(P_u,Xv)) Int((P_u)*((P_A)+((O_B)*(tan((O_a)+((O_b)*(Xv)))))),Xv) = Int(((P_u)*(((O_B)+(((P_A)*(cot(((O_a)+(((O_b)*(Xv))))))))))*(((cot(((O_a)+(((O_b)*(Xv))))))^((-1))))),Xv)
 
-# Regel 9 (1417176 Varianten):
+# Rule 9 (1417176 variants):
 #   Int[u_.*(c_.*tan[a_. + b_.*x_])^ n_.*(A_. + B_.*cot[a_. + b_.*x_] + C_.*cot[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[ u]*(c*Tan[a + b*x])^(n - 2)*(C + B*Tan[a + b*x] + A*Tan[a + b*x]^2), x] /; FreeQ[{a, b, c, A, B, C, n}, x] && KnownTangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_A,O_B,O_C,O_n), (knowntangentintegrandq(O_u,Xv)) Int((O_u)*(((O_c)*(tan((O_a)+((O_b)*(Xv)))))^(O_n))*((O_A)+((O_B)*(cot((O_a)+((O_b)*(Xv)))))+((O_C)*((cot((O_a)+((O_b)*(Xv))))^(2)))),Xv) = ((((O_c)^(2)))*(Int(((O_u)*(((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-2))))))*(((O_C)+(((O_B)*(tan(((O_a)+(((O_b)*(Xv))))))))+(((O_A)*(((tan(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)))
 
-# Regel 10 (1417176 Varianten):
+# Rule 10 (1417176 variants):
 #   Int[u_.*(c_.*cot[a_. + b_.*x_])^ n_.*(A_. + B_.*tan[a_. + b_.*x_] + C_.*tan[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[ u]*(c*Cot[a + b*x])^(n - 2)*(C + B*Cot[a + b*x] + A*Cot[a + b*x]^2), x] /; FreeQ[{a, b, c, A, B, C, n}, x] && KnownCotangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_A,O_B,O_C,O_n), (knowncotangentintegrandq(O_u,Xv)) Int((O_u)*(((O_c)*(cot((O_a)+((O_b)*(Xv)))))^(O_n))*((O_A)+((O_B)*(tan((O_a)+((O_b)*(Xv)))))+((O_C)*((tan((O_a)+((O_b)*(Xv))))^(2)))),Xv) = ((((O_c)^(2)))*(Int(((O_u)*(((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-2))))))*(((O_C)+(((O_B)*(cot(((O_a)+(((O_b)*(Xv))))))))+(((O_A)*(((cot(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)))
 
-# Regel 11 (17496 Varianten):
+# Rule 11 (17496 variants):
 #   Int[u_.*(c_.*tan[a_. + b_.*x_])^n_.*(A_ + C_.*cot[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[u]*(c*Tan[a + b*x])^(n - 2)*(C + A*Tan[a + b*x]^2), x] /; FreeQ[{a, b, c, A, C, n}, x] && KnownTangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_A,O_C,O_n), (knowntangentintegrandq(O_u,Xv)) Int((O_u)*(((O_c)*(tan((O_a)+((O_b)*(Xv)))))^(O_n))*((P_A)+((O_C)*((cot((O_a)+((O_b)*(Xv))))^(2)))),Xv) = ((((O_c)^(2)))*(Int(((O_u)*(((((O_c)*(tan(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-2))))))*(((O_C)+(((P_A)*(((tan(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)))
 
-# Regel 12 (17496 Varianten):
+# Rule 12 (17496 variants):
 #   Int[u_.*(c_.*cot[a_. + b_.*x_])^n_.*(A_ + C_.*tan[a_. + b_.*x_]^2), x_Symbol] := c^2*Int[ ActivateTrig[u]*(c*Cot[a + b*x])^(n - 2)*(C + A*Cot[a + b*x]^2), x] /; FreeQ[{a, b, c, A, C, n}, x] && KnownCotangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_A,O_C,O_n), (knowncotangentintegrandq(O_u,Xv)) Int((O_u)*(((O_c)*(cot((O_a)+((O_b)*(Xv)))))^(O_n))*((P_A)+((O_C)*((tan((O_a)+((O_b)*(Xv))))^(2)))),Xv) = ((((O_c)^(2)))*(Int(((O_u)*(((((O_c)*(cot(((O_a)+(((O_b)*(Xv))))))))^(((O_n)+((-2))))))*(((O_C)+(((P_A)*(((cot(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)))
 
-# Regel 13 (8748 Varianten):
+# Rule 13 (8748 variants):
 #   Int[u_*(A_. + B_.*cot[a_. + b_.*x_] + C_.*cot[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + B*Tan[a + b*x] + A*Tan[a + b*x]^2)/ Tan[a + b*x]^2, x] /; FreeQ[{a, b, A, B, C}, x] && KnownTangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C), (knowntangentintegrandq(P_u,Xv)) Int((P_u)*((O_A)+((O_B)*(cot((O_a)+((O_b)*(Xv)))))+((O_C)*((cot((O_a)+((O_b)*(Xv))))^(2)))),Xv) = Int(((P_u)*(((O_C)+(((O_B)*(tan(((O_a)+(((O_b)*(Xv))))))))+(((O_A)*(((tan(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((tan(((O_a)+(((O_b)*(Xv))))))^((-2))))),Xv)
 
-# Regel 14 (8748 Varianten):
+# Rule 14 (8748 variants):
 #   Int[u_*(A_. + B_.*tan[a_. + b_.*x_] + C_.*tan[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + B*Cot[a + b*x] + A*Cot[a + b*x]^2)/ Cot[a + b*x]^2, x] /; FreeQ[{a, b, A, B, C}, x] && KnownCotangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C), (knowncotangentintegrandq(P_u,Xv)) Int((P_u)*((O_A)+((O_B)*(tan((O_a)+((O_b)*(Xv)))))+((O_C)*((tan((O_a)+((O_b)*(Xv))))^(2)))),Xv) = Int(((P_u)*(((O_C)+(((O_B)*(cot(((O_a)+(((O_b)*(Xv))))))))+(((O_A)*(((cot(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((cot(((O_a)+(((O_b)*(Xv))))))^((-2))))),Xv)
 
-# Regel 15 (108 Varianten):
+# Rule 15 (108 variants):
 #   Int[u_*(A_ + C_.*cot[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + A*Tan[a + b*x]^2)/Tan[a + b*x]^2, x] /; FreeQ[{a, b, A, C}, x] && KnownTangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_A,O_C), (knowntangentintegrandq(P_u,Xv)) Int((P_u)*((P_A)+((O_C)*((cot((O_a)+((O_b)*(Xv))))^(2)))),Xv) = Int(((P_u)*(((O_C)+(((P_A)*(((tan(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((tan(((O_a)+(((O_b)*(Xv))))))^((-2))))),Xv)
 
-# Regel 16 (108 Varianten):
+# Rule 16 (108 variants):
 #   Int[u_*(A_ + C_.*tan[a_. + b_.*x_]^2), x_Symbol] := Int[ActivateTrig[u]*(C + A*Cot[a + b*x]^2)/Cot[a + b*x]^2, x] /; FreeQ[{a, b, A, C}, x] && KnownCotangentIntegrandQ[u, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_A,O_C), (knowncotangentintegrandq(P_u,Xv)) Int((P_u)*((P_A)+((O_C)*((tan((O_a)+((O_b)*(Xv))))^(2)))),Xv) = Int(((P_u)*(((O_C)+(((P_A)*(((cot(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((cot(((O_a)+(((O_b)*(Xv))))))^((-2))))),Xv)
 
-# Regel 17 (8748 Varianten):
+# Rule 17 (8748 variants):
 #   Int[u_*(A_. + B_.*tan[a_. + b_.*x_] + C_.*cot[a_. + b_.*x_]), x_Symbol] := Int[ActivateTrig[u]*(C + A*Tan[a + b*x] + B*Tan[a + b*x]^2)/ Tan[a + b*x], x] /; FreeQ[{a, b, A, B, C}, x]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C) Int((P_u)*((O_A)+((O_B)*(tan((O_a)+((O_b)*(Xv)))))+((O_C)*(cot((O_a)+((O_b)*(Xv)))))),Xv) = Int(((P_u)*(((O_C)+(((O_A)*(tan(((O_a)+(((O_b)*(Xv))))))))+(((O_B)*(((tan(((O_a)+(((O_b)*(Xv))))))^(2)))))))*(((tan(((O_a)+(((O_b)*(Xv))))))^((-1))))),Xv)
 
-# Regel 18 (314928 Varianten):
+# Rule 18 (314928 variants):
 #   Int[u_*(A_.*tan[a_. + b_.*x_]^n_. + B_.*tan[a_. + b_.*x_]^n1_ + C_.*tan[a_. + b_.*x_]^n2_), x_Symbol] := Int[ActivateTrig[u]* Tan[a + b*x]^n*(A + B*Tan[a + b*x] + C*Tan[a + b*x]^2), x] /; FreeQ[{a, b, A, B, C, n}, x] && EqQ[n1, n + 1] && EqQ[n2, n + 2]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C,O_n), (eqq(P_n1,((O_n)+(1)))), (eqq(P_n2,((O_n)+(2)))) Int((P_u)*(((O_A)*((tan((O_a)+((O_b)*(Xv))))^(O_n)))+((O_B)*((tan((O_a)+((O_b)*(Xv))))^(P_n1)))+((O_C)*((tan((O_a)+((O_b)*(Xv))))^(P_n2)))),Xv) = Int(((P_u)*(((tan(((O_a)+(((O_b)*(Xv))))))^(O_n)))*(((O_A)+(((O_B)*(tan(((O_a)+(((O_b)*(Xv))))))))+(((O_C)*(((tan(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)
 
-# Regel 19 (314928 Varianten):
+# Rule 19 (314928 variants):
 #   Int[u_*(A_.*cot[a_. + b_.*x_]^n_. + B_.*cot[a_. + b_.*x_]^n1_ + C_.*cot[a_. + b_.*x_]^n2_), x_Symbol] := Int[ActivateTrig[u]* Cot[a + b*x]^n*(A + B*Cot[a + b*x] + C*Cot[a + b*x]^2), x] /; FreeQ[{a, b, A, B, C, n}, x] && EqQ[n1, n + 1] && EqQ[n2, n + 2]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_A,O_B,O_C,O_n), (eqq(P_n1,((O_n)+(1)))), (eqq(P_n2,((O_n)+(2)))) Int((P_u)*(((O_A)*((cot((O_a)+((O_b)*(Xv))))^(O_n)))+((O_B)*((cot((O_a)+((O_b)*(Xv))))^(P_n1)))+((O_C)*((cot((O_a)+((O_b)*(Xv))))^(P_n2)))),Xv) = Int(((P_u)*(((cot(((O_a)+(((O_b)*(Xv))))))^(O_n)))*(((O_A)+(((O_B)*(cot(((O_a)+(((O_b)*(Xv))))))))+(((O_C)*(((cot(((O_a)+(((O_b)*(Xv))))))^(2)))))))),Xv)

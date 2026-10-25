@@ -1,8 +1,8 @@
-# Numerisches Loesen von expliziten Diff-gleichungen
-# Eingabe : f(x,y) = y'
-# x0 = Anfangswert x (normal : == 0)
-# y0 = Anfangswert y
-# dx = Schrittweite x
+# numerical solution of explicit differential equations
+# input : f(x,y) = y'
+# x0 = initial value x (normally : == 0)
+# y0 = initial value y
+# dx = step size x
 
 y=y0
 

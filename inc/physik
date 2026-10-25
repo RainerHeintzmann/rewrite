@@ -20,29 +20,29 @@ CONST x0,y0,x1,y1,x2,y2,x3,y3     : real
 CONST vx0,vy0,vx1,vy1,vx2,vy2,vx3,vy3    : real
 CONST ax0,ay0,ax1,ay1,ax2,ay2,ax3,ay3    : real
 
-# Einheiten:
+# units:
 
 CONST  _E,_P,_T,_G,_M,_k,_h,_da,_d,_c,_m,_my,_mu,_n,_p,_f,_a,_Ang,_eV : real
 
-# spezielle Konstanten : (fuer Numerische Werte : physnum)
+# special constants : (for numerical values : physnum)
 
-# CONST c      : real  # schon definiert    Vak.-Lichtgeschw.
-CONST G      : real    # Gravitationskonstante
-CONST e0     : real    # Elementarladung
-CONST me     : real    # Elektronenmasse
-CONST mp     : real    # Protonenmasse
-CONST g      : real    # Erdbeschleunigung
-CONST R      : real    # Universelle Gaskonstante
-CONST Na     : real    # Avogadrokonstante
-CONST k,kb   : real    # Bolzmannkonstante
-CONST h      : real    # Planksches Wirkungsquant
-CONST hq     : real    # Planksches Wirkungsquant
-CONST ep0    : real    # Elektrische Feldkonstante
-CONST my0,mu0 : real    # Magnetische Feldkonstante
+# CONST c      : real  # already defined    speed of light in vacuum
+CONST G      : real    # gravitational constant
+CONST e0     : real    # elementary charge
+CONST me     : real    # electron mass
+CONST mp     : real    # proton mass
+CONST g      : real    # gravitational acceleration
+CONST R      : real    # universal gas constant
+CONST Na     : real    # Avogadro constant
+CONST k,kb   : real    # Boltzmann constant
+CONST h      : real    # Planck constant
+CONST hq     : real    # Planck constant
+CONST ep0    : real    # electric constant
+CONST my0,mu0 : real    # magnetic constant
 CONST TK     : real    # 0 C = TK (273.15) K
-CONST bel    : real    # Streulaenge des Elektrons (e0*e0/(4*pi*ep0*me*c*c))
+CONST bel    : real    # scattering length of the electron (e0*e0/(4*pi*ep0*me*c*c))
 
-CONST u      : real    # Atomare Masseneinheit
+CONST u      : real    # atomic mass unit
 
 ADDSPEC diff : D(er,t) = D(phi,t) * ep
 ADDSPEC diff : D(ep,t) = - D(phi,t) * er

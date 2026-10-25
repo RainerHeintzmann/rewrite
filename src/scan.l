@@ -3,7 +3,7 @@
  *	scan.l V1.00
  *	Copyright (c)  Rainer Heintzmann (1992)
  *
- *  Skanner fuer 'rewrite'
+ *  Scanner for 'rewrite'
  */
 
 #include "fatal.h"
@@ -51,7 +51,7 @@ sp_ops2 ([\-\+])
 				  	for (i=1;yytext[i]!=0;i++)
 						;
 				  	yytext[i-1]=0;
-					lookup(& yytext[1]); /* damit Speicher reserviert wird */
+					lookup(& yytext[1]); /* so that memory is allocated */
 					return String;}
 
 {sp_ops}*	{ return lookup(yytext); }	/* Id, etc */
@@ -60,7 +60,7 @@ sp_ops2 ([\-\+])
 {numb}	   { double * value;
               Symbol * sp;
 				  if (strspn(yytext,"0123456789") == strlen(yytext)
-				      && (sp = int_literal(yytext)) != NULL)  /* 2026: ganze Zahl (INTNUM) */
+				      && (sp = int_literal(yytext)) != NULL)  /* 2026: integer number (INTNUM) */
 					{
 					yylval.y_sym = sp;
 					return lexval(sp);
@@ -69,29 +69,29 @@ sp_ops2 ([\-\+])
 				  if (! value)
 						fatal("lex: no room for making real-number !\n");
 
-              sscanf(yytext,"%lf",value); /* bekommt Pointer auf value */
-    			  sp=mknum((void *) value,NULL); /* Std.Num-Type */
+              sscanf(yytext,"%lf",value); /* gets pointer to value */
+    			  sp=mknum((void *) value,NULL); /* std. number type */
 
              yylval.y_sym = sp;
 	          return lexval(sp);
 	         }  
 {alnum}*		{ return lookup(yytext); }	/* Id, etc */
 
-"#".*$	;			/* #... ignorieren */
-[ \t]	;			/* Zwischenraum ignorieren */
+"#".*$	;			/* ignore #... */
+[ \t]	;			/* ignore white space */
 
 \n	|
-.	return (int) yytext[0];	/* 'x' fuer yyparse() */
+.	return (int) yytext[0];	/* 'x' for yyparse() */
 
 %%
 
 /*
- *	Zeilen-Schnittstelle
+ *	Line interface
  */
 
-static const char * buf, * bp;	/* aktuelle Zeile */
+static const char * buf, * bp;	/* current line */
 #ifdef	FLEX_SCANNER
-static int avail;		/* # Zeichen uebrig */
+static int avail;		/* # characters left */
 #endif
 
 void lexi_buf _1a ((cp), const char * cp)
@@ -99,7 +99,7 @@ void lexi_buf _1a ((cp), const char * cp)
 	buf = bp = cp;
 #ifdef	FLEX_SCANNER
 	avail = strlen(buf);
-	yyrestart(yyin);	/* (re-) initialisiert scanner (modern flex: yy_init=1 heisst "schon initialisiert") */
+	yyrestart(yyin);	/* (re-) initializes the scanner (modern flex: yy_init=1 means "already initialized") */
 #endif
 }
 

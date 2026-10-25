@@ -1,15 +1,15 @@
-# Loesen von Diff-gleichungen
-# Eingabe : P2 = f(x,P0) = P0'
-# P4 = Anfangswert ( x0) (normal : == 0)
-# P1 = Anfangswert ( == P0(x0)) (y0)
-# P3 = Anfangspolynom (normalerweise == x)
-# Bsp. :
+# solving differential equations
+# input : P2 = f(x,P0) = P0'
+# P4 = initial value ( x0) (normally : == 0)
+# P1 = initial value ( == P0(x0)) (y0)
+# P3 = initial polynomial (normally == x)
+# example :
 P2 = 1+P0^2
 P1 = 0
 P4 = 0
 
 P3 = x
-FUNC Picard : real,real >> real   # z.B. Picard(2,x)
+FUNC Picard : real,real >> real   # e.g. Picard(2,x)
 
 P0 = Picard(N- 1,X)
 ALG Pic

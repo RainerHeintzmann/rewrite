@@ -1,4 +1,4 @@
-/* stack.h (c) Rainer Heintzmann Juni 1991 */
+/* stack.h (c) Rainer Heintzmann June 1991 */
 
 typedef struct Stackelem STACKELEM;
 

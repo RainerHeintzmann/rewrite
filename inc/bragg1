@@ -1,16 +1,16 @@
-# Berchnung der Beugung am durch die scharfe Braggbedingung 
-# erzeugten Spalt
+# calculation of the diffraction at the slit created by the sharp
+# Bragg condition
 
 CONST Phi0,Phi,Steps1,Steps2,PhiMax,l,DThetaB,sinThetaB,ld,k,t,SUM,a,step1,step2,I0 : real
-l = 30             # Abstand zur Quelle
+l = 30             # distance to the source
 DThetaB = 10 * _my # 3 * _my
 ld = 1.09e-10
 
 Phi0 = (0) * _my
 PhiMax = (150) * _my
 
-Steps1 = 150 # Fuer Betragsaddition (pro PhiMax-Phi0)
-Steps2 = 154 # 04 # Fuer Amplitudenaddition (pro DThetaB)
+Steps1 = 150 # for magnitude addition (per PhiMax-Phi0)
+Steps2 = 154 # 04 # for amplitude addition (per DThetaB)
 
 "# l = ",l
 "# DThetaB = ",DThetaB

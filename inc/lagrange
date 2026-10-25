@@ -1,7 +1,7 @@
-# braucht TERM Koord  als Input
-# TERM DGL ist Output
+# needs TERM Koord  as input
+# TERM DGL is the output
 
 # L = T - V
 
-DGL = D(Dp(L,D(Koord,t)),t) - Dp(L,Koord)  # Lagrange-2 Formalismus
+DGL = D(Dp(L,D(Koord,t)),t) - Dp(L,Koord)  # Lagrange-2 formalism
 

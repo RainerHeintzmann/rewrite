@@ -1,8 +1,8 @@
 
-#                     Messwerterfassung   
+#                     data acquisition
 # Inputs : 
 #
-#			P4 :   Anz. Messwerte
+#			P4 :   number of measured values
 
 P4,"Messwerte zu erfasen ! "
 DATA "Labor/V9.2.1.pb"

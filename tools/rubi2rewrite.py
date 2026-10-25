@@ -362,8 +362,7 @@ PREDICATES = {
     'KnownSineIntegrandQ': 'knownsineintegrandq', 'KnownTangentIntegrandQ': 'knowntangentintegrandq',
     'KnownCotangentIntegrandQ': 'knowncotangentintegrandq',
     'KnownSecantIntegrandQ': 'knownsecantintegrandq',
-    'PiecewiseLinearQ': 'piecewiselinearq', 'LinearMatchQ': 'linearmatchq',
-    'BinomialMatchQ': 'binomialmatchq', 'QuadraticMatchQ': 'quadraticmatchq',
+    'PiecewiseLinearQ': 'piecewiselinearq',
     'TrinomialQ': 'trinomialq', 'IndependentQ': 'freeq', 'LinearPairQ': 'linearpairq',
     'AlgebraicFunctionQ': 'algebraicfunctionq',
 }
@@ -542,6 +541,13 @@ def tr_bool(e, ctx):
         items = args[0][2] if args[0][0] == 'call' and args[0][1] == 'List' else [args[0]]
         x = tr_rhs(args[1], ctx)
         return paren(' && '.join('freeq(%s,%s)' % (tr_rhs(i, ctx), x) for i in items))
+    if head in MATCHQ_DEFS and len(args) == 2:
+        # LinearMatchQ[u, x], ...: Rubi's definition with MatchQ
+        params, body = MATCHQ_DEFS[head]
+        if args[0][0] == 'call' and args[0][1] == 'List':
+            return paren(' && '.join(paren(tr_bool(('call', head, [item, args[1]]), ctx))
+                                     for item in args[0][2]))
+        return tr_bool(normalize(substitute(body, dict(zip(params, args)))), ctx)
     if head == 'MatchQ' and len(args) == 2:
         # matchq(u, pattern, cond) with the matcher of the rule lists
         pat, cond = args[1], None
@@ -854,12 +860,12 @@ def translate_parsed(lhs, rhs):
 # ======================================================================
 
 HEADER = """# %s
-# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
-# mit tools/rubi2rewrite.py, Abschnitt
+# Translated automatically from Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# by tools/rubi2rewrite.py, section
 #   %s
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi.
-# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi.
+# Do not edit by hand: changes belong in the translator.
 """
 
 
@@ -952,6 +958,53 @@ def collect_macros(files):
                     MACROS[key] = (params, body)
 
 
+# Rubi's form tests LinearMatchQ, BinomialMatchQ, ... are defined in its
+# utility file as MatchQ[u, pattern /; cond] (for a list u: every element).
+# They are inlined as matchq(...) instead of being C functions.
+MATCHQ_DEFS = {}
+
+
+def top_level_args(text):
+    """the comma-separated arguments of text at bracket depth 0"""
+    out, depth, cur = [], 0, ''
+    for ch in text:
+        if ch in '[({':
+            depth += 1
+        elif ch in '])}':
+            depth -= 1
+        if ch == ',' and depth == 0:
+            out.append(cur)
+            cur = ''
+        else:
+            cur += ch
+    out.append(cur)
+    return out
+
+
+def collect_matchq_defs(util_path):
+    for text in definitions_of(util_path):
+        lhs_s, rhs_s = split_top(text, ':=')
+        if rhs_s is None:
+            continue
+        rhs_s = rhs_s.strip()
+        if rhs_s.startswith('If[ListQ[') and rhs_s.endswith(']'):
+            # If[ListQ[u], <each element (not parsable)>, <single u>]
+            parts = top_level_args(rhs_s[3:-1])
+            if len(parts) != 3:
+                continue
+            rhs_s = parts[2]
+        try:
+            lhs, body = parse(lhs_s), parse(rhs_s)
+        except Exception:
+            continue
+        if lhs[0] != 'call' or not lhs[1].endswith('MatchQ') or len(lhs[2]) != 2:
+            continue
+        if not all(a[0] == 'pat' for a in lhs[2]):
+            continue
+        if 'MatchQ' in repr(body):
+            MATCHQ_DEFS[lhs[1]] = ([a[1] for a in lhs[2]], body)
+
+
 # rules that cannot be translated, but whose work a C helper does: the start
 # of the Mathematica text -> the rule in rewrite (at the same place in the
 # order). The helper stays unevaluated if it does not apply, and the rule
@@ -987,22 +1040,22 @@ def translate_file(path, out_dir, all_vars, stats):
             ok += 1
             all_vars['P'].add('P_u')
             if hand[0] in used:         # several cases of one helper: once
-                lines.append('# Regel %d (von Hand, wie oben):\n#   %s\n' % (i, text))
+                lines.append('# Rule %d (by hand, as above):\n#   %s\n' % (i, text))
             else:
                 used.add(hand[0])
-                lines.append('# Regel %d (von Hand, C-Hilfsfunktion):\n#   %s\n%s\n' % (i, text, hand[0]))
+                lines.append('# Rule %d (by hand, C helper):\n#   %s\n%s\n' % (i, text, hand[0]))
             continue
         try:
             results = translate_rule(text)
         except Untranslatable as err:
             reason = str(err)
             stats['rejected'][reason] = stats['rejected'].get(reason, 0) + 1
-            lines.append('# Regel %d nicht uebersetzt: %s\n#   %s\n' % (i, reason, text))
+            lines.append('# Rule %d not translated: %s\n#   %s\n' % (i, reason, text))
             continue
         except (RecursionError, IndexError, ZeroDivisionError) as err:
             reason = 'internal: %s' % type(err).__name__
             stats['rejected'][reason] = stats['rejected'].get(reason, 0) + 1
-            lines.append('# Regel %d nicht uebersetzt: %s\n#   %s\n' % (i, reason, text))
+            lines.append('# Rule %d not translated: %s\n#   %s\n' % (i, reason, text))
             continue
         ok += 1
         for k, (rule, nvar, ctx) in enumerate(results):
@@ -1011,7 +1064,7 @@ def translate_file(path, out_dir, all_vars, stats):
             all_vars['K'].update(ctx.kvars)
             stats['variants'].append((nvar, name, i))
             if k == 0:
-                lines.append('# Regel %d (%d Varianten):\n#   %s\n%s\n' % (i, nvar, text, rule))
+                lines.append('# Rule %d (%d variants):\n#   %s\n%s\n' % (i, nvar, text, rule))
             else:
                 lines.append(rule + '\n')
     stats['files'].append((name, section, ok, sum(1 for _ in rules_of(path))))
@@ -1021,10 +1074,10 @@ def translate_file(path, out_dir, all_vars, stats):
 
 
 LOADER = """# inc/integration/rubi/all
-# Automatisch erzeugt von tools/rubi2rewrite.py: laedt die aus Rubi 4.17.3
-# uebersetzten Regeln (Copyright (c) 2018 Rule-Based-Integration
-# Organization, MIT-Lizenz, siehe inc/integration/LICENSE.Rubi).
-# Benutzung:
+# Generated by tools/rubi2rewrite.py: loads the rules translated from
+# Rubi 4.17.3 (Copyright (c) 2018 Rule-Based-Integration Organization,
+# MIT license, see inc/integration/LICENSE.Rubi).
+# Usage:
 #   INC "inc/all"
 #   INC "inc/integration/all"
 #   INC "inc/integration/rubi/all"
@@ -1036,27 +1089,27 @@ DEFAULT * = 1
 DEFAULT RIGHT ^ = 1
 COMM +,*
 ALG RubiRules
-# zuerst konstante Faktoren herausziehen, wie Mathematica: sonst macht normpoly
-# aus -1*(x*u) den Faktor (-1*x), und Regeln fuer (c*x)^m passen mit c = -1
+# first take constant factors out, as Mathematica does: otherwise normpoly
+# makes the factor (-1*x) from -1*(x*u), and rules for (c*x)^m match with c = -1
 ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
-# wie Mathematica 1/sin(u) = csc(u), und Rubis FixInertTrigFunction fuer
-# Produkte zweier Winkelfunktionen: sec(u)*sin(u)^2 = cos(u)^-1*sin(u)^2
+# as Mathematica: 1/sin(u) = csc(u), and Rubi's FixInertTrigFunction for
+# products of two trig functions: sec(u)*sin(u)^2 = cos(u)^-1*sin(u)^2
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(trignorm(Uv,Xv),Xv)
-# Vielfache eines Winkels (sin(2x) neben cos(x)) mit sin, cos des Winkels
-# schreiben, wie Mathematicas TrigExpand
+# write multiples of an angle (sin(2x) next to cos(x)) with sin, cos of the
+# angle, as Mathematica's TrigExpand
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(trigexpand(Uv,Xv),Xv)
-# Polynome im Integranden in Mathematicas Normalform c0+c1*x+...
-# (ohne Aenderung wird die Regel uebersprungen)
+# polynomials in the integrand in Mathematica's normal form c0+c1*x+...
+# (without a change the rule is skipped)
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)
-# Integrale von Summen gleich hier aufteilen, bevor andere Regeln die Summe
-# umformen (sonst Zyklen ausmultiplizieren/ausklammern)
+# split integrals of sums right here, before other rules transform the sum
+# (else cycles of multiplying out and factoring)
 ADDSPEC RubiRules : Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)
 %s
-# zuletzt: Hyperbelfunktionen, fuer die keine Regel passt, als e^u schreiben
-# (Rubi nimmt dafuer sin, cos mit imaginaerem Argument)
+# last: hyperbolic functions that no rule fits, written as e^u
+# (Rubi uses sin, cos with an imaginary argument for them)
 ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
 
-# am Ende: gleiche Summanden des Ergebnisses zusammenfassen
+# at the end: collect like summands of the result
 ALG RubiCollect
 ADDSPEC RubiCollect : Uv+Vv = collect(Uv+Vv)
 ADDSPEC RubiCollect : Uv*Vv = simp(Uv*Vv)       # x^2*e/x^2 = e
@@ -1089,13 +1142,13 @@ def ordered_files(rule_dir, order_file):
 
 
 UNIFY_HEADER = """# r4_0_unify
-# Automatisch erzeugt von tools/rubi2rewrite.py aus Rubis Hilfsfunktion
-# UnifyInertTrigFunction (Rubi 4.17.3, MIT-Lizenz, siehe LICENSE.Rubi).
-# Rubi hat seine Regeln fuer Potenzen meist nur fuer sin, csc, tan; vor den
-# Trigonometrie-Regeln schreibt es cos(e+f x) als sin(e+pi/2+f x) usw.
-# Jede Definition UnifyInertTrigFunction[P, x] := R /; C wird hier zur Regel
-# Int(P, x) = Int(R, x) mit der Bedingung C. IntOut macht aus
-# sin(pi/2 + u) am Ende wieder cos(u).
+# Generated by tools/rubi2rewrite.py from Rubi's helper function
+# UnifyInertTrigFunction (Rubi 4.17.3, MIT license, see LICENSE.Rubi).
+# Rubi has its rules for powers mostly only for sin, csc, tan; before the
+# trigonometric rules it writes cos(e+f x) as sin(e+pi/2+f x) and so on.
+# Each definition UnifyInertTrigFunction[P, x] := R /; C becomes the rule
+# Int(P, x) = Int(R, x) with the condition C here. IntOut turns
+# sin(pi/2 + u) back into cos(u) at the end.
 """
 
 
@@ -1152,7 +1205,7 @@ def translate_unify(util_path, out_dir, all_vars, stats):
             for r_text in rules:
                 results.extend(translate_rule(r_text))
         except (Untranslatable, RecursionError, IndexError) as err:
-            lines.append('# Definition %d nicht uebersetzt: %s\n#   %s\n' % (i, err, st))
+            lines.append('# Definition %d not translated: %s\n#   %s\n' % (i, err, st))
             continue
         ok += 1
         for k, (r, nvar, ctx) in enumerate(results):
@@ -1176,11 +1229,11 @@ def write_steps(out_dir):
         section, label, text = default_label, default_label, ''
         lines = open(path, encoding='utf-8').read().split('\n')
         for k, line in enumerate(lines):
-            if line.startswith('#   ') and k > 0 and lines[k - 1].rstrip().endswith('Abschnitt'):
+            if line.startswith('#   ') and k > 0 and lines[k - 1].rstrip().endswith('section'):
                 section = line[4:].strip()
-            m = re.match(r'# (Regel|Definition) (\d+)', line)
+            m = re.match(r'# (Rule|Definition) (\d+)', line)
             if m:
-                label = '%s, %s %s' % (section, 'rule' if m.group(1) == 'Regel' else 'definition',
+                label = '%s, %s %s' % (section, 'rule' if m.group(1) == 'Rule' else 'definition',
                                        m.group(2))
                 text = ''
             elif line.startswith('#   ') and not text and label != section:
@@ -1217,6 +1270,10 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
     files = ordered_files(rule_dir, order_file)
     collect_macros(files)
+    if util_file:
+        collect_matchq_defs(util_file)
+        if '--stats' in sys.argv:
+            print('MatchQ helpers from the utility file: %s' % ', '.join(sorted(MATCHQ_DEFS)))
     if '--stats' in sys.argv:
         print('helper definitions found in the rule files: %s' % ', '.join('%s/%d' % k for k in sorted(MACROS)))
     all_vars = {'P': set(), 'O': set(), 'K': set()}
@@ -1231,7 +1288,7 @@ def main():
         names.append(name)
 
     with open(os.path.join(out_dir, 'declarations'), 'w', newline='\n') as f:
-        f.write('# Deklarationen fuer die uebersetzten Rubi-Regeln (rubi2rewrite.py)\n')
+        f.write('# Declarations for the translated Rubi rules (rubi2rewrite.py)\n')
         f.write('VAR %s : real\n' % ','.join(sorted(all_vars['P'])))
         f.write('VAR %s : real\n' % ','.join(sorted(all_vars['O'])))
         f.write('OPT %s\n' % ','.join(sorted(all_vars['O'])))

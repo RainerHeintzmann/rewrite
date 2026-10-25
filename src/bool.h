@@ -4,8 +4,8 @@
 /*
  * bool.h V1.00
  * Copyright (c) : Rainer Heintzmann
- * 
- * Benutzerfunktionen fuer 'rewrite' (Resultattyp bool)
+ *
+ * User functions for 'rewrite' (result type bool)
  *
  */
 

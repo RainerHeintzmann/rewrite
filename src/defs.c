@@ -25,7 +25,7 @@ NULL,
 NULL},
 "ReturnTerm",
 Term,
-NULL, /* beliebiger Datentyp */
+NULL, /* any data type */
 NULL,
 FALSE,
 NULL,
@@ -35,31 +35,31 @@ NULL,
 (Symbol *) NULL,
 (Symbol *) NULL,
 (Symbol *) NULL,
-0 /* global (wird geaendert) */
+0 /* global (is changed) */
 };
 
-static Symbol * returnterm =  & ReturnTerm; /* speichert letzten term zwischen */
-static int blockstufe=0;	/* wird von sync.c bei Fehlern auf Null gesetzt */
-static int running   =0;	/* Wird gerade ein statement ausgefuert ? */
-static int blockbase =0;	/* Blockstufe, auf der ein per INC gelesenes File "Top-Level" ist */
+static Symbol * returnterm =  & ReturnTerm; /* temporarily stores the last term */
+static int blockstufe=0;	/* set to zero by sync.c on errors */
+static int running   =0;	/* Is a statement being executed right now ? */
+static int blockbase =0;	/* Block level at which a file read via INC is "top level" */
 
 #define MAXBLOCKS 250
 
-Node * local[MAXBLOCKS]; /* Kette lokaler Symbole */
+Node * local[MAXBLOCKS]; /* Chain of local symbols */
 
-static BOOLEAN dont_protect[MAXBLOCKS]; /* mit FALSE initialisiert */
+static BOOLEAN dont_protect[MAXBLOCKS]; /* initialized with FALSE */
 
-static BOOLEAN never_protect; /* In Funktionsaufruf kein protect */
+static BOOLEAN never_protect; /* No protect inside a function call */
 
-static BOOLEAN in_definition=0; /* In Funktionsaufruf kein protect */
+static BOOLEAN in_definition=0; /* No protect inside a function call */
 
-static Node * globalArglist=NULL; /* fuer direktes Zuweisen von Parametern */
+static Node * globalArglist=NULL; /* for direct assignment of parameters */
 
-static Node * globalRtw = NULL; /* Return-Wert von Funktionen */
+static Node * globalRtw = NULL; /* Return value of functions */
 
-/* Funktionen zum Blockhandling :   */
+/* Functions for block handling :   */
 
-static Symbol * save_local_run(Symbol * sp)  /* zur Laufzeit andere Reihenfolge ! */
+static Symbol * save_local_run(Symbol * sp)  /* different order at run time ! */
 {
 	Symbol * ns;
 	Node * vp;
@@ -67,10 +67,10 @@ static Symbol * save_local_run(Symbol * sp)  /* zur Laufzeit andere Reihenfolge 
 	DEBG((15,"save_local_run\n"));
 
 	if (! blockstufe) return sp;
-	for (vp=local[blockstufe];vp != NULL;vp=vp->r) /* schon mal definiert ? */
+	for (vp=local[blockstufe];vp != NULL;vp=vp->r) /* already defined ? */
 		if (sp==(Symbol *) vp->l)	return oldvals(sp);
 
-	ns=mksym(Id,name(sp));           /* jetzt frei fuer bel. Definitionen */
+	ns=mksym(Id,name(sp));           /* now free for arbitrary definitions */
 	defined_in_block(ns)=blockstufe;
 	oldvals(ns)=oldvals(sp);
 	oldvals(sp)=ns;
@@ -86,22 +86,22 @@ static Symbol * save_local(Symbol * sp)
 
 	DEBG((15,"save_local\n"));
 
-	if (blockstufe <= blockbase) return sp; /* Top-Level (auch in INC-Files): global definieren */
-	if (running) return save_local_run(sp); /* Zur Laufzeit anderes Verfahren ! */
+	if (blockstufe <= blockbase) return sp; /* Top level (also in INC files): define globally */
+	if (running) return save_local_run(sp); /* Different procedure at run time ! */
 
 	for (vp=local[blockstufe];vp != NULL;vp=vp->r)
 		if (sp==(Symbol *) vp->l)	return sp;
 
 	ns=clonesym(sp);
 	oldvals(sp)=ns;
-	lexval(sp)=Id; /* jetzt frei fuer bel. Definitionen */
+	lexval(sp)=Id; /* now free for arbitrary definitions */
 	local[blockstufe]=mknod(Id,(Node *) sp,local[blockstufe]);	
 	DEBG((15,"save_local_end\n"));
 	return sp;
 }
 
-/* Laufzeit-Kopie eines lokalen Symbols (aus save_local_run) freigeben:
- * Name (strsave in mksym), Zahlenwert und gespeicherter Term gehoeren ihr. */
+/* Free the run-time copy of a local symbol (from save_local_run):
+ * the name (strsave in mksym), numeric value and stored term belong to it. */
 static void free_local_sym(Symbol * sp)
 {
 	if (lexval(sp) == Const && hasval(sp) && value(sp)
@@ -113,7 +113,7 @@ static void free_local_sym(Symbol * sp)
 	delsym(sp);
 }
 
-static void restore_locals_run(void) /* zur Laufzeit andere Reihenfolge ! */
+static void restore_locals_run(void) /* different order at run time ! */
 {
 	Node * vp,* op;
 	Symbol * sp,* sp2;
@@ -143,7 +143,7 @@ static void restore_locals(void)
 	DEBG((20,"restore_local\n"));
 	if (running) 
 		{
-		restore_locals_run(); /* Zur Laufzeit anderes Verfahren ! */
+		restore_locals_run(); /* Different procedure at run time ! */
 		return;
 		}
 
@@ -153,11 +153,11 @@ static void restore_locals(void)
 		sp=(Symbol *) vp->l;
 		sp2=oldvals(sp);
 		{
-		char * keep = name(sp); /* sp behaelt seinen eigenen Namen */
+		char * keep = name(sp); /* sp keeps its own name */
 		cpysym(sp2,sp);
 		name(sp) = keep;
 		}
-		free(name(sp2));        /* Kopie des Namens aus clonesym */
+		free(name(sp2));        /* Copy of the name from clonesym */
 		delsym(sp2);
 		op=vp;
 		vp=vp->r;
@@ -167,7 +167,7 @@ static void restore_locals(void)
 	local[blockstufe]=NULL;
 }
 
-/* weitere Functs */
+/* further Functs */
 
 void specials(Symbol * sp, int lexv)
 {
@@ -176,13 +176,13 @@ void specials(Symbol * sp, int lexv)
 		case Sort :			value(sp) = NULL;
 										IS_Verbindung(sp) = NULL;
 										IS_kette(sp) = NULL;
-										show(sp)  = (void *) std_show_real; /* show-Fkt. */
+										show(sp)  = (void *) std_show_real; /* show function */
 										cmp(sp)  = (Node *) std_cmp_real;
 										cpy(sp)  = (Node *) std_cpy_real;
 										del(sp)  = (Symbol *) std_del_real;
 										break;
 		case Bra :
-										klammer(sp) = sp; /* mit sich selbst */
+										klammer(sp) = sp; /* with itself */
 										kette(sp) = NULL;
 										break;			
 		default : break;
@@ -190,12 +190,12 @@ void specials(Symbol * sp, int lexv)
 
 }
 
-void protectAtall (void) /* fuer declare-argumente */
+void protectAtall (void) /* for declare arguments */
 {
 never_protect=FALSE;
 }
 
-void protect (void) /* fuer declare-argumente */
+void protect (void) /* for declare arguments */
 {
 dont_protect[blockstufe]=FALSE;
 }
@@ -237,7 +237,7 @@ Symbol * declaresym(Symbol * sp,Node * rtps,Node * atps,int lexv,int hasv)
 		DEBG((15,"declare_sym : "));
 		DBFK(15, print(np));
 		DEBG((15,"\n"));
-		np=ARGS_ITEM(np);  /* aktuelles Argument */
+		np=ARGS_ITEM(np);  /* current argument */
 		switch (lexv)
 			{
 				case Const : numassign2(np,sp);
@@ -246,7 +246,7 @@ Symbol * declaresym(Symbol * sp,Node * rtps,Node * atps,int lexv,int hasv)
 				case Term : termassign2((Node *) sp,np);
 										globalArglist=ARGS_NEXT(globalArglist);
 										break;
-				case Func : /* Funktionen zu weisen */
+				case Func : /* assign functions */
 				case Bra  :
 				case Bra1 :
 				case Ra   :
@@ -291,14 +291,14 @@ void declare (Node * np) /* Idlist,lexv,rtps,atps,hasv */
 	sp = (Symbol *) mynp;
 	sp = declaresym(sp,rtps,atps,lexv,hasv);
 
-	/* Nur auf Top-Level neutralisieren: dort wird die Zeile nach dem Ausfuehren geloescht.
-	 * In Bloecken (Schleifen, Funktionen, INC in Bloecken) muss die Definition
-	 * bei jedem Durchlauf erneut ausgefuehrt werden koennen. */
+	/* Neutralize only at top level: there the line is deleted after execution.
+	 * In blocks (loops, functions, INC inside blocks) the definition must be
+	 * executable again on every pass. */
 	if (blockstufe <= blockbase)
 		{
-		DECL_LEXV(np)=PARAM;   /* vorher lexval */
-		DECL_HASV(np)=PARAM;   /* vorher hasval */
-		DECL_ATYPES(np)= NULL; /* atypes nicht loeschen ! */
+		DECL_LEXV(np)=PARAM;   /* formerly lexval */
+		DECL_HASV(np)=PARAM;   /* formerly hasval */
+		DECL_ATYPES(np)= NULL; /* do not delete atypes ! */
 		DECL_RTYPES(np)= NULL;
 		}
 
@@ -324,17 +324,17 @@ void other_fkt (Node * np)
   newsym=mksym(lexval(sp),name(sp));
 	atypes(newsym)=vsortl;
 	rtypes(newsym)=sort;
-	kette(newsym)=sp; /* Im Kreis verkettet */
+	kette(newsym)=sp; /* Linked in a circle */
 	for (hilf=sp;(kette(hilf)!= (Symbol *) NULL) && (kette(hilf) != sp);hilf=kette(hilf))
-				; /* Kein Schleifenkoerper */
-	kette(hilf)=newsym;  /* Verketten der Funktionen */
+				; /* No loop body */
+	kette(hilf)=newsym;  /* Chaining of the functions */
 	urs_fkt(newsym)=sp;
 	if (att)
 		if (att->type==ATT)
 			{
 			hasval(newsym) = TRUE;
 			value(newsym)  = ATT_CFUNC(att);
-			builtin(newsym) = att->r ? (att->r->r ? 2 : 1) : 0;	/* symbolische C-Funktion, 2: HOLD */
+			builtin(newsym) = att->r ? (att->r->r ? 2 : 1) : 0;	/* symbolic C function, 2: HOLD */
 			}
 		else /* PARAM */
 			{
@@ -343,7 +343,7 @@ void other_fkt (Node * np)
 			hasval(newsym) = TRUE;
 			}
 	OTHER_ATT(np)   = NULL;
-	OTHER_RTYPE(np) = NULL; /* atypes nicht loeschen */
+	OTHER_RTYPE(np) = NULL; /* do not delete atypes */
 	OTHER_SORTS(np) = NULL;
 }
 
@@ -356,10 +356,10 @@ void att_fkt (Node * np)
 	kette(sp) = NULL;
 	urs_fkt(sp)= sp;
 	if (ufk)
-		if (ufk->type == ATT) /* USERfkt. */
+		if (ufk->type == ATT) /* user function */
 			{value(sp)  = ATT_CFUNC(ufk);
 			hasval(sp) = TRUE;
-			builtin(sp) = ufk->r ? (ufk->r->r ? 2 : 1) : 0;}	/* symbolische C-Funktion, 2: HOLD */
+			builtin(sp) = ufk->r ? (ufk->r->r ? 2 : 1) : 0;}	/* symbolic C function, 2: HOLD */
 		else /* PARAM */
 			{
 			value(sp) =ufk;
@@ -377,7 +377,7 @@ void att_sort (Node * np)
        * ufk4  = ATTS_DEL(np);
 DEBG((4,"def.c : att_sort \n"));
 hasval(sp) = TRUE;
-show(sp) = (void *) ufk1 ; /* show-Fkt. */
+show(sp) = (void *) ufk1 ; /* show function */
 cmp(sp)  = (Node *) ufk2;
 cpy(sp)  = (Node *) ufk3;
 del(sp)  = (Symbol *) ufk4;
@@ -407,7 +407,7 @@ Node * ap,* form,* toform;
 		{
 		form=FORM_LHS(ap->l);
 		toform=FORM_RES(ap->l);
-		atypes(sp)=add_rule(form,toform,atypes(sp)); /* in Formelbaum oder Regelliste (expand.c) */
+		atypes(sp)=add_rule(form,toform,atypes(sp)); /* in formula tree or rule list (expand.c) */
 		}
 SPEC_LIST(np) = NULL;
 }
@@ -461,7 +461,7 @@ Node * in_block_def(Node * np)
 {
 if (blockstufe > blockbase)
 	{
-	((void (*) (Node *)) (np->l)) (np); /* zeitweise definieren, werden durch block-end geloescht */
+	((void (*) (Node *)) (np->l)) (np); /* define temporarily, they are deleted by block end */
 	return np;
 	}
 else return np;
@@ -491,7 +491,7 @@ Node * exe_function (Node * np)
 	globalArglist=TERM_ARGS(np);
 	in_definition=TRUE;
 
-	for(jog=UFUNC_ARGDEFS((Node *) value(sp));jog;jog=jog->r) /* Argument-definitionen */
+	for(jog=UFUNC_ARGDEFS((Node *) value(sp));jog;jog=jog->r) /* Argument definitions */
 		CALLFUNCT(jog->l);
 
 	in_definition=FALSE;
@@ -515,7 +515,7 @@ Node * exe_function (Node * np)
 void return_fkt (Node * np)
 {
 returnterm= &ReturnTerm;
-if (! termassign2((Node *) returnterm,np->r)) returnterm=NULL; /* damit wird Ergebnis ignoriert */
+if (! termassign2((Node *) returnterm,np->r)) returnterm=NULL; /* this way the result is ignored */
 DEBG((4,"RETURNed : "));
 DBFK(4, print((Node *) returnterm));
 DEBG((4,"\n"));
@@ -544,12 +544,12 @@ else /* type == SYM_TYPE */
 		DEBG((4,"def.c : rec_build_list entered Symbol : "));
 		DBFK(4, print(* np));
 		DEBG((4,"\n"));
-		return mknod(SYM_TYPE,(Node *) np,(Node *) (* np)); /* Adresse, an der Aenderung vorzunehmen ist und Grund-Symbol */
+		return mknod(SYM_TYPE,(Node *) np,(Node *) (* np)); /* Address at which the change is to be made, and base symbol */
 		}
 	else
 		return NULL;
 	}
-return NULL; /* fuer dumme Compiler */
+return NULL; /* for dumb compilers */
 }
 
 void set_locals (Node * np,Symbol * (* give_fkt) (Symbol *))
@@ -562,20 +562,20 @@ if (np -> type == SYM_TYPE)
 	{
 	Symbol ** spp= (Symbol **) (np->l);
 	DEBG((4,"def.c : set_locals Symbol : %s changed\n",name(* spp)));
-	(* spp) = give_fkt((Symbol *) np->r); /* Aendern des Zeigers */
+	(* spp) = give_fkt((Symbol *) np->r); /* Change the pointer */
 	DEBG((4,"done\n",name(* spp)));
 	}
 else
 	fatal("ERROR : set_locals : wrong type");
 }
 
-Symbol * give_actual (Symbol * sp) /* neustes Symbol raussuchen (run-time) */
+Symbol * give_actual (Symbol * sp) /* look up the newest symbol (run time) */
 {
   DEBG((5,"def.c : giveactual returned : %s \n",name(oldvals(sp))));
   return oldvals(sp);
 }
 
-Symbol * give_old (Symbol * sp) /* altes Symbol raussuchen (run-time) */
+Symbol * give_old (Symbol * sp) /* look up the old symbol (run time) */
 {
   DEBG((5,"def.c : giveold returned : %s \n",name(sp)));
   return sp;
@@ -592,7 +592,7 @@ DEBG((4,"args: "));
 DBFK(4, print(INSTR_PAR(instr)));
 DEBG((4,"\n"));
 CALLFUNCT(instr);
-set_locals(list,give_old); /* Wieder fuer naechsten Aufruf zuruecksetzen */
+set_locals(list,give_old); /* Reset again for the next call */
 return;
 }
 
@@ -627,9 +627,9 @@ void is_running(void)
 }
 
 
-/* INC innerhalb eines laufenden Blocks: das eingelesene File wird wie eine
- * Eingabe auf Top-Level behandelt (Definitionen sofort und global, nicht
- * doppelt zur Parse- und Laufzeit). Die aeusseren Bloecke bleiben erhalten. */
+/* INC inside a running block: the file read is treated like an
+ * input at top level (definitions immediately and globally, not
+ * twice at parse time and run time). The outer blocks are kept. */
 int include_begin(void)
 {
 	int old = blockbase;
@@ -639,7 +639,7 @@ int include_begin(void)
 
 void include_end(int oldbase)
 {
-	while (blockstufe > blockbase) /* nicht geschlossene Bloecke im File */
+	while (blockstufe > blockbase) /* unclosed blocks in the file */
 		{
 		protect();
 		block_end();

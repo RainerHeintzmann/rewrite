@@ -1,24 +1,24 @@
-#                     Simulation von Synchrotronstrahlung
+#                     simulation of synchrotron radiation
 # Inputs :
 #
 
-CONST pose : rvector # Position des Elektrons 
-CONST pe : rvector   # Impuls   des Elektrons 
-CONST pos2,e12a,e12b,e12c : rvector  # Position Beobachter,Scheinbarer Relativer Einheitsvector
-CONST l12 : real                     # Entfernung
-CONST t12a,t12b,t12c,dummy : real          # Zeit beim Beobachter
+CONST pose : rvector # position of the electron
+CONST pe : rvector   # momentum of the electron
+CONST pos2,e12a,e12b,e12c : rvector  # position of observer, apparent relative unit vector
+CONST l12 : real                     # distance
+CONST t12a,t12b,t12c,dummy : real          # time at the observer
 
-TERM E,B,F,d2dt2_e,Be : rvector # E=Elektrisches Feld,B = zugeh. Magnetfeld,Kraft,2.Abl (posrel), Magnetfeld fuer elektron
+TERM E,B,F,d2dt2_e,Be : rvector # E=electric field,B = corresp. magnetic field,force,2nd deriv. (posrel), magnetic field for electron
 TERM t12 : real
 
 d2dt2_e = 2*((e12b-e12a)/(t12b-t12a)-(e12c-e12b)/(t12c-t12b))/(t12c-t12a)
 
-t12= .5*t12b+.25*(t12a+t12c) # Zugehoerige Zeit
+t12= .5*t12b+.25*(t12a+t12c) # corresponding time
 
 E = (- e0) / (4*pi*ep0*c^2) * d2dt2_e
 # B = -1* e12b _x_ E/c
 
-# Bewegung des Elektrons : (Naeherung : kein Energieverlust) d/dt p = q*VxB
+# motion of the electron : (approximation : no energy loss) d/dt p = q*VxB
 
 Be = [1*sin elem(pose,0),0,0]  # Wiggler
 
@@ -40,7 +40,7 @@ t12a=t12b ; t12b=t12c
 e12c=pos2 - pose
 l12 = (e12c*e12c)^.5
 t12c = l12/c
-e12c=e12c/l12 # Einheitsvector
+e12c=e12c/l12 # unit vector
 
 pose
 }

@@ -1,8 +1,8 @@
 /*
  * vector.c V1.00
  * Copyright (c) : Rainer Heintzmann
- * 
- * Benutzerfunktionen fuer 'rewrite' (Resultattyp vector)
+ *
+ * User functions for 'rewrite' (result type vector)
  *
  */
 
@@ -17,7 +17,7 @@
 void show_vec (vector * vp)
 {
 int i;
-double * dp; /* Lattice schnallt's sonst nicht */
+double * dp; /* otherwise Lattice does not get it */
 
 /* printfOut("vec( "); */
 
@@ -89,11 +89,11 @@ int i;
 	dp=Vector(vp);
 
 	for(i=0;i<Dimension(vp);i++)
-			(* dp++) = (double) 0; /* auf Null setzen */
+			(* dp++) = (double) 0; /* set to zero */
 	return vp;
 }
 
-vector * eins_vec (double * arg[]) /* Einheits-vector mit Eins bei arg[1] */
+vector * eins_vec (double * arg[]) /* unit vector with a one at arg[1] */
 {
 vector * rt = null_vec(arg);
 int pos = (int) * arg[1]; 
@@ -126,7 +126,7 @@ dp += Pos;
 return rp;
 }
 
-vector * constr_vec (double * arg[]) /* Variable viele Args ! */
+vector * constr_vec (double * arg[]) /* variable number of args ! */
 {
 int args;
 double * dp;
@@ -329,7 +329,7 @@ m3[1] = v1[2]*v2[0]-v1[0]*v2[2];
 m3[2] = v1[0]*v2[1]-v1[1]*v2[0];
 }
 
-vector * vec_x_vec (void * arg[]) /* Kreuzprodukt */
+vector * vec_x_vec (void * arg[]) /* cross product */
 {
 vector * v1= (vector *) arg[0];
 vector * v2= (vector *) arg[1];
@@ -347,7 +347,7 @@ xvec(Vector(v1),Vector(v2),Vector(rt),Dimension(v1));
 return rt;
 }
 
-double * vec_middle (void * arg[]) /* Mittelwert eines Vectors */
+double * vec_middle (void * arg[]) /* mean of a vector */
 {
 vector * vp= (vector *) arg[0];
 double * dp= Vector(vp),sum=0.0;
@@ -358,7 +358,7 @@ for (i=0;i<Dimension(vp);i++) sum += * (dp++);
 return mkreal(sum/Dimension(vp));
 }
 
-double * vec_ms (void * arg[]) /* Mean Sqare */
+double * vec_ms (void * arg[]) /* mean square */
 {
 vector * vp= (vector *) arg[0];
 double * dp= Vector(vp),sum=0.0,sqsum=0.0;
@@ -369,7 +369,7 @@ for (i=0;i<Dimension(vp);i++) {sum += * dp;sqsum += (* dp)*(* dp);dp++;}
 return mkreal((sum*sum-sqsum)/Dimension(vp));
 }
 
-double * vec_rms (void * arg[]) /* Rout mean square */
+double * vec_rms (void * arg[]) /* root mean square */
 {
 vector * vp= (vector *) arg[0];
 double * dp= Vector(vp),sum=0.0,sqsum=0.0;
@@ -397,7 +397,7 @@ for(pos=0;pos < maxpos;pos++)
 return mkreal((double) maxpos);
 }
 
-/**************** Elementweise Fkt. *************************/
+/**************** elementwise functions *************************/
 
 vector * sin_vec (void * arg[])
 {
@@ -609,7 +609,7 @@ for(i=0;i<Dimension(vp);i++)
 return rt;
 }
 
-vector * gen_vec (void * arg[])  /* arg : double : von,bis,Steps */
+vector * gen_vec (void * arg[])  /* arg : double : from,to,Steps */
 {
 int	i;
 double * dp1 = (double *) arg[0];

@@ -1,4 +1,4 @@
-#                     Ausfuerung von Graphiktabelle
+#                     execution of the graphics table
 # Inputs :
 #
 #			m1=1 m2=1e10 x0=1 y0=0 vx0=0 vy0=1
@@ -20,4 +20,4 @@ FOR t = 0 TO 1.3*(3600*24*365) STEP dt DO 	{ \
 	y1 = y1 + vy1*dt \
 	x1/1000,y1/1000,a/1000 \
 	}\
-z=x	# z ist wieder unbekannt
+z=x	# z is unknown again

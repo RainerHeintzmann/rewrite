@@ -9,8 +9,8 @@
  *	give the fields names; they expand to the same expressions as before,
  *	so the memory layout is unchanged.
  *
- *	Benannter Zugriff auf die Knotenstrukturen aus syn.y. Das Speicher-
- *	layout bleibt gleich, die Makros dokumentieren es.
+ *	In short: named access to the node structures of syn.y. The memory
+ *	layout stays the same, the macros document it.
  */
 
 #include "run.h"

@@ -1,27 +1,27 @@
-# Physikalische Konstanten
-# Einheiten des S-I Systems
+# physical constants
+# units of the SI system
 
-  c = 2.997924562e8   # Vak.-Lichtgeschw.
-  G = 6.670e-11       # Gravitationskonstante
- e0 = 1.6022e-19      # Elementarladung
- me = 9.1093897e-31   # Elektronenmasse
- mp = 1.6726231e-27   # Protonenmasse
-  g = 9.80665         # Erdbeschleunigung
-  R = 8.3143          # Universelle Gaskonstante
- Na = 6.023e23        # Avogadrokonstante
-  k = 1.380658e-23    # Bolzmannkonstante [J/K]
+  c = 2.997924562e8   # speed of light in vacuum
+  G = 6.670e-11       # gravitational constant
+ e0 = 1.6022e-19      # elementary charge
+ me = 9.1093897e-31   # electron mass
+ mp = 1.6726231e-27   # proton mass
+  g = 9.80665         # gravitational acceleration
+  R = 8.3143          # universal gas constant
+ Na = 6.023e23        # Avogadro constant
+  k = 1.380658e-23    # Boltzmann constant [J/K]
  kb = k
-  h = 6.6256e-34      # Planksches Wirkungsquant
- hq = h/(2*pi)        # h-Quer
-ep0 = 8.8542e-12      # Elektrische Feldkonstante
-my0 = 4*pi*1e-7       # Magnetische Feldkonstante
+  h = 6.6256e-34      # Planck constant
+ hq = h/(2*pi)        # h-bar
+ep0 = 8.8542e-12      # electric constant
+my0 = 4*pi*1e-7       # magnetic constant
 mu0 = my0
  TK = 273.15          # 0 C = TK Kelvin
-bel = e0*e0/(4*pi*ep0*me*c*c) # Streulaenge des Elektrons == 2.82 fm
+bel = e0*e0/(4*pi*ep0*me*c*c) # scattering length of the electron == 2.82 fm
 
-  u = 1.660277e-27    # Atomare Masseneinheit
+  u = 1.660277e-27    # atomic mass unit
 
-# Einheiten:
+# units:
 
 _E = 1e18
 _P = 1e15

@@ -1,14 +1,14 @@
 /* forms.c */
-/* Baum fuer Formeln der Algebren */
+/* Tree for the formulas of the algebras */
 
 #include "inout.h"
 #include "run.h"
 #include "sym.h"
 #include "syn.h"
 #include "forms.h"
-#include "node.h" /* auch symeq */
+#include "node.h" /* also symeq */
 #include "sync.h"
-#include "numsort.h"	/* 2026: var_sort_ok */  /* Fuer IS_follows, lock_rtypes */
+#include "numsort.h"	/* 2026: var_sort_ok */  /* For IS_follows, lock_rtypes */
 #include "nodes.h"
 
 extern Node * chain_pos;
@@ -29,7 +29,7 @@ static Node * ersetz;
 
 Node * einhaengen (Node * form,Node * Ersetz)
 {
-	return mknod(ERSETZ_TYPE,form,Ersetz);  /* tcopy benutzen ?? (Aber geht nicht wegen Cond) */
+	return mknod(ERSETZ_TYPE,form,Ersetz);  /* use tcopy ?? (But does not work because of Cond) */
 }
 
 Node * mkor(Node * l,Node * r)
@@ -71,10 +71,10 @@ BOOLEAN merge2(Node * form,Node * Baum)
 	if ((form != NULL) && (Baum != NULL) 
 		&& (form->type == SYM_TYPE) && (Baum->type == SYM_TYPE)
 		&& (lexval((Symbol *) form) == Var) && (lexval((Symbol *) Baum) == Var))
-			return FALSE; /* Metavariablen duerfen nie passen, da es sonst spaeter Entscheidungsprobleme fuer das restaurieren der Variablen gibt : */
+			return FALSE; /* Metavariables must never match, otherwise there are decision problems later when restoring the variables : */
 
 	if (form == Baum)
-		return TRUE;   /* Teilbaeume sind identisch (Symbole oder NULL) */
+		return TRUE;   /* Subtrees are identical (symbols or NULL) */
 
 	if ((Baum == (Node *) NULL) || (form == (Node *) NULL))
 		{
@@ -136,19 +136,19 @@ BOOLEAN merge2(Node * form,Node * Baum)
 		/* if (depth1 >= depth2) */
 		/* 	{  */
 		/* 	merk_p_baum = &(Baum->l); */
-		/*	tmp = merge2(form,Baum->l);  /* Tiefe mitzaehlen, besseren Baum nehmen */
+		/*	tmp = merge2(form,Baum->l);  /* count depth, take the better tree */
 	  /* 	} */
 		/* else */
 		/* 	{ */
 		/* 	merk_p_baum = &(Baum->r); */
-		/* 	tmp = merge2(form,Baum->r);  /* Tiefe mitzaehlen, besseren Baum nehmen */
+		/* 	tmp = merge2(form,Baum->r);  /* count depth, take the better tree */
 		/* 	} */
 
 		depthcount += merk_depth;
 		merk_p_baum = &(Baum->r); 
     matched_ers = FALSE;
-		tmp = merge2(form,Baum->r);  /* Besser Tiefe mitzaehlen, besseren Baum nehmen */
-		if (! tmp)  /* siehe auch unten */
+		tmp = merge2(form,Baum->r);  /* Better: count depth, take the better tree */
+		if (! tmp)  /* see also below */
 			if (wo_ers == (Node * *) NULL)
 				{
 				wo_ers = &(Baum->r);
@@ -160,7 +160,7 @@ BOOLEAN merge2(Node * form,Node * Baum)
 		}
 
 
-	if (  (form -> type == SYM_TYPE)   /* evt. gleicher Wert ? */
+	if (  (form -> type == SYM_TYPE)   /* possibly the same value ? */
 		 && (Baum -> type == SYM_TYPE))
 		{
 		BOOLEAN tmp=symeq((Symbol *) form,(Symbol *) Baum);
@@ -174,7 +174,7 @@ BOOLEAN merge2(Node * form,Node * Baum)
 		return tmp;
 		}
 	else
-		if (form->type==Baum->type)   /* Term oder Func ,.. */
+		if (form->type==Baum->type)   /* Term or Func ,.. */
 			{
 				BOOLEAN m1,m2,merk_ers;
 
@@ -211,7 +211,7 @@ BOOLEAN merge2(Node * form,Node * Baum)
 						wo_ers_weg = alt_ers_weg;
 						alt_ers = in_ers;
 						}
-				if ((!m1)       /* && (!m2) aber Probleme bei Func-dann OR-Knoten ! */
+				if ((!m1)       /* && (!m2) but problems with Func followed by OR node ! */
 				  || ( matched_ers))
 						{
 						if (! matched_ers)
@@ -229,7 +229,7 @@ BOOLEAN merge2(Node * form,Node * Baum)
 
 						wo_ers = (Node * *) NULL;
 						alt_ers = in_ers;
-						matched_ers = FALSE; /* Zuruecksetzen, neachste moegliche Ersetzung findet statt */
+						matched_ers = FALSE; /* Reset, the next possible replacement takes place */
 						}
 				else
 						depthcount--;
@@ -265,9 +265,9 @@ Node * merge(Node * form,Node * Ersetz,Node * Baum)
 			{
 			if (alt_ers==Baum)
 				if (wo_ers == (Node **) NULL)
-					alt_ers=NULL; /* Oberer ER-Knoten wird ganz ersetzt */
+					alt_ers=NULL; /* Upper ER node is replaced entirely */
 				else
-          Baum = Baum->l; /* Da ER-Knoten in den Teilbaum gezogen wird ! */
+          Baum = Baum->l; /* Because the ER node is pulled into the subtree ! */
 			else
 					if (alt_ers != (Node *) NULL)
 						(* wo_ers_weg) = alt_ers->l;
@@ -322,10 +322,10 @@ BOOLEAN match2 (Node * term,Node * Baum)
 			DBFK(6,print(Baum->r));
 			DEBG((6,"\n"));
 
-			/* passende Formel gefunden , nun Condition pruefen */
-			if (COND_CALL(RES_COND(Baum->r)))	/* Condition fuer Gleichung */
+			/* matching formula found, now check the condition */
+			if (COND_CALL(RES_COND(Baum->r)))	/* Condition for the equation */
 				{
-				ersetz = Baum->r; /* Condition passt auch ! */
+				ersetz = Baum->r; /* Condition matches too ! */
 				return TRUE;
 				}
 			else
@@ -355,7 +355,7 @@ BOOLEAN match2 (Node * term,Node * Baum)
 		{
 			Symbol * tsym;
 
-			switch (term->type)	/* Sucht zu term gehoeredes Symbol */
+			switch (term->type)	/* Finds the symbol belonging to term */
 				{
 				case Const: 
 				case Func:  tsym=(Symbol *) term->l;
@@ -365,7 +365,7 @@ BOOLEAN match2 (Node * term,Node * Baum)
 										break;
 				default:
 										RESTORE
-										return FALSE; /* Passiert schon mal im Baum ! */
+										return FALSE; /* Does happen in the tree ! */
 										/* printfErr("match2: Internal ERROR : term : ");
 										   print(term);
 										   printfErr("Baum : ");
@@ -373,10 +373,10 @@ BOOLEAN match2 (Node * term,Node * Baum)
 										   printfErr("(unexpected term-type) Nr.:%d !\n",term->type); */
 				}
 
-		if  (lexval((Symbol *) Baum) == Var) /* Variable ersetzen */
+		if  (lexval((Symbol *) Baum) == Var) /* Replace variable */
 			{
 			if ((term->type != Const) 
-					&& (term->type != Func)) /* Gewuenscht : Const,Func */
+					&& (term->type != Func)) /* Wanted : Const,Func */
 				{
 				printfErr("match2: ERROR : unexpected term-type : ");
 				print(term);
@@ -385,19 +385,19 @@ BOOLEAN match2 (Node * term,Node * Baum)
 				return FALSE;
 				}
 
-			/* Verschiedene Sorts werden auch zugeordnet, ehemals: if (! eq_sorts(rtypes((Symbol *) Baum),rtypes(tsym))) return FALSE;*/
-			/* 2026: ausser fuer Untersorten (VAR X : nonneg passt nur zu nonneg) */
+			/* Different sorts are assigned too, formerly: if (! eq_sorts(rtypes((Symbol *) Baum),rtypes(tsym))) return FALSE;*/
+			/* 2026: except for subsorts (VAR X : nonneg only matches nonneg) */
 			if (! var_sort_ok(rtypes((Symbol *) Baum), term))
 				{
 				RESTORE
 				return FALSE;
 				}
 
-                       /* Typen (auch Fkt.resultate) stimmen nun */
+                       /* Types (also function results) match now */
 
-			if (hasval(Baum))                 /* Numerische Variable ? */
+			if (hasval(Baum))                 /* Numeric variable ? */
        if (!(lexval(tsym) == Const)
-  				|| ! hasval(tsym))            /* nur Numerische Const / Func ersetzen */
+  				|| ! hasval(tsym))            /* only replace numeric Const / Func */
         {
 			/*	 Node * erg1=calkulate (term);
 					if (!erg1 || rtypes((Symbol *) erg1) != numbertype)
@@ -413,16 +413,16 @@ BOOLEAN match2 (Node * term,Node * Baum)
 				}
 
 			chain_pos = chain_pos -> l = mknod(CHAIN,NULL,NULL);
-			chain_pos->r = (Node *) Baum; /* Neue Pos. belegen */
+			chain_pos->r = (Node *) Baum; /* Occupy new position */
 			DEBG((4,"Variable ersetzt : "));
 			DBFK(4,print(Baum));
 
-				Baum->type = term->type;  /* Const oder Func */
+				Baum->type = term->type;  /* Const or Func */
 				Baum->l = term->l;
 				Baum->r = term->r;
 
-	/* (* Baum) = (* term);	einzig moegl. Ersetzung direkt in der Symboltabelle ! */
-		   												/* Node-Struktur wird kopiert (und so ueberschrieben !) */
+	/* (* Baum) = (* term);	only possible replacement directly in the symbol table ! */
+		   												/* Node structure is copied (and thus overwritten !) */
 
 				DEBG((4,"-> "));
 				DBFK(4,print(Baum));
@@ -430,11 +430,11 @@ BOOLEAN match2 (Node * term,Node * Baum)
 
 			return TRUE;
 			}
-		else			/* Constanten oder Funktionen vergleichen */
+		else			/* Compare constants or functions */
 			{
 			if (lexval((Symbol *) Baum) == Term)
 				{
-				return match2(term,Baum->l); /* Symbol-Platz ueberspringen */
+				return match2(term,Baum->l); /* Skip the symbol slot */
 				}
 			return symeq((Symbol *) term,(Symbol *) Baum);
 			}
@@ -456,7 +456,7 @@ BOOLEAN match2 (Node * term,Node * Baum)
 								return TRUE;
 								}
 							else
-								{ /* locks loeschen */
+								{ /* delete locks */
 								Node * oldc;
 								while (tmpchain)
 									{
@@ -487,7 +487,7 @@ BOOLEAN match2 (Node * term,Node * Baum)
 				RESTORE
 				return FALSE;
 				}
-	else			/* Hier unterscheiden sich term, Baum ! */
+	else			/* Here term and Baum differ ! */
 		{
 
 		DEBG((5,"Terms don't match : returned False !\n"));
@@ -505,7 +505,7 @@ NULL,
 NULL
 };
 
-ersetz = &dummi; /* damit fuer in_tree nicht NULL zurueck kommt ! */
+ersetz = &dummi; /* so that in_tree does not return NULL ! */
 
 if(match2(term,Baum))
 	return ersetz;
@@ -521,19 +521,19 @@ BOOLEAN testrewrite _2a ((term,formterm) , Node * term ,Node * formterm)
 		DBFK(4,print(formterm));
 		DEBG((4,"\n"));
 
-	if (term == formterm) /* Symbole / Zeiger vergleichen (auch NULL !!) */
+	if (term == formterm) /* Compare symbols / pointers (also NULL !!) */
 		return TRUE;
 
 	if (((formterm -> type) == SYM_TYPE))
 		{
-		if  (lexval((Symbol *) formterm) == Var) /* Variable ersetzen */
+		if  (lexval((Symbol *) formterm) == Var) /* Replace variable */
 			{
-			/* ehemals : if (!eq_sorts(rtypes((Symbol *) formterm),rtypes((Symbol *) term->l))) /* term -> l geht in die Symboltabelle */
+			/* formerly : if (!eq_sorts(rtypes((Symbol *) formterm),rtypes((Symbol *) term->l))) /* term -> l goes into the symbol table */
       /*  return FALSE; */
-                                            /* Typen (auch Fkt.resultate) stimmen nun */
+                                            /* Types (also function results) match now */
 			if (hasval(formterm))
         if ((term->type != Const) /****/
-					|| ! hasval(term->l))    /* nur Numerische Const ersetzen */
+					|| ! hasval(term->l))    /* only replace numeric Const */
 				return FALSE;
 
 			chain_pos = chain_pos -> l = mknod(CHAIN,NULL,NULL);
@@ -541,22 +541,22 @@ BOOLEAN testrewrite _2a ((term,formterm) , Node * term ,Node * formterm)
 			DEBG((4,"Variable ersetzt : "));
 			DBFK(4,print(formterm));
 
-			(* formterm) = (* term);	/* einzig moegl. Ersetzung direkt in der Symboltabelle !*/
-												/* formterm->l wird ueberschrieben !! */
+			(* formterm) = (* term);	/* only possible replacement directly in the symbol table !*/
+												/* formterm->l is overwritten !! */
 			DEBG((4,"-> "));
 			DBFK(4,print(formterm));
 			DEBG((4,"\n"));
 
 			return TRUE;
 			}
-		else			/* Constanten oder Funktionen vergleichen */
+		else			/* Compare constants or functions */
 			{
 			if (lexval((Symbol *) formterm) == Term)
 				{
-				return testrewrite(term,formterm->l); /* Symbol-Platz ueberspringen */
+				return testrewrite(term,formterm->l); /* Skip the symbol slot */
 				}
 
-			   /* Numerische Werte vergleichen ? */
+			   /* Compare numeric values ? */
 
          if ((lexval((Symbol *) term)==Const) &&
 				 (lexval((Symbol *) formterm)==Const) && 
@@ -581,7 +581,7 @@ BOOLEAN testrewrite _2a ((term,formterm) , Node * term ,Node * formterm)
 			case La3:
 			case La4:
 			case La5:
-						/* erst Namen vergleichen, dann Terms vergleichen */
+						/* first compare names, then compare terms */
 			default:
 				if ((testrewrite(term->l,formterm->l)) && (testrewrite (term->r,formterm->r)))
 					return TRUE;
@@ -589,7 +589,7 @@ BOOLEAN testrewrite _2a ((term,formterm) , Node * term ,Node * formterm)
 					return FALSE;
 				break;
 			}
-	else			/* Hier unterscheiden sich term, form ! */
+	else			/* Here term and form differ ! */
 		{
 		DEBG((4,"Terms don't match : returned False !\n"));
 		return FALSE;

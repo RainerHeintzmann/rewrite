@@ -5,7 +5,7 @@
  *	run.h V1.00
  *	Copyright (c) Rainer Heintzmann 1992
  *
- *	Funktionsprototypen und Node-struktur
+ *	function prototypes and Node structure
  */
 
 #include "ansi.h"
@@ -13,8 +13,8 @@
 
 typedef struct Node Node;
 struct Node {
-	int	type;				/* Typ des Knotens */
-	Node * l, * r;			/* Operanden */
+	int	type;				/* type of the node */
+	Node * l, * r;			/* operands */
 };
 
 typedef int BOOLEAN ;
@@ -45,12 +45,12 @@ extern int calc_exact_only;   /* 2026: 1: no real value for 2^(1/2) */
 void print	_1p(Node *);
 Node * solve	_2p(Node * ,Node *);
 Node * rewrite _2p(Node * ,Node *);
-void rewrite_begin (void);   /* 2026: Schrittbegrenzung fuer REWR */
-void steps_fkt (Node * np);  /* 2026: STEPS Alg "file": Loesungsweg anzeigen */
+void rewrite_begin (void);   /* 2026: step limit for REWR */
+void steps_fkt (Node * np);  /* 2026: STEPS Alg "file": show the solution steps */
 void rewrite_end (void);
 extern long max_rewrite_steps;
 
-/* Condition-Funktionen */
+/* condition functions */
 
 void prt_num(Node *);
 

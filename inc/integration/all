@@ -1,11 +1,11 @@
 # inc/integration/all
-# Regelbasierte Integration nach Rubi (Auswahl), siehe inc/integration/README.md
-# Benutzung:
+# Rule-based integration following Rubi (selection), see inc/integration/README.md
+# Usage:
 #   INC "inc/all"
 #   INC "inc/integration/all"
 #   REWR Int(x*exp(2*x),x) : Integrate
 
-INC "inc/exact"      # exakte Zahlen: 1/3 bleibt ein Bruch (nicht nochmals laden)
+INC "inc/exact"      # exact numbers: 1/3 stays a fraction (do not load again)
 INC "inc/helpers"
 INC "inc/integration/base"
 INC "inc/integration/1.1.1.1_linear_power"
@@ -13,7 +13,7 @@ INC "inc/integration/1.1.1.2_linear_products"
 INC "inc/integration/2_exponentials"
 INC "inc/integration/4.1_sine"
 
-# Einstellungen aus base gelten nur fuer diese Regeln: wieder loeschen
+# settings from base apply only to these rules: delete them again
 OPT
 DEFAULT
 COMM

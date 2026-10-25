@@ -1,8 +1,8 @@
 /*
  * userfkt.c V1.00
  * Copyright (c) : Rainer Heintzmann
- * 
- * Benutzerfunktionen fuer 'rewrite'
+ *
+ * User functions for 'rewrite'
  *
  */
 
@@ -240,7 +240,7 @@ u_function * give_ufkt (char * name)
 	return NULL;
 }
 
-/* 2026: wie give_ufkt, aber ohne Fehlermeldung (NULL, wenn unbekannt) */
+/* 2026: like give_ufkt, but without an error message (NULL if unknown) */
 u_function * give_ufkt_quiet (char * name)
 {	int i;
 	for (i=0;i<LASTFUNC;i++)

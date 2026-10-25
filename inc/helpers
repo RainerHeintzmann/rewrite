@@ -1,79 +1,79 @@
 # inc/helpers (2026)
-# Symbolische Hilfsfunktionen (in C, symfkt.c), vor allem fuer die
-# regelbasierte Integration (inc/integration). Die Namen folgen Rubis
-# Hilfsfunktionen in Kleinschreibung (FreeQ -> freeq).
-# Sie bekommen die Terme selbst, nicht deren Zahlenwerte.
-# Benoetigt inc/all (Sorten real und bool).
+# Symbolic helper functions (in C, symfkt.c), mainly for the
+# rule-based integration (inc/integration). The names follow Rubi's
+# helper functions in lower case (FreeQ -> freeq).
+# They get the terms themselves, not their numerical values.
+# Needs inc/all (sorts real and bool).
 
-# ---- Praedikate (Ergebnis wahr/falsch, fuer Bedingungen) ----
-FUNC freeq     : real,real >> bool        ATT SYMBOLIC freeq      # x kommt in u nicht vor
-FUNC integerq  : real >> bool             ATT SYMBOLIC integerq   # u ist eine ganze Zahl
-FUNC integersq : real++ >> bool           ATT SYMBOLIC integersq  # alle sind ganze Zahlen
-FUNC rationalq : real++ >> bool           ATT SYMBOLIC rationalq  # alle sind Zahlen
-FUNC posq      : real >> bool             ATT SYMBOLIC posq       # u hat positive Form
-FUNC negq      : real >> bool             ATT SYMBOLIC negq       # u hat negative Form
+# ---- Predicates (result true/false, for conditions) ----
+FUNC freeq     : real,real >> bool        ATT SYMBOLIC freeq      # x does not occur in u
+FUNC integerq  : real >> bool             ATT SYMBOLIC integerq   # u is an integer
+FUNC integersq : real++ >> bool           ATT SYMBOLIC integersq  # all are integers
+FUNC rationalq : real++ >> bool           ATT SYMBOLIC rationalq  # all are numbers
+FUNC posq      : real >> bool             ATT SYMBOLIC posq       # u has a positive form
+FUNC negq      : real >> bool             ATT SYMBOLIC negq       # u has a negative form
 FUNC eqq       : real,real >> bool        ATT SYMBOLIC eqq        # u = v
-FUNC neq       : real,real >> bool        ATT SYMBOLIC neq        # u ungleich v
-FUNC igtq      : real,real >> bool        ATT SYMBOLIC igtq       # u ganz und > n
-FUNC iltq      : real,real >> bool        ATT SYMBOLIC iltq       # u ganz und < n
-FUNC polyq     : real,real >> bool        ATT SYMBOLIC polyq      # Polynom in x
-OTHER polyq    : real,real,real >> bool   ATT SYMBOLIC polyq      # Polynom vom Grad n
-FUNC linearq   : real,real >> bool        ATT SYMBOLIC linearq    # Polynom vom Grad 1
+FUNC neq       : real,real >> bool        ATT SYMBOLIC neq        # u not equal to v
+FUNC igtq      : real,real >> bool        ATT SYMBOLIC igtq       # u integer and > n
+FUNC iltq      : real,real >> bool        ATT SYMBOLIC iltq       # u integer and < n
+FUNC polyq     : real,real >> bool        ATT SYMBOLIC polyq      # polynomial in x
+OTHER polyq    : real,real,real >> bool   ATT SYMBOLIC polyq      # polynomial of degree n
+FUNC linearq   : real,real >> bool        ATT SYMBOLIC linearq    # polynomial of degree 1
 FUNC sumq      : real >> bool             ATT SYMBOLIC sumq
 FUNC nonsumq   : real >> bool             ATT SYMBOLIC nonsumq
-FUNC gtq : real,real >> bool             ATT SYMBOLIC gtq    # Rubi: GtQ, falsch wenn keine Zahlen
+FUNC gtq : real,real >> bool             ATT SYMBOLIC gtq    # Rubi: GtQ, false unless numbers
 FUNC ltq : real,real >> bool             ATT SYMBOLIC ltq
 FUNC geq : real,real >> bool             ATT SYMBOLIC geq
 FUNC leq : real,real >> bool             ATT SYMBOLIC leq
 FUNC productq  : real >> bool             ATT SYMBOLIC productq
 FUNC powerq    : real >> bool             ATT SYMBOLIC powerq
-FUNC fractionq : real++ >> bool           ATT SYMBOLIC fractionq     # keine ganzen Zahlen
-FUNC halfintegerq : real++ >> bool        ATT SYMBOLIC halfintegerq  # halbzahlig
-FUNC nicesqrtq : real >> bool             ATT SYMBOLIC nicesqrtq     # Zahl > 0
+FUNC fractionq : real++ >> bool           ATT SYMBOLIC fractionq     # no integers
+FUNC halfintegerq : real++ >> bool        ATT SYMBOLIC halfintegerq  # half-integers
+FUNC nicesqrtq : real >> bool             ATT SYMBOLIC nicesqrtq     # number > 0
 
-# ---- Termfunktionen ----
-FUNC expand    : real >> real             ATT SYMBOLIC expand     # ausmultiplizieren
+# ---- Term functions ----
+FUNC expand    : real >> real             ATT SYMBOLIC expand     # multiply out
 OTHER expand   : real,real >> real        ATT SYMBOLIC expand     # Expand[u,x]
 FUNC expandintegrand : real,real >> real  ATT SYMBOLIC expandintegrand
 OTHER expandintegrand : real,real,real >> real ATT SYMBOLIC expandintegrand
-FUNC coeff     : real,real,real >> real   ATT SYMBOLIC coeff      # Koeffizient von x^n
-OTHER coeff    : real,real >> real        ATT SYMBOLIC coeff      # Koeffizient von x
-FUNC expon     : real,real >> real        ATT SYMBOLIC expon      # Grad in x
-FUNC subst     : real,real,real >> real   ATT SYMBOLIC subst      # x in u durch v ersetzen
-FUNC simp      : real,real >> real        ATT SYMBOLIC simp       # u (Vereinfachen macht All)
+FUNC coeff     : real,real,real >> real   ATT SYMBOLIC coeff      # coefficient of x^n
+OTHER coeff    : real,real >> real        ATT SYMBOLIC coeff      # coefficient of x
+FUNC expon     : real,real >> real        ATT SYMBOLIC expon      # degree in x
+FUNC subst     : real,real,real >> real   ATT SYMBOLIC subst      # replace x by v in u
+FUNC simp      : real,real >> real        ATT SYMBOLIC simp       # u (All does the simplification)
 OTHER simp     : real >> real             ATT SYMBOLIC simp
 FUNC simplify  : real >> real             ATT SYMBOLIC simplify
 FUNC dist      : real,real,real >> real   ATT SYMBOLIC dist       # u*v
 OTHER dist     : real,real >> real        ATT SYMBOLIC dist
-FUNC rt        : real,real >> real        ATT SYMBOLIC rt         # n-te Wurzel
+FUNC rt        : real,real >> real        ATT SYMBOLIC rt         # n-th root
 FUNC intpart   : real >> real             ATT SYMBOLIC intpart
 FUNC fracpart  : real >> real             ATT SYMBOLIC fracpart
-FUNC gcd       : real,real >> real        ATT SYMBOLIC gcd        # ggT von Bruechen
-FUNC numerator : real >> real             ATT SYMBOLIC numerator  # Zaehler
-FUNC denominator : real >> real           ATT SYMBOLIC denominator # Nenner
-FUNC freefactors : real,real >> real      ATT SYMBOLIC freefactors     # Faktoren ohne x
-FUNC nonfreefactors : real,real >> real   ATT SYMBOLIC nonfreefactors  # Faktoren mit x
+FUNC gcd       : real,real >> real        ATT SYMBOLIC gcd        # gcd of fractions
+FUNC numerator : real >> real             ATT SYMBOLIC numerator  # numerator
+FUNC denominator : real >> real           ATT SYMBOLIC denominator # denominator
+FUNC freefactors : real,real >> real      ATT SYMBOLIC freefactors     # factors free of x
+FUNC nonfreefactors : real,real >> real   ATT SYMBOLIC nonfreefactors  # factors with x
 FUNC removecontent : real,real >> real    ATT SYMBOLIC removecontent   # Rubi: RemoveContent[u,x]
-FUNC trignorm : real,real >> real         ATT SYMBOLIC trignorm        # 1/sin = csc, Rubis FixInertTrigFunction
+FUNC trignorm : real,real >> real         ATT SYMBOLIC trignorm        # 1/sin = csc, Rubi's FixInertTrigFunction
 FUNC trigexpand : real,real >> real       ATT SYMBOLIC trigexpand      # sin(2x) = 2 sin(x) cos(x), ... (TrigExpand)
 FUNC substfracpow : real,real >> real     ATT SYMBOLIC substfracpow    # Rubi: x -> (a+b*x)^(1/n)
-FUNC substsqrtquad : real,real >> real    ATT SYMBOLIC substsqrtquad   # Rubi: Eulersche Substitutionen
-FUNC expandtosum : real,real >> real      ATT SYMBOLIC expandtosum     # Summe c_k*x^k
+FUNC substsqrtquad : real,real >> real    ATT SYMBOLIC substsqrtquad   # Rubi: Euler's substitutions
+FUNC expandtosum : real,real >> real      ATT SYMBOLIC expandtosum     # sum c_k*x^k
 OTHER expandtosum : real,real,real >> real ATT SYMBOLIC expandtosum
-FUNC polyquotient  : real,real,real >> real ATT SYMBOLIC polyquotient  # Polynomdivision
-FUNC polyremainder : real,real,real >> real ATT SYMBOLIC polyremainder # Rest
-FUNC normpoly  : real,real >> real        ATT SYMBOLIC normpoly   # Polynome: c0+c1*x+...
-FUNC deriv     : real,real >> real        ATT SYMBOLIC deriv      # Ableitung (in C)
-FUNC collect   : real >> real             ATT SYMBOLIC collect    # gleiche Summanden zusammenfassen
-# 2026: weitere Hilfsfunktionen von Rubi
-FUNC replaceall : real,real,real >> real  ATT SYMBOLIC replaceall   # u mit x -> v (sofort)
+FUNC polyquotient  : real,real,real >> real ATT SYMBOLIC polyquotient  # polynomial division
+FUNC polyremainder : real,real,real >> real ATT SYMBOLIC polyremainder # remainder
+FUNC normpoly  : real,real >> real        ATT SYMBOLIC normpoly   # polynomials: c0+c1*x+...
+FUNC deriv     : real,real >> real        ATT SYMBOLIC deriv      # derivative (in C)
+FUNC collect   : real >> real             ATT SYMBOLIC collect    # collect like summands
+# 2026: more helper functions of Rubi
+FUNC replaceall : real,real,real >> real  ATT SYMBOLIC replaceall   # u with x -> v (at once)
 FUNC binomialq  : real,real >> bool       ATT SYMBOLIC binomialq    # u = a + b x^n
-OTHER binomialq : real,real,real >> bool  ATT SYMBOLIC binomialq    # mit gegebenem n
+OTHER binomialq : real,real,real >> bool  ATT SYMBOLIC binomialq    # with a given n
 FUNC binomialdegree : real,real >> real   ATT SYMBOLIC binomialdegree
-FUNC quadraticq : real,real >> bool       ATT SYMBOLIC quadraticq   # Grad 2, nicht nur c x^2
+FUNC quadraticq : real,real >> bool       ATT SYMBOLIC quadraticq   # degree 2, not just c x^2
 FUNC rationalfunctionq : real,real >> bool ATT SYMBOLIC rationalfunctionq
 FUNC inversefunctionfreeq : real,real >> bool ATT SYMBOLIC inversefunctionfreeq
-FUNC leafcount  : real >> real            ATT SYMBOLIC leafcount    # Groesse eines Terms
+FUNC leafcount  : real >> real            ATT SYMBOLIC leafcount    # size of a term
 FUNC simplerq   : real,real >> bool       ATT SYMBOLIC simplerq
 FUNC sumsimplerq : real,real >> bool      ATT SYMBOLIC sumsimplerq
 FUNC simplersqrtq : real,real >> bool     ATT SYMBOLIC simplersqrtq
@@ -83,21 +83,18 @@ FUNC knowncotangentintegrandq : real,real >> bool ATT SYMBOLIC knowncotangentint
 FUNC knownsecantintegrandq : real,real >> bool ATT SYMBOLIC knownsecantintegrandq
 FUNC piecewiselinearq : real,real >> bool ATT SYMBOLIC piecewiselinearq
 OTHER piecewiselinearq : real,real,real >> bool ATT SYMBOLIC piecewiselinearq
-FUNC linearmatchq : real,real >> bool     ATT SYMBOLIC linearmatchq # u ist woertlich a+b*x
 FUNC expandtrigreduce : real,real >> real ATT SYMBOLIC expandtrigreduce  # sin^2 -> (1-cos 2x)/2
 OTHER expandtrigreduce : real,real,real >> real ATT SYMBOLIC expandtrigreduce
-FUNC binomialmatchq : real,real >> bool   ATT SYMBOLIC binomialmatchq  # woertlich a+b*x^n
-FUNC quadraticmatchq : real,real >> bool  ATT SYMBOLIC quadraticmatchq # woertlich a+b*x+c*x^2
 FUNC trinomialq : real,real >> bool       ATT SYMBOLIC trinomialq      # a+b*x^n+c*x^(2n), n > 1
 FUNC linearpairq : real,real,real >> bool ATT SYMBOLIC linearpairq
 FUNC algebraicfunctionq : real++ >> bool ATT SYMBOLIC algebraicfunctionq
 FUNC intsubst : real,real,real >> real    ATT SYMBOLIC intsubst     # Subst[Int[u,x],x,v]
-FUNC hyp2exp : real,real >> real         ATT SYMBOLIC hyp2exp      # sinh, cosh, ... als e^u
+FUNC hyp2exp : real,real >> real         ATT SYMBOLIC hyp2exp      # sinh, cosh, ... as e^u
 FUNC substexp : real,real >> real        ATT SYMBOLIC substexp     # Rubi: Substitution x -> F^(g x)
-FUNC binomsum : real,real >> real        ATT SYMBOLIC binomsum     # Rubi: x^m/(a+b x^n), Partialbrueche mit cos(k pi/n)
-FUNC  matchq : real,real >> bool        ATT SYMBOLIC HOLD matchq  # Rubi: MatchQ[u, Muster]
-OTHER matchq : real,real,bool >> bool   ATT SYMBOLIC HOLD matchq  # MatchQ[u, Muster /; Bedingung]
+FUNC binomsum : real,real >> real        ATT SYMBOLIC binomsum     # Rubi: x^m/(a+b x^n), partial fractions with cos(k pi/n)
+FUNC  matchq : real,real >> bool        ATT SYMBOLIC HOLD matchq  # Rubi: MatchQ[u, pattern]
+OTHER matchq : real,real,bool >> bool   ATT SYMBOLIC HOLD matchq  # MatchQ[u, pattern /; condition]
 FUNC functionofq : real++ >> bool       ATT SYMBOLIC functionofq   # Rubi: FunctionOfQ[v,u,x(,pure)]
 FUNC substfor : real++ >> real           ATT SYMBOLIC substfor     # Rubi: SubstFor[(h,)v,u,x]
 FUNC derivdivides : real,real,real >> real ATT SYMBOLIC derivdivides # Rubi: DerivativeDivides[y,u,x]
-FUNC falseq : real >> bool               ATT SYMBOLIC falseq       # Rubi: FalseQ (Hilfsfunktion nicht anwendbar)
+FUNC falseq : real >> bool               ATT SYMBOLIC falseq       # Rubi: FalseQ (helper not applicable)

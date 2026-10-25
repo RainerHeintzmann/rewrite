@@ -5,11 +5,11 @@
  *	forms.h V1.00
  *	Copyright (c) Rainer Heintzmann 1992
  *
- *	Funktionsprototypen fuer einfuegen, und 'matchen' im Formelbaum
+ *	Function prototypes for inserting and 'matching' in the formula tree
  */
 
-Node * merge(Node * ,Node * ,Node * );  /* Formel,'=' Ersetz,Baum */
+Node * merge(Node * ,Node * ,Node * );  /* formula,'=' replacement,tree */
 
-Node * match (Node * ,Node * );         /* Formel,Baum */
-BOOLEAN testrewrite (Node * ,Node * );  /* Alte lineare Version braucht kein RESTORE ! */
+Node * match (Node * ,Node * );         /* formula,tree */
+BOOLEAN testrewrite (Node * ,Node * );  /* Old linear version needs no RESTORE ! */
 #endif

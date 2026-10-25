@@ -1,11 +1,11 @@
 /*
  *	sym.c V1.00
  *	Copyright (c)  Rainer Heintzmann 	(1992)
- *	Grundgeruesst : Prof. Axel T. Schreiner
+ *	Framework : Prof. Axel T. Schreiner
  *
- *  Symbolverwaltung fuer 'rewrite'
- *	Symboltabelle: binaerer Baum
- *	reservierte Worte: Suchtabelle
+ *  Symbol management for 'rewrite'
+ *	symbol table: binary tree
+ *	reserved words: search table
  */
 
 #include "search.h"
@@ -16,11 +16,11 @@
 #include "fatal.h"
 #include "sym.h"
 #include "syn.h"
-#include "node.h" /* fuer mksym */
+#include "node.h" /* for mksym */
 
 extern YYSTYPE yylval;
 
-static const Reserved words [] = {	/* sortiert */
+static const Reserved words [] = {	/* sorted */
 	{ "%",      LAST },
 	{ "++",     VARPAR },
 	{ "=",     	EQ },
@@ -29,25 +29,25 @@ static const Reserved words [] = {	/* sortiert */
 	{ "ALG",    ALG },
 	{ "ATT",    ATT },
 	{ "BRA",    BRA },
-	{ "COMM",   COMM },     /* kommutative Funktionen (2026) */
+	{ "COMM",   COMM },     /* commutative functions (2026) */
 	{ "CONST",  CST },
-	{ "DATA",   DATA },  /* Einlesen von Daten-files */
+	{ "DATA",   DATA },  /* reading data files */
 	{ "DEBUG",  DBG },
-	{ "DEFAULT",DEFAULT },  /* Wert fehlender Operanden (2026) */
+	{ "DEFAULT",DEFAULT },  /* value of missing operands (2026) */
 	{ "DO",     DO },
 	{ "ELSE",   ELSE },
 	{ "EXE",    EXE },
 	{ "FOR",    FOR },
 	{ "FUNC",   FUNC },
 	{ "GRAPH",  GRAPH },
-	{ "HOLD",   HOLD },     /* ATT SYMBOLIC HOLD: Argumente unausgewertet (2026) */
+	{ "HOLD",   HOLD },     /* ATT SYMBOLIC HOLD: arguments unevaluated (2026) */
 	{ "IF",     IF  },
 	{ "IN",     IN  },
 	{ "INC",    INC },      /* Include */
 	{ "INFO",   INFO },
-	{ "INTNUM", INTNUM },   /* Sorte ganzzahliger Literale (2026) */
+	{ "INTNUM", INTNUM },   /* sort of integer literals (2026) */
 	{ "IS",     IS  },
-	{ "LA1",    LA1  },			/* Linksassoziativ */
+	{ "LA1",    LA1  },			/* left-associative */
 	{ "LA2",    LA2  },
 	{ "LA3",    LA3  },
 	{ "LA4",    LA4  },
@@ -57,23 +57,23 @@ static const Reserved words [] = {	/* sortiert */
 	{ "LOCAL",  LOCAL },
 	{ "NIN",    NIN },
 	{ "NUM",    NUM },
-	{ "OPT",    OPT },      /* optionale Metavariablen (2026) */
+	{ "OPT",    OPT },      /* optional meta variables (2026) */
 	{ "OTHER",  OTHER },
 	{ "OUT",    OUT },
 	{ "PRT",    PRT },
 	{ "PRTNUM", PRTNUM },
 	{ "QUIT",   QUIT },
-	{ "RA",		  RA  },  			/* Rechtsassoziativ */
+	{ "RA",		  RA  },  			/* right-associative */
 	{ "RETURN", RETURN },
 	{ "REWR",   REWR },
 	{ "RIGHT",  RIGHT },    /* DEFAULT RIGHT (2026) */
-	{ "RU",     RU  },			/* Rechtsunaer */
+	{ "RU",     RU  },			/* right-unary */
 	{ "SORT",   SORT },
 	{ "SPEC",   SPEC },
 	{ "STEP",   STEP },
-	{ "STEPS",  STEPS },    /* Loesungsweg einer Regelliste (2026) */
-	{ "SUBSORT",SUBSORT },  /* Untersorte mit Umwandlung (2026) */
-	{ "SYMBOLIC",SYMBOLIC },/* ATT SYMBOLIC: C-Funktion auf Termen (2026) */
+	{ "STEPS",  STEPS },    /* solution steps of a rule list (2026) */
+	{ "SUBSORT",SUBSORT },  /* subsort with conversion (2026) */
+	{ "SYMBOLIC",SYMBOLIC },/* ATT SYMBOLIC: C function on terms (2026) */
 	{ "SYS",    SYS },
 	{ "TERM",   TERM },
 	{ "TO",     TO },
@@ -83,7 +83,7 @@ static const Reserved words [] = {	/* sortiert */
 
 #define	DIM(x)	(sizeof(x) / sizeof(x[0]))
 
-static const void * root = NULL; /* Wurzel fuer benutzer-Symbole */
+static const void * root = NULL; /* root for user symbols */
 
 
 static int rcmp _2a ((a, b), const void * a, const void * b)
@@ -116,7 +116,7 @@ int lookup _1a ((name), const char * name)
 	if (! (pp = (Symbol **) tsearch(& s, & root, scmp)))
 		fatal("lookup: no room");
 
-	if ((* pp) == (& s))	/* nicht gefunden */
+	if ((* pp) == (& s))	/* not found */
   		(* pp) = mksym(Id,name);
 
 	yylval.y_sym = * pp;
@@ -124,7 +124,7 @@ int lookup _1a ((name), const char * name)
 	return lexval(* pp);
 }
 
-/* 2026: Symbol zu einem Namen suchen, ohne es anzulegen (NULL, wenn unbekannt) */
+/* 2026: look up the symbol of a name without creating it (NULL if unknown) */
 Symbol * find_symbol (const char * name)
 {
 	Symbol s, ** pp;
@@ -141,7 +141,7 @@ void focus (Symbol * sp)
 
 	DEBG((20,"focus %s,%p -> %p\n",name(sp),(* pp),sp));
 
-	if ((* pp) == sp)	/* gleiches gefunden */
+	if ((* pp) == sp)	/* found an equal one */
 			fatal ("Internal error: Symbol already focused");
 	(* pp) = sp;
 }
@@ -163,7 +163,7 @@ Node * ochain;
 			}
 		ochain=chain;
 		chain=chain->l;
-		delnod(ochain); /* Erst weiter dann free ! */
+		delnod(ochain); /* first advance, then free ! */
 		}
 }
 

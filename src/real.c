@@ -1,8 +1,8 @@
 /*
  * real.c V1.00
  * Copyright (c) : Rainer Heintzmann
- * 
- * Benutzerfunktionen fuer 'rewrite' (Resultattyp real)
+ *
+ * User functions for 'rewrite' (result type real)
  *
  */
 
@@ -138,7 +138,7 @@ double * bessel   (double * arg[])
 	}
 
 
-/* ---- 2026: weitere elementare Funktionen (fuer die Rubi-Regeln) ---- */
+/* ---- 2026: more elementary functions (for the Rubi rules) ---- */
 double * r_csc     (double * arg[])	{return mkreal(1.0/sin(* arg[0]));}
 double * r_sec     (double * arg[])	{return mkreal(1.0/cos(* arg[0]));}
 double * r_cot     (double * arg[])	{return mkreal(1.0/tan(* arg[0]));}
@@ -151,7 +151,7 @@ double * r_arccosh (double * arg[])	{return mkreal(acosh(* arg[0]));}
 double * r_arctanh (double * arg[])	{return mkreal(atanh(* arg[0]));}
 double * r_arccoth (double * arg[])	{return mkreal(atanh(1.0/(* arg[0])));}
 
-/* polylog(n,x) = sum x^k/k^n fuer ganzzahliges n und |x| <= 1 (Reihe) */
+/* polylog(n,x) = sum x^k/k^n for integer n and |x| <= 1 (series) */
 double * r_polylog (double * arg[])
 {
 	double n = * arg[0], x = * arg[1], sum = 0.0, term, xk = 1.0;
@@ -159,7 +159,7 @@ double * r_polylog (double * arg[])
 	if (fabs(x) > 1.0 || n != floor(n))
 		return mkreal(NAN);
 	if (n <= 0 && fabs(x) < 1.0)
-		{	/* geschlossene Formen: Li_0 = x/(1-x), Li_-1 = x/(1-x)^2 */
+		{	/* closed forms: Li_0 = x/(1-x), Li_-1 = x/(1-x)^2 */
 		if (n == 0)  return mkreal(x/(1.0-x));
 		if (n == -1) return mkreal(x/((1.0-x)*(1.0-x)));
 		}
@@ -173,7 +173,7 @@ double * r_polylog (double * arg[])
 	return mkreal(sum);
 }
 
-/* productlog(x) = Lambertsche W-Funktion (Hauptzweig), w*exp(w) = x */
+/* productlog(x) = Lambert W function (principal branch), w*exp(w) = x */
 double * r_productlog (double * arg[])
 {
 	double x = * arg[0], w;
@@ -189,5 +189,5 @@ double * r_productlog (double * arg[])
 	return mkreal(w);
 }
 
-/* ArcTan[x,y] in Mathematica: Winkel von (x,y) */
+/* ArcTan[x,y] in Mathematica: angle of (x,y) */
 double * r_arctan2 (double * arg[])	{return mkreal(atan2(* arg[1], * arg[0]));}

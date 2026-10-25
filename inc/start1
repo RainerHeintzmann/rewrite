@@ -1,5 +1,5 @@
-# diese Include-File includet in der richtigen Reihenfolge alle wichtigen 
-# mathematischen und Physikalischen Formeln
+# this include file includes all important mathematical and physical
+# formulas in the right order
 
 INC "inc/alg"
 INC "inc/rvector"

@@ -1,17 +1,17 @@
-#                     Ausfuerung von Graphiktabelle
-# Global Inputs : pos : Position, p : Impuls
-# Fkt Inputs : F=Kraft, dt=Zeitschritt, m0 = Ruhe-Masse oder m Masse
-# Bewegung eines Teilchens
+#                     execution of the graphics table
+# global inputs : pos : position, p : momentum
+# function inputs : F=force, dt=time step, m0 = rest mass or m mass
+# motion of a particle
 
 CONST dt,m0 : real
 
-CONST pos,p,vel : rvector    # Position des Teilchens,Impuls,Geschwindigkeit
+CONST pos,p,vel : rvector    # position of the particle, momentum, velocity
 TERM m : real
-m= m0/(1-sqr(vel/c))^.5 # Relativistische Masse
+m= m0/(1-sqr(vel/c))^.5 # relativistic mass
 
 FUNC iterate : rvector,real >> real ATT (TERM F : rvector;TERM dt : real) {
 "hier Iterate"
-vel=p/(m0+sqr(p/c))^.5 # Achtung,m(vel neu) !
+vel=p/(m0+sqr(p/c))^.5 # caution, m(vel new) !
 p=p+dt*F
 pos
 pos=pos+vel*dt

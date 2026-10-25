@@ -1,67 +1,67 @@
 # r4_3_4_1
-# Automatisch uebersetzt aus Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
-# mit tools/rubi2rewrite.py, Abschnitt
+# Translated automatically from Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi)
+# by tools/rubi2rewrite.py, section
 #   4.3.4.1 (a+b tan)^m (A+B tan+C tan^2)
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi.
-# Nicht von Hand aendern: Aenderungen gehoeren in das Uebersetzungsprogramm.
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi.
+# Do not edit by hand: changes belong in the translator.
 
-# Regel 1 (17496 Varianten):
+# Rule 1 (17496 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^m_.*(A_ + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := A/(b*f)*Subst[Int[(a + x)^m, x], x, b*Tan[e + f*x]] /; FreeQ[{a, b, e, f, A, C, m}, x] && EqQ[A, C]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,P_A,O_C,O_m), (eqq(P_A,O_C)) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(O_m))*((P_A)+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = ((P_A)*(((O_b)^((-1))))*(((O_f)^((-1))))*(intsubst(((((O_a)+(Xv)))^(O_m)),Xv,((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))
 
-# Regel 2 (17496 Varianten):
+# Rule 2 (17496 variants):
 #   Int[(a_. + b_.*cot[e_. + f_.*x_])^m_.*(A_ + C_.*cot[e_. + f_.*x_]^2), x_Symbol] := -A/(b*f)*Subst[Int[(a + x)^m, x], x, b*Cot[e + f*x]] /; FreeQ[{a, b, e, f, A, C, m}, x] && EqQ[A, C]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,P_A,O_C,O_m), (eqq(P_A,O_C)) Int((((O_a)+((O_b)*(cot((O_e)+((O_f)*(Xv))))))^(O_m))*((P_A)+((O_C)*((cot((O_e)+((O_f)*(Xv))))^(2)))),Xv) = (((-1))*(P_A)*(((O_b)^((-1))))*(((O_f)^((-1))))*(intsubst(((((O_a)+(Xv)))^(O_m)),Xv,((O_b)*(cot(((O_e)+(((O_f)*(Xv))))))))))
 
-# Regel 3 (1417176 Varianten):
+# Rule 3 (1417176 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^ m_.*(A_. + B_.*tan[e_. + f_.*x_] + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := 1/b^2* Int[(a + b*Tan[e + f*x])^(m + 1)* Simp[b*B - a*C + b*C*Tan[e + f*x], x], x] /; FreeQ[{a, b, e, f, A, B, C, m}, x] && EqQ[A*b^2 - a*b*B + a^2*C, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_A,O_B,O_C,O_m), (eqq(((((O_A)*(((O_b)^(2)))))+((((-1))*(O_a)*(O_b)*(O_B)))+(((((O_a)^(2)))*(O_C)))),0)) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(O_m))*((O_A)+((O_B)*(tan((O_e)+((O_f)*(Xv)))))+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = ((((O_b)^((-2))))*(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((O_m)+(1)))))*(simp(((((O_b)*(O_B)))+((((-1))*(O_a)*(O_C)))+(((O_b)*(O_C)*(tan(((O_e)+(((O_f)*(Xv))))))))),Xv))),Xv)))
 
-# Regel 4 (26244 Varianten):
+# Rule 4 (26244 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^m_.*(A_. + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := -C/b^2*Int[(a + b*Tan[e + f*x])^(m + 1)*(a - b*Tan[e + f*x]), x] /; FreeQ[{a, b, e, f, A, C, m}, x] && EqQ[A*b^2 + a^2*C, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_A,O_C,O_m), (eqq(((((O_A)*(((O_b)^(2)))))+(((((O_a)^(2)))*(O_C)))),0)) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(O_m))*((O_A)+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = (((-1))*(O_C)*(((O_b)^((-2))))*(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((O_m)+(1)))))*(((O_a)+((((-1))*(O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))),Xv)))
 
-# Regel 5 (1417176 Varianten):
+# Rule 5 (1417176 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^ m_.*(A_. + B_.*tan[e_. + f_.*x_] + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := -(a*A + b*B - a*C)* Tan[e + f*x]*(a + b*Tan[e + f*x])^m/(2*a*f*m) + 1/(2*a^2*m)* Int[(a + b*Tan[e + f*x])^(m + 1)* Simp[(b*B - a*C) + a*A*(2*m + 1) - (b*C*(m - 1) + (A*b - a*B)*(m + 1))* Tan[e + f*x], x], x] /; FreeQ[{a, b, e, f, A, B, C}, x] && NeQ[A*b^2 - a*b*B + a^2*C, 0] && LeQ[m, -1] && EqQ[a^2 + b^2, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_A,O_B,O_C), (neq(((((O_A)*(((O_b)^(2)))))+((((-1))*(O_a)*(O_b)*(O_B)))+(((((O_a)^(2)))*(O_C)))),0)), (((leq(O_m,(-1))))), (eqq(((((O_a)^(2)))+(((O_b)^(2)))),0)) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(O_m))*((O_A)+((O_B)*(tan((O_e)+((O_f)*(Xv)))))+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = (((((-(1/2)))*(((((O_a)*(O_A)))+(((O_b)*(O_B)))+((((-1))*(O_a)*(O_C)))))*(tan(((O_e)+(((O_f)*(Xv))))))*(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(O_m)))*(((O_a)^((-1))))*(((O_f)^((-1))))*(((O_m)^((-1))))))+((((1/2))*(((O_a)^((-2))))*(((O_m)^((-1))))*(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((O_m)+(1)))))*(simp(((((O_b)*(O_B)))+((((-1))*(O_a)*(O_C)))+(((O_a)*(O_A)*(((((2)*(O_m)))+(1)))))+((((-1))*(((((O_b)*(O_C)*(((O_m)+((-1))))))+(((((((O_A)*(O_b)))+((((-1))*(O_a)*(O_B)))))*(((O_m)+(1)))))))*(tan(((O_e)+(((O_f)*(Xv))))))))),Xv))),Xv)))))
 
-# Regel 6 (26244 Varianten):
+# Rule 6 (26244 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^m_.*(A_. + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := -(a*A - a*C)*Tan[e + f*x]*(a + b*Tan[e + f*x])^m/(2*a*f*m) + 1/(2*a^2*m)* Int[(a + b*Tan[e + f*x])^(m + 1)* Simp[-a*C + a*A*(2*m + 1) - (b*C*(m - 1) + A*b*(m + 1))*Tan[e + f*x], x], x] /; FreeQ[{a, b, e, f, A, C}, x] && NeQ[A*b^2 + a^2*C, 0] && LeQ[m, -1] && EqQ[a^2 + b^2, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_A,O_C), (neq(((((O_A)*(((O_b)^(2)))))+(((((O_a)^(2)))*(O_C)))),0)), (((leq(O_m,(-1))))), (eqq(((((O_a)^(2)))+(((O_b)^(2)))),0)) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(O_m))*((O_A)+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = (((((-(1/2)))*(((((O_a)*(O_A)))+((((-1))*(O_a)*(O_C)))))*(tan(((O_e)+(((O_f)*(Xv))))))*(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(O_m)))*(((O_a)^((-1))))*(((O_f)^((-1))))*(((O_m)^((-1))))))+((((1/2))*(((O_a)^((-2))))*(((O_m)^((-1))))*(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((O_m)+(1)))))*(simp((((((-1))*(O_a)*(O_C)))+(((O_a)*(O_A)*(((((2)*(O_m)))+(1)))))+((((-1))*(((((O_b)*(O_C)*(((O_m)+((-1))))))+(((O_A)*(O_b)*(((O_m)+(1)))))))*(tan(((O_e)+(((O_f)*(Xv))))))))),Xv))),Xv)))))
 
-# Regel 7 (472392 Varianten):
+# Rule 7 (472392 variants):
 #   Int[(A_ + B_.*tan[e_. + f_.*x_] + C_.*tan[e_. + f_.*x_]^2)/(a_. + b_.*tan[e_. + f_.*x_]), x_Symbol] := (a*A + b*B - a*C)*x/(a^2 + b^2) + (A*b^2 - a*b*B + a^2*C)/(a^2 + b^2)* Int[(1 + Tan[e + f*x]^2)/(a + b*Tan[e + f*x]), x] /; FreeQ[{a, b, e, f, A, B, C}, x] && NeQ[a^2 + b^2, 0] && EqQ[A*b - a*B - b*C, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_e,O_f,P_A,O_B,O_C), (neq(((((O_a)^(2)))+(((O_b)^(2)))),0)), (eqq(((((P_A)*(O_b)))+((((-1))*(O_a)*(O_B)))+((((-1))*(O_b)*(O_C)))),0)) Int(((P_A)+((O_B)*(tan((O_e)+((O_f)*(Xv)))))+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2))))*(((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((((((((O_a)*(P_A)))+(((O_b)*(O_B)))+((((-1))*(O_a)*(O_C)))))*(Xv)*(((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))))+(((((((P_A)*(((O_b)^(2)))))+((((-1))*(O_a)*(O_b)*(O_B)))+(((((O_a)^(2)))*(O_C)))))*(((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))*(Int(((((1)+(((tan(((O_e)+(((O_f)*(Xv))))))^(2)))))*(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^((-1))))),Xv)))))
 
-# Regel 8 (52488 Varianten):
+# Rule 8 (52488 variants):
 #   Int[(A_ + B_.*tan[e_. + f_.*x_] + C_.*tan[e_. + f_.*x_]^2)/ tan[e_. + f_.*x_], x_Symbol] := B*x + A*Int[1/Tan[e + f*x], x] + C*Int[Tan[e + f*x], x] /; FreeQ[{e, f, A, B, C}, x] && NeQ[A, C]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_e,O_f,P_A,O_B,O_C), (neq(P_A,O_C)) Int(((P_A)+((O_B)*(tan((O_e)+((O_f)*(Xv)))))+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2))))*((tan((O_e)+((O_f)*(Xv))))^(K_1)),Xv) = ((((O_B)*(Xv)))+(((P_A)*(Int(((tan(((O_e)+(((O_f)*(Xv))))))^((-1))),Xv))))+(((O_C)*(Int(tan(((O_e)+(((O_f)*(Xv))))),Xv)))))
 
-# Regel 9 (972 Varianten):
+# Rule 9 (972 variants):
 #   Int[(A_ + C_.*tan[e_. + f_.*x_]^2)/tan[e_. + f_.*x_], x_Symbol] := A*Int[1/Tan[e + f*x], x] + C*Int[Tan[e + f*x], x] /; FreeQ[{e, f, A, C}, x] && NeQ[A, C]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_e,O_f,P_A,O_C), (neq(P_A,O_C)) Int(((P_A)+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2))))*((tan((O_e)+((O_f)*(Xv))))^(K_1)),Xv) = ((((P_A)*(Int(((tan(((O_e)+(((O_f)*(Xv))))))^((-1))),Xv))))+(((O_C)*(Int(tan(((O_e)+(((O_f)*(Xv))))),Xv)))))
 
-# Regel 10 (472392 Varianten):
+# Rule 10 (472392 variants):
 #   Int[(A_ + B_.*tan[e_. + f_.*x_] + C_.*tan[e_. + f_.*x_]^2)/(a_. + b_.*tan[e_. + f_.*x_]), x_Symbol] := (a*A + b*B - a*C)*x/(a^2 + b^2) - (A*b - a*B - b*C)/(a^2 + b^2)*Int[Tan[e + f*x], x] + (A*b^2 - a*b*B + a^2*C)/(a^2 + b^2)* Int[(1 + Tan[e + f*x]^2)/(a + b*Tan[e + f*x]), x] /; FreeQ[{a, b, e, f, A, B, C}, x] && NeQ[A*b^2 - a*b*B + a^2*C, 0] && NeQ[a^2 + b^2, 0] && NeQ[A*b - a*B - b*C, 0]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_e,O_f,P_A,O_B,O_C), (neq(((((P_A)*(((O_b)^(2)))))+((((-1))*(O_a)*(O_b)*(O_B)))+(((((O_a)^(2)))*(O_C)))),0)), (neq(((((O_a)^(2)))+(((O_b)^(2)))),0)), (neq(((((P_A)*(O_b)))+((((-1))*(O_a)*(O_B)))+((((-1))*(O_b)*(O_C)))),0)) Int(((P_A)+((O_B)*(tan((O_e)+((O_f)*(Xv)))))+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2))))*(((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((((((((O_a)*(P_A)))+(((O_b)*(O_B)))+((((-1))*(O_a)*(O_C)))))*(Xv)*(((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))))+((((-1))*(((((P_A)*(O_b)))+((((-1))*(O_a)*(O_B)))+((((-1))*(O_b)*(O_C)))))*(((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))*(Int(tan(((O_e)+(((O_f)*(Xv))))),Xv))))+(((((((P_A)*(((O_b)^(2)))))+((((-1))*(O_a)*(O_b)*(O_B)))+(((((O_a)^(2)))*(O_C)))))*(((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))*(Int(((((1)+(((tan(((O_e)+(((O_f)*(Xv))))))^(2)))))*(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^((-1))))),Xv)))))
 
-# Regel 11 (5832 Varianten):
+# Rule 11 (5832 variants):
 #   Int[(A_ + C_.*tan[e_. + f_.*x_]^2)/(a_ + b_.*tan[e_. + f_.*x_]), x_Symbol] := a*(A - C)*x/(a^2 + b^2) - b*(A - C)/(a^2 + b^2)*Int[Tan[e + f*x], x] + (a^2*C + A*b^2)/(a^2 + b^2)* Int[(1 + Tan[e + f*x]^2)/(a + b*Tan[e + f*x]), x] /; FreeQ[{a, b, e, f, A, C}, x] && NeQ[a^2*C + A*b^2, 0] && NeQ[a^2 + b^2, 0] && NeQ[A, C]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_e,O_f,P_A,O_C), (neq(((((((P_a)^(2)))*(O_C)))+(((P_A)*(((O_b)^(2)))))),0)), (neq(((((P_a)^(2)))+(((O_b)^(2)))),0)), (neq(P_A,O_C)) Int(((P_A)+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2))))*(((P_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(K_1)),Xv) = ((((P_a)*(((P_A)+((((-1))*(O_C)))))*(Xv)*(((((((P_a)^(2)))+(((O_b)^(2)))))^((-1))))))+((((-1))*(O_b)*(((P_A)+((((-1))*(O_C)))))*(((((((P_a)^(2)))+(((O_b)^(2)))))^((-1))))*(Int(tan(((O_e)+(((O_f)*(Xv))))),Xv))))+(((((((((P_a)^(2)))*(O_C)))+(((P_A)*(((O_b)^(2)))))))*(((((((P_a)^(2)))+(((O_b)^(2)))))^((-1))))*(Int(((((1)+(((tan(((O_e)+(((O_f)*(Xv))))))^(2)))))*(((((P_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^((-1))))),Xv)))))
 
-# Regel 12 (708588 Varianten):
+# Rule 12 (708588 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^ m_*(A_. + B_.*tan[e_. + f_.*x_] + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := (A*b^2 - a*b*B + a^2*C)*(a + b*Tan[e + f*x])^(m + 1)/(b* f*(m + 1)*(a^2 + b^2)) + 1/(a^2 + b^2)* Int[(a + b*Tan[e + f*x])^(m + 1)* Simp[b*B + a*(A - C) - (A*b - a*B - b*C)*Tan[e + f*x], x], x] /; FreeQ[{a, b, e, f, A, B, C}, x] && NeQ[A*b^2 - a*b*B + a^2*C, 0] && LtQ[m, -1] && NeQ[a^2 + b^2, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_A,O_B,O_C), (neq(((((O_A)*(((O_b)^(2)))))+((((-1))*(O_a)*(O_b)*(O_B)))+(((((O_a)^(2)))*(O_C)))),0)), (((ltq(P_m,(-1))))), (neq(((((O_a)^(2)))+(((O_b)^(2)))),0)) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(P_m))*((O_A)+((O_B)*(tan((O_e)+((O_f)*(Xv)))))+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = ((((((((O_A)*(((O_b)^(2)))))+((((-1))*(O_a)*(O_b)*(O_B)))+(((((O_a)^(2)))*(O_C)))))*(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((P_m)+(1)))))*(((O_b)^((-1))))*(((O_f)^((-1))))*(((((P_m)+(1)))^((-1))))*(((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))))+(((((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))*(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((P_m)+(1)))))*(simp(((((O_b)*(O_B)))+(((O_a)*(((O_A)+((((-1))*(O_C)))))))+((((-1))*(((((O_A)*(O_b)))+((((-1))*(O_a)*(O_B)))+((((-1))*(O_b)*(O_C)))))*(tan(((O_e)+(((O_f)*(Xv))))))))),Xv))),Xv)))))
 
-# Regel 13 (13122 Varianten):
+# Rule 13 (13122 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^m_*(A_. + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := (A*b^2 + a^2*C)*(a + b*Tan[e + f*x])^(m + 1)/(b* f*(m + 1)*(a^2 + b^2)) + 1/(a^2 + b^2)* Int[(a + b*Tan[e + f*x])^(m + 1)* Simp[a*(A - C) - (A*b - b*C)*Tan[e + f*x], x], x] /; FreeQ[{a, b, e, f, A, C}, x] && NeQ[A*b^2 + a^2*C, 0] && LtQ[m, -1] && NeQ[a^2 + b^2, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_A,O_C), (neq(((((O_A)*(((O_b)^(2)))))+(((((O_a)^(2)))*(O_C)))),0)), (((ltq(P_m,(-1))))), (neq(((((O_a)^(2)))+(((O_b)^(2)))),0)) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(P_m))*((O_A)+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = ((((((((O_A)*(((O_b)^(2)))))+(((((O_a)^(2)))*(O_C)))))*(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((P_m)+(1)))))*(((O_b)^((-1))))*(((O_f)^((-1))))*(((((P_m)+(1)))^((-1))))*(((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))))+(((((((((O_a)^(2)))+(((O_b)^(2)))))^((-1))))*(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((P_m)+(1)))))*(simp(((((O_a)*(((O_A)+((((-1))*(O_C)))))))+((((-1))*(((((O_A)*(O_b)))+((((-1))*(O_b)*(O_C)))))*(tan(((O_e)+(((O_f)*(Xv))))))))),Xv))),Xv)))))
 
-# Regel 14 (1417176 Varianten):
+# Rule 14 (1417176 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^ m_.*(A_. + B_.*tan[e_. + f_.*x_] + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := C*(a + b*Tan[e + f*x])^(m + 1)/(b*f*(m + 1)) + Int[(a + b*Tan[e + f*x])^m*Simp[A - C + B*Tan[e + f*x], x], x] /; FreeQ[{a, b, e, f, A, B, C, m}, x] && NeQ[A*b^2 - a*b*B + a^2*C, 0] && Not[LeQ[m, -1]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_A,O_B,O_C,O_m), (neq(((((O_A)*(((O_b)^(2)))))+((((-1))*(O_a)*(O_b)*(O_B)))+(((((O_a)^(2)))*(O_C)))),0)), (not(((leq(O_m,(-1)))))) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(O_m))*((O_A)+((O_B)*(tan((O_e)+((O_f)*(Xv)))))+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = ((((O_C)*(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((O_m)+(1)))))*(((O_b)^((-1))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(Int(((((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(O_m)))*(simp(((O_A)+((((-1))*(O_C)))+(((O_B)*(tan(((O_e)+(((O_f)*(Xv))))))))),Xv))),Xv)))
 
-# Regel 15 (26244 Varianten):
+# Rule 15 (26244 variants):
 #   Int[(a_. + b_.*tan[e_. + f_.*x_])^m_.*(A_. + C_.*tan[e_. + f_.*x_]^2), x_Symbol] := C*(a + b*Tan[e + f*x])^(m + 1)/(b*f*(m + 1)) + (A - C)* Int[(a + b*Tan[e + f*x])^m, x] /; FreeQ[{a, b, e, f, A, C, m}, x] && NeQ[A*b^2 + a^2*C, 0] && Not[LeQ[m, -1]]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_e,O_f,O_A,O_C,O_m), (neq(((((O_A)*(((O_b)^(2)))))+(((((O_a)^(2)))*(O_C)))),0)), (not(((leq(O_m,(-1)))))) Int((((O_a)+((O_b)*(tan((O_e)+((O_f)*(Xv))))))^(O_m))*((O_A)+((O_C)*((tan((O_e)+((O_f)*(Xv))))^(2)))),Xv) = ((((O_C)*(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(((O_m)+(1)))))*(((O_b)^((-1))))*(((O_f)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((((O_A)+((((-1))*(O_C)))))*(Int(((((O_a)+(((O_b)*(tan(((O_e)+(((O_f)*(Xv))))))))))^(O_m)),Xv)))))

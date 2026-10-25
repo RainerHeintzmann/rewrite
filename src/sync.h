@@ -5,10 +5,10 @@
  *	sync.h V1.00
  *	Copyright (c) Rainer Heintzmann 1992
  *
- *	Funktionsprototypen fuer parser-Laufzeitroutinen
+ *	function prototypes for parser run-time routines
  */
 
-#include <stdio.h>    /* fuer readinput(FILE * fp); */
+#include <stdio.h>    /* for readinput(FILE * fp); */
 
 extern void include (const char *);
 
@@ -16,9 +16,9 @@ extern void rebuild_mat(void);
 
 extern void termlist_is_termlist(Node * np);
 
-extern void sequence (Node * np);						/* fuert instructions hintereinander aus */
+extern void sequence (Node * np);						/* executes instructions one after another */
 
-extern BOOLEAN rm_term_in(Node *,Node **); /* ueberspringt 'to_remove' */
+extern BOOLEAN rm_term_in(Node *,Node **); /* skips 'to_remove' */
 
 extern int termassign2 (Node * toass, Node * froass);
 
@@ -38,7 +38,7 @@ extern void setdebug (Node * np);
 
 extern void numassign2 (Node * froass,Symbol * toass);
 
-extern void numassign (Node * np);   /* Setzt bzw Loescht Nummer */
+extern void numassign (Node * np);   /* sets or deletes a number */
 
 extern void while_fkt (Node * np);
 
@@ -70,10 +70,10 @@ extern Symbol * IS_search (Symbol * from,Symbol * to);
 
 extern BOOLEAN lock_rtypes (Symbol * which,Symbol * from,Node ** chain);
 
-extern Symbol * getsymbol (Symbol * symbol,Node * termlist); /* sucht aus gleinamigen Symbolen das, mit den richtigen Argumenten heraus */
-extern Symbol * getsymbol_widen (Symbol * symbol,Node * termlist); /* 2026: mit SUBSORT-Erweiterung, NULL wenn keine passt */
-extern void retype_term (Node * t);  /* 2026: Varianten nach den Sorten der Argumente waehlen */
-extern void retype_node (Node * t);  /* 2026: dasselbe nur fuer diesen Knoten */
+extern Symbol * getsymbol (Symbol * symbol,Node * termlist); /* picks, among symbols of the same name, the one with the right arguments */
+extern Symbol * getsymbol_widen (Symbol * symbol,Node * termlist); /* 2026: with SUBSORT extension, NULL if none fits */
+extern void retype_term (Node * t);  /* 2026: choose variants according to the sorts of the arguments */
+extern void retype_node (Node * t);  /* 2026: the same, only for this node */
 
 extern int read_input (FILE * fp);
 

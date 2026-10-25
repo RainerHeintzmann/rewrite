@@ -10,6 +10,9 @@ Usage:
                  MIT license); sub folders are searched too
   --files TEXT   only test files whose name contains TEXT (may be repeated)
   --max N        at most N problems per file
+  --every K      only every K-th problem of each file (a smaller but
+                 representative set for development, e.g. --every 5)
+  --jobs N       rewrite runs in parallel (default 8)
   --batch N      problems per rewrite run (default 20)
   --timeout S    seconds per rewrite run (default 60)
   --exe PATH     rewrite executable (default ./rewrite.exe or ./rewrite)
@@ -42,6 +45,7 @@ except ImportError:
     mpmath = None
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 import subprocess
 import sys
 import time
@@ -411,6 +415,17 @@ def run_batch(exe, items, timeout):
     return parse_output(res.stdout + res.stderr), res.returncode != 0
 
 
+def run_checked(exe, batch, timeout):
+    """run_batch for problems p; a problem lost in a crash or time-out of the
+    batch is run alone"""
+    found, broken = run_batch(exe, [(p[0], p[2], p[4]) for p in batch], timeout)
+    for p in batch:
+        if p[0] not in found and (broken or len(batch) > 1):
+            one, _ = run_batch(exe, [(p[0], p[2], p[4])], min(timeout, 20))
+            found.update(one)
+    return found
+
+
 def parse_output(text):
     found = {}
     for m in re.finditer(r'@@BEGIN (\S+)@@(.*?)@@END@@', text, re.S):
@@ -435,15 +450,15 @@ def classify(body, f_py, params):
 
 def main():
     args = sys.argv[1:]
-    opts = {'files': [], 'max': None, 'batch': 20, 'timeout': 60, 'exe': None,
-            'report': None, 'verbose': False}
+    opts = {'files': [], 'max': None, 'every': 1, 'jobs': 8, 'batch': 20, 'timeout': 60,
+            'exe': None, 'report': None, 'verbose': False}
     rest = []
     i = 0
     while i < len(args):
         a = args[i]
         if a == '--files':
             opts['files'].append(args[i + 1]); i += 2
-        elif a in ('--max', '--batch', '--timeout'):
+        elif a in ('--max', '--every', '--jobs', '--batch', '--timeout'):
             opts[a[2:]] = int(args[i + 1]); i += 2
         elif a in ('--exe', '--report'):
             opts[a[2:]] = args[i + 1]; i += 2
@@ -455,6 +470,9 @@ def main():
         print(__doc__)
         sys.exit(1)
     exe = opts['exe'] or ('./rewrite.exe' if os.path.exists('rewrite.exe') else './rewrite')
+    if mpmath is None:
+        print('warning: no mpmath in this Python: results with special functions '
+              'count as unverified', file=sys.stderr)
 
     files = []
     for root, _, names in os.walk(rest[0]):
@@ -469,9 +487,11 @@ def main():
     for path in files:
         fname = os.path.basename(path)
         probs = []
-        for no, text in problems_of(path):
+        for idx, (no, text) in enumerate(problems_of(path)):
             if opts['max'] and len(probs) >= opts['max']:
                 break
+            if idx % opts['every']:
+                continue
             key = '%s:%d' % (re.sub(r'\W+', '_', fname)[:30], no)
             try:
                 e = r2r.parse(text)
@@ -489,14 +509,10 @@ def main():
         counts = {}
         todo = [p for p in probs if p[5] is None]
         results = {}
-        for b in range(0, len(todo), opts['batch']):
-            batch = todo[b:b + opts['batch']]
-            found, broken = run_batch(exe, [(p[0], p[2], p[4]) for p in batch], opts['timeout'])
-            for p in batch:
-                if p[0] not in found and (broken or len(batch) > 1):
-                    # crash or time out in this batch: run the problem alone
-                    one, _ = run_batch(exe, [(p[0], p[2], p[4])], min(opts['timeout'], 20))
-                    found.update(one)
+        batches = [todo[b:b + opts['batch']] for b in range(0, len(todo), opts['batch'])]
+        with ThreadPoolExecutor(max_workers=max(1, opts['jobs'])) as pool:
+            founds = list(pool.map(lambda bt: run_checked(exe, bt, opts['timeout']), batches))
+        for batch, found in zip(batches, founds):
             for p in batch:
                 if p[0] in found:
                     results[p[0]] = classify(found[p[0]], p[3], p[4])

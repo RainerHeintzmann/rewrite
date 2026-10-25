@@ -1,6 +1,6 @@
-# +++++++++++++++ Operatoren +++++++++++++++
-SORT doperator   # Differentialop.
-SORT vdoperator  # Vektorieller Diffop.
+# +++++++++++++++ Operators +++++++++++++++
+SORT doperator   # differential op.
+SORT vdoperator  # vector differential op.
 
 VAR DOP1 : doperator
 VAR DOP2 : doperator
@@ -9,11 +9,11 @@ VAR VDOP1 : vdoperator
 VAR VDOP2 : vdoperator
 VAR VDOP3 : vdoperator
 
-CONST \/ : vdoperator # Nambla
+CONST \/ : vdoperator # Nabla
 CONST /\ : doperator # Laplace
 
-OTHER * : real,doperator    >> doperator # Nicht kommutativ !
-OTHER * : real,vdoperator   >> vdoperator # Nicht kommutativ !
+OTHER * : real,doperator    >> doperator # not commutative !
+OTHER * : real,vdoperator   >> vdoperator # not commutative !
 OTHER * : doperator,real    >> real 
 OTHER * : doperator,vector  >> vector 
 OTHER * : vdoperator,real   >> vector 
@@ -28,7 +28,7 @@ OTHER + : vdoperator,vdoperator  >> vdoperator
 
 
 ALG Oper
-SPEC    Oper : \/ * \/ = /\  #  Achtung : Rueckw.-Schraegstr
+SPEC    Oper : \/ * \/ = /\  #  caution : backslash
 ADDSPEC Oper : \/ *(\/ * A) = 0
 ADDSPEC Oper : VDOP1+VDOP1=2*VDOP1
 ADDSPEC Oper : A*VDOP1+VDOP1=(A+1)*VDOP1

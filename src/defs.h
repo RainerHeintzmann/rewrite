@@ -5,7 +5,7 @@
  *	defs.h V1.00
  *	Copyright (c) Rainer Heintzmann 1993
  *
- *	Funktionsprototypen fuer parser-Laufzeitroutinen (Definitionen)
+ *	Function prototypes for parser run-time routines (definitions)
  */
 
 extern void declare (Node * np);

@@ -1,4 +1,4 @@
-/* node.c  :   Speicherverwaltung fuer Knoten  ( zur Beschleunigung) */
+/* node.c  :   memory management for nodes  ( for speed) */
 
 #include <stdlib.h>
 #include <string.h> /* memset */
@@ -13,7 +13,7 @@
 
 extern Node * numbertype; /* run.c */
 
-const char * numbername = "flt"; /* Eindeutige Identifizierung einer Nummer ueber diese const. */
+const char * numbername = "flt"; /* Unique identification of a number via this const. */
 
 static int i;
 static Node * nodestack = NULL;
@@ -22,7 +22,7 @@ static Symbol * symbolstack = NULL;
 static char * prtnumstring = "%g ";
 
 
-static Symbol stdsort={ /* Globale Standart-Real Menge */
+static Symbol stdsort={ /* Global standard real set */
 {SYM_TYPE,
 (Node *) NULL,
 (Node *) NULL
@@ -42,7 +42,7 @@ TRUE,
 0
 };
 
-/* besondere Zahlen 0,1  , damit beim Lifting immer beim selben Symbol gestartet wird. */
+/* special numbers 0,1  , so that lifting always starts at the same symbol. */
 static double Zero = 0.0;
 static double One  = 1.0;
 
@@ -86,7 +86,7 @@ NULL,
 0
 };
 
-/* Funktionen zur standartbehandlung reeller Zahlen : */
+/* Functions for the standard handling of real numbers : */
 
 /* void std_show_cont (double * * x)
 {
@@ -145,7 +145,7 @@ void prt_num(Node * np)
 	prtnumstring=name((Symbol *) np->r);
 }
 
-BOOLEAN symeq (Symbol * a,Symbol * b) /* Vergleicht zwei Symbole auf Gleichheit */
+BOOLEAN symeq (Symbol * a,Symbol * b) /* Compares two symbols for equality */
 {
 BOOLEAN tmp;
 	DEBG((6,"symeq("));
@@ -162,10 +162,10 @@ if (!hasval(a) || ! hasval(b))
 if ((lexval(a) != Const) || (lexval(b)!=Const))
 	return FALSE;
 
-/* Numerische Werte vergleichen ? */
+/* Compare numeric values ? */
 
-if (rtypes(a) != rtypes(b))  /* Resultattypen */
-	{			/* 2026: Zahlen verschiedener Sorten einer SUBSORT-Kette */
+if (rtypes(a) != rtypes(b))  /* result types */
+	{			/* 2026: numbers of different sorts of a SUBSORT chain */
 	Node * sa = rtypes(a), * sb = rtypes(b), * to = NULL;
 	void * w;
 	BOOLEAN eq;
@@ -235,7 +235,7 @@ void delnod (Node * node)
 }
 
 
-Symbol * mksym (int lexv,const char * name)  /* legt Symbol an */
+Symbol * mksym (int lexv,const char * name)  /* creates a symbol */
 {
 	Symbol * newsym;
 
@@ -259,7 +259,7 @@ Symbol * mksym (int lexv,const char * name)  /* legt Symbol an */
 
 	newsym = symbolstack;
 	symbolstack = (Symbol *) newsym->node.l;
-	memset(newsym, 0, sizeof(Symbol)); /* wiederverwendeter Platz: keine alten atypes/value usw. */
+	memset(newsym, 0, sizeof(Symbol)); /* reused slot: no old atypes/value etc. */
 	newsym->node.type = SYM_TYPE;
 	newsym->node.l = NULL;
 	newsym->node.r = NULL;
@@ -275,7 +275,7 @@ Symbol * mksym (int lexv,const char * name)  /* legt Symbol an */
 	return newsym;
 }
 
-/* gibt einen Zahlenwert mit der Loeschfunktion des Zahlentyps frei */
+/* frees a numeric value with the delete function of its number type */
 static void free_number_value (void * value)
 {
 	Symbol * srt = numbertype ? (Symbol *) numbertype : & stdsort;
@@ -283,8 +283,8 @@ static void free_number_value (void * value)
 		((void (*) (void *)) del(srt)) (value);
 }
 
-/* mknum uebernimmt den Wert 'value'. Fuer 0 und 1 wird das gemeinsame
- * Symbol geliefert und 'value' freigegeben. */
+/* mknum takes over the value 'value'. For 0 and 1 the shared
+ * symbol is returned and 'value' is freed. */
 Symbol * mknum (void * value,Node * rtype)
 {
 Symbol * sp;
@@ -297,14 +297,14 @@ Symbol * sp;
 	if (! numbertype)
 		printfErr("You have to set numbertype first (NUM Sort) !\n"); 
 
-	if (rtype == numbertype) /* wird ueber NUM Sort gesetzt */
+	if (rtype == numbertype) /* is set via NUM Sort */
 		{
 		if (* (double *) value == 0.0)
 			{
 			if (numbertype) rtypes(& Null_Symbol) = numbertype;
 			else
 				rtypes(& Null_Symbol) = ( Node *) & stdsort;
-			free_number_value(value); /* das gemeinsame Symbol hat einen eigenen Wert */
+			free_number_value(value); /* the shared symbol has its own value */
 			return & Null_Symbol;
 			}
 		if (* (double *) value == 1.0)
@@ -312,12 +312,12 @@ Symbol * sp;
 			if (numbertype) rtypes(& Eins_Symbol) = numbertype;
 			else
 				rtypes(& Eins_Symbol) = ( Node *) & stdsort;
-			free_number_value(value); /* das gemeinsame Symbol hat einen eigenen Wert */
+			free_number_value(value); /* the shared symbol has its own value */
 			return & Eins_Symbol;
 			}
 		}
 
-	sp=mksym(Const,NULL); /* NULL, damit strsave nicht benutzt wird */
+	sp=mksym(Const,NULL); /* NULL, so that strsave is not used */
 	name(sp)   = numbername;
 
  	rtypes(sp) = rtype;
@@ -366,7 +366,7 @@ void delnum (Symbol * number,BOOLEAN delvalue)
 	if (! rtypes(number))
 		fatal("FATAL ERROR node.c : delnum: Number has no rtype");
 
-	if (delvalue) DELNUM(number,value(number)); /* vom Benutzer verwaltet ! (delnum) siehe sym.h */
+	if (delvalue) DELNUM(number,value(number)); /* managed by the user ! (delnum) see sym.h */
 
 	delsym(number);
 	return;
@@ -374,10 +374,10 @@ void delnum (Symbol * number,BOOLEAN delvalue)
 
 void cpysym(Symbol * s1,Symbol * s2)
 {
-	(* s2) = * s1; /* name(s) nicht freigeben */
+	(* s2) = * s1; /* do not free name(s) */
 }
 
-Symbol * clonesym(Symbol * s) /* namen doppelt ! */
+Symbol * clonesym(Symbol * s) /* names duplicated ! */
 {	Symbol * sp=mksym(lexval(s),name(s));
 	char * cp = name(sp);
 	cpysym(s,sp);
@@ -386,9 +386,9 @@ Symbol * clonesym(Symbol * s) /* namen doppelt ! */
 }
 
 
-/* TRUE fuer die gemeinsam benutzten Zahlen 0 und 1 (Null_Symbol, Eins_Symbol).
- * Ihr Wert liegt im statischen Speicher und darf nie an eine Variable
- * uebergeben und spaeter mit free() freigegeben werden. */
+/* TRUE for the shared numbers 0 and 1 (Null_Symbol, Eins_Symbol).
+ * Their value lives in static memory and must never be handed to a variable
+ * and later freed with free(). */
 BOOLEAN is_shared_num (Symbol * sp)
 {
 	return (sp == & Null_Symbol) || (sp == & Eins_Symbol);

@@ -1,13 +1,13 @@
 # inc/integration/2_exponentials
-# Uebersetzung von Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi,
-# Commit 61e9c18), Abschnitte
-#   2 Exponentials / 2.3 Miscellaneous exponentials   (Regel 1)
-#   2 Exponentials / 2.1 (c+d x)^m (a+b (F^(g (e+f x)))^n)^p   (Regel 1)
-# Copyright (c) 2018 Rule-Based-Integration Organization, MIT-Lizenz,
-# siehe inc/integration/LICENSE.Rubi. Uebersetzung 2026.
-# Schreibweise der Muster: siehe inc/integration/base.
-# F^(g*(e+f*x)) wird fuer F = E als exp(e+f*x) geschrieben (g, n, b = 1),
-# fuer eine Zahl F als Kf^(e+f*x).
+# Translation of Rubi 4.17.3 (github.com/RuleBasedIntegration/Rubi,
+# commit 61e9c18), sections
+#   2 Exponentials / 2.3 Miscellaneous exponentials   (rule 1)
+#   2 Exponentials / 2.1 (c+d x)^m (a+b (F^(g (e+f x)))^n)^p   (rule 1)
+# Copyright (c) 2018 Rule-Based-Integration Organization, MIT license,
+# see inc/integration/LICENSE.Rubi. Translated 2026.
+# Notation of the patterns: see inc/integration/base.
+# F^(g*(e+f*x)) is written for F = E as exp(e+f*x) (g, n, b = 1),
+# for a number F as Kf^(e+f*x).
 
 # Int[(F_^(c_.*(a_. + b_.*x_)))^n_., x_Symbol] := (F^(c*(a + b*x)))^n/(b*c*n*Log[F]) /; FreeQ[{F, a, b, c, n}, x]
 ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb) Int(exp(Qa+Qb*Xv),Xv) = exp(Qa+Qb*Xv)/Qb

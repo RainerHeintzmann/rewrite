@@ -6,25 +6,25 @@ VAR  X_v : vector
 VAR  Y_v : vector
 VAR  Z_v : vector
 
-CONST 1_v : vector                   # Einsvektor
-CONST e1 : vector                    # 1.Einheitsvektor
-CONST e2 : vector                    # 2.Einheitsvektor
-CONST e3 : vector                    # 3.Einheitsvektor
+CONST 1_v : vector                   # ones vector
+CONST e1 : vector                    # 1st unit vector
+CONST e2 : vector                    # 2nd unit vector
+CONST e3 : vector                    # 3rd unit vector
 
-OTHER +  : vector,vector >> vector   # Vektoraddition
-OTHER -  : vector,vector >> vector   # Vektorsubtruktion
-OTHER -  : vector >> vector          # Additivinverses
-OTHER *  : vector,vector >> real     # Skalarprodukt
-OTHER *  : vector,real >> vector     # reell mal Vektor
-OTHER *  : real,vector >> vector     # reell mal Vektor
-OTHER ^  : vector,real >> real       # z.B. a_v ^ 2
-OTHER D  : vector,real >> vector     # z.B. D(a_v,t)
-OTHER Dp : real,vector >> real       # z.B. D(a_v,t)
+OTHER +  : vector,vector >> vector   # vector addition
+OTHER -  : vector,vector >> vector   # vector subtraction
+OTHER -  : vector >> vector          # additive inverse
+OTHER *  : vector,vector >> real     # scalar product
+OTHER *  : vector,real >> vector     # real times vector
+OTHER *  : real,vector >> vector     # real times vector
+OTHER ^  : vector,real >> real       # e.g. a_v ^ 2
+OTHER D  : vector,real >> vector     # e.g. D(a_v,t)
+OTHER Dp : real,vector >> real       # e.g. D(a_v,t)
 
-FUNC vec  : real,real,real >> vector # Definition eines 3-Vektors
-BRA  [ ]  : real ++ >> vector # Definition eines n-Vektors
-FUNC grad : real >> vector           # Kreuzprodukt
-FUNC _x_   : vector,vector >> vector  LA4 # Kreuzprodukt (auf einer Stufe mit ^,inx)
+FUNC vec  : real,real,real >> vector # definition of a 3-vector
+BRA  [ ]  : real ++ >> vector # definition of an n-vector
+FUNC grad : real >> vector           # cross product
+FUNC _x_   : vector,vector >> vector  LA4 # cross product (same precedence as ^,inx)
 
 SORT matrix
 VAR  A_m : matrix
@@ -34,21 +34,21 @@ VAR  X_m : matrix
 VAR  Y_m : matrix
 VAR  Z_m : matrix
 
-CONST E : matrix                    # Einheitsmatrix
-CONST 0_m : matrix						# Nullmatrix
+CONST E : matrix                    # identity matrix
+CONST 0_m : matrix						# zero matrix
 
-OTHER + : matrix,matrix >> matrix   # Matrizenaddition
-OTHER * : matrix,matrix >> matrix   # Matrizenmultiplikation
-OTHER * : real,matrix >> matrix     # reel mal Matrix
-OTHER * : matrix,real >> matrix     # reel mal Matrix
-OTHER * : matrix,vector >> vector   # z.B. Gleichungssystem
+OTHER + : matrix,matrix >> matrix   # matrix addition
+OTHER * : matrix,matrix >> matrix   # matrix multiplication
+OTHER * : real,matrix >> matrix     # real times matrix
+OTHER * : matrix,real >> matrix     # real times matrix
+OTHER * : matrix,vector >> vector   # e.g. system of equations
 
 FUNC det  : matrix >> real
-FUNC ohne : real,real,matrix >> matrix # Spalte,Zeile weg (fuer det)
-FUNC entwz : real,matrix >> matrix 		# zuende-entwickeln nach Zeile 
-FUNC trans : matrix >> matrix RU    # Transponiert
-FUNC mat : vector,vector,vector >> matrix # Definition einer 3*3-Matrix
-FUNC elem : real,real,real >> matrix # Zeile,Spalte,Wert
+FUNC ohne : real,real,matrix >> matrix # remove column,row (for det)
+FUNC entwz : real,matrix >> matrix 		# fully expand along row
+FUNC trans : matrix >> matrix RU    # transposed
+FUNC mat : vector,vector,vector >> matrix # definition of a 3*3 matrix
+FUNC elem : real,real,real >> matrix # row,column,value
 
 ALG Vector
 SPEC    Vector : A_v+(B_v+C_v)=A_v+B_v+C_v
@@ -58,7 +58,7 @@ ADDSPEC Vector : A_v - B_v = A_v + - B_v
 ADDSPEC Vector : A_v _x_ (B_v _x_ C_v)=B_v*(A_v*C_v)+ - (C_v*(A_v*B_v))
 ADDSPEC Vector : grad A = vec(Dp(A,e1),Dp(A,e2),Dp(A,e3))
 
-# explizite Vektoren
+# explicit vectors
 ADDSPEC Vector : vec(A,B,C)*vec(X,Y,Z)=A*X+B*Y+C*Z
 ADDSPEC Vector : vec(A,B,C)^2=A^2+B^2+C^2
 # ADDSPEC Vector : A*vec(X,Y,Z)=vec(A*X,A*Y,A*Z)
@@ -104,7 +104,7 @@ ADDSPEC det1 : det(entwz(N,elem(N,M,X)))=X*sgn(-1^(N+M))
 ADDSPEC det1 : ohne(A,B,A_m+B_m)=ohne(A,B,A_m)+ohne(A,B,B_m)
 ADDSPEC det1 : ohne(A,B,elem(A,Y,Z))=0_m
 ADDSPEC det1 : ohne(A,B,elem(X,B,Z))=0_m
-# ADDSPEC det1 : IF (LB(A,X) && LB(B,Y)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z) # besser: Notequal
+# ADDSPEC det1 : IF (LB(A,X) && LB(B,Y)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z) # better: Notequal
 # ADDSPEC det1 : IF (LB(A,X) && LB(Y,B)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)
 # ADDSPEC det1 : IF (LB(X,A) && LB(B,Y)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)
 # ADDSPEC det1 : IF (LB(X,A) && LB(Y,B)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)

@@ -1,58 +1,58 @@
 SORT rvector
 ATT rvector  show_vec,cmp_vec,cpy_vec,del_vec
 
-FUNC vecs  : rvector ++ >> real ATT vec_write          # Anzeige von vielen Vektoren
+FUNC vecs  : rvector ++ >> real ATT vec_write          # display of many vectors
 
-OTHER + : rvector,rvector >> rvector  ATT vec_add      # Vectoraddition
-OTHER * : rvector,rvector >> real     ATT vec_mul      # Scalarprodukt
-OTHER * : real,rvector >> rvector     ATT real_mul_vec # reel mal Vector
-OTHER * : rvector,real >> rvector     ATT vec_mul_real # Vector mal reel
+OTHER + : rvector,rvector >> rvector  ATT vec_add      # vector addition
+OTHER * : rvector,rvector >> real     ATT vec_mul      # scalar product
+OTHER * : real,rvector >> rvector     ATT real_mul_vec # real times vector
+OTHER * : rvector,real >> rvector     ATT vec_mul_real # vector times real
 
-OTHER / : rvector,real >> rvector     ATT vec_div_real # Vector durch reel
+OTHER / : rvector,real >> rvector     ATT vec_div_real # vector divided by real
 
 OTHER - : rvector >> rvector          ATT minus_vec    # -1*Vector 
-OTHER - : rvector,rvector >> rvector  ATT vec_min_vec  # Vector minus Vector
+OTHER - : rvector,rvector >> rvector  ATT vec_min_vec  # vector minus vector
 
-OTHER abs : rvector >> real ATT vec_abs                # Betrag
+OTHER abs : rvector >> real ATT vec_abs                # magnitude
 
-FUNC _x_  : rvector,rvector >> rvector LA3 ATT vec_x_vec # Quadrat
-FUNC sqr  : rvector >> real ATT vec_sqr              # Quadrat
+FUNC _x_  : rvector,rvector >> rvector LA3 ATT vec_x_vec # square
+FUNC sqr  : rvector >> real ATT vec_sqr              # square
 FUNC elem : rvector,real >> real ATT elem_vec        # Vector,Pos
 FUNC part : rvector,real,real >> rvector ATT vec_part  # Part of the Vector From..To
 FUNC nullvec : real      >> rvector ATT null_vec     # Dimension
 FUNC einsvec : real,real >> rvector ATT eins_vec     # Dimension,Pos
-FUNC gen : real,real,real  >> rvector ATT gen_vec    # Von,Bis,Steps
-FUNC chvec : rvector,real,real >> rvector ATT ch_vec # Vector,Pos,Wert
-FUNC vecms : rvector >> real ATT vec_ms              # Varianz
-FUNC vecrms : rvector >> real ATT vec_rms            # Standartabweichung
-FUNC vecmiddle : rvector >> real ATT vec_middle      # Mittelwert
-BRA  [ ]  : real ++ >> rvector ATT constr_vec        # Matrix,Pos,Wert
+FUNC gen : real,real,real  >> rvector ATT gen_vec    # from,to,steps
+FUNC chvec : rvector,real,real >> rvector ATT ch_vec # vector,pos,value
+FUNC vecms : rvector >> real ATT vec_ms              # variance
+FUNC vecrms : rvector >> real ATT vec_rms            # standard deviation
+FUNC vecmiddle : rvector >> real ATT vec_middle      # mean
+BRA  [ ]  : real ++ >> rvector ATT constr_vec        # matrix,pos,value
 OTHER [ : rvector,real >> real ATT elem_vec          # Vector[Pos]
 
-# Elementweise ::
+# elementwise ::
 
-OTHER sin : rvector >> rvector       ATT sin_vec  # Elementweise
-OTHER sinh : rvector >> rvector      ATT sinh_vec  # Elementweise
-OTHER arcsin : rvector  >> rvector   ATT asin_vec  # Elementweise
-OTHER cos : rvector  >> rvector      ATT cos_vec  # Elementweise
-OTHER cosh : rvector  >> rvector     ATT cosh_vec  # Elementweise
-OTHER arccos : rvector  >> rvector   ATT acos_vec  # Elementweise
-OTHER tan : rvector  >> rvector      ATT tan_vec  # Elementweise
-OTHER tanh : rvector  >> rvector     ATT tanh_vec  # Elementweise
-OTHER arctan : rvector  >> rvector   ATT atan_vec  # Elementweise
-FUNC  eabs : rvector  >> rvector     ATT abs_vec  # Elementweise
-OTHER ln : rvector  >> rvector       ATT log_vec  # Elementweise
-OTHER exp : rvector  >> rvector      ATT exp_vec  # Elementweise
-OTHER ! : rvector  >> rvector        ATT fak_vec  # Elementweise
-FUNC  esqr : rvector  >> rvector     ATT sqr_vec  # Elementweise
-OTHER sqrt : rvector  >> rvector     ATT sqrt_vec  # Elementweise
+OTHER sin : rvector >> rvector       ATT sin_vec  # elementwise
+OTHER sinh : rvector >> rvector      ATT sinh_vec  # elementwise
+OTHER arcsin : rvector  >> rvector   ATT asin_vec  # elementwise
+OTHER cos : rvector  >> rvector      ATT cos_vec  # elementwise
+OTHER cosh : rvector  >> rvector     ATT cosh_vec  # elementwise
+OTHER arccos : rvector  >> rvector   ATT acos_vec  # elementwise
+OTHER tan : rvector  >> rvector      ATT tan_vec  # elementwise
+OTHER tanh : rvector  >> rvector     ATT tanh_vec  # elementwise
+OTHER arctan : rvector  >> rvector   ATT atan_vec  # elementwise
+FUNC  eabs : rvector  >> rvector     ATT abs_vec  # elementwise
+OTHER ln : rvector  >> rvector       ATT log_vec  # elementwise
+OTHER exp : rvector  >> rvector      ATT exp_vec  # elementwise
+OTHER ! : rvector  >> rvector        ATT fak_vec  # elementwise
+FUNC  esqr : rvector  >> rvector     ATT sqr_vec  # elementwise
+OTHER sqrt : rvector  >> rvector     ATT sqrt_vec  # elementwise
 
-FUNC  _plus : real,rvector  >> rvector LA2  ATT eplus2_vec  # Elementweise
-OTHER _plus : rvector,real  >> rvector      ATT eplus1_vec  # Elementweise
-FUNC  _minus : real,rvector  >> rvector LA2  ATT emin2_vec  # Elementweise
-OTHER _minus : rvector,real  >> rvector      ATT emin1_vec  # Elementweise
+FUNC  _plus : real,rvector  >> rvector LA2  ATT eplus2_vec  # elementwise
+OTHER _plus : rvector,real  >> rvector      ATT eplus1_vec  # elementwise
+FUNC  _minus : real,rvector  >> rvector LA2  ATT emin2_vec  # elementwise
+OTHER _minus : rvector,real  >> rvector      ATT emin1_vec  # elementwise
 
-FUNC _pow : rvector,real  >> rvector RA  ATT epow_vec  # Elementweise
-FUNC _mul : rvector,rvector  >> rvector LA3  ATT emul_vec  # Elementweise
-FUNC _div : rvector,rvector  >> rvector LA3  ATT ediv_vec  # Elementweise
+FUNC _pow : rvector,real  >> rvector RA  ATT epow_vec  # elementwise
+FUNC _mul : rvector,rvector  >> rvector LA3  ATT emul_vec  # elementwise
+FUNC _div : rvector,rvector  >> rvector LA3  ATT ediv_vec  # elementwise
 

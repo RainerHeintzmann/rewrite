@@ -1,31 +1,31 @@
 # inc/integration/base
-# Grundlagen fuer die Integration nach Rubi (Rule-based integration, A. Rich).
-# Benoetigt inc/all. Wird von inc/integration/all geladen.
+# Basics for integration following Rubi (Rule-based integration, A. Rich).
+# Needs inc/all. Loaded by inc/integration/all.
 #
-# Int(f,x)   unbestimmtes Integral (Ergebnis ohne Integrationskonstante)
+# Int(f,x)   indefinite integral (result without integration constant)
 #
-# Uebersetzung der Rubi-Muster:
+# Translation of the Rubi patterns:
 #   x_         -> Xv
-#   a_         -> Pa   (Parameter, muss vorhanden sein)
-#   a_.        -> Qa   (optionaler Parameter, OPT; fehlt er, gilt 0 fuer +,
-#                       1 fuer * und fuer den Exponenten von ^)
+#   a_         -> Pa   (parameter, must be present)
+#   a_.        -> Qa   (optional parameter, OPT; if missing, 0 is used for +,
+#                       1 for * and for the exponent of ^)
 #   FreeQ[{a,b},x]  -> NIN(Xv,Qa,Qb)
-#   mehrere Bedingungen werden durch Kommas getrennt:  IF NIN(Xv,Pm), (Pm != -1)
-# Faktoren und Summanden duerfen in jeder Reihenfolge stehen (COMM +,*).
+#   several conditions are separated by commas:  IF NIN(Xv,Pm), (Pm != -1)
+# Factors and summands may appear in any order (COMM +,*).
 
 FUNC Int : real,real >> real
 FUNC inthide      : real,real >> real ATT SYMBOLIC inthide       # Rubi IntHide = Int
-FUNC unintegrable : real,real >> real                   # Rubi Unintegrable: bleibt stehen, IntOut macht Int daraus
+FUNC unintegrable : real,real >> real                   # Rubi Unintegrable: stays as is, IntOut turns it into Int
 
-VAR Uv,Vv,Wv,Xv : real                    # beliebige Terme
+VAR Uv,Vv,Wv,Xv : real                    # arbitrary terms
 VAR Pa,Pb,Pc,Pd,Pe,Pf,Pm,Pn : real        # Rubi a_ , b_ , ...
 VAR Qa,Qb,Qc,Qd,Qe,Qf,Qm,Qn : real        # Rubi a_., b_., ...
-NUM Kc,Kd,Kf : real                       # nur Zahlen
+NUM Kc,Kd,Kf : real                       # numbers only
 
-# ---------------- Normalform wie in Mathematica ----------------
+# ---------------- Normal form as in Mathematica ----------------
 # x-y -> x+(-1)*y,  x/y -> x*y^(-1),  sqrt(x) -> x^0.5,  e^x -> exp(x),
-# Zahlenfaktoren nach vorne, Produkte mit Summen ausmultiplizieren.
-# Diese Regeln stehen vor OPT/COMM und werden daher nicht erweitert.
+# numeric factors to the front, multiply out products with sums.
+# These rules come before OPT/COMM and are therefore not extended.
 ALG IntNorm
 SPEC    IntNorm : Uv-Vv   = Uv+(-1)*Vv
 ADDSPEC IntNorm : -Uv     = (-1)*Uv
@@ -39,13 +39,13 @@ ADDSPEC IntNorm : IF (Kc == 1) Kc*Uv = Uv
 ADDSPEC IntNorm : IF (Kc == 0) Kc*Uv = 0
 ADDSPEC IntNorm : IF (Kc == 0) Kc+Uv = Uv
 ADDSPEC IntNorm : IF (Kc == 0) Uv+Kc = Uv
-ADDSPEC IntNorm : IF (is_int(Kc)) (Uv^Vv)^Kc = Uv^(Vv*Kc)   # nicht (x^2)^0.5 = x
+ADDSPEC IntNorm : IF (is_int(Kc)) (Uv^Vv)^Kc = Uv^(Vv*Kc)   # not (x^2)^0.5 = x
 ADDSPEC IntNorm : Uv*Uv = Uv^2
 ADDSPEC IntNorm : Uv^Vv*Uv = Uv^(Vv+1)
 ADDSPEC IntNorm : Uv*Uv^Vv = Uv^(Vv+1)
 ADDSPEC IntNorm : Uv^Vv*Uv^Wv = Uv^(Vv+Wv)
-# (Reihenfolge wichtig: zwei Zahlen zuerst zusammenfassen, sonst
-#  wechseln 5*(-1*a) und -1*(5*a) endlos)
+# (order matters: combine two numbers first, otherwise
+#  5*(-1*a) and -1*(5*a) alternate endlessly)
 ADDSPEC IntNorm : Kc*(Kd*Uv) = (Kc*Kd)*Uv
 ADDSPEC IntNorm : Uv*Kc = Kc*Uv
 ADDSPEC IntNorm : (Kc*Uv)*Vv = Kc*(Uv*Vv)
@@ -53,13 +53,13 @@ ADDSPEC IntNorm : Uv*(Kc*Vv) = Kc*(Uv*Vv)
 ADDSPEC IntNorm : Uv*(Vv+Wv) = Uv*Vv+Uv*Wv
 ADDSPEC IntNorm : (Vv+Wv)*Uv = Vv*Uv+Wv*Uv
 
-# ---------------- Rueckwandlung fuer die Ausgabe ----------------
-# negative Zahlen als Minuszeichen und Kehrwerte als Bruch, damit All die
-# gewohnte Form ausgibt
-# Normalform fuer die automatisch uebersetzten Rubi-Regeln (rubi/all):
-# wie IntNorm, aber ohne Ausmultiplizieren (Mathematica multipliziert
-# Produkte mit Summen nicht von selbst aus).
-# 2026: e als Symbol ohne Zahlenwert (wie E in Mathematica); ln(eE) = 1
+# ---------------- Conversion back for output ----------------
+# negative numbers as minus sign and reciprocals as fraction, so that All
+# prints the usual form
+# Normal form for the automatically translated Rubi rules (rubi/all):
+# like IntNorm, but without multiplying out (Mathematica does not multiply
+# out products with sums by itself).
+# 2026: e as a symbol without numeric value (like E in Mathematica); ln(eE) = 1
 CONST eE : positive
 
 ALG RubiNorm
@@ -68,44 +68,44 @@ ADDSPEC RubiNorm : -Uv     = (-1)*Uv
 ADDSPEC RubiNorm : Uv/Vv   = Uv*Vv^(-1)
 ADDSPEC RubiNorm : mi Uv   = Uv^(-1)
 ADDSPEC RubiNorm : sqrt Uv = Uv^(1/2)
-ADDSPEC RubiNorm : exp(Uv) = eE^Uv   # wie Mathematica: E^u, damit F^u-Muster passen
+ADDSPEC RubiNorm : exp(Uv) = eE^Uv   # like Mathematica: E^u, so that F^u patterns match
 ADDSPEC RubiNorm : IF (abs(Kf - e) < 1e-9) Kf^Uv = eE^Uv
-ADDSPEC RubiNorm : ln(eE) = 1        # exakt, fuer Rubis Log[E]
+ADDSPEC RubiNorm : ln(eE) = 1        # exact, for Rubi's Log[E]
 ADDSPEC RubiNorm : IF (Kc == 0) Uv^Kc = 1
 ADDSPEC RubiNorm : IF (Kc == 1) Uv^Kc = Uv
 ADDSPEC RubiNorm : IF (Kc == 1) Kc*Uv = Uv
 ADDSPEC RubiNorm : IF (Kc == 0) Kc*Uv = 0
 ADDSPEC RubiNorm : IF (Kc == 0) Kc+Uv = Uv
 ADDSPEC RubiNorm : IF (Kc == 0) Uv+Kc = Uv
-ADDSPEC RubiNorm : IF (is_int(Kc)) (Uv^Vv)^Kc = Uv^(Vv*Kc)   # nicht (x^2)^0.5 = x
-ADDSPEC RubiNorm : IF (is_int(Kc)) (Uv*Vv)^Kc = Uv^Kc*Vv^Kc   # wie Mathematica: 1/(u v) = u^-1 v^-1
+ADDSPEC RubiNorm : IF (is_int(Kc)) (Uv^Vv)^Kc = Uv^(Vv*Kc)   # not (x^2)^0.5 = x
+ADDSPEC RubiNorm : IF (is_int(Kc)) (Uv*Vv)^Kc = Uv^Kc*Vv^Kc   # like Mathematica: 1/(u v) = u^-1 v^-1
 ADDSPEC RubiNorm : Uv*Uv = Uv^2
 ADDSPEC RubiNorm : Uv^Vv*Uv = Uv^(Vv+1)
 ADDSPEC RubiNorm : Uv*Uv^Vv = Uv^(Vv+1)
 ADDSPEC RubiNorm : Uv^Vv*Uv^Wv = Uv^(Vv+Wv)
-# (Reihenfolge wichtig: zwei Zahlen zuerst zusammenfassen, sonst
-#  wechseln 5*(-1*a) und -1*(5*a) endlos)
+# (order matters: combine two numbers first, otherwise
+#  5*(-1*a) and -1*(5*a) alternate endlessly)
 ADDSPEC RubiNorm : Kc*(Kd*Uv) = (Kc*Kd)*Uv
 ADDSPEC RubiNorm : Uv*Kc = Kc*Uv
 ADDSPEC RubiNorm : (Kc*Uv)*Vv = Kc*(Uv*Vv)
 ADDSPEC RubiNorm : Uv*(Kc*Vv) = Kc*(Uv*Vv)
-# ---------------- Rueckwandlung fuer die Ausgabe ----------------
-# negative Zahlen als Minuszeichen und Kehrwerte als Bruch, damit All die
-# gewohnte Form ausgibt
+# ---------------- Conversion back for output ----------------
+# negative numbers as minus sign and reciprocals as fraction, so that All
+# prints the usual form
 
-# 2026: Integrationsvariablen fuer Substitutionen (intsubst): Xnn steht fuer
-# einen nicht negativen Ausdruck wie sqrt(a+b*x), Xre fuer einen beliebigen
+# 2026: integration variables for substitutions (intsubst): Xnn stands for
+# a non-negative expression like sqrt(a+b*x), Xre for an arbitrary one
 CONST Xnn : nonneg
 CONST Xre : real
 VAR Un : nonneg
-ADDSPEC RubiNorm : (Un^Vv)^Wv = Un^(Vv*Wv)   # nur fuer nonneg (sqrt(x^2) = x)
+ADDSPEC RubiNorm : (Un^Vv)^Wv = Un^(Vv*Wv)   # only for nonneg (sqrt(x^2) = x)
 
 ALG IntOut
 SPEC    IntOut : IF (Kc < 0) Uv^Kc = mi(Uv^(-Kc))
 ADDSPEC IntOut : IF (Kc == -1) Kc*Uv = -Uv
 ADDSPEC IntOut : IF (Kc < 0), (Kc != -1) Kc*Uv = -((-Kc)*Uv)
 ADDSPEC IntOut : unintegrable(Uv,Vv) = Int(Uv,Vv)
-# 2026: Argumente mit pi/2 (aus r4_0_unify) wieder zurueck: sin(pi/2+u) = cos(u) ...
+# 2026: convert arguments with pi/2 (from r4_0_unify) back: sin(pi/2+u) = cos(u) ...
 ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sin(Kc+Uv) = cos(Uv)
 ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sin(Uv+Kc) = cos(Uv)
 ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cos(Kc+Uv) = -(sin(Uv))
@@ -130,7 +130,7 @@ ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sec(Kc+Uv) = csc(Uv)
 ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sec(Uv+Kc) = csc(Uv)
 ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) csc(Kc+Uv) = -(sec(Uv))
 ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) csc(Uv+Kc) = -(sec(Uv))
-# Verschiebung um pi (zweimal pi/2): sin(u+pi) = -sin(u), ...
+# shift by pi (twice pi/2): sin(u+pi) = -sin(u), ...
 ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) sin(Kc+Uv) = -(sin(Uv))
 ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) sin(Uv+Kc) = -(sin(Uv))
 ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) cos(Kc+Uv) = -(cos(Uv))
@@ -146,18 +146,18 @@ ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) csc(Uv+Kc) = -(csc(Uv))
 ADDSPEC IntOut : IF (abs(Kf - e) < 1e-9) Kf^Uv = exp(Uv)
 ADDSPEC IntOut : eE^Uv = exp(Uv)
 ADDSPEC IntOut : ln(eE) = 1
-ADDSPEC IntOut : ln(eE^Uv) = Uv          # fuer reelles u
+ADDSPEC IntOut : ln(eE^Uv) = Uv          # for real u
 ADDSPEC IntOut : ln(exp(Uv)) = Uv
 
-# ---------------- Einstellungen fuer die Rubi-Regeln ----------------
-# (werden am Ende von inc/integration/all wieder geloescht)
+# ---------------- Settings for the Rubi rules ----------------
+# (deleted again at the end of inc/integration/all)
 OPT Qa,Qb,Qc,Qd,Qe,Qf,Qm,Qn
 DEFAULT + = 0
 DEFAULT * = 1
 DEFAULT RIGHT ^ = 1
 COMM +,*
 
-# ---------------- Rubi 9.1 Integrand simplification rules (Auswahl) -----
+# ---------------- Rubi 9.1 Integrand simplification rules (selection) -----
 ALG IntRubi
 # Int[u_, x_Symbol] := IntSum[u, x] /; SumQ[u]
 SPEC    IntRubi : Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)

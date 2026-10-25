@@ -4,7 +4,7 @@
  *	strsave.h -- 1.1 Apr 19 06:32:18 1991
  *	Copyright (c) 1991 Axel T. Schreiner
  *
- *	strsave -- String dynamisch speichern
+ *	strsave -- store a string dynamically
  */
 
 #include "ansi.h"

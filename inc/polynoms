@@ -1,5 +1,5 @@
 
-FUNC polynom : real,real,real++ >> real  # Maskiert in:1. grad:2. ,koeff.: 3.++
+FUNC polynom : real,real,real++ >> real  # masks in:1. degree:2. ,coeff.: 3.++
 
 ALG PolStd1a
 SPEC    PolStd1a : SLV*A=A*SLV^1

@@ -6,13 +6,13 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>  /* fuer ReadInput */
+#include <stdio.h>  /* for ReadInput */
 #include <unistd.h> /* isatty (2026) */
 
 #include "sym.h"
 #include "syn.h"
 #include "run.h"
-#include "node.h"  /* fuer symeq */
+#include "node.h"  /* for symeq */
 #include "sync.h"
 #include "numsort.h"		/* 2026: SUBSORT */
 #include "inout.h"
@@ -22,7 +22,7 @@
 #define BLOCKAUF '{'
 #define BLOCKZU  '}'
 
-#define BUFFSIZE 65536	/* Programm-Stack muss gross genug sein ! (2026: lange Regeln aus Rubi) */
+#define BUFFSIZE 65536	/* program stack must be large enough ! (2026: long rules from Rubi) */
 
 #ifdef NO_MAIN
 #define main(argc,argv) start_input(argc,argv)
@@ -45,7 +45,7 @@ NULL,
 NULL},
 "%",
 Term,
-NULL, /* beliebiger Datentyp */
+NULL, /* any data type */
 NULL,
 FALSE,
 NULL,
@@ -58,7 +58,7 @@ NULL,
 0 /* global */
 };
 
-Symbol * lastterm =  & LastTerm; /* speichert letzten term zwischen */
+Symbol * lastterm =  & LastTerm; /* temporarily stores the last term */
 
 void ErrorMsg(const char * s)
 {
@@ -67,10 +67,10 @@ void ErrorMsg(const char * s)
 }
 
 
-void sequence (Node * np)	/* fuert instructions hintereinander aus */
+void sequence (Node * np)	/* executes instructions one after another */
 {
  	np = np->r;
-	while (np)  /* ehemals -> type == PARAM */ 
+	while (np)  /* formerly -> type == PARAM */ 
 		{
 		if (np->l != NULL)
 			{
@@ -84,7 +84,7 @@ void sequence (Node * np)	/* fuert instructions hintereinander aus */
 		}
 }	 
 
-BOOLEAN rm_term_in(Node * to_remove,Node ** p_in) /* ueberspringt 'to_remove' */
+BOOLEAN rm_term_in(Node * to_remove,Node ** p_in) /* skips 'to_remove' */
 {
 BOOLEAN changed = FALSE;
 	if (!(* p_in)) return FALSE;
@@ -93,8 +93,8 @@ BOOLEAN changed = FALSE;
 		 changed = TRUE;
 		}
 	else /* to_remove != % */
-		if (((Node *) lastterm) == (* p_in)) /* Termabhaengigkeit von % nicht merken -> Term nicht loeschen */
-			(* p_in) = tcopy((* p_in)->l); /* % wird kopiert, da es spaeter geloescht wird */
+		if (((Node *) lastterm) == (* p_in)) /* do not remember the term dependency of % -> do not delete the term */
+			(* p_in) = tcopy((* p_in)->l); /* % is copied, since it is deleted later */
 
 	if (!(* p_in)) return FALSE;
 
@@ -117,7 +117,7 @@ int cmp_blockstufe (Node * term,int maxstufe)
 		return (cmp_blockstufe (term->l,maxstufe) && cmp_blockstufe (term->r,maxstufe));
 		}
 	else
-		if (lexval((Symbol *) term) == Term) return cmp_blockstufe (term->l,maxstufe); /* wird bei tcopy sowieso ersetzt */
+		if (lexval((Symbol *) term) == Term) return cmp_blockstufe (term->l,maxstufe); /* is replaced by tcopy anyway */
 		else
 			if (defined_in_block((Symbol *) term) > maxstufe)
 				if (! hasval((Symbol *) term))
@@ -145,7 +145,7 @@ Node * merkold;
 
 if (froass->type != SYM_TYPE)
 	{if (rtypes((Symbol *) toass) != rtypes((Symbol *) (froass->l))
-	     && sort_dist(rtypes((Symbol *) (froass->l)), rtypes((Symbol *) toass)) < 0)	/* 2026: Untersorte erlaubt */
+	     && sort_dist(rtypes((Symbol *) (froass->l)), rtypes((Symbol *) toass)) < 0)	/* 2026: subsort allowed */
 		{
 		ErrorMsg("");
 		printfErr("Termsort equals not the used sort ! (Converted to %s )\n",name((Symbol *) rtypes((Symbol *) toass)));
@@ -162,17 +162,17 @@ else
 if (!cmp_blockstufe(froass,defined_in_block((Symbol *) toass))) return FALSE;
 
 merkold=toass->l;
-toass->l = tcopy(froass);      /* direkt in der Symboltabelle ueberschreiben ! */
-delete(merkold);   /* stoppt vor Term Symbolen */
+toass->l = tcopy(froass);      /* overwrite directly in the symbol table ! */
+delete(merkold);   /* stops before term symbols */
 return TRUE;
 }
 
 Node * get_type(Node * np)
 {
 if (np->type != SYM_TYPE)
-	return rtypes((Symbol *)(np->l));     /* setzen des variablen Term-types */
+	return rtypes((Symbol *)(np->l));     /* setting the variable term type */
 else
-	return rtypes((Symbol *) np);         /* z.B. Term */
+	return rtypes((Symbol *) np);         /* e.g. Term */
 }
 
 
@@ -181,12 +181,12 @@ void termassign (Node * np)
 termassign2(ASSIGN_TARGET(np),ASSIGN_TERM(np));
 }
 
-void termlist_is_termlist(Node * np)   /* LIFT Befehl */
+void termlist_is_termlist(Node * np)   /* LIFT command */
 {
 Node * jog1, * jog2;
 Symbol * oldsym=(Symbol *) 0;
 
-/* Pruefen, ob Symbole schon belegt sind  */
+/* check whether symbols are already bound  */
 for (jog1= LIFT_TO(np);jog1->type==Terms; jog1=jog1->r)
 	if (IS_kette(TERM_HEAD(jog1->l)) != (Symbol *) NULL)
 		{
@@ -216,7 +216,7 @@ for (jog1= LIFT_TO(np),jog2= LIFT_FROM(np);jog1->type==Terms; jog1=jog1->r,jog2=
           /* Symbol2 ^^                                 Symbol1 ^^ */
 	}
 
-if (jog2->type == Terms) /* jog1 ist kuerzer */
+if (jog2->type == Terms) /* jog1 is shorter */
 	{
 	ErrorMsg("");
 	printfErr("Assigned list is too long\n");
@@ -224,7 +224,7 @@ if (jog2->type == Terms) /* jog1 ist kuerzer */
 	oldsym = TERM_HEAD(jog1);
 	IS_Verbindung(oldsym) = TERM_HEAD(jog2->l);
 	}
-if (jog1->type == Terms) /* jog1 ist laenger */
+if (jog1->type == Terms) /* jog1 is longer */
 	{
 	ErrorMsg("");
 	printfErr("Assigned list is too short\n");
@@ -232,14 +232,14 @@ if (jog1->type == Terms) /* jog1 ist laenger */
 	oldsym = TERM_HEAD(jog1->l);
 	IS_Verbindung(oldsym) = TERM_HEAD(jog2);
 	}
-if (jog1->type != Terms && jog2->type != Terms) /* jog1,jog2 sind gleichlang */
+if (jog1->type != Terms && jog2->type != Terms) /* jog1,jog2 have the same length */
 	{
 	IS_kette(TERM_HEAD(jog1)) = oldsym;
 	oldsym = TERM_HEAD(jog1);
 	IS_Verbindung(oldsym) = TERM_HEAD(jog2);
 	}
 
-if (LIFT_TO(np)->type != Terms)                          /* Im Kreis verketten */
+if (LIFT_TO(np)->type != Terms)                          /* chain in a circle */
 	IS_kette(TERM_HEAD(LIFT_TO(np))) = oldsym;
 else
 	IS_kette(TERM_HEAD(LIFT_TO(np)->l)) = oldsym;
@@ -250,11 +250,11 @@ return;
 void history_store (Node * np)
 {
 if (!(np->l))
-	return;    /* Nur Terme speichern,die nicht NULL sind */
+	return;    /* store only terms that are not NULL */
 
 rtypes(lastterm)=get_type(np);
 
-termassign2((Node *) lastterm,np);         /* hier tcopy sonst Verwirrung bei der Benutzung */
+termassign2((Node *) lastterm,np);         /* tcopy here, otherwise confusion when it is used */
 }
 
 void printterm (Node * np)
@@ -263,11 +263,11 @@ Node * erg;
 if (erg=calkulate (np ->r)) 
 	{
 	print(erg);
-	delnum((Symbol *) erg,TRUE); /* auch value */
+	delnum((Symbol *) erg,TRUE); /* also value */
 	}
 else print(np -> r);
 
-/* printfOut("\t"); */ /* Tab ausgeben */
+/* printfOut("\t"); */ /* print tab */
 
 history_store(np->r);
 
@@ -290,12 +290,12 @@ printfOut("\n");
 void setdebug (Node * np)
 {
 	double d;
-	if (! num_to_double((Symbol *) np->r, & d))	/* 2026: auch integer */
+	if (! num_to_double((Symbol *) np->r, & d))	/* 2026: also integer */
 		d = * (double *) value(np ->r);
 	setDebug((int) d);
 }
 
-void numassign2 (Node * froass, Symbol * toass)   /* Setzt bzw Loescht Nummer */
+void numassign2 (Node * froass, Symbol * toass)   /* sets or deletes a number */
 {
 Node * erg;
 while (((froass)->type != Const) && (froass->type != Func))
@@ -307,8 +307,8 @@ while (((froass)->type != Const) && (froass->type != Func))
 	}
 erg = calkulate(froass);
 
-/* 2026: ohne Wert (z.B. a = nothing) wird der Wert geloescht, fuer jede
-   Sorte; sonst muss die Sorte passen (Untersorten erlaubt) */
+/* 2026: without a value (e.g. a = nothing) the value is deleted, for every
+   sort; otherwise the sort must fit (subsorts allowed) */
 if (erg && rtypes(toass) != rtypes((Symbol *) erg)
     && sort_dist(rtypes((Symbol *) erg), rtypes(toass)) < 0)
  	{
@@ -319,7 +319,7 @@ if (erg && rtypes(toass) != rtypes((Symbol *) erg)
 
 if (hasval(toass)) DELNUM(toass,value(toass));
 
-if (erg && rtypes((Symbol *) erg) != rtypes(toass))	/* 2026: Wert umwandeln (SUBSORT) */
+if (erg && rtypes((Symbol *) erg) != rtypes(toass))	/* 2026: convert the value (SUBSORT) */
 	{
 	void * w = sort_convert(value((Symbol *) erg), rtypes((Symbol *) erg), rtypes(toass));
 	delete(erg);
@@ -329,7 +329,7 @@ if (erg && rtypes((Symbol *) erg) != rtypes(toass))	/* 2026: Wert umwandeln (SUB
 	}
 if (erg)
 	{
-	if (is_shared_num((Symbol *) erg))  /* 0,1: statischen Wert kopieren, sonst spaeter free() auf statischen Speicher */
+	if (is_shared_num((Symbol *) erg))  /* 0,1: copy the static value, otherwise free() is later called on static memory */
 		value(toass) = CPYNUM(erg,value(erg));
 	else
 		value(toass)  = value(erg);
@@ -340,7 +340,7 @@ else
 	hasval(toass) = FALSE;
 }
 
-void numassign (Node * np)   /* Setzt bzw Loescht Nummer */
+void numassign (Node * np)   /* sets or deletes a number */
 {
 numassign2(ASSIGN_TERM(np),(Symbol *) ASSIGN_TARGET(np));
 }
@@ -371,7 +371,7 @@ Node * p_anf,
 
 double anf,ende,step;
 long schritte,i;
-double counter;    /* lokal */
+double counter;    /* local */
 double * merkval;
 int merkhasval;
 
@@ -380,12 +380,12 @@ if (	!( p_anf = calkulate(FOR_FROM(np)))
 	||	((p_step) && !(p_step = calkulate(FOR_STEP(np)))))
 	{
 	ErrorMsg("Wrong FOR-loop: all values must be calculable !\n");
-	if (p_anf)  delnum((Symbol *) p_anf,TRUE); /* auch value */
-	if (p_ende) delnum((Symbol *) p_ende,TRUE); /* auch value */
-	if (p_step) delnum((Symbol *) p_step,TRUE); /* auch value */
+	if (p_anf)  delnum((Symbol *) p_anf,TRUE); /* also value */
+	if (p_ende) delnum((Symbol *) p_ende,TRUE); /* also value */
+	if (p_step) delnum((Symbol *) p_step,TRUE); /* also value */
 	return;
 	}
-/* 2026: auch Werte von Untersorten (integer, rational) */
+/* 2026: also values of subsorts (integer, rational) */
 if (! num_to_double((Symbol *) p_anf, & anf)) anf = * (double *) value(p_anf);
 if (! num_to_double((Symbol *) p_ende, & ende)) ende = * (double *) value(p_ende);
 
@@ -406,17 +406,17 @@ if (step == 0)
 schritte = ((long) 1) + (long) ((ende-anf)/step);
 if  (schritte < 0)
 	{ErrorMsg("Step must point in the other direction ! \n");
-	delnum((Symbol *) p_anf,TRUE); /* auch value */
-	delnum((Symbol *) p_ende,TRUE); /* auch value */
-	if (p_step) delnum((Symbol *) p_step,TRUE); /* auch value */
+	delnum((Symbol *) p_anf,TRUE); /* also value */
+	delnum((Symbol *) p_ende,TRUE); /* also value */
+	if (p_step) delnum((Symbol *) p_step,TRUE); /* also value */
 	return;
 	}
 
 if (FOR_VAR(np) -> type != Const)
 	{ErrorMsg("Assigned Term should be a CONST - Value \n");
-	delnum((Symbol *) p_anf,TRUE); /* auch value */
-	delnum((Symbol *) p_ende,TRUE); /* auch value */
-	if (p_step) delnum((Symbol *) p_step,TRUE); /* auch value */
+	delnum((Symbol *) p_anf,TRUE); /* also value */
+	delnum((Symbol *) p_ende,TRUE); /* also value */
+	if (p_step) delnum((Symbol *) p_step,TRUE); /* also value */
 	return;
 	}
 
@@ -436,16 +436,16 @@ value(p_symbol)= & counter;
 for (i=0;i<schritte;i++)
 	{
 	counter = ((double) i)*step+anf;
-	if (FOR_BODY(np))				/* Sonst sozusagen NOP (instruction ist NULL) */
+	if (FOR_BODY(np))				/* otherwise effectively a NOP (instruction is NULL) */
 		CALLFUNCT(FOR_BODY(np));
 	}
 
 hasval(p_symbol) = merkhasval;
 value(p_symbol) = (void *) merkval;
 
-delnum((Symbol *) p_anf,TRUE); /* auch value */
-delnum((Symbol *) p_ende,TRUE); /* auch value */
-if (p_step) delnum((Symbol *) p_step,TRUE); /* auch value */
+delnum((Symbol *) p_anf,TRUE); /* also value */
+delnum((Symbol *) p_ende,TRUE); /* also value */
+if (p_step) delnum((Symbol *) p_step,TRUE); /* also value */
 
 return;
 }
@@ -463,7 +463,7 @@ void readdata (Node * np)
 				fatal("readdata: no room for making real-number !\n");
 	(* zahlp) = readData();
 	if (hasval(np->r) && value(np->r))
-		DELNUM(np->r,value(np->r)); /* alten Wert freigeben */
+		DELNUM(np->r,value(np->r)); /* free the old value */
 	value(np->r)=zahlp;
 	hasval(np->r)=TRUE;
 	return;
@@ -512,23 +512,23 @@ else
 
 void rewrite_ass_fkt (Node * np)
 {
-Node * to_rewr = tcopy(REWRASS_TERM(np)); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
+Node * to_rewr = tcopy(REWRASS_TERM(np)); /* no replacing inside terms (TERM t) ; tcopy skips the symbols 'TERM' */
 rewrite_begin();
 to_rewr = solve(to_rewr,REWRASS_ALGS(np));
 rewrite_end();
-termassign2(REWRASS_TARGET(np),to_rewr); /* speichert eine Kopie */
+termassign2(REWRASS_TARGET(np),to_rewr); /* stores a copy */
 delete(to_rewr);
 }
 
 void rewrite_fkt (Node * np)
 {
-Node * to_rewr = tcopy(REWR_TERM(np)); /* in Termen (TERM t) darf nicht ersetzt werden ; tcopy ueberspringt die Symbole 'TERM' */
+Node * to_rewr = tcopy(REWR_TERM(np)); /* no replacing inside terms (TERM t) ; tcopy skips the symbols 'TERM' */
 rewrite_begin();
 to_rewr = solve(to_rewr,REWR_ALGS(np));
 rewrite_end();
 print(to_rewr);
 printfOut("\n");
-history_store(to_rewr); /* speichert eine Kopie in % */
+history_store(to_rewr); /* stores a copy in % */
 delete(to_rewr);
 }
 
@@ -537,7 +537,7 @@ void quit_fkt (Node * np)
 	exit(0);
 }
 
-BOOLEAN IS_follows(Symbol * from,Symbol * to) /* to befindet sich in IS_Verbindung */
+BOOLEAN IS_follows(Symbol * from,Symbol * to) /* to is in an IS connection */
 {
 	Symbol * jog;
 	DEBG((4,"DB : IS_follows : from :"));
@@ -547,12 +547,12 @@ BOOLEAN IS_follows(Symbol * from,Symbol * to) /* to befindet sich in IS_Verbindu
 
 	for (jog=from;jog != (Symbol *) NULL ;jog=IS_Verbindung(jog))
 		{
-		if (symeq(jog,to)) /* Symbole bzw. Werte gleich */
+		if (symeq(jog,to)) /* symbols or values equal */
 			{
 			DEBG((4," .. returned TRUE\n"));
 			return TRUE;
 			}
-		if (IS_Verbindung(jog) == from) /* Einmal im Kreis */
+		if (IS_Verbindung(jog) == from) /* once around the circle */
 			{
 			DEBG((4," .. returned FALSE\n"));
 			return FALSE;
@@ -574,7 +574,7 @@ Symbol * IS_search (Symbol * from,Symbol * to)
 	if (IS_follows(from,to))
 		return from;
 	if (! IS_kette(from))
-		return (Symbol *) NULL; /* Variable ist in keine Kette eingetragen ! */
+		return (Symbol *) NULL; /* variable is not entered in any chain ! */
 
 	for (jog=IS_kette(from);jog != from;jog=IS_kette(jog))
 		{
@@ -601,11 +601,11 @@ BOOLEAN lock_rtypes (Symbol * which,Symbol * from,Node * * chain)
 if (symeq(which,from))
 	return TRUE;
 
-/* Einmal die IS_Verbindungskette ablaufen und moeglichen Widerspruch feststellen : */
+/* walk the IS connection chain once and detect a possible contradiction : */
 for (from2=from,jog2=IS_Verbindung(from);!symeq(from2,which);from2=jog2,jog2=IS_Verbindung(jog2))
 	{
 	if (jog2 == NULL)
-		fatal("ERROR sync.c: lock_rtypes : 'which' does'nt follow from 'from'\n") ; /* Ende der Kette erreicht ohne which zu finden */
+		fatal("ERROR sync.c: lock_rtypes : 'which' does'nt follow from 'from'\n") ; /* end of the chain reached without finding which */
 	if ((lock=IS_Verbindung(rtypes(jog2))) != NULL)
 			{
 			if (lock != from2)
@@ -630,19 +630,19 @@ for (from2=from,jog2=IS_Verbindung(from);!symeq(from2,which);from2=jog2,jog2=IS_
 			if (! detected)
 				{
 				DEBG((4," did not detect one, returned FALSE\n"));
-				return FALSE; /* anders gelockt */
+				return FALSE; /* locked differently */
 				}
 			}
 	}
 
-/* keine Falsch gelockte Menge vorhanden -> restliche locken */
+/* no wrongly locked set present -> lock the remaining ones */
 
 for (from2=from,jog2=IS_Verbindung(from);!symeq(from2,which);from2=jog2,jog2=IS_Verbindung(jog2))
 	{
 	if ((lock=IS_Verbindung(rtypes(jog2))) == NULL)
 			{
 			IS_Verbindung(rtypes(jog2)) = from2;
-			* chain = mknod(CHAIN,* chain,rtypes(jog2)); /* Aufspiessen um wieder zu loeschen */
+			* chain = mknod(CHAIN,* chain,rtypes(jog2)); /* skewer them so they can be deleted again */
 			
 			DEBG((4," .. established new\n"));
 			}
@@ -663,15 +663,15 @@ BOOLEAN eq_rtypes(Node * a,Node * typ)
 		DEBG((4,"DB : eq_rtypes : a->type is 'Terms' \n"));
 		return FALSE;
 
-	case SYM_TYPE: /* VAR (ersetzte VAR's sind mit Const oder Func ueberschrieben)*/
+	case SYM_TYPE: /* VAR (replaced VARs are overwritten with Const or Func)*/
 		DEBG((4,"DB : eq_rtypes Termsort : %s  required sort : %s \n",name((Symbol *) (rtypes((Symbol *)(a)))),name((Symbol *) (typ))));
-		if (typ!=rtypes((Symbol *) (a))) /* ! eq_sorts(typ,rtypes..) bewirkt sofortige Reduktion */
+		if (typ!=rtypes((Symbol *) (a))) /* ! eq_sorts(typ,rtypes..) causes immediate reduction */
 			 return FALSE;
 	break;
 
 	default:                          /* Funct ,Const */
 		DEBG((4,"DB : eq_rtypes Termsort : %s  required sort : %s \n",name((Symbol *) (rtypes((Symbol *)(a->l)))),name((Symbol *) (typ))));
-		if (typ!=rtypes((Symbol *) (a->l))) /* ! eq_sorts(typ,rtypes..) bewirkt sofortige Reduktion */
+		if (typ!=rtypes((Symbol *) (a->l))) /* ! eq_sorts(typ,rtypes..) causes immediate reduction */
 			return FALSE;
 	break;
 	}
@@ -680,8 +680,8 @@ return TRUE;
 }
 
 
-/* 2026: Kosten einer Variante mit Erweiterung der Sorten (SUBSORT):
-   Summe der Schritte integer -> rational -> real ...; -1 wenn sie nicht passt */
+/* 2026: cost of a variant with extension of the sorts (SUBSORT):
+   sum of the steps integer -> rational -> real ...; -1 if it does not fit */
 static int arg_cost (Node * a, Node * typ)
 {
 	if (a->type == Terms) return -1;
@@ -711,7 +711,7 @@ static int variant_cost (Symbol * sym, Node * termlist)
 	return cost + c;
 }
 
-/* Variante mit den wenigsten Erweiterungen, oder NULL */
+/* variant with the fewest extensions, or NULL */
 Symbol * getsymbol_widen (Symbol * symbol,Node * termlist)
 {
 	Symbol * sym = symbol, * best = NULL;
@@ -729,11 +729,11 @@ Symbol * getsymbol_widen (Symbol * symbol,Node * termlist)
 	return best;
 }
 
-/* 2026: nach dem Einsetzen einer rechten Seite fuer jede Funktion die
-   guenstigste Variante zu den tatsaechlichen Sorten der Argumente waehlen.
-   Das LIFTen ersetzt alle Symbole einer Sorte durch die einer anderen; mit
-   Untersorten (integer < rational < real) passen die Argumente dann nicht
-   immer. Ohne SUBSORT passen die Varianten genau und nichts aendert sich. */
+/* 2026: after inserting a right-hand side, choose for every function the
+   cheapest variant for the actual sorts of the arguments.
+   LIFTing replaces all symbols of one sort by those of another; with
+   subsorts (integer < rational < real) the arguments then do not always
+   fit. Without SUBSORT the variants fit exactly and nothing changes. */
 void retype_term (Node * t)
 {
 	Node * a;
@@ -752,7 +752,7 @@ void retype_term (Node * t)
 	retype_node(t);
 }
 
-/* nur dieser Knoten (die Argumente sind schon richtig) */
+/* only this node (the arguments are already correct) */
 void retype_node (Node * t)
 {
 	Symbol * best;
@@ -768,20 +768,20 @@ void retype_node (Node * t)
 		t->l = (Node *) best;
 }
 
-Symbol * getsymbol (Symbol * symbol,Node * termlist) /* sucht aus gleinamigen Symbolen das, mit den richtigen Argumenten heraus */
-{                                                    /* termlist ist Liste der Argumente,die tatsaechlich vorliegen */
+Symbol * getsymbol (Symbol * symbol,Node * termlist) /* picks, among symbols of the same name, the one with the right arguments */
+{                                                    /* termlist is the list of the arguments actually present */
 	Node * at1,* at2,* asym;
-	Symbol * sym=symbol;           /* Symbole sind im Kreis verkettet */
+	Symbol * sym=symbol;           /* symbols are chained in a circle */
 	int			varcount=-1,atype;
 	BOOLEAN iseq;
 
 	if (! termlist) fatal("Internal ERROR : No termlist in getsymbol\n ");	
 
-	do	{       /* durchlaeuft die einzelnen Funktionen */
+	do	{       /* runs through the individual functions */
 		iseq=TRUE;	
 		varcount = -1;
 
-		asym = atypes(sym); /* sym kann nicht NULL sein ! */
+		asym = atypes(sym); /* sym cannot be NULL ! */
 		atype= asym->type;
 
 		if (atype == VARPAR)
@@ -813,10 +813,10 @@ Symbol * getsymbol (Symbol * symbol,Node * termlist) /* sucht aus gleinamigen Sy
 
 		if (iseq) break;
 
-	sym=kette(sym); /* naechstes Symbol */
-	}  while	((sym != (Symbol *) NULL) && (sym != symbol));  /* NULL fuer den Fall nur eines Symbols */
+	sym=kette(sym); /* next symbol */
+	}  while	((sym != (Symbol *) NULL) && (sym != symbol));  /* NULL for the case of only one symbol */
 
-	if (iseq==FALSE)		/* 2026: mit Erweiterung der Sorten (SUBSORT) */
+	if (iseq==FALSE)		/* 2026: with extension of the sorts (SUBSORT) */
 		{
 		Symbol * w = getsymbol_widen(symbol, termlist);
 		if (w)
@@ -826,7 +826,7 @@ Symbol * getsymbol (Symbol * symbol,Node * termlist) /* sucht aus gleinamigen Sy
 		{
 		ErrorMsg("");
 		printfErr("Used wrong argumenttype or -number for Funktion '%s' !\n",name(symbol));
-		sym=symbol; /* erste Definition benutzen */
+		sym=symbol; /* use the first definition */
 		}
 	else
 		if (varcount != -1)
@@ -838,7 +838,7 @@ Symbol * getsymbol (Symbol * symbol,Node * termlist) /* sucht aus gleinamigen Sy
 }
 
 
-static int interactive = 0;	/* 2026: Eingabe von der Tastatur: Begruessung, Eingabeaufforderung */
+static int interactive = 0;	/* 2026: input from the keyboard: greeting, prompt */
 
 int read_input _1a ((fp), FILE * fp)
 {	
@@ -849,15 +849,15 @@ int read_input _1a ((fp), FILE * fp)
 
 
 	do
-	{	if (fp == stdin && interactive)		/* 2026: Eingabeaufforderung */
+	{	if (fp == stdin && interactive)		/* 2026: prompt */
 			{
 			fputs("> ", stdout);
 			fflush(stdout);
 			}
-		for (bp = buf; bp < ep && fgets(bp, ep - bp, fp); ) /* Zeilenweises Aufrufen des Yacc */
+		for (bp = buf; bp < ep && fgets(bp, ep - bp, fp); ) /* calls yacc line by line */
 		{	
 			if (fp != stdin)
-				DEBG((1,bp));  /* Text aus Datei auf den Bildschirm */
+				DEBG((1,bp));  /* text from file to the screen */
 
 			for (;*bp != '\0';bp++)
 				{
@@ -870,7 +870,7 @@ int read_input _1a ((fp), FILE * fp)
 				continue;
 				}
 			if (klammerbalance > 0)
-				{if (fp == stdin && interactive)	/* 2026: nur im Dialog */
+				{if (fp == stdin && interactive)	/* 2026: only in interactive mode */
 					{
 					fputs("--> ", stdout);
 					fflush(stdout);
@@ -895,7 +895,7 @@ int read_input _1a ((fp), FILE * fp)
 
 int parse_it(char * text)
 {
-void lexi_buf(const char *); /* Prototyp */
+void lexi_buf(const char *); /* prototype */
 
 lexi_buf(text);
 yyparse();
@@ -921,11 +921,11 @@ static void welcome (void)
 	       "End with QUIT or the end-of-file key (Ctrl-D, on Windows Ctrl-Z Enter).\n\n");
 }
 
-int main(int argc, char * argv []) /* Kein Leerzeichen zw. main und '(' ! */
+int main(int argc, char * argv []) /* no space between main and '(' ! */
 {
 	int i, files = 0, force = 0;
 	inc_level=0;
-	for (i = 1; i < argc; i++)		/* 2026: Optionen und Dateien */
+	for (i = 1; i < argc; i++)		/* 2026: options and files */
 		{
 		if (! strcmp(argv[i], "-h") || ! strcmp(argv[i], "--help")) { usage(); return 0; }
 		else if (! strcmp(argv[i], "-i")) force = 1;
@@ -933,10 +933,10 @@ int main(int argc, char * argv []) /* Kein Leerzeichen zw. main und '(' ! */
 		}
 	for (i = 1; i < argc; i++)
 		if (strcmp(argv[i], "-i"))
-			include(argv[i]);	/* wie INC "datei" */
+			include(argv[i]);	/* like INC "file" */
 	if (files && ! force) return 0;
 	interactive = force || isatty(fileno(stdin));
-	if (interactive && files) putchar(10);	/* Ausgabe der Dateien abschliessen */
+	if (interactive && files) putchar(10);	/* finish the output of the files */
 	if (interactive) welcome();
 	read_input(stdin);
 	if (interactive) putchar(10);
@@ -955,7 +955,7 @@ void include _1a ((cp), const char * cp)
 		int oldbase;
 		is_not_running();
 		inc_level++;
-		oldbase = include_begin(); /* File wie Top-Level-Eingabe behandeln */
+		oldbase = include_begin(); /* treat file like top-level input */
 		read_input(fp);
 		include_end(oldbase);
 		inc_level--;
@@ -977,7 +977,7 @@ void yyerror (const char * s)
 	ErrorMsg(s);
 	printfErr("\n");
 }
-int yywrap(void) /* von flex aufgerufen: 1 = Eingabe zu Ende */
+int yywrap(void) /* called by flex: 1 = end of input */
 {
 return 1;
 }

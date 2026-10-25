@@ -1,10 +1,10 @@
-# Numerisches Loesen von expliziten Diff-gleichungen
-# Eingabe : f(x,y) = y'
-# x0 = Anfangswert x (normal : == 0)
-# y0 = Anfangswert y
-# dx = Schrittweite x
+# numerical solution of explicit differential equations
+# input : f(x,y) = y'
+# x0 = initial value x (normally : == 0)
+# y0 = initial value y
+# dx = step size x
 
-# 1. Erstellen der Ableitungen
+# 1. create the derivatives
 
 REWR f : pdiff;DIFFGLSUB
 D1=%

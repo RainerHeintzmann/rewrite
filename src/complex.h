@@ -3,8 +3,8 @@
 /*
  * complex.h V1.00
  * Copyright (c) : Rainer Heintzmann
- * 
- * Benutzerfunktionen fuer 'rewrite' (Resultattyp complex)
+ *
+ * User functions for 'rewrite' (result type complex)
  *
  */
 
