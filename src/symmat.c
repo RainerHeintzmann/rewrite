@@ -559,6 +559,196 @@ static double dgcd (double a, double b)
 /* the common factors of nu and de divided out: a polynomial gcd in a
  * single atom, the integer content; the denominator's leading coefficient
  * positive */
+/* ---- gcd of polynomials in several atoms ----
+ * Euclid's algorithm with primitive pseudo-remainders, recursive in the
+ * atoms: as a polynomial in a main atom v, the gcd is the gcd of the
+ * contents (the gcds of the coefficients, polynomials in the other atoms)
+ * times the gcd of the primitive parts. Exact coefficients only. */
+
+static int mp_is_const (MPoly * p)
+{
+	int i;
+	for (i = 0; i < p->n; i++)
+		if (p->m[i].nf > 0) return 0;
+	return 1;
+}
+
+static int mp_deg (MPoly * p, Node * v)		/* degree in v; -1 for 0 */
+{
+	int i, j, d = p->n ? 0 : -1;
+	for (i = 0; i < p->n; i++)
+		for (j = 0; j < p->m[i].nf; j++)
+			if (tequal(p->m[i].f[j].base, v) && p->m[i].f[j].e > d) d = (int) p->m[i].f[j].e;
+	return d;
+}
+
+/* the coefficient of v^k (a polynomial without v) */
+static MPoly mp_coef (MPoly * p, Node * v, int k)
+{
+	MPoly r = { NULL, 0, 0 };
+	int i, j;
+	for (i = 0; i < p->n; i++)
+		{
+		Mono * m = & p->m[i];
+		double e = 0;
+		for (j = 0; j < m->nf; j++)
+			if (tequal(m->f[j].base, v)) e = m->f[j].e;
+		if (e == k)
+			{
+			Mono c = mono_dup(m);
+			if (k > 0)
+				{
+				mono_put(& c, tcpy(v), - k);
+				mono_sort(& c);
+				}
+			mp_add_mono(& r, c);
+			}
+		}
+	return r;
+}
+
+static MPoly mp_vpow (MPoly * p, Node * v, int k)	/* p * v^k */
+{
+	MPoly r = { NULL, 0, 0 };
+	int i;
+	for (i = 0; i < p->n; i++)
+		{
+		Mono c = mono_dup(& p->m[i]);
+		if (k > 0) { mono_put(& c, tcpy(v), k); mono_sort(& c); }
+		mp_add_mono(& r, c);
+		}
+	return r;
+}
+
+static Node * mp_main_atom (MPoly * a, MPoly * b)	/* an atom of a or b (the first by tcmp) */
+{
+	MPoly * ps[2] = { a, b };
+	Node * v = NULL;
+	int s, i, j;
+	for (s = 0; s < 2; s++)
+		for (i = 0; i < ps[s]->n; i++)
+			for (j = 0; j < ps[s]->m[i].nf; j++)
+				if (! v || tcmp(ps[s]->m[i].f[j].base, v) < 0) v = ps[s]->m[i].f[j].base;
+	return v;
+}
+
+static MPoly mp_gcd (MPoly * a, MPoly * b);
+
+/* the content of p in v: the gcd of its coefficients */
+static MPoly mp_content (MPoly * p, Node * v)
+{
+	int d = mp_deg(p, v), k;
+	MPoly g = { NULL, 0, 0 };
+	for (k = 0; k <= d; k++)
+		{
+		MPoly c = mp_coef(p, v, k), h;
+		if (c.n == 0) { mp_free(& c); continue; }
+		if (g.n == 0) { g = c; }
+		else
+			{
+			h = mp_gcd(& g, & c);
+			mp_free(& g);
+			mp_free(& c);
+			g = h;
+			}
+		if (mp_is_const(& g)) break;
+		}
+	return g;
+}
+
+/* the integer content made 1 and the leading coefficient positive */
+static void mp_normalize (MPoly * p)
+{
+	double g = 0;
+	int i;
+	for (i = 0; i < p->n; i++)
+		{
+		double c = p->m[i].c;
+		if (c != floor(c) || fabs(c) > 1e15) { g = 0; break; }
+		g = dgcd(g, c);
+		}
+	if (p->n && g == 0) g = fabs(p->m[mp_lead(p)].c);	/* fractions: leading coefficient 1 */
+	if (p->n && p->m[mp_lead(p)].c < 0) g = -g;
+	if (g != 0 && g != 1)
+		for (i = 0; i < p->n; i++) p->m[i].c /= g;
+}
+
+/* pseudo-remainder of a by b in v: lc(b)^k a - q b with deg r < deg b */
+static MPoly mp_prem (MPoly * a, MPoly * b, Node * v)
+{
+	MPoly r = mp_dup(a), lb = mp_coef(b, v, mp_deg(b, v));
+	int db = mp_deg(b, v), steps = 0;
+	while (r.n > 0 && mp_deg(& r, v) >= db && steps++ < 1000)
+		{
+		int dr = mp_deg(& r, v);
+		MPoly lr = mp_coef(& r, v, dr), t = { NULL, 0, 0 }, sh = mp_vpow(b, v, dr - db);
+		mp_addmul(& t, & lb, & r, 1);		/* lc(b)*r - lc(r)*v^(dr-db)*b */
+		mp_addmul(& t, & lr, & sh, -1);
+		mp_free(& r);
+		mp_free(& lr);
+		mp_free(& sh);
+		r = t;
+		}
+	mp_free(& lb);
+	return r;
+}
+
+static MPoly mp_gcd (MPoly * a, MPoly * b)
+{
+	Node * v;
+	MPoly ca, cb, pa, pb, c, g;
+	if (a->n == 0) { g = mp_dup(b); mp_normalize(& g); return g; }
+	if (b->n == 0) { g = mp_dup(a); mp_normalize(& g); return g; }
+	if (mp_is_const(a) || mp_is_const(b)) return mp_const(1);
+	v = mp_main_atom(a, b);
+	if (mp_deg(a, v) == 0 || mp_deg(b, v) == 0)	/* v in one of them only */
+		{
+		MPoly * with = mp_deg(a, v) > 0 ? a : b, * without = with == a ? b : a, cw;
+		cw = mp_content(with, v);
+		g = mp_gcd(& cw, without);
+		mp_free(& cw);
+		return g;
+		}
+	ca = mp_content(a, v);
+	cb = mp_content(b, v);
+	c = mp_gcd(& ca, & cb);
+	if (! mp_div(a, & ca, & pa)) pa = mp_dup(a);
+	if (! mp_div(b, & cb, & pb)) pb = mp_dup(b);
+	mp_free(& ca);
+	mp_free(& cb);
+	if (mp_deg(& pa, v) < mp_deg(& pb, v)) { MPoly h = pa; pa = pb; pb = h; }
+	while (pb.n > 0 && mp_deg(& pb, v) > 0)		/* primitive remainder sequence */
+		{
+		MPoly r = mp_prem(& pa, & pb, v), cr, pr;
+		mp_free(& pa);
+		pa = pb;
+		if (r.n == 0) { pb = r; break; }
+		cr = mp_content(& r, v);
+		if (! mp_div(& r, & cr, & pr)) pr = mp_dup(& r);
+		mp_free(& r);
+		mp_free(& cr);
+		pb = pr;
+		}
+	if (pb.n > 0)				/* a remainder free of v: the primitive gcd is 1 */
+		{
+		mp_free(& pa);
+		pa = mp_const(1);
+		}
+	mp_free(& pb);
+	{
+	MPoly cp = mp_content(& pa, v), pp;		/* primitive part of the last one */
+	if (! mp_div(& pa, & cp, & pp)) pp = mp_dup(& pa);
+	mp_free(& cp);
+	mp_free(& pa);
+	g = (MPoly) { NULL, 0, 0 };
+	mp_addmul(& g, & c, & pp, 1);
+	mp_free(& c);
+	mp_free(& pp);
+	}
+	mp_normalize(& g);
+	return g;
+}
+
 static void mp_cancel (MPoly * nu, MPoly * de)
 {
 	MPoly * ps[2] = { nu, de };
@@ -567,7 +757,22 @@ static void mp_cancel (MPoly * nu, MPoly * de)
 	int s, i, exact = 1;
 	for (s = 0; s < 2; s++)
 		for (i = 0; i < ps[s]->n; i++) exact &= ps[s]->m[i].exact;
-	if (v && nu->n > 0)
+	if (exact && nu->n > 0 && de->n > 0)	/* exact: the gcd in all atoms */
+		{
+		MPoly gp = mp_gcd(nu, de), q1, q2;
+		if (! mp_is_const(& gp) && mp_div(nu, & gp, & q1))
+			{
+			if (mp_div(de, & gp, & q2))
+				{
+				mp_free(nu); * nu = q1;
+				mp_free(de); * de = q2;
+				}
+			else
+				mp_free(& q1);
+			}
+		mp_free(& gp);
+		}
+	else if (v && nu->n > 0)		/* real numbers: Euclid in one atom */
 		{
 		MPoly gp = mp_gcd1(nu, de, v, exact), q1, q2;
 		if (gp.n > 0 && mp_div(nu, & gp, & q1))
@@ -633,6 +838,14 @@ static Node * mp_quotient (MPoly * num, MPoly * den)
 		}
 	mp_free(& nu);
 	mp_free(& de);
+	return r;
+}
+
+static Node * mp_quotient_free (MPoly * num, MPoly * den)	/* frees num and den */
+{
+	Node * r = mp_quotient(num, den);
+	mp_free(num);
+	mp_free(den);
 	return r;
 }
 

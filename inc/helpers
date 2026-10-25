@@ -72,6 +72,10 @@ OTHER deriv    : number,number >> number  ATT RULES DerivDef,(DerivConst,Linear,
 SPEC DerivDef : deriv(Xnu,Ynu) = D(Xnu,Ynu)
 SPEC DerivConst : IF NIN(Znu,Xnu) D(Xnu,Znu) = 0
 FUNC collect   : real >> real             ATT SYMBOLIC collect    # collect like summands
+FUNC cancel    : real >> real             ATT SYMBOLIC cancel     # N/D over a common denominator, gcd cancelled
+OTHER cancel   : number >> number         ATT SYMBOLIC cancel
+FUNC polygcd   : real,real >> real        ATT SYMBOLIC polygcd    # gcd of two polynomials (several variables)
+OTHER polygcd  : number,number >> number  ATT SYMBOLIC polygcd
 # 2026: more helper functions of Rubi
 FUNC replaceall : real,real,real >> real  ATT SYMBOLIC replaceall   # u with x -> v (at once)
 FUNC binomialq  : real,real >> bool       ATT SYMBOLIC binomialq    # u = a + b x^n

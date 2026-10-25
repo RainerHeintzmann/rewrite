@@ -67,6 +67,16 @@ static Node * deref (Node * t)		/* follow Term symbols to their term */
 	return t;
 }
 
+/* 2026: in exact mode (inc/exact) pi stays a symbol in terms, as Pi in
+ * Mathematica; its value is still used for numerical calculations */
+int symbolic_constant (Symbol * s)
+{
+	static Symbol * pi = NULL;
+	static int looked = 0;
+	if (! looked || ! pi) { pi = find_symbol("pi"); looked = 1; }
+	return s && s == pi && exact_numbers();
+}
+
 static Symbol * num_sym (Node * t)	/* symbol of a real number, or NULL */
 {
 	Symbol * s;
@@ -77,6 +87,7 @@ static Symbol * num_sym (Node * t)	/* symbol of a real number, or NULL */
 	else return NULL;
 	if (lexval(s) != Const || ! hasval(s) || ! value(s)) return NULL;
 	if (sort_dist(rtypes(s), get_numbertype()) < 0) return NULL;	/* real, integer, rational */
+	if (symbolic_constant(s)) return NULL;		/* pi in exact mode: a symbol */
 	return s;
 }
 
@@ -98,18 +109,27 @@ static Node * mk_neg (Node * a);
  * real numbers) */
 static int nv_strict = 1;	/* no real fallback (see num_value_r) */
 
+static int exactish (Node * t);
+static Symbol * atom_sym (Node * t);
+
 static int num_value (Node * t, double * v)
 {
 	Node * r;
 	if (is_num(t, v)) return 1;
 	t = deref(t);
-	if (! t || t->type != Func) return 0;
+	if (! t || (t->type != Func && (nv_strict || ! symbolic_constant(atom_sym(t))))) return 0;
 	if (nv_strict)		/* an exact value only (2^(1/2) has none) */
 		{
 		int save = calc_exact_only;
 		calc_exact_only = 1;
 		r = calkulate(t);
 		calc_exact_only = save;
+		/* exact mode: ln(2), pi/6 are no numbers either (exact_symbolic) */
+		if (r && exact_numbers() && ! num_exact((Symbol *) r) && exactish(t))
+			{
+			delnum((Symbol *) r, TRUE);
+			return 0;
+			}
 		}
 	else
 		r = calkulate(t);	/* with a real value for 2^(1/2) */
@@ -153,7 +173,7 @@ static int num_value_exact (Node * t)
  * "cos", ..., "ln", "exp", the constants "pi" and "eE", "Int", "D". These
  * strings are roles. By default a role is played by the symbol of the
  * same name; a library with other names declares
- *     SYMBOLIC "cos" = "cosinus"
+ *     SYMBOLIC "cos" = "kos"
  * The helpers assume the usual properties: "+" and "*" are commutative and
  * associative, "mi(x)" is 1/x, "cos" is the cosine, and so on. */
 
@@ -1569,7 +1589,7 @@ static Node * pi2_shift (Node * t)
 	if (i == 6 || ! is_head(arg(t, 0), "+", 2)) return NULL;
 	summands_to(arg(t, 0), & l, 0);
 	for (j = 0; j < l.n; j++)
-		if (! k && num_value(l.t[j], & v) && (q = v / (M_PI / 2), fabs(q - floor(q + 0.5)) < 1e-9)
+		if (! k && num_value_r(l.t[j], & v) && (q = v / (M_PI / 2), fabs(q - floor(q + 0.5)) < 1e-9)
 		    && ((long) floor(q + 0.5)) % 4 != 0)
 			k = (int) ((((long) floor(q + 0.5)) % 4 + 4) % 4);	/* 1, 2 or 3 */
 		else
@@ -2782,6 +2802,92 @@ static Node * s_normform (Node * a[], int n, Symbol * f)
 	delete(k);
 	nf_hash(r, 1);
 	return r;
+}
+
+
+/* ---- exact mode: functions of exact numbers stay symbolic ----
+ * With exact numbers (inc/exact), as in Mathematica: ln(2), sin(1/3),
+ * exp(1) and pi/6 stay terms in a term; only exact values are taken:
+ * rational ones (cos(0) = 1, cos(pi/3) = 1/2), square roots of rational
+ * ones (sin(pi/3) = 3^(1/2)/2) and, for the inverse trig functions,
+ * rational multiples of pi (arcsin(1/2) = pi/6). They are found from the
+ * numerical value; a transcendental function of a nonzero algebraic number
+ * is transcendental, so a hit is no accident. Conditions and a value
+ * printed on its own are still calculated numerically. */
+
+static int is_pi (Node * t)
+{
+	Symbol * s = role_find("pi");
+	t = deref(t);
+	return s && t && atom_sym(t) == s;
+}
+
+static int exactish (Node * t)		/* exact numbers and pi, combined by numeric functions */
+{
+	int i, n;
+	t = deref(t);
+	if (! t) return 0;
+	if (is_exact(t) || is_pi(t)) return 1;
+	if (t->type != Func || builtin(TERM_HEAD(t)) || ! hasval(TERM_HEAD(t))) return 0;
+	n = term_nargs(t);
+	for (i = 0; i < n; i++)
+		if (! exactish(arg(t, i))) return 0;
+	return 1;
+}
+
+int exact_symbolic (Node * t)
+{
+	Symbol * h;
+	int i, n;
+	t = deref(t);
+	if (! t || t->type != Func || ! exact_numbers()) return 0;
+	h = TERM_HEAD(t);
+	if (builtin(h) || ! hasval(h) || exe_always(h) || sort_exact(rtypes(h))) return 0;
+	n = term_nargs(t);
+	for (i = 0; i < n; i++)
+		if (! exactish(arg(t, i))) return 0;
+	return n > 0;
+}
+
+static int small_rational (double v, double * p, double * q)
+{
+	double d;
+	for (d = 1; d <= 1000; d++)
+		{
+		double m = floor(v * d + 0.5);
+		if (fabs(m / d - v) <= 1e-13 * (1 + fabs(v))) { * p = m; * q = d; return 1; }
+		}
+	return 0;
+}
+
+Node * special_value (Node * t)
+{
+	static const char * arith[] = { "+", "-", "*", "/", "^", "mi", NULL };
+	static const char * inv[] = { "arcsin", "arccos", "arctan", "arccot", "arcsec", "arccsc", NULL };
+	Node * c;
+	double v, p, q;
+	int i, save;
+	for (i = 0; arith[i]; i++)
+		if (is_head(t, arith[i], -1)) return NULL;	/* pi/6 stays as it is */
+	save = calc_exact_only;
+	calc_exact_only = 0;
+	c = calkulate(t);
+	calc_exact_only = save;
+	if (! c) return NULL;
+	i = num_to_double((Symbol *) c, & v);
+	delnum((Symbol *) c, TRUE);
+	if (! i || ! isfinite(v)) return NULL;
+	if (small_rational(v, & p, & q)) return mk_num_ex(p / q, 1);
+	if (v != 0 && small_rational(v * v, & p, & q))		/* sin(pi/3) = 3^(1/2)/2 */
+		return mk_mul(mk_int(v < 0 ? -1 : 1), mk_pow(mk_num_ex(p / q, 1), mk_num_ex(0.5, 1)));
+	for (i = 0; inv[i]; i++)
+		if (is_head(t, inv[i], 1))
+			{
+			Symbol * ps = role_find("pi");
+			if (ps && small_rational(v / M_PI, & p, & q) && q <= 12)
+				return mk_mul(mk_num_ex(p / q, 1), mknod(Const, (Node *) ps, NULL));
+			}
+	return NULL;
 }
 
 /* ================= more Rubi helpers (2026) ================= */
@@ -4811,6 +4917,8 @@ static Node * s_radicalq (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_isoeach (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_linsys (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_linsysq (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_cancel (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_polygcd (Node * a[], int n, Symbol * f);	/* symsolve.c */
 
 /* ---- functions defined by a rule list: FUNC f ... ATT RULES alglist ----
  * f(a1,..,an) is calculated as REWR f(a1,..,an) : alglist. If the result
@@ -4967,6 +5075,8 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "isoeach", s_isoeach },
 	{ "linsys", s_linsys },
 	{ "linsysq", s_linsysq },
+	{ "cancel", s_cancel },
+	{ "polygcd", s_polygcd },
 	{ "functionofq", s_functionofq },
 	{ "substfor", s_substfor },
 	{ "derivdivides", s_derivdivides },

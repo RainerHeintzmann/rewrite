@@ -1,5 +1,5 @@
 # File for Correlating the datas
-CONST size,int,a,b,n,maxb,fak : real
+CONST size,int,a,b,n,maxb,factorial : real
 CONST yval,xval : rvector
 
 size=380
@@ -8,8 +8,8 @@ DATA "x-rayos/rh10295w.ux"
 OUT "korr-w"
 
 
-xval=nullvec(size)
-yval=nullvec(size)
+xval=zerovec(size)
+yval=zerovec(size)
 
 int=0
 
@@ -20,10 +20,10 @@ xval=chvec(xval,n,a)
 yval=chvec(yval,n,b)
 }
 
-fak=part(yval,maxb,size-maxb)*(2*part(yval,maxb,size-maxb))
+factorial=part(yval,maxb,size-maxb)*(2*part(yval,maxb,size-maxb))
 
 FOR b=1 TO maxb-1 DO {
-b*(elem(xval,size-1)-elem(xval,0))/size,part(yval,maxb,size-maxb)*(part(yval,maxb-b,size-maxb-b)+part(yval,maxb+b,size-maxb+b))/fak
+b*(elem(xval,size-1)-elem(xval,0))/size,part(yval,maxb,size-maxb)*(part(yval,maxb-b,size-maxb-b)+part(yval,maxb+b,size-maxb+b))/factorial
 }
 OUT "stdout"
 

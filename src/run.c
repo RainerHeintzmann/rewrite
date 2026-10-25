@@ -471,7 +471,8 @@ int	this_type;					/* since La1 .. La5 are entered in the tree as Func ! */
 			tprint(np->l,last_func_type); /* last type */
 		else
 			if ((lexval((Symbol *) np) == Const)
-				&& (hasval(np) == TRUE)) 
+				&& (hasval(np) == TRUE)
+				&& ! symbolic_constant((Symbol *) np))	/* 2026: pi by its name (exact mode) */
 				{
 				if (rtypes((Symbol *) np) == NULL)
 					fatal("run.c : tprint no rtypes given for Symbol");
@@ -1157,6 +1158,16 @@ if  ((term -> type) == Func) /* the rest is mapped onto it */
 		delete(term);
 		return tcalc(pp);
 		}
+	if (exact_symbolic(term))	/* 2026: ln(2), pi/6 stay terms; cos(pi/3) = 1/2 */
+		{
+		Node * sv = special_value(term);
+		if (sv)
+			{
+			delete(term);
+			return tcalc(sv);
+			}
+		return term;
+		}
 	int save = calc_exact_only;
 	calc_exact_only = 1;		/* 2^(1/2) stays exact in a term */
 	sp = (Symbol *) calkulate(term);
@@ -1225,7 +1236,8 @@ if (term->type == SYM_TYPE)
 	if (lexval((Symbol *) term) == Term) /* replace term */
 		return tcopy(term->l);
 
-	if ((hasval((Symbol *) term)) && lexval((Symbol *) term)==Const)
+	if ((hasval((Symbol *) term)) && lexval((Symbol *) term)==Const
+	    && ! symbolic_constant((Symbol *) term))	/* 2026: pi stays a symbol (exact mode) */
 		{
 		return (Node *) mknum(CPYNUM(term,value(term)),rtypes((Symbol *) term));
 		}

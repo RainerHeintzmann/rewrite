@@ -10,6 +10,7 @@
 #include "sync.h"
 #include "numsort.h"	/* 2026: var_sort_ok */  /* For IS_follows, lock_rtypes */
 #include "nodes.h"
+#include "symfkt.h"	/* 2026: symbolic_constant */
 
 extern Node * chain_pos;
 extern Node var_chain;
@@ -403,7 +404,8 @@ BOOLEAN match2 (Node * term,Node * Baum)
 
 			if (hasval(Baum))                 /* Numeric variable ? */
        if (!(lexval(tsym) == Const)
-  				|| ! hasval(tsym))            /* only replace numeric Const / Func */
+  				|| ! hasval(tsym)            /* only replace numeric Const / Func */
+				|| symbolic_constant(tsym))	/* 2026: pi in exact mode: no number */
         {
 			/*	 Node * erg1=calkulate (term);
 					if (!erg1 || rtypes((Symbol *) erg1) != numbertype)
@@ -508,13 +510,13 @@ BOOLEAN match2 (Node * term,Node * Baum)
 
 Node * match (Node * term,Node * Baum)
 {
-static Node dummi = {
+static Node dummy = {
 CHAIN,
 NULL,
 NULL
 };
 
-ersetz = &dummi; /* so that in_tree does not return NULL ! */
+ersetz = &dummy; /* so that in_tree does not return NULL ! */
 
 if(match2(term,Baum))
 	return ersetz;

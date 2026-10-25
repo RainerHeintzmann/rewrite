@@ -37,8 +37,8 @@ geladen. Nun koenne Sie Ihre Aufgabe stellen z.B:
 Das Programm bestimmt nun die Ableitung der Fkt. sin(cos(x)) nach x durch 
 Umschreiben des Terms in der Algebraliste 'All'.
 Numerische Rechnungen gehen z.B. so:
-  REWR I(0,1,x^2,x) : numerik,rechne      # Integral (Simpson) -> 0.333333
-  REWR newton(1,x^2-2,D(x^2-2,x),x) : numerik,rechne   # Nullstelle -> 1.41421
+  REWR I(0,1,x^2,x) : numerik,calc      # Integral (Simpson) -> 0.333333
+  REWR newton(1,x^2-2,D(x^2-2,x),x) : numerik,calc   # Nullstelle -> 1.41421
 Die Eingabe kann auch aus einer Datei kommen:  rewrite < meinprogramm
 
 Benutzung von 'Rewrite' :
@@ -69,7 +69,7 @@ REWR term : algname [,algname ..]
                 Der Term 'term' wird in den Algebren (Regellisten) algname
                 nacheinander umgeschrieben. Die Algebren werden durch Kommas
                 getrennt (nicht durch ';' wie in aelteren Versionen).
-                Bsp.: REWR I(0,1,x^2,x) : numerik,rechne
+                Bsp.: REWR I(0,1,x^2,x) : numerik,calc
 
 PRTNUM "String" Das Standartformat fuer die Ausgabe von reelen Zahlen wird in
                 "String" geaendert. Z.B. : PRTNUM "%2.15g "
@@ -419,6 +419,9 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    linsolve, inverse mit Bareiss' bruchfreier Elimination auf duennen
    Polynomen, dot, transpose, identity; Rechnen mit Listen elementweise
    (thread, Listable), z.B. det(m - x*identity(2)).
+ - Exakte Ergebnisse: Funktionen exakter Zahlen bleiben Terme (ln(2), pi/6),
+   ausser ihr Wert ist exakt (cos(pi/3) = 1/2, arcsin(1/2) = pi/6);
+   ggT von Polynomen in mehreren Variablen (polygcd, cancel).
  - Gleichungen (inc/solve, symsolve.c): solve(lhs == rhs, x) mit Regeln im
    Stil von PRESS (Isolieren, Polynome, neue Unbekannte, Logarithmen
    zusammenfassen, Wurzeln quadrieren), Loesungen werden geprueft;

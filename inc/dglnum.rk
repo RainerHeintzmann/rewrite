@@ -19,4 +19,4 @@ y=a+dx/6*(k1+2*k2+2*k3+k4)
 x,y
 }
 
-y=dummi
+y=dummy

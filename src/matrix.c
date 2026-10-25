@@ -72,7 +72,7 @@ memcpy(Matrix(rp),Matrix(mp),Matsize(rp));
 return rp;
 }
 	
-matrix * null_mat (double * arg[]) 
+matrix * zero_mat (double * arg[]) 
 {
 matrix * mp;
 double * dp;
@@ -88,9 +88,9 @@ int i,j;
 	return mp;
 }
 
-matrix * eins_mat (double * arg[]) /* identity matrix with the minimum diagonal */
+matrix * one_mat (double * arg[]) /* identity matrix with the minimum diagonal */
 {
-matrix * rt = null_mat(arg);
+matrix * rt = zero_mat(arg);
 double * dp = Matrix(rt);
 int i,min,dia=Spalten(rt)+1;
 min= (Zeilen(rt) < Spalten(rt)) ? Zeilen(rt) : Spalten(rt);

@@ -548,27 +548,33 @@ ADDSPEC RubiRules : IF (eqq(P_w,P_v)) Int((O_u)*((sinh(P_v))^(O_p))*((sinh(P_w))
 #   Int[u_.*Cosh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[u*Cosh[v]^(p + q), x] /; EqQ[w, v]
 ADDSPEC RubiRules : IF (eqq(P_w,P_v)) Int((O_u)*((cosh(P_v))^(O_p))*((cosh(P_w))^(O_q)),Xv) = Int(((O_u)*(((cosh(P_v))^(((O_p)+(O_q)))))),Xv)
 
-# Rule 57 not translated: function Cancel
+# Rule 57 (8 variants):
 #   Int[Sinh[v_]^p_.*Sinh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Sinh[v]^p*Sinh[w]^q, x], x] /; IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
+ADDSPEC RubiRules : IF (igtq(O_p,0)), (igtq(O_q,0)), (((((polyq(P_v,Xv)) && (polyq(P_w,Xv)))) || (((((binomialq(P_v,Xv)) && (binomialq(P_w,Xv)))) && (freeq(cancel(((P_v)*(((P_w)^((-1)))))),Xv)))))) Int(((sinh(P_v))^(O_p))*((sinh(P_w))^(O_q)),Xv) = Int(expandtrigreduce(((((sinh(P_v))^(O_p)))*(((sinh(P_w))^(O_q)))),Xv),Xv)
 
-# Rule 58 not translated: function Cancel
+# Rule 58 (8 variants):
 #   Int[Cosh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Cosh[v]^p*Cosh[w]^q, x], x] /; IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
+ADDSPEC RubiRules : IF (igtq(O_p,0)), (igtq(O_q,0)), (((((polyq(P_v,Xv)) && (polyq(P_w,Xv)))) || (((((binomialq(P_v,Xv)) && (binomialq(P_w,Xv)))) && (freeq(cancel(((P_v)*(((P_w)^((-1)))))),Xv)))))) Int(((cosh(P_v))^(O_p))*((cosh(P_w))^(O_q)),Xv) = Int(expandtrigreduce(((((cosh(P_v))^(O_p)))*(((cosh(P_w))^(O_q)))),Xv),Xv)
 
-# Rule 59 not translated: function Cancel
+# Rule 59 (32 variants):
 #   Int[x_^m_.*Sinh[v_]^p_.*Sinh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Sinh[v]^p*Sinh[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
+ADDSPEC RubiRules : IF (igtq(O_m,0)), (igtq(O_p,0)), (igtq(O_q,0)), (((((polyq(P_v,Xv)) && (polyq(P_w,Xv)))) || (((((binomialq(P_v,Xv)) && (binomialq(P_w,Xv)))) && (freeq(cancel(((P_v)*(((P_w)^((-1)))))),Xv)))))) Int(((Xv)^(O_m))*((sinh(P_v))^(O_p))*((sinh(P_w))^(O_q)),Xv) = Int(expandtrigreduce(((Xv)^(O_m)),((((sinh(P_v))^(O_p)))*(((sinh(P_w))^(O_q)))),Xv),Xv)
 
-# Rule 60 not translated: function Cancel
+# Rule 60 (32 variants):
 #   Int[x_^m_.*Cosh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Cosh[v]^p*Cosh[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
+ADDSPEC RubiRules : IF (igtq(O_m,0)), (igtq(O_p,0)), (igtq(O_q,0)), (((((polyq(P_v,Xv)) && (polyq(P_w,Xv)))) || (((((binomialq(P_v,Xv)) && (binomialq(P_w,Xv)))) && (freeq(cancel(((P_v)*(((P_w)^((-1)))))),Xv)))))) Int(((Xv)^(O_m))*((cosh(P_v))^(O_p))*((cosh(P_w))^(O_q)),Xv) = Int(expandtrigreduce(((Xv)^(O_m)),((((cosh(P_v))^(O_p)))*(((cosh(P_w))^(O_q)))),Xv),Xv)
 
 # Rule 61 (24 variants):
 #   Int[u_.*Sinh[v_]^p_.*Cosh[w_]^p_., x_Symbol] := 1/2^p*Int[u*Sinh[2*v]^p, x] /; EqQ[w, v] && IntegerQ[p]
 ADDSPEC RubiRules : IF (eqq(P_w,P_v)), (integerq(O_p)) Int((O_u)*((sinh(P_v))^(O_p))*((cosh(P_w))^(O_p)),Xv) = ((((((2)^(O_p)))^((-1))))*(Int(((O_u)*(((sinh(((2)*(P_v))))^(O_p)))),Xv)))
 
-# Rule 62 not translated: function Cancel
+# Rule 62 (8 variants):
 #   Int[Sinh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[Sinh[v]^p*Cosh[w]^q, x], x] /; IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
+ADDSPEC RubiRules : IF (igtq(O_p,0)), (igtq(O_q,0)), (((((polyq(P_v,Xv)) && (polyq(P_w,Xv)))) || (((((binomialq(P_v,Xv)) && (binomialq(P_w,Xv)))) && (freeq(cancel(((P_v)*(((P_w)^((-1)))))),Xv)))))) Int(((sinh(P_v))^(O_p))*((cosh(P_w))^(O_q)),Xv) = Int(expandtrigreduce(((((sinh(P_v))^(O_p)))*(((cosh(P_w))^(O_q)))),Xv),Xv)
 
-# Rule 63 not translated: function Cancel
+# Rule 63 (32 variants):
 #   Int[x_^m_.*Sinh[v_]^p_.*Cosh[w_]^q_., x_Symbol] := Int[ExpandTrigReduce[x^m, Sinh[v]^p*Cosh[w]^q, x], x] /; IGtQ[m, 0] && IGtQ[p, 0] && IGtQ[q, 0] && (PolynomialQ[v, x] && PolynomialQ[w, x] || BinomialQ[{v, w}, x] && IndependentQ[Cancel[v/w], x])
+ADDSPEC RubiRules : IF (igtq(O_m,0)), (igtq(O_p,0)), (igtq(O_q,0)), (((((polyq(P_v,Xv)) && (polyq(P_w,Xv)))) || (((((binomialq(P_v,Xv)) && (binomialq(P_w,Xv)))) && (freeq(cancel(((P_v)*(((P_w)^((-1)))))),Xv)))))) Int(((Xv)^(O_m))*((sinh(P_v))^(O_p))*((cosh(P_w))^(O_q)),Xv) = Int(expandtrigreduce(((Xv)^(O_m)),((((sinh(P_v))^(O_p)))*(((cosh(P_w))^(O_q)))),Xv),Xv)
 
 # Rule 64 (4 variants):
 #   Int[Sinh[v_]*Tanh[w_]^n_., x_Symbol] := Int[Cosh[v]*Tanh[w]^(n - 1), x] - Cosh[v - w]*Int[Sech[w]*Tanh[w]^(n - 1), x] /; GtQ[n, 0] && NeQ[w, v] && FreeQ[v - w, x]

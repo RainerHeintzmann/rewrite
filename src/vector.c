@@ -78,7 +78,7 @@ return;
 }
 
 	
-vector * null_vec (double * arg[]) 
+vector * zero_vec (double * arg[]) 
 {
 vector * vp;
 double * dp;
@@ -93,9 +93,9 @@ int i;
 	return vp;
 }
 
-vector * eins_vec (double * arg[]) /* unit vector with a one at arg[1] */
+vector * one_vec (double * arg[]) /* unit vector with a one at arg[1] */
 {
-vector * rt = null_vec(arg);
+vector * rt = zero_vec(arg);
 int pos = (int) * arg[1]; 
 
 if (pos >= Dimension(rt) || pos < 0) printfErr("Vector element error : Vector has lower dimension\n");
@@ -553,7 +553,7 @@ for(i=0;i<Dimension(vp);i++)
 return rt;
 }
 
-vector * fak_vec (void * arg[])
+vector * factorial_vec (void * arg[])
 {
 int	i;
 vector * vp= (vector *) arg[0];

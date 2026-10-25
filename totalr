@@ -24,7 +24,7 @@ alpha0= 0.45/2/scale*_deg
 temp = arccos(cos(alpha0)/nbr)
 Reflein = ((sin (alpha0) - nbr*sin temp)/(sin (alpha0) + nbr*sin temp))^2
 
-pos = nullvec(18)
+pos = zerovec(18)
 
 FOR nr= 4 TO -5 STEP -1 DO {
 
@@ -71,6 +71,6 @@ Intensity= 1.15e2*(Refl*Reflein) _pow 0.5 _mul (\
 0.11*exp(width*(alout _minus pos[7]) _pow 2)+\
 0.08*exp(width*(alout _minus pos[8]) _pow 2)      ) _plus 1e-10
 
-dummi=vecs(alout*scale/_deg,Intensity*140000)
+dummy=vecs(alout*scale/_deg,Intensity*140000)
 
 # " Total Reflectivity : ",Refl

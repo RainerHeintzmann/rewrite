@@ -29,7 +29,7 @@ double myfak (double a)
 double result=1;
 int i = (int) a;
 if (i != a)
-	printfErr("Tried to compute a non-integer fak (Domain Error) !\n");
+	printfErr("Tried to compute a non-integer factorial (Domain Error) !\n");
 
 if (i>148) return MAXREAL
 	else 
@@ -80,24 +80,24 @@ return;
 
 double * plus (double * arg[]) 			{return mkreal((* arg[0]) + (* arg[1]));}
 double * minus (double * arg[])			{return mkreal((* arg[0]) - (* arg[1]));}
-double * mal (double * arg[])			{return mkreal((* arg[0]) * (* arg[1]));}
-double * geteilt (double * arg[])		{return mkreal((* arg[0]) / (* arg[1]));}
-double * hoch(double * arg[])			{return mkreal(mypow((* arg[0]),(* arg[1])));}
-double * logarithmus (double * arg[])	{return mkreal(log((* arg[0])));}
+double * mult (double * arg[])			{return mkreal((* arg[0]) * (* arg[1]));}
+double * divide (double * arg[])		{return mkreal((* arg[0]) / (* arg[1]));}
+double * power(double * arg[])			{return mkreal(mypow((* arg[0]),(* arg[1])));}
+double * r_ln (double * arg[])	{return mkreal(log((* arg[0])));}
 double * wurzel (double * arg[])		{return mkreal(sqrt((* arg[0])));}
-double * sinus (double * arg[])			{return mkreal(sin((* arg[0])));}
-double * cosinus (double * arg[])		{return mkreal(cos((* arg[0])));}
-double * tangens (double * arg[])		{return mkreal(tan((* arg[0])));}
-double * sinush (double * arg[])      {return mkreal(sinh((* arg[0])));}
-double * cosinush (double * arg[])      {return mkreal(cosh((* arg[0])));}
-double * tangensh (double * arg[])      {return mkreal(tanh((* arg[0])));}
-double * ehoch(double * arg[])			{return mkreal(exp((* arg[0])));}
+double * r_sin (double * arg[])			{return mkreal(sin((* arg[0])));}
+double * r_cos (double * arg[])		{return mkreal(cos((* arg[0])));}
+double * r_tan (double * arg[])		{return mkreal(tan((* arg[0])));}
+double * r_sinh (double * arg[])      {return mkreal(sinh((* arg[0])));}
+double * r_cosh (double * arg[])      {return mkreal(cosh((* arg[0])));}
+double * r_tanh (double * arg[])      {return mkreal(tanh((* arg[0])));}
+double * r_exp(double * arg[])			{return mkreal(exp((* arg[0])));}
 double * ai(double * arg[])			{return mkreal(-(* arg[0]));}
 double * mi(double * arg[])			{return mkreal(((double) 1)/(* arg[0]));}
-double * fak(double * arg[])			{return mkreal(myfak(* arg[0]));}
-double * asinus   (double * arg[])		{return mkreal(asin((* arg[0])));}
-double * acosinus (double * arg[])		{return mkreal(acos((* arg[0])));}
-double * atangens (double * arg[])		{return mkreal(atan((* arg[0])));}
+double * factorial(double * arg[])			{return mkreal(myfak(* arg[0]));}
+double * r_arcsin   (double * arg[])		{return mkreal(asin((* arg[0])));}
+double * r_arccos (double * arg[])		{return mkreal(acos((* arg[0])));}
+double * r_arctan (double * arg[])		{return mkreal(atan((* arg[0])));}
 double * r_abs      (double * arg[])		{return mkreal(fabs((* arg[0])));}
 double * r_sqr      (double * arg[])		{return mkreal((* arg[0])*(* arg[0]));}
 double * r_sqrt     (double * arg[])		{return mkreal(sqrt((* arg[0])));}

@@ -1,5 +1,5 @@
 
-TERM Koord : real # any coordinate, e.g. x
+TERM Coordinate : real # any coordinate, e.g. x
 
 TERM Tkin : real	# kinetic energy
 TERM V : real	# generalized potential
@@ -9,4 +9,4 @@ TERM H : real # Hamilton function
 Tkin=.5*m*D(z,t)^2   # example preset : free fall
 V=m*g*z
 L=Tkin-V
-Koord = z
+Coordinate = z

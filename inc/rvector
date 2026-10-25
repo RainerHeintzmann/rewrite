@@ -19,8 +19,8 @@ FUNC _x_  : rvector,rvector >> rvector LA3 ATT vec_x_vec # square
 FUNC sqr  : rvector >> real ATT vec_sqr              # square
 FUNC elem : rvector,real >> real ATT elem_vec        # Vector,Pos
 FUNC part : rvector,real,real >> rvector ATT vec_part  # Part of the Vector From..To
-FUNC nullvec : real      >> rvector ATT null_vec     # Dimension
-FUNC einsvec : real,real >> rvector ATT eins_vec     # Dimension,Pos
+FUNC zerovec : real      >> rvector ATT zero_vec     # Dimension
+FUNC onevec : real,real >> rvector ATT one_vec     # Dimension,Pos
 FUNC gen : real,real,real  >> rvector ATT gen_vec    # from,to,steps
 FUNC chvec : rvector,real,real >> rvector ATT ch_vec # vector,pos,value
 FUNC vecms : rvector >> real ATT vec_ms              # variance
@@ -43,7 +43,7 @@ OTHER arctan : rvector  >> rvector   ATT atan_vec  # elementwise
 FUNC  eabs : rvector  >> rvector     ATT abs_vec  # elementwise
 OTHER ln : rvector  >> rvector       ATT log_vec  # elementwise
 OTHER exp : rvector  >> rvector      ATT exp_vec  # elementwise
-OTHER ! : rvector  >> rvector        ATT fak_vec  # elementwise
+OTHER ! : rvector  >> rvector        ATT factorial_vec  # elementwise
 FUNC  esqr : rvector  >> rvector     ATT sqr_vec  # elementwise
 OTHER sqrt : rvector  >> rvector     ATT sqrt_vec  # elementwise
 

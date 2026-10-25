@@ -39,7 +39,16 @@ static Node * s_occurs (Node * a[], int n, Symbol * f)
 
 /* ---- eqnorm: the numerator of f over a common denominator ---- */
 
+/* the numerator of f over a common denominator of the negative powers of
+ * terms with x (x = NULL: of any terms); *den (if wanted) the denominator */
+static Node * eqnorm_den (Node * f, Node * x, Node ** den_out);
+
 static Node * eqnorm (Node * f, Node * x)
+{
+	return eqnorm_den(f, x, NULL);
+}
+
+static Node * eqnorm_den (Node * f, Node * x, Node ** den_out)
 {
 	TList l = {0}, out = {0};
 	Node * den[64], * r;
@@ -54,7 +63,7 @@ static Node * eqnorm (Node * f, Node * x)
 			{
 			Node * t = deref(fl.t[j]);
 			if (is_head(t, "^", 2) && num_value(arg(t, 1), & e) && e < 0 && e == floor(e)
-			    && contains(arg(t, 0), x))
+			    && (x ? contains(arg(t, 0), x) : ! num_sym(arg(t, 0))))
 				{
 				for (k = 0; k < nd && ! tequal(den[k], arg(t, 0)); k++)
 					;
@@ -92,8 +101,49 @@ static Node * eqnorm (Node * f, Node * x)
 		expand_to(t, & out);
 		delete(t);
 		}
+	if (den_out)
+		{
+		Node * d = NULL;
+		for (k = 0; k < nd; k++)
+			{
+			Node * p = mk_pow(tcpy(den[k]), mk_int(dex[k]));
+			d = d ? mk_mul(d, p) : p;
+			}
+		* den_out = d ? d : mk_int(1);
+		}
 	tl_free(& l);
 	r = tl_collect(& out);
+	return r;
+}
+
+/* ---- cancel(u): u as N/D over a common denominator, the polynomial gcd
+ * of N and D cancelled (symmat.c: mp_gcd) ---- */
+static Node * s_cancel (Node * a[], int n, Symbol * f)
+{
+	Node * d, * nu = NULL;
+	MPoly pn, pd;
+	if (n != 1) return NULL;
+	nu = eqnorm_den(a[0], NULL, & d);
+	pn = mp_from(nu);
+	pd = mp_from(d);
+	delete(nu);
+	delete(d);
+	return mp_quotient_free(& pn, & pd);
+}
+
+/* polygcd(a, b): the greatest common divisor of two polynomials */
+static Node * s_polygcd (Node * a[], int n, Symbol * f)
+{
+	MPoly pa, pb, g;
+	Node * r;
+	if (n != 2) return NULL;
+	pa = mp_from(a[0]);
+	pb = mp_from(a[1]);
+	g = mp_gcd(& pa, & pb);
+	r = nice(mp_term(& g));
+	mp_free(& pa);
+	mp_free(& pb);
+	mp_free(& g);
 	return r;
 }
 

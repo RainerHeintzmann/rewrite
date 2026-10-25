@@ -1,5 +1,5 @@
 # File for Correlating the datas
-CONST size,int,a,b,n,maxb,fak : real
+CONST size,int,a,b,n,maxb,factorial : real
 CONST yval,xval : rvector
 
 size=200
@@ -8,8 +8,8 @@ DATA "x-rayos/rh10295q.ux"
 OUT "x-rayos/rh10295q"
 
 
-xval=nullvec(size)
-yval=nullvec(size)
+xval=zerovec(size)
+yval=zerovec(size)
 
 int=0
 
@@ -20,10 +20,10 @@ xval=chvec(xval,n,a)
 yval=chvec(yval,n,b)
 }
 
-fak=(elem(xval,size-1)-elem(xval,0))/size
+factorial=(elem(xval,size-1)-elem(xval,0))/size
 
 FOR n= 0 TO size-1 DO {
-n*fak+elem(xval,0),elem(yval,n)
+n*factorial+elem(xval,0),elem(yval,n)
 }
 
 OUT "stdout"

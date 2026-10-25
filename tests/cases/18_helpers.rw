@@ -129,3 +129,12 @@ SPEC tq : IF (polyq(Uu,Xx) && (expon(Uu,Xx) == 2)) qq(Uu,Xx) = coeff(Uu,Xx,2)
 REWR qq(3*x^2+1,x) : tq
 REWR qq(x^3,x) : tq
 REWR qq(sin(x),x) : tq
+# ---- gcd of polynomials in several variables, cancel
+REWR polygcd(x^2 - 1, x^2 + 2*x + 1) : raw
+REWR polygcd(x^2 - y^2, x^2 + 2*x*y + y^2) : raw
+REWR polygcd((x+y)*(x-2*y)*(a+1), (x+y)^2*(a+1)) : raw
+REWR polygcd(x^3 + y, x + 1) : raw
+REWR cancel((x^2 - 1)/(x^2 + 2*x + 1)) : raw
+REWR cancel((x^2 - y^2)/(x - y)) : raw
+REWR cancel(1/x + 1/y) : raw
+REWR cancel((a*x + a*y)/(b*x + b*y)) : raw

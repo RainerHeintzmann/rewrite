@@ -216,21 +216,21 @@ instruction : aninstruction     {$$ = in_block_instruct($1); /* Check local vari
 																mknod(PARAM,mknod(FUNC,(Node *) do_block_begin,NULL),
 																mknod(PARAM,mknod(FUNC,(Node *) sequence,$3),
 																mknod(PARAM,mknod(FUNC,(Node *) do_block_end,NULL),NULL))));}
-			| WHILE condition instruction	{Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,$2,NULL /* then becomes $3 */)));
-																		WHILE_BODY(merk) = $3;$$=rtw;}
+			| WHILE condition instruction	{Node * memo,* rtw=in_block_instruct(memo=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,$2,NULL /* then becomes $3 */)));
+																		WHILE_BODY(memo) = $3;$$=rtw;}
 
-			| IF condition instruction	{Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,$2,mknod(PARAM,NULL,NULL))));
-																		IF_THEN(merk) = $3;$$=rtw;}
-			| IF condition instruction ELSE instruction	{Node * merk,* rtw = in_block_instruct(merk=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,$2,mknod(PARAM,NULL /* $3 */,NULL /* $5 */ ))));
-																		IF_THEN(merk) = $3;IF_ELSE(merk) = $5;$$=rtw;}
+			| IF condition instruction	{Node * memo,* rtw=in_block_instruct(memo=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,$2,mknod(PARAM,NULL,NULL))));
+																		IF_THEN(memo) = $3;$$=rtw;}
+			| IF condition instruction ELSE instruction	{Node * memo,* rtw = in_block_instruct(memo=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,$2,mknod(PARAM,NULL /* $3 */,NULL /* $5 */ ))));
+																		IF_THEN(memo) = $3;IF_ELSE(memo) = $5;$$=rtw;}
 			| FOR term EQ term TO term step DO instruction
-														{Node * merk,* rtw = in_block_instruct(merk=mknod(FUNC,(Node *) forschleife,
+														{Node * memo,* rtw = in_block_instruct(memo=mknod(FUNC,(Node *) forschleife,
 																mknod(PARAM,
 																	mknod(PARAM,$4,$6),
 																	mknod(PARAM,
 																		mknod(PARAM,$7,(Node *) ($2)),
 																		NULL /* $9 */) )));	
-														FOR_BODY(merk) = $9;$$=rtw;};
+														FOR_BODY(memo) = $9;$$=rtw;};
 
 
 aninstruction	: /* Nothing */ 	{$$=NULL;}

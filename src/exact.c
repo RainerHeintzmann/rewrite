@@ -80,11 +80,11 @@ void * read_int (void * arg[])		/* arg[0]: text of the literal */
 
 void * int_plus (void * arg[])  { mpz_ptr z = new_int(); mpz_add(z, I(0), I(1)); return z; }
 void * int_minus (void * arg[]) { mpz_ptr z = new_int(); mpz_sub(z, I(0), I(1)); return z; }
-void * int_mal (void * arg[])   { mpz_ptr z = new_int(); mpz_mul(z, I(0), I(1)); return z; }
+void * int_mult (void * arg[])   { mpz_ptr z = new_int(); mpz_mul(z, I(0), I(1)); return z; }
 void * int_neg (void * arg[])   { mpz_ptr z = new_int(); mpz_neg(z, I(0)); return z; }
 void * int_abs (void * arg[])   { mpz_ptr z = new_int(); mpz_abs(z, I(0)); return z; }
 
-void * int_fak (void * arg[])		/* n! */
+void * int_factorial (void * arg[])		/* n! */
 {
 	mpz_ptr z;
 	if (mpz_sgn(I(0)) < 0 || ! mpz_fits_ulong_p(I(0)) || mpz_get_ui(I(0)) > MAXEXP)
@@ -189,7 +189,7 @@ void * int_div (void * arg[])		/* integer / integer -> rational */
 
 void * rat_plus (void * arg[])  { mpq_ptr q = new_rat(); mpq_add(q, Q(0), Q(1)); return q; }
 void * rat_minus (void * arg[]) { mpq_ptr q = new_rat(); mpq_sub(q, Q(0), Q(1)); return q; }
-void * rat_mal (void * arg[])   { mpq_ptr q = new_rat(); mpq_mul(q, Q(0), Q(1)); return q; }
+void * rat_mult (void * arg[])   { mpq_ptr q = new_rat(); mpq_mul(q, Q(0), Q(1)); return q; }
 void * rat_neg (void * arg[])   { mpq_ptr q = new_rat(); mpq_neg(q, Q(0)); return q; }
 void * rat_abs (void * arg[])   { mpq_ptr q = new_rat(); mpq_abs(q, Q(0)); return q; }
 

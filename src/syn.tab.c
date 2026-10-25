@@ -1930,34 +1930,34 @@ yyreduce:
 
   case 64: /* instruction: WHILE condition instruction  */
 #line 219 "syn.y"
-                                                        {Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,(yyvsp[-1].y_nod),NULL /* then becomes $3 */)));
-																		WHILE_BODY(merk) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
+                                                        {Node * memo,* rtw=in_block_instruct(memo=mknod(FUNC,(Node *) while_fkt,mknod(PARAM,(yyvsp[-1].y_nod),NULL /* then becomes $3 */)));
+																		WHILE_BODY(memo) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
 #line 1936 "syn.tab.c"
     break;
 
   case 65: /* instruction: IF condition instruction  */
 #line 222 "syn.y"
-                                                        {Node * merk,* rtw=in_block_instruct(merk=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,(yyvsp[-1].y_nod),mknod(PARAM,NULL,NULL))));
-																		IF_THEN(merk) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
+                                                        {Node * memo,* rtw=in_block_instruct(memo=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,(yyvsp[-1].y_nod),mknod(PARAM,NULL,NULL))));
+																		IF_THEN(memo) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
 #line 1943 "syn.tab.c"
     break;
 
   case 66: /* instruction: IF condition instruction ELSE instruction  */
 #line 224 "syn.y"
-                                                                        {Node * merk,* rtw = in_block_instruct(merk=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,(yyvsp[-3].y_nod),mknod(PARAM,NULL /* $3 */,NULL /* $5 */ ))));
-																		IF_THEN(merk) = (yyvsp[-2].y_nod);IF_ELSE(merk) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
+                                                                        {Node * memo,* rtw = in_block_instruct(memo=mknod(FUNC,(Node *) if_fkt,mknod(PARAM,(yyvsp[-3].y_nod),mknod(PARAM,NULL /* $3 */,NULL /* $5 */ ))));
+																		IF_THEN(memo) = (yyvsp[-2].y_nod);IF_ELSE(memo) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
 #line 1950 "syn.tab.c"
     break;
 
   case 67: /* instruction: FOR term EQ term TO term step DO instruction  */
 #line 227 "syn.y"
-                                                                                                                {Node * merk,* rtw = in_block_instruct(merk=mknod(FUNC,(Node *) forschleife,
+                                                                                                                {Node * memo,* rtw = in_block_instruct(memo=mknod(FUNC,(Node *) forschleife,
 																mknod(PARAM,
 																	mknod(PARAM,(yyvsp[-5].y_nod),(yyvsp[-3].y_nod)),
 																	mknod(PARAM,
 																		mknod(PARAM,(yyvsp[-2].y_nod),(Node *) ((yyvsp[-7].y_nod))),
 																		NULL /* $9 */) )));	
-														FOR_BODY(merk) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
+														FOR_BODY(memo) = (yyvsp[0].y_nod);(yyval.y_nod)=rtw;}
 #line 1962 "syn.tab.c"
     break;
 

@@ -63,6 +63,9 @@ BOOLEAN var_sort_ok (Node * vsort, Node * term);
 /* the sort has no wider sort (SUBSORT) */
 BOOLEAN sort_top (Node * s);
 
+/* the sort has exact values (natural, integer, rational) */
+BOOLEAN sort_exact (Node * s);
+
 /* sort of an argument node (as eq_rtypes sees it) */
 Node * arg_sort (Node * a);
 

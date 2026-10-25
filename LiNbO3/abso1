@@ -1,6 +1,6 @@
 CONST h,k,l,lambda,Egy,cnt,cmax,thick,mu : real
 CONST Egyf,muf : rvector
-Egyf=nullvec(1000)
+Egyf=zerovec(1000)
 muf=Egyf
 INC "LiNbO3/comp"
 

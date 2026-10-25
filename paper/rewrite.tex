@@ -128,8 +128,8 @@ expressions:
 SORT real                                 # a data type
 NUM real                                  # numbers typed in have sort real
 FUNC + : real,real >> real LA2 ATT plus   # left-associative, priority 2
-FUNC * : real,real >> real LA3 ATT mal    # binds tighter than +
-FUNC ^ : real,real >> real RA  ATT hoch   # right-associative
+FUNC * : real,real >> real LA3 ATT mult    # binds tighter than +
+FUNC ^ : real,real >> real RA  ATT power   # right-associative
 1+2*3                                     # prints 7
 2^3^2                                     # prints 512
 CONST x,y : real
@@ -181,7 +181,7 @@ of the library is defined like this:
 
 \begin{lstlisting}
 SPEC All : Std,Doit,(Linear,Compl,diff,GrRi),AGroup,integr,
-           (Subst,GrRi),Std,Zus,unaerweg
+           (Subst,GrRi),Std,Combine,NoMi
 \end{lstlisting}
 
 With the library loaded, \texttt{REWR D(sin cos x,x) : All} returns
@@ -250,6 +250,16 @@ variant) are reported, and a more specific variant resolves the tie. The \texttt
 rules of \texttt{real}, and a second one does the same for
 \texttt{integer}; \texttt{x*1+0*x+(1/2)*x} simplifies to \texttt{(3/2) * x}
 with the unchanged rules for real numbers.
+
+\paragraph{Exact constants.} With the exact sorts, a function of exact
+numbers without an exact value stays a term, and $\pi$ stays a symbol, as
+in Mathematica; $\ln 2$ and $\pi/6$ are not replaced by decimal numbers.
+Exact values are recognized from the numerical value: rational ones
+($\cos(\pi/3)=1/2$), square roots of rational ones
+($\sin(\pi/3)=\sqrt3/2$) and rational multiples of $\pi$ for the inverse
+trigonometric functions ($\arcsin\frac12=\pi/6$). Since a transcendental
+function of a nonzero algebraic number is transcendental, such a match is
+no coincidence. Conditions are still evaluated numerically.
 
 \paragraph{Symbolic numbers.} Above \texttt{real} and \texttt{complex}
 the library declares the sort \texttt{number} of symbolic scalar
@@ -329,21 +339,21 @@ written as rewrite rules. The library defines Simpson integration as a
 rule whose \texttt{DO} block computes the value:
 
 \begin{lstlisting}
-ALG rechne
-SPEC rechne : I(N,M,A,_x)=_myerg DO { _myerg=0;_zw1=0;_zw2=0  # Simpson
-        FOR n=N+_step/2 TO M-_step STEP _step DO { _x=n;_zw1=_zw1+A
+ALG calc
+SPEC calc : I(N,M,A,_x)=_myerg DO { _myerg=0;_tmp1=0;_tmp2=0  # Simpson
+        FOR n=N+_step/2 TO M-_step STEP _step DO { _x=n;_tmp1=_tmp1+A
         _x=n+_step/2
-        _zw2=_zw2+A }
+        _tmp2=_tmp2+A }
         _x=M-_step/2
-        _zw1=_zw1+A
-        _x=N;_myerg=A+4*_zw1+2*_zw2
+        _tmp1=_tmp1+A
+        _x=N;_myerg=A+4*_tmp1+2*_tmp2
         _x=M;_myerg=(_myerg+A)*_step/2/3
-        _x=dummi }
+        _x=dummy }
 \end{lstlisting}
 
 A second rule set first substitutes the integration variable by the
 internal variable \texttt{\_x}. With \texttt{\_step=0.01},
-\texttt{REWR I(0,pi,sin(x),x) : numerik,rechne} returns 2. The same
+\texttt{REWR I(0,pi,sin(x),x) : numerik,calc} returns 2. The same
 mechanism gives Newton's method and the search for minima and maxima. The
 symbolic part can prepare the numerical part: \texttt{newton} expects the
 derivative as an argument, which is computed symbolically by \texttt{D}.

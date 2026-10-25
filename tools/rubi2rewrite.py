@@ -342,7 +342,7 @@ RHS_HELPERS = {
     'Coeff': 'coeff', 'Coefficient': 'coeff', 'Expon': 'expon', 'Rt': 'rt',
     'IntPart': 'intpart', 'FracPart': 'fracpart', 'IntHide': 'inthide',
     'Unintegrable': 'unintegrable', 'D': 'deriv',
-    'GCD': 'gcd', 'Numerator': 'numerator', 'Denominator': 'denominator',
+    'GCD': 'gcd', 'Cancel': 'cancel', 'Together': 'cancel', 'Numerator': 'numerator', 'Denominator': 'denominator',
     'Denom': 'denominator', 'FreeFactors': 'freefactors',
     'NonfreeFactors': 'nonfreefactors', 'ExpandToSum': 'expandtosum',
     'PolynomialQuotient': 'polyquotient', 'PolynomialRemainder': 'polyremainder',

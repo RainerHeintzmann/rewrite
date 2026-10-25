@@ -240,8 +240,9 @@ ADDSPEC RubiRules : Int(P_u,Xv) = substsqrtquad(P_u,Xv)
 # Rule 65 (by hand, as above):
 #   Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2 \[Star] Subst[Int[lst[[1]],x],x,lst[[2]]] /; Not[FalseQ[lst]] && EqQ[lst[[3]],3]] /; EulerIntegrandQ[u,x]
 
-# Rule 66 not translated: function Together
+# Rule 66 (6 variants):
 #   Int[1/(a_+b_.*v_^2),x_Symbol] :=  1/(2*a) \[Star] Int[Together[1/(1-v/Rt[-a/b,2])],x] + 1/(2*a) \[Star] Int[Together[1/(1+v/Rt[-a/b,2])],x] /; FreeQ[{a,b},x]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*((P_v)^(2))))^(K_1),Xv) = (((((1/2))*(((P_a)^((-1))))*(Int(cancel(((((1)+((((-1))*(P_v)*(((rt((((-1))*(P_a)*(((O_b)^((-1))))),2))^((-1))))))))^((-1)))),Xv))))+((((1/2))*(((P_a)^((-1))))*(Int(cancel(((((1)+(((P_v)*(((rt((((-1))*(P_a)*(((O_b)^((-1))))),2))^((-1))))))))^((-1)))),Xv)))))
 
 # Rule 67 not translated: function Sum
 #   Int[1/(a_+b_.*v_^n_),x_Symbol] := 2/(a*n) \[Star] Sum[Int[Together[1/(1-v^2/((-1)^(4*k/n)*Rt[-a/b,n/2]))],x],{k,1,n/2}] /; FreeQ[{a,b},x] && IGtQ[n/2,1]

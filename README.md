@@ -26,7 +26,7 @@ $ rewrite
 - cos (cos (x ))* sin (x )
 > REWR D(x^2*sin x,x) : All
 2 * x * sin (x )+ x ^ 2 * cos (x )
-> REWR I(0,1,x^2,x) : numerik,rechne
+> REWR I(0,1,x^2,x) : numerik,calc
 0.333333
 > sqrt(16), ln(e), sin(pi/2)
 4 1 1
@@ -144,8 +144,8 @@ This complete program defines them from scratch:
 SORT real                                   # a data type
 NUM real                                    # numbers like 1.5 have type real
 FUNC + : real,real >> real LA2 ATT plus     # operators with priority and
-FUNC * : real,real >> real LA3 ATT mal      # the C function that computes them
-FUNC ^ : real,real >> real RA  ATT hoch
+FUNC * : real,real >> real LA3 ATT mult      # the C function that computes them
+FUNC ^ : real,real >> real RA  ATT power
 1+2*3                                       # prints 7
 2^3^2                                       # prints 512
 CONST x,y : real
@@ -422,6 +422,24 @@ REWR x*(4/3)^(1/2) : All      # prints 2 * 3 ^ (-1/2) * x
 REWR x*2^(1/2)*0.5 : All      # prints 0.707107 * x
 ```
 
+**Functions of exact numbers.** With `inc/exact`, a function of exact
+numbers that has no exact value stays a term, as in Mathematica: `ln(2)`,
+`sin(1/3)`, `exp(1)`, `sqrt(2)`. `pi` stays a symbol in terms as well, and
+`pi/6` is not calculated. Exact values are taken: rational ones (`cos(0)`
+is 1, `cos(pi/3)` is 1/2), square roots of rational ones (`sin(pi/3)` is
+`(1/2) * 3 ^ (1/2)`) and, for the inverse trigonometric functions, rational
+multiples of `pi` (`arcsin(1/2)` is `(1/6) * pi`). They are found from the
+numerical value; since a transcendental function of a nonzero algebraic
+number is transcendental, a match is no accident. A real number makes the
+term numeric (`sin(0.5)` is 0.479426), conditions are calculated
+numerically, and a value printed on its own is still a number (`ln(2)`
+prints 0.693147).
+
+```text
+REWR x + ln(2) + pi/6 : All                # prints pi / 6 + ln (2 )+ x
+REWR x + arcsin(1/2) + sin(pi/3) : All     # prints (1/2) * 3 ^ (1/2) + (1/6) * pi + x
+```
+
 **Sorts with a known sign.** A sort can have several wider sorts.
 `inc/exact` declares
 
@@ -522,11 +540,11 @@ the files are in German.
 | [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
 | [inc/rvector](inc/rvector) | Real vectors `[1,2,3]`, scalar product, cross product `_x_`, `abs`, element access. |
-| [inc/rmatrix](inc/rmatrix) | Real matrices: `einsmat`, `nullmat`, `chmat`, `trans`, products. Indices start at 0. |
+| [inc/rmatrix](inc/rmatrix) | Real matrices: `onemat`, `zeromat`, `chmat`, `trans`, products. Indices start at 0. |
 | [inc/physik](inc/physik), [inc/theophys](inc/theophys), [inc/lagrange](inc/lagrange) | Physical units and formulas, Lagrange formalism. |
 | [inc/physnum](inc/physnum), [inc/mathnum](inc/mathnum) | Numerical values of physical and mathematical constants such as `c`, `e` and `pi`. |
 | [inc/eqnsolve](inc/eqnsolve) | Solving equations. |
-| [inc/numerik](inc/numerik) | Numerics with the rule lists `numerik,rechne`: integral `I(a,b,f,x)`, Newton zero `newton(start,f,f',x)`, `fmin`, `fmax`, `flzero`, `flext`. |
+| [inc/numerik](inc/numerik) | Numerics with the rule lists `numerik,calc`: integral `I(a,b,f,x)`, Newton zero `newton(start,f,f',x)`, `fmin`, `fmax`, `flzero`, `flext`. |
 | [LiNbO3/comp](LiNbO3/comp) | Material constants of lithium niobate crystals. |
 
 Note that the library defines many short names, for example `c` (speed of
@@ -537,8 +555,8 @@ Some examples:
 (1+2*i)*(3-i)                     # prints (5,5)
 [1,2,3]*[4,5,6]                   # prints 32
 3!                                # prints 6
-REWR newton(1,x^2-2,D(x^2-2,x),x) : numerik,rechne    # prints 1.41421
-REWR fmin(-1,1,(x-0.3)^2,x) : numerik,rechne          # prints 0.3
+REWR newton(1,x^2-2,D(x^2-2,x),x) : numerik,calc    # prints 1.41421
+REWR fmin(-1,1,(x-0.3)^2,x) : numerik,calc          # prints 0.3
 ```
 
 ### Rule-based integration
@@ -659,9 +677,8 @@ the entries become sparse polynomials in their atoms (every factor that is
 no number and no natural power, such as `sin(x)`, `a^-1` or `2^(1/2)`), and
 every division during the elimination is an exact division of polynomials,
 so no nested fractions arise. A solution is a polynomial divided by the
-determinant; common monomial factors, a common polynomial factor in a
-single atom and integer contents are cancelled (`1/(a+2)`), a common
-factor of several variables is not yet. The matrix functions thread their
+determinant; common factors are cancelled with the polynomial gcd
+(`1/(a+2)`). The matrix functions thread their
 arguments first, so `det(m - x*identity(2))` is the characteristic
 polynomial of `m`; the rule set `Listable` does this for any term, like
 Mathematica's `Listable` functions:
@@ -715,7 +732,8 @@ REWR solve(sqrt(x+1) == x - 1, x) : Solve               # {3}
 REWR solve(list(x + y == 3, x - y == 1), list(x, y)) : Solve   # {2, 1}
 ```
 
-Numbers in the results are calculated: `ln(2)` prints as `0.693147`.
+With exact numbers, the results are exact: `exp(2*x+1) = 5` gives
+`{(1/2) * ln (5 )- (1/2)}`, `sin(x) = 1/2` gives `{(1/6) * pi, (5/6) * pi}`.
 
 ### Symbolic helper functions
 
@@ -734,7 +752,7 @@ default a role is played by the symbol of the same name, which fits
 operator for different sorts count as the same function:
 
 ```text
-FUNC kos : real >> real ATT cosinus
+FUNC kos : real >> real ATT r_cos
 SYMBOLIC "cos" = "kos"                    # kos is the cosine for the helpers
 REWR expandtrigreduce(kos(x)^2,x) : All   # prints 0.5 + 0.5 * kos (2 * x )
 SYMBOLIC                                  # back to the names
@@ -786,6 +804,8 @@ The helpers are:
 | `normpoly(u,x)` | every polynomial sum in `u` as `c0+c1*x+...` with collected coefficients |
 | `deriv(u,x)` | derivative, every term without `x` constant; defined by rules (`ATT RULES`, the rules `diff` of inc/alg); `D(f(x),x)` remains for unknown functions |
 | `collect(u)` | like summands combined, e.g. `2*a+b-a` gives `a+b` |
+| `cancel(u)` | `u` over a common denominator, `N/D`, with the greatest common divisor of `N` and `D` cancelled: `(x^2-y^2)/(x-y)` gives `x+y` (Mathematica's `Cancel` and `Together`) |
+| `polygcd(a,b)` | greatest common divisor of two polynomials in several variables (primitive remainder sequence; exact coefficients) |
 | `replaceall(u,x,v)` | `u` with `x` replaced by `v` at once |
 | `expandtrigreduce(u,x)`, `expandtrigreduce(v,u,x)` | products and powers of `sin`, `cos`, `sinh`, `cosh` as sums of multiple angles, e.g. `sin(x)^3` gives `(3/4)*sin(x) - (1/4)*sin(3*x)`; times `v` |
 | `binomialq(u,x)`, `binomialdegree(u,x)`, `trinomialq(u,x)`, `quadraticq(u,x)` | `u` is `a+b*x^n` (and its `n`), `a+b*x^n+c*x^(2n)`, a quadratic |
@@ -941,6 +961,9 @@ where the library [inc/](inc) and the tests are used from.
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
+- Exact results: functions of exact numbers stay terms (`ln(2)`, `pi/6`) unless
+  their value is exact (`cos(pi/3) = 1/2`, `arcsin(1/2) = pi/6`); a gcd of
+  polynomials in several variables (`polygcd`, `cancel`).
 - Equations ([inc/solve](inc/solve)): `solve(lhs == rhs, x)` with rules in
   the style of PRESS, linear systems.
 - Symbolic matrices on lists ([inc/linalg](inc/linalg)): `det`, `linsolve`,

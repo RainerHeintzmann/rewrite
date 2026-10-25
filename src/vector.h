@@ -30,8 +30,8 @@ void     del_vec (vector * mp);
 
 double * elem_vec (void * arg[]);
 vector * vec_part (void * arg[]);
-vector * null_vec (double * arg[]);
-vector * eins_vec (double * arg[]);
+vector * zero_vec (double * arg[]);
+vector * one_vec (double * arg[]);
 vector * ch_vec (void * arg[]);
 vector * constr_vec (double * arg[]); /* Va - args */
 vector * vec_add (void * arg[]);
@@ -60,7 +60,7 @@ vector * tanh_vec (void * arg[]);    /* elementwise */
 vector * atan_vec (void * arg[]);    /* elementwise */
 vector * log_vec (void * arg[]);    /* elementwise */
 vector * exp_vec (void * arg[]);    /* elementwise */
-vector * fak_vec (void * arg[]);    /* elementwise */
+vector * factorial_vec (void * arg[]);    /* elementwise */
 vector * sqr_vec (void * arg[]);    /* elementwise */
 vector * sqrt_vec (void * arg[]);    /* elementwise */
 vector * abs_vec (void * arg[]);    /* elementwise */

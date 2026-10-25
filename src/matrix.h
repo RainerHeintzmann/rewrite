@@ -33,8 +33,8 @@ matrix * cpy_mat (matrix * mp) ;
 void     del_mat (matrix * mp);
 
 double * elem_mat (void * arg[]);
-matrix * null_mat (double * arg[]);
-matrix * eins_mat (double * arg[]);
+matrix * zero_mat (double * arg[]);
+matrix * one_mat (double * arg[]);
 matrix * ch_mat (void * arg[]);
 matrix * mat_add (void * arg[]);
 matrix * mat_mul_real (void * arg[]);

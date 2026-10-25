@@ -16,7 +16,7 @@ CONST Xg : complex # Complex Susceptibility
 CONST indj,indk,num,value : real
 CONST d1jk,d2jk,d3jk : rmatrix
 
-Cvec=nullvec(100)
+Cvec=zerovec(100)
 Dvec=Cvec
 
 DATA c1             # Aequivalente Punkte lesen

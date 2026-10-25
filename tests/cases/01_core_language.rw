@@ -3,8 +3,8 @@
 SORT real
 NUM real
 FUNC + : real,real >> real LA2 ATT plus
-FUNC * : real,real >> real LA3 ATT mal
-FUNC ^ : real,real >> real RA ATT hoch
+FUNC * : real,real >> real LA3 ATT mult
+FUNC ^ : real,real >> real RA ATT power
 1+2*3
 (1+2)*3
 2^3^2

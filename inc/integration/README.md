@@ -148,7 +148,10 @@ have it, so a few steps are added:
   -im`). The pattern variables, `Int` and the helpers are declared for
   `number`, so the rules match real integrands and integrands with `im`
   alike, and a real integrand keeps its real operators. `Complex[a,b]`
-  is translated as `a+b*im`. The checker [tools/rubitest.py](../../tools/rubitest.py)
+  is translated as `a+b*im`. With the exact numbers, constants in the
+  results stay exact as in Mathematica: `2^x/ln(2)`, `pi^(1/2)`, not
+  `1.4427*2^x`. Rubi's `Cancel` and `Together` are `cancel` (with the gcd
+  of polynomials in several variables). The checker [tools/rubitest.py](../../tools/rubitest.py)
   evaluates `im` as `1j`.
 - Cosine forms: Rubi has most of its rules only for sine and rewrites
   cosine forms first (`UnifyInertTrigFunction`: `a+b*cos(e+f*x)` becomes

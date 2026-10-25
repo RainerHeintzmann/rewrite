@@ -1,9 +1,9 @@
 CONST _step  : real
 CONST _steps : real
 CONST _myerg : real
-CONST _zw1   : real
-CONST _zw2   : real
-CONST _zw3   : real
+CONST _tmp1   : real
+CONST _tmp2   : real
+CONST _tmp3   : real
 CONST _best  : real
 CONST _bestx : real
 
@@ -23,23 +23,23 @@ ADDSPEC num1 : IF NIN(_x,B) flext(X,A,B)=flzero(X,D(Sub(A,B,_x),_x),_x)
 ADDSPEC num1 : IF NIN(_x,B) fmin(X,Y,A,B)=fmin(X,Y,Sub(A,B,_x),_x)
 ADDSPEC num1 : IF NIN(_x,B) fmax(X,Y,A,B)=fmin(X,Y,- A,B)
 
-ALG rechne
-SPEC    rechne : I(N,M,A,_x)=_myerg DO { _myerg=0;_zw1=0;_zw2=0 # Simpson
-        FOR n=N+_step/2 TO M-_step STEP _step DO { _x=n;_zw1=_zw1+A	
+ALG calc
+SPEC    calc : I(N,M,A,_x)=_myerg DO { _myerg=0;_tmp1=0;_tmp2=0 # Simpson
+        FOR n=N+_step/2 TO M-_step STEP _step DO { _x=n;_tmp1=_tmp1+A	
         _x=n+_step/2
-				_zw2=_zw2+A }
+				_tmp2=_tmp2+A }
 				_x=M-_step/2
-				_zw1=_zw1+A
-				_x=N;_myerg=A+4*_zw1+2*_zw2
+				_tmp1=_tmp1+A
+				_x=N;_myerg=A+4*_tmp1+2*_tmp2
 				_x=M;_myerg=(_myerg+A)*_step/2/3
-				_x=dummi }
+				_x=dummy }
 
-ADDSPEC rechne : fmin(N,M,A,_x)=_myerg DO {_myerg=0;_bestx=dummi;_best=maxreal
+ADDSPEC calc : fmin(N,M,A,_x)=_myerg DO {_myerg=0;_bestx=dummy;_best=maxreal
         FOR _x=N TO M STEP _step DO IF (_best>A) { _best=A;_bestx=_x }
         _myerg=_bestx}
 
-ADDSPEC rechne : newton(N,A,B,_x) = _myerg DO { _x=N
-        FOR n=1 TO _steps DO { _x=_x-A/B }; _myerg=_x; _x=dummi }
+ADDSPEC calc : newton(N,A,B,_x) = _myerg DO { _x=N
+        FOR n=1 TO _steps DO { _x=_x-A/B }; _myerg=_x; _x=dummy }
 
 ALG numerik
 SPEC numerik : (num1,Subst),All

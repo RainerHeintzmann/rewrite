@@ -14,13 +14,13 @@ SPEC     ai_m1 : -A = -1*A
 
 # +++++++++++++++++ specifications: term multiplicative to the back  +++++++++++
 # +++++++++++++++++ STD : A*SLV^X+B*SLV^Y ...  +++++++++++
-ALG Mulhinten
-SPEC       Mulhinten : X*Y*Z=X*(Y*Z)
-ADDSPEC    Mulhinten : SLV*X=X*SLV
-ADDSPEC    Mulhinten : SLV*SLV=SLV^2
-ADDSPEC    Mulhinten : SLV*SLV^X=SLV^(X+1)
-ADDSPEC    Mulhinten : SLV^X*SLV=SLV^(X+1)
-ADDSPEC    Mulhinten : SLV^X*SLV^Y=SLV^(X+Y)
+ALG MulBack
+SPEC       MulBack : X*Y*Z=X*(Y*Z)
+ADDSPEC    MulBack : SLV*X=X*SLV
+ADDSPEC    MulBack : SLV*SLV=SLV^2
+ADDSPEC    MulBack : SLV*SLV^X=SLV^(X+1)
+ADDSPEC    MulBack : SLV^X*SLV=SLV^(X+1)
+ADDSPEC    MulBack : SLV^X*SLV^Y=SLV^(X+Y)
 
 # +++++++++++++++++ specifications: term multiplicative to the back  +++++++++++
 ALG Mulass
@@ -28,36 +28,36 @@ SPEC       Mulass : X*(Y*Z)=X*Y*Z
 
 # +++++++++++++++++ specifications: term additive to the front  ++++++++++++++++++
 # +++++++++++++++++ STD : A*SLV+B  +++++++++++
-ALG Addvorne
-SPEC       Addvorne : X+(Y+Z)=X+Y+Z
-ADDSPEC    Addvorne : X+SLV=SLV+X
-ADDSPEC    Addvorne : X+Y*SLV=Y*SLV+X
-ADDSPEC    Addvorne : SLV+SLV=2*SLV
-ADDSPEC    Addvorne : X*SLV+SLV=(X+1)*SLV
-ADDSPEC    Addvorne : SLV+X*SLV=(X+1)*SLV
-ADDSPEC    Addvorne : X*SLV+Y*SLV=(X+Y)*SLV
+ALG AddFront
+SPEC       AddFront : X+(Y+Z)=X+Y+Z
+ADDSPEC    AddFront : X+SLV=SLV+X
+ADDSPEC    AddFront : X+Y*SLV=Y*SLV+X
+ADDSPEC    AddFront : SLV+SLV=2*SLV
+ADDSPEC    AddFront : X*SLV+SLV=(X+1)*SLV
+ADDSPEC    AddFront : SLV+X*SLV=(X+1)*SLV
+ADDSPEC    AddFront : X*SLV+Y*SLV=(X+Y)*SLV
 
 
 # +++++++++++++++++ presorting: everything matching A*SLV^B to the front ++++
 
-ALG Vorsort
-SPEC      Vorsort :          A+(B+C)=A+B+C
-ADDSPEC   Vorsort :      A _ (B _ C)=A _ B _ C
-ADDSPEC   Vorsort :            X+SLV=poly(SLV)+X
-ADDSPEC   Vorsort :            SLV+X=poly(SLV)+X
-ADDSPEC   Vorsort :          X+A*SLV=poly(A*SLV)+X
-ADDSPEC   Vorsort :          A*SLV+X=poly(A*SLV)+X
-ADDSPEC   Vorsort :          X+SLV^N=poly(SLV^N)+X
-ADDSPEC   Vorsort :          SLV^N+X=poly(SLV^N)+X
-ADDSPEC   Vorsort :        X+A*SLV^N=poly(A*SLV^N)+X
-ADDSPEC   Vorsort :        A*SLV^N+X=poly(A*SLV^N)+X
-ADDSPEC   Vorsort :  poly(A)+poly(B)=poly(A _ B)
-ADDSPEC   Vorsort :        A+poly(B)=poly(B)+A
+ALG PreSort
+SPEC      PreSort :          A+(B+C)=A+B+C
+ADDSPEC   PreSort :      A _ (B _ C)=A _ B _ C
+ADDSPEC   PreSort :            X+SLV=poly(SLV)+X
+ADDSPEC   PreSort :            SLV+X=poly(SLV)+X
+ADDSPEC   PreSort :          X+A*SLV=poly(A*SLV)+X
+ADDSPEC   PreSort :          A*SLV+X=poly(A*SLV)+X
+ADDSPEC   PreSort :          X+SLV^N=poly(SLV^N)+X
+ADDSPEC   PreSort :          SLV^N+X=poly(SLV^N)+X
+ADDSPEC   PreSort :        X+A*SLV^N=poly(A*SLV^N)+X
+ADDSPEC   PreSort :        A*SLV^N+X=poly(A*SLV^N)+X
+ADDSPEC   PreSort :  poly(A)+poly(B)=poly(A _ B)
+ADDSPEC   PreSort :        A+poly(B)=poly(B)+A
 
 # +++++++++ constants to the very front +++++++++++++++++
-ALG Constvorn
-SPEC      Constvorn : A+(B+C)=A+B+C
-# ADDSPEC   Constvorn : IF (NIN(SLV,A) && IN(SLV,B)) B+A=A+B
+ALG ConstFront
+SPEC      ConstFront : A+(B+C)=A+B+C
+# ADDSPEC   ConstFront : IF (NIN(SLV,A) && IN(SLV,B)) B+A=A+B
 
 # +++++++++ insert constants at the back of the polynomial ++++
 # constants are placed at the back of poly
@@ -124,9 +124,9 @@ ADDSPEC    Pln : A+SLV^N+X*SLV^N=A+(X+1)*SLV^N
 ADDSPEC    Pln : A+X*SLV^N+Y*SLV^N=A+(X+Y)*SLV^N
 
 # +++++++++++++++++ remove poly +++++++++++++++++++++++++++++++++++++++++++++++
-ALG Polyweg
-SPEC    Polyweg : poly(A)=A
-ADDSPEC Polyweg : A _ B = A+B
+ALG PolyOff
+SPEC    PolyOff : poly(A)=A
+ADDSPEC PolyOff : A _ B = A+B
 
 # +++++++++++++++++ -1 to additive inverse ++++++++++++++++++++++++++++++++
 ALG xm1_ai
@@ -152,4 +152,4 @@ ADDSPEC    Slv : IF NIN(SLV,B) EQN(SLV^2+A*SLV+B) = (SLV == - .5*A +(- B+.25*A^2
 ADDSPEC    Slv : X*(Y*Z)=X*Y*Z
 
 ALG Eqn
-SPEC Eqn : ai_m1,Mulhinten,Mulass,Addvorne,Vorsort,Constvorn,Constsort,Pln,Polyweg,Slv,xm1_ai
+SPEC Eqn : ai_m1,MulBack,Mulass,AddFront,PreSort,ConstFront,Constsort,Pln,PolyOff,Slv,xm1_ai

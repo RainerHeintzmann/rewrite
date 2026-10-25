@@ -170,6 +170,12 @@ static Node * integersort (void)	/* the sort of all integers (negative too) */
 	return z ? z : (Node *) intsort;
 }
 
+BOOLEAN sort_exact (Node * s)		/* integer, rational, natural: exact numbers */
+{
+	Node * rs = ratsort();
+	return rs && s && sort_dist(s, rs) >= 0;
+}
+
 BOOLEAN exact_numbers (void)
 {
 	return intsort != NULL && ratsort() != NULL;

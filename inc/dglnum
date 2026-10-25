@@ -24,8 +24,8 @@ y=y+dx*d1+dx^2/2*d2+dx^3/6*d3
 x+ dx,y
 }
 
-y=dummi
-d1=dummi
-d2=dummi
-d3=dummi
+y=dummy
+d1=dummy
+d2=dummy
+d3=dummy
 

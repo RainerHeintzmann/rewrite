@@ -3,8 +3,8 @@
 # tiefe = Taylor method of order tiefe
 # f : y' = f(x,y)
 
-merk=dx
-dx=dummi
+memo=dx
+dx=dummy
 
 TAY=y+dx*f
 FOR i=2 TO tiefe STEP 1 DO {
@@ -14,4 +14,4 @@ TAY=TAY+dx^i*%/(i!)
 REWR TAY : Real
 TAY=%
 
-dx=merk
+dx=memo

@@ -178,7 +178,7 @@ t05=Vuc*_Ang^3/(2*2^0.5*d*_Ang*bel*abs(Fg)) # d : layer separation (see above)
 
 # read the piezoelectric constants from the datafile
 
-d1jk = nullmat(3,3)               # initialize
+d1jk = zeromat(3,3)               # initialize
 
 DATA nconst                       # number of constants != 0
 FOR b = 1 TO nconst DO {
@@ -187,7 +187,7 @@ d1jk = chmat(d1jk,indj-1,indk-1,value)
 d1jk = chmat(d1jk,indk-1,indj-1,value)   # coefficients are symmetric !
 }
 
-d2jk = nullmat(3,3)
+d2jk = zeromat(3,3)
 
 DATA nconst   # Number of Constants != 0
 FOR b = 1 TO nconst DO {
@@ -196,7 +196,7 @@ d2jk = chmat(d2jk,indj-1,indk-1,value)
 d2jk = chmat(d2jk,indk-1,indj-1,value)   # coefficients are symmetric !
 }
 
-d3jk = nullmat(3,3)
+d3jk = zeromat(3,3)
 
 DATA nconst   # Number of Constants != 0
 FOR b = 1 TO nconst DO {

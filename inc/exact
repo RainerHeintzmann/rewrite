@@ -41,11 +41,11 @@ VAR Ap,Bp : positive
 # ---------------- integer ----------------
 OTHER +  : integer,integer >> integer   ATT int_plus
 OTHER -  : integer,integer >> integer   ATT int_minus
-OTHER *  : integer,integer >> integer   ATT int_mal
+OTHER *  : integer,integer >> integer   ATT int_mult
 OTHER /  : integer,integer >> rational  ATT int_div
 OTHER -  : integer >> integer           ATT int_neg
 OTHER ^  : integer,integer >> rational  ATT int_pow   # 2^-1 = 1/2
-OTHER !  : integer >> integer           ATT int_fak
+OTHER !  : integer >> integer           ATT int_factorial
 OTHER abs : integer >> integer          ATT int_abs
 OTHER >  : integer,integer >> bool      ATT int_gt
 OTHER >= : integer,integer >> bool      ATT int_ge
@@ -60,7 +60,7 @@ FUNC  gcd_int : integer,integer >> integer ATT int_gcd
 # ---------------- rational ----------------
 OTHER +  : rational,rational >> rational ATT rat_plus
 OTHER -  : rational,rational >> rational ATT rat_minus
-OTHER *  : rational,rational >> rational ATT rat_mal
+OTHER *  : rational,rational >> rational ATT rat_mult
 OTHER /  : rational,rational >> rational ATT rat_div
 OTHER -  : rational >> rational          ATT rat_neg
 OTHER mi : rational >> rational          ATT rat_mi
@@ -78,7 +78,7 @@ FUNC  denom : rational >> integer        ATT rat_den   # denominator
 
 # ---------------- natural ----------------
 OTHER +  : natural,natural >> natural   ATT int_plus
-OTHER *  : natural,natural >> natural   ATT int_mal
+OTHER *  : natural,natural >> natural   ATT int_mult
 OTHER ^  : natural,natural >> natural   ATT nat_pow
 # natural is a subsort of integer and of nonneg; these two would fit equally
 # well (as many conversions), so the exact variants are given explicitly:
@@ -88,17 +88,17 @@ OTHER ^  : natural,integer >> rational  ATT int_pow    # 2^-1 = (1/2)
 
 # ---------------- nonneg, positive ----------------
 OTHER +  : nonneg,nonneg >> nonneg      ATT plus
-OTHER *  : nonneg,nonneg >> nonneg      ATT mal
-OTHER /  : nonneg,nonneg >> nonneg      ATT geteilt
-OTHER ^  : nonneg,real >> nonneg        ATT hoch
+OTHER *  : nonneg,nonneg >> nonneg      ATT mult
+OTHER /  : nonneg,nonneg >> nonneg      ATT divide
+OTHER ^  : nonneg,real >> nonneg        ATT power
 OTHER mi : nonneg >> nonneg             ATT mi
 OTHER sqrt : nonneg >> nonneg           ATT r_sqrt
 OTHER +  : positive,positive >> positive ATT plus
 OTHER +  : positive,nonneg >> positive  ATT plus
 OTHER +  : nonneg,positive >> positive  ATT plus
-OTHER *  : positive,positive >> positive ATT mal
-OTHER /  : positive,positive >> positive ATT geteilt
-OTHER ^  : positive,real >> positive    ATT hoch
+OTHER *  : positive,positive >> positive ATT mult
+OTHER /  : positive,positive >> positive ATT divide
+OTHER ^  : positive,real >> positive    ATT power
 OTHER mi : positive >> positive         ATT mi
 OTHER sqrt : positive >> positive       ATT r_sqrt
 

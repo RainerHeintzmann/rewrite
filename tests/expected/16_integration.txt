@@ -19,7 +19,7 @@ true
 true 
 exp (x )
 true 
-1.4427 * 2 ^ x 
+2 ^ x / ln (2 )
 true 
 (1/2) * exp (2 * x )* x - (1/4) * exp (2 * x )
 true 

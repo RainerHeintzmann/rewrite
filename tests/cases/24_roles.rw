@@ -6,7 +6,7 @@ INC "inc/helpers"
 TERM T : real
 CONST yy : real
 x = yy
-FUNC kos : real >> real ATT cosinus
+FUNC kos : real >> real ATT r_cos
 # without roles kos is unknown to the helpers: no power reduction
 T = REWR expandtrigreduce(kos(x)^2,x) : All
 T

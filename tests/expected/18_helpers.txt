@@ -44,3 +44,11 @@ a + 0.5
 3 
 qq (x ^ 3 ,x )
 qq (sin (x ),x )
+x + 1 
+x + y 
+a * x + x + a * y + y 
+1 
+(x - 1 )/ (x + 1 )
+x + y 
+(y + x )/ (x * y )
+a / b 
