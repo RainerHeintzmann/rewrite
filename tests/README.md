@@ -53,6 +53,7 @@ can be used in scripts and CI.
 | `23_matchq` | `matchq(u, pattern, cond)` (Rubi's `MatchQ`) in rule conditions: optional operands, the condition with the bindings, variables of the rule in the pattern. |
 | `24_roles` | `SYMBOLIC "role" = "symbol"`: the symbolic helpers with other function names, and back. |
 | `27_lists` | Lists of inc/list: building, `part` (also nested), `table`, `select`, `range`, `total`, and unevaluated calls. |
+| `30_solve` | Equations (`inc/solve`): polynomials (complex roots, rational roots, biquadratic, rational equations), isolation, a new unknown, attraction of logarithms, square roots with checking, no solution, linear systems. |
 | `29_linalg` | Symbolic matrices (`inc/linalg`): `transpose`, `dot`, `det` up to 4 x 4, `linsolve` and `inverse` with cancellation, a singular system, entries with `im`, the characteristic polynomial, `Listable`; printing as a grid, in slices and inline, `SHOW list`. |
 | `28_number_sort` | The sort `number` above `real` and `complex`: rules with `number` variables on real terms (conditions calculated with the real variants), the imaginary unit `im` (`im^2 = -1`, derivatives, Rubi integrals), no redeclaration of a sort. |
 | `26_sort_precedence` | Variant choice with subsorts: `real < complex` as fallback, exact variants first, fewest conversions, the warning for ties. |

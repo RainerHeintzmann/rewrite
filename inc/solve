@@ -1,0 +1,119 @@
+# inc/solve (2026)
+# Equations solved with rules in the style of PRESS (Bundy and Welham 1981:
+# methods chosen by the form of the equation, here an ordered rule list):
+#
+#   REWR solve(x^2 - 3*x + 2 == 0, x) : Solve     # {1, 2}
+#
+# solve(lhs == rhs, x) gives the list of the solutions (the empty list nil
+# if there is none); it stays unevaluated if no method applies. The methods
+# for f = lhs - rhs = 0, in this order:
+#   isolation      x occurs once: the functions around it are inverted
+#   polynomials    degree 1 and 2, x^n = c, polynomials in x^2, rational roots
+#   attraction     several logarithms with x combined: ln(u)+ln(v) = ln(u*v)
+#   new unknown    f a polynomial in g(x) (exp(x), x^(1/2), sin(x), ...):
+#                  solved for y = g(x), then g(x) = y isolated
+#   radicals       a + b*c^(1/2) = 0 squared: a^2 - b^2*c = 0
+# A system of linear equations, solve(list(eq1, eq2), list(x, y)), gives the
+# list of the values of x and y (Bareiss' elimination, inc/linalg).
+# Trigonometric equations give the principal solutions (as Mathematica's
+# Solve without the integer constant). Squaring can add solutions; all
+# solutions are checked (numerically where possible) and those that make
+# the equation undefined or false are removed.
+# Needs inc/all, inc/list and inc/helpers (for the imaginary unit im of
+# complex roots inc/integration/all):
+#     INC "inc/all"
+#     INC "inc/integration/all"
+#     INC "inc/list"
+#     INC "inc/solve"
+
+FUNC  solve     : bool,number >> number                  # solve(lhs == rhs, x)
+OTHER solve     : number,number >> number                # solve(list(eqs), list(unknowns)): linear systems
+OTHER list      : bool++ >> number                       # a list of equations
+SHOW list ATT show_list
+FUNC  sol       : number,number >> number                # the solutions of f = 0
+FUNC  iso       : number,number,number >> number         # the solutions of u = r, x only in u
+FUNC  isomap    : number,number,number >> number         # iso(g, r, x) for each r of a list
+FUNC  solker    : number,number >> number                # with a new unknown
+FUNC  ker       : number,number,number >> number         # ker(p, y, g): f = p(y), y = g(x)
+FUNC  union     : number,number >> number                # two solution lists
+FUNC  solcheck  : number,number,number >> number         # the solutions checked in f = 0
+CONST yker      : number                                 # the new unknown
+
+FUNC  occurs    : number,number >> real    ATT SYMBOLIC occurs     # occurrences of x in u (a number)
+FUNC  eqnorm    : number,number >> number  ATT SYMBOLIC eqnorm     # numerator over a common denominator
+FUNC  polyroots : number,number >> number  ATT SYMBOLIC polyroots  # roots of a polynomial
+FUNC  nroots    : number,number >> number  ATT SYMBOLIC nroots     # the n roots of y^n = r
+FUNC  kernel    : number,number >> number  ATT SYMBOLIC kernel     # ker(p, y, g)
+FUNC  unradical : number,number >> number  ATT SYMBOLIC unradical  # a + b*c^(1/2) -> a^2 - b^2*c
+FUNC  attract   : number,number >> number  ATT SYMBOLIC attract    # ln(u) + ln(v) -> ln(u*v)
+FUNC  attractq  : number,number >> bool    ATT SYMBOLIC attractq
+FUNC  kernelq   : number,number >> bool    ATT SYMBOLIC kernelq
+FUNC  radicalq  : number,number >> bool    ATT SYMBOLIC radicalq
+FUNC  isoeach   : number,number,number >> number ATT SYMBOLIC isoeach
+FUNC  solfilter : number,number,number >> number ATT SYMBOLIC solfilter
+FUNC  linsys    : number,number >> number ATT SYMBOLIC linsys     # linear system: the values of the unknowns
+FUNC  linsysq   : number,number >> bool   ATT SYMBOLIC linsysq    # a solvable linear system
+
+VAR Sf,Sg,Su,Sv,Sr,Sx,Sa,Sn,Sp,Sy,Sl,Sm : number
+
+COMM +,*
+ALG Solve
+# ---- the equation
+SPEC    Solve : solve(Su == Sv, Sx) = solcheck(sol(Su - Sv, Sx), Su - Sv, Sx)
+ADDSPEC Solve : IF (linsysq(Sl, Sm)) solve(Sl, Sm) = linsys(Sl, Sm)
+ADDSPEC Solve : IF (listq(Sl)) solcheck(Sl, Sf, Sx) = solfilter(Sl, Sf, Sx)
+ADDSPEC Solve : IF (listq(Sl)), (listq(Sm)) union(Sl, Sm) = join(Sl, Sm)
+ADDSPEC Solve : IF (listq(Sl)) isomap(Sg, Sl, Sx) = isoeach(Sg, Sl, Sx)
+# ---- the methods, in this order
+ADDSPEC Solve : IF (occurs(Sf, Sx) == 1) sol(Sf, Sx) = iso(Sf, 0, Sx)
+# x cancels: no solution if a nonzero constant is left
+ADDSPEC Solve : IF (occurs(eqnorm(Sf, Sx), Sx) == 0), (neq(eqnorm(Sf, Sx), 0)) sol(Sf, Sx) = nil
+ADDSPEC Solve : IF (polyq(eqnorm(Sf, Sx), Sx)), (listq(polyroots(eqnorm(Sf, Sx), Sx))) sol(Sf, Sx) = polyroots(eqnorm(Sf, Sx), Sx)
+ADDSPEC Solve : IF (attractq(Sf, Sx)) sol(Sf, Sx) = sol(attract(Sf, Sx), Sx)
+ADDSPEC Solve : IF (kernelq(Sf, Sx)) sol(Sf, Sx) = solker(kernel(Sf, Sx), Sx)
+ADDSPEC Solve : solker(ker(Sp, Sy, Sg), Sx) = isomap(Sg, sol(Sp, Sy), Sx)
+ADDSPEC Solve : IF (radicalq(Sf, Sx)) sol(Sf, Sx) = sol(unradical(Sf, Sx), Sx)
+# ---- isolation: u = r with x only in u
+ADDSPEC Solve : iso(Sx, Sr, Sx) = list(normform(Sr))
+ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Su + Sa, Sr, Sx) = iso(Su, Sr - Sa, Sx)
+ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Su - Sa, Sr, Sx) = iso(Su, Sr + Sa, Sx)
+ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Sa - Su, Sr, Sx) = iso(Su, Sa - Sr, Sx)
+ADDSPEC Solve : iso(- Su, Sr, Sx) = iso(Su, - Sr, Sx)
+ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Sa * Su, Sr, Sx) = iso(Su, Sr / Sa, Sx)
+ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Su / Sa, Sr, Sx) = iso(Su, Sr * Sa, Sx)
+ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Sa / Su, Sr, Sx) = iso(Su, Sa / Sr, Sx)
+ADDSPEC Solve : iso(mi(Su), Sr, Sx) = iso(Su, mi(Sr), Sx)
+ADDSPEC Solve : IF (freeq(Sn, Sx)), (integerq(Sn)), (Sn > 1) iso(Su ^ Sn, Sr, Sx) = isomap(Su, nroots(Sr, Sn), Sx)
+ADDSPEC Solve : IF (freeq(Sn, Sx)), (integerq(Sn)), (Sn < -1) iso(Su ^ Sn, Sr, Sx) = isomap(Su, nroots(mi(Sr), - Sn), Sx)
+ADDSPEC Solve : IF (freeq(Sn, Sx)) iso(Su ^ Sn, Sr, Sx) = iso(Su, Sr ^ mi(Sn), Sx)
+ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Sa ^ Su, Sr, Sx) = iso(Su, ln(Sr) / ln(Sa), Sx)
+ADDSPEC Solve : iso(sqrt(Su), Sr, Sx) = iso(Su, Sr ^ 2, Sx)
+ADDSPEC Solve : iso(exp(Su), Sr, Sx) = iso(Su, ln(Sr), Sx)
+ADDSPEC Solve : iso(ln(Su), Sr, Sx) = iso(Su, exp(Sr), Sx)
+ADDSPEC Solve : iso(sin(Su), Sr, Sx) = isomap(Su, list(arcsin(Sr), pi - arcsin(Sr)), Sx)
+ADDSPEC Solve : iso(cos(Su), Sr, Sx) = isomap(Su, list(arccos(Sr), - arccos(Sr)), Sx)
+ADDSPEC Solve : iso(tan(Su), Sr, Sx) = iso(Su, arctan(Sr), Sx)
+ADDSPEC Solve : iso(cot(Su), Sr, Sx) = iso(Su, arccot(Sr), Sx)
+ADDSPEC Solve : iso(sec(Su), Sr, Sx) = isomap(Su, list(arcsec(Sr), - arcsec(Sr)), Sx)
+ADDSPEC Solve : iso(csc(Su), Sr, Sx) = isomap(Su, list(arccsc(Sr), pi - arccsc(Sr)), Sx)
+ADDSPEC Solve : iso(sinh(Su), Sr, Sx) = iso(Su, arcsinh(Sr), Sx)
+ADDSPEC Solve : iso(cosh(Su), Sr, Sx) = isomap(Su, list(arccosh(Sr), - arccosh(Sr)), Sx)
+ADDSPEC Solve : iso(tanh(Su), Sr, Sx) = iso(Su, arctanh(Sr), Sx)
+ADDSPEC Solve : iso(coth(Su), Sr, Sx) = iso(Su, arccoth(Sr), Sx)
+ADDSPEC Solve : iso(sech(Su), Sr, Sx) = isomap(Su, list(arcsech(Sr), - arcsech(Sr)), Sx)
+ADDSPEC Solve : iso(csch(Su), Sr, Sx) = iso(Su, arccsch(Sr), Sx)
+ADDSPEC Solve : iso(arcsin(Su), Sr, Sx) = iso(Su, sin(Sr), Sx)
+ADDSPEC Solve : iso(arccos(Su), Sr, Sx) = iso(Su, cos(Sr), Sx)
+ADDSPEC Solve : iso(arctan(Su), Sr, Sx) = iso(Su, tan(Sr), Sx)
+ADDSPEC Solve : iso(arccot(Su), Sr, Sx) = iso(Su, cot(Sr), Sx)
+ADDSPEC Solve : iso(arcsec(Su), Sr, Sx) = iso(Su, sec(Sr), Sx)
+ADDSPEC Solve : iso(arccsc(Su), Sr, Sx) = iso(Su, csc(Sr), Sx)
+ADDSPEC Solve : iso(arcsinh(Su), Sr, Sx) = iso(Su, sinh(Sr), Sx)
+ADDSPEC Solve : iso(arccosh(Su), Sr, Sx) = iso(Su, cosh(Sr), Sx)
+ADDSPEC Solve : iso(arctanh(Su), Sr, Sx) = iso(Su, tanh(Sr), Sx)
+ADDSPEC Solve : iso(arccoth(Su), Sr, Sx) = iso(Su, coth(Sr), Sx)
+ADDSPEC Solve : iso(arcsech(Su), Sr, Sx) = iso(Su, sech(Sr), Sx)
+ADDSPEC Solve : iso(arccsch(Su), Sr, Sx) = iso(Su, csch(Sr), Sx)
+# x still more than once inside: the whole equation u - r = 0 again
+ADDSPEC Solve : IF (occurs(Su, Sx) > 1) iso(Su, Sr, Sx) = sol(Su - Sr, Sx)
+COMM

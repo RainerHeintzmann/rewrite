@@ -516,6 +516,7 @@ the files are in German.
 | File | Contents |
 | --- | --- |
 | [inc/list](inc/list) | Lists as terms, `list(a,b,c)` and `nil`, with `part`, `length`, `table`, `select`, ... (load it after `inc/all`). |
+| [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), linear systems (load it after `inc/list`). |
 | [inc/linalg](inc/linalg) | Symbolic matrices on lists: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread` (load it after `inc/list`). |
 | [inc/exact](inc/exact) | Exact numbers: sorts `integer` and `rational` (GMP), subsorts of `real`. |
 | [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
@@ -676,6 +677,46 @@ REWR det(list(list(2,1),list(1,2)) - x*identity(2)) : All    # 3 + x ^ 2 - 4 * x
 REWR list(1,2)*x + list(a,b) : Listable                      # {x + a, 2 * x + b}
 ```
 
+### Equations
+
+[inc/solve](inc/solve) solves equations with rules in the style of PRESS
+(Bundy and Welham 1981), where the form of the equation chooses the
+method. `solve(lhs == rhs, x)` gives the list of the solutions (`nil` if
+there is none) and stays unevaluated if no method applies; `==` is the
+symbolic equation here. The methods for `f = lhs - rhs = 0` are tried in
+this order:
+
+| Method | Applies when | Example |
+| --- | --- | --- |
+| isolation | `x` occurs once: the functions around it are inverted | `(x+1)^3 = 8`, `exp(2x+1) = 5`, `sin(x) = 1/2` |
+| polynomials | degree 1 and 2, `x^n = c`, polynomials in `x^2`, rational roots; after a common denominator | `x^3 - 6x^2 + 11x - 6 = 0`, `1/x + 1/(x+1) = 1` |
+| attraction | several logarithms with `x`: `ln(u) + ln(v) = ln(u v)` | `ln(x) + ln(x+1) = ln(6)` |
+| new unknown | `f` is a polynomial in `g(x)` (`exp(c x)`, `x^(1/n)`, `sin(x)`, ...) | `exp(2x) - 3 exp(x) + 2 = 0`, `x + sqrt(x) - 6 = 0` |
+| radicals | `a + b c^(1/2) = 0` is squared to `a^2 - b^2 c = 0` | `sqrt(x+1) = x - 1` |
+
+Complex roots use the imaginary unit `im`; trigonometric equations give
+the principal solutions, as Mathematica's `Solve` without the integer
+constant. Every solution is checked (numerically where possible), so the
+extra solutions of squaring and those that make the equation undefined are
+removed. A system of linear equations, `solve(list(eq1, eq2), list(x, y))`,
+gives the list of the values of the unknowns, solved with Bareiss'
+elimination of [inc/linalg](inc/linalg); nonlinear systems stay unevaluated.
+The analysis is done by C helpers ([symsolve.c](src/symsolve.c)), the
+methods themselves are an ordered rule list.
+
+```text
+INC "inc/all"
+INC "inc/integration/all"       # im
+INC "inc/list"
+INC "inc/solve"
+REWR solve(x^2 + 4*x + 7 == 0, x) : Solve               # {3 ^ (1/2) * im - 2, -2 - 3 ^ (1/2) * im}
+REWR solve(exp(2*x) - 3*exp(x) + 2 == 0, x) : Solve     # {0.693147, 0}
+REWR solve(sqrt(x+1) == x - 1, x) : Solve               # {3}
+REWR solve(list(x + y == 3, x - y == 1), list(x, y)) : Solve   # {2, 1}
+```
+
+Numbers in the results are calculated: `ln(2)` prints as `0.693147`.
+
 ### Symbolic helper functions
 
 [inc/helpers](inc/helpers) declares helper functions written in C
@@ -832,6 +873,7 @@ where the library [inc/](inc) and the tests are used from.
 | [numsort.c](src/numsort.c), [exact.c](src/exact.c) | Subsorts (`SUBSORT`, `INTNUM`) and the exact number sorts with GMP. |
 | [specfun.c](src/specfun.c) | Special functions (erf, Fresnel, Ei, Gamma, zeta, elliptic integrals, 2F1, ...). |
 | [apart.c](src/apart.c) | Partial fractions of rational functions with exact coefficients (GMP). |
+| [symsolve.c](src/symsolve.c) | Helpers of the equation solver: polynomial roots, the new unknown, square roots, checking (included by symfkt.c). |
 | [symmat.c](src/symmat.c) | Symbolic matrices on lists: Bareiss elimination on sparse polynomials (included by symfkt.c). |
 | [tools/rubi2rewrite.py](tools/rubi2rewrite.py) | Translator of Rubi's integration rules. |
 | [tools/rubitest.py](tools/rubitest.py) | Runs Rubi's test suite and checks the results numerically. |
@@ -899,6 +941,8 @@ where the library [inc/](inc) and the tests are used from.
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
+- Equations ([inc/solve](inc/solve)): `solve(lhs == rhs, x)` with rules in
+  the style of PRESS, linear systems.
 - Symbolic matrices on lists ([inc/linalg](inc/linalg)): `det`, `linsolve`,
   `inverse`, `dot`, `transpose` with fraction-free elimination; arithmetic
   on lists element by element.

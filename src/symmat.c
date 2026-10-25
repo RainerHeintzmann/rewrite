@@ -250,7 +250,9 @@ static Node * mp_term (MPoly * p)
 
 static Node * nice (Node * t)		/* a result entry in normal form (takes t) */
 {
-	Node * r = s_normform(& t, 1, NULL);
+	Node * r;
+	t = tcalc(t);			/* exact roots and numbers first: 12^(1/2) = 2*3^(1/2) */
+	r = s_normform(& t, 1, NULL);
 	delete(t);
 	return r;
 }

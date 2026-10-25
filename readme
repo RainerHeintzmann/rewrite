@@ -419,6 +419,10 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    linsolve, inverse mit Bareiss' bruchfreier Elimination auf duennen
    Polynomen, dot, transpose, identity; Rechnen mit Listen elementweise
    (thread, Listable), z.B. det(m - x*identity(2)).
+ - Gleichungen (inc/solve, symsolve.c): solve(lhs == rhs, x) mit Regeln im
+   Stil von PRESS (Isolieren, Polynome, neue Unbekannte, Logarithmen
+   zusammenfassen, Wurzeln quadrieren), Loesungen werden geprueft;
+   lineare Gleichungssysteme mit Bareiss-Elimination.
  - SHOW f ATT name: eigene C-Ausgabefunktion fuer eine Funktion. Listen werden
    damit nach ihrer Form ausgegeben (wie in Julia): als {a, b}, eine Matrix
    als ganzer ausgegebener Term als Gitter mit ausgerichteten Spalten.

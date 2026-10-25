@@ -35,7 +35,7 @@ $(S)/syn.c $(S)/syn.h: $(S)/syn.y
 
 $(O): $(S)/syn.h
 
-$(S)/symfkt.o: $(S)/symmat.c
+$(S)/symfkt.o: $(S)/symmat.c $(S)/symsolve.c
 
 $(S)/%.o: $(S)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

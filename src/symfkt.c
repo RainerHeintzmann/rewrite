@@ -4797,6 +4797,20 @@ static Node * s_linsolve (Node * a[], int n, Symbol * f);
 static Node * s_inverse (Node * a[], int n, Symbol * f);
 static Node * s_thread (Node * a[], int n, Symbol * f);
 static Node * s_threadq (Node * a[], int n, Symbol * f);
+static Node * s_occurs (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_eqnorm (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_polyroots (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_nroots (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_kernel (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_unradical (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_attract (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_solfilter (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_attractq (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_kernelq (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_radicalq (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_isoeach (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_linsys (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_linsysq (Node * a[], int n, Symbol * f);	/* symsolve.c */
 
 /* ---- functions defined by a rule list: FUNC f ... ATT RULES alglist ----
  * f(a1,..,an) is calculated as REWR f(a1,..,an) : alglist. If the result
@@ -4939,6 +4953,20 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "inverse", s_inverse },
 	{ "thread", s_thread },
 	{ "threadq", s_threadq },
+	{ "occurs", s_occurs },
+	{ "eqnorm", s_eqnorm },
+	{ "polyroots", s_polyroots },
+	{ "nroots", s_nroots },
+	{ "kernel", s_kernel },
+	{ "unradical", s_unradical },
+	{ "attract", s_attract },
+	{ "solfilter", s_solfilter },
+	{ "attractq", s_attractq },
+	{ "kernelq", s_kernelq },
+	{ "radicalq", s_radicalq },
+	{ "isoeach", s_isoeach },
+	{ "linsys", s_linsys },
+	{ "linsysq", s_linsysq },
 	{ "functionofq", s_functionofq },
 	{ "substfor", s_substfor },
 	{ "derivdivides", s_derivdivides },
@@ -5348,3 +5376,6 @@ Node * call_builtin (Node * term)
 
 /* symbolic matrices on lists (2026) */
 #include "symmat.c"
+
+/* equation solving (2026) */
+#include "symsolve.c"

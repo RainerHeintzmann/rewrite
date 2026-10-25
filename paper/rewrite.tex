@@ -788,9 +788,13 @@ library of symbolic matrices represents a matrix as a list of rows;
 determinants, linear systems and inverses use Bareiss' fraction-free
 elimination on sparse polynomials in the atoms of the entries, so that
 every division is exact, and arithmetic on lists works element by element,
-so that $\det(A-x I)$ is the characteristic polynomial. Natural next steps
-are equation solving with rules in the style of PRESS~\cite{bundy1981press}
-on top of it, a multivariate polynomial gcd for the cancellation of
+so that $\det(A-x I)$ is the characteristic polynomial. Equations are
+solved with rules in the style of PRESS~\cite{bundy1981press}: the form of
+the equation selects isolation, polynomial methods, a change of the
+unknown, the attraction of logarithms or the removal of square roots, and
+every solution is checked in the original equation; linear systems use the
+fraction-free elimination. Natural next steps are nonlinear systems, a
+multivariate polynomial gcd for the cancellation of
 symbolic fractions, the general simplification for the sort
 \texttt{number}, an associative-commutative matcher for sums and products
 of any length, and code generation that turns symbolically derived
