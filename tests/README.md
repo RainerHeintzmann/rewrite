@@ -52,6 +52,7 @@ can be used in scripts and CI.
 | `22_steps` | Solution steps of the Rubi rules (`STEPS RubiRules "inc/integration/rubi/steps"`), and switching them off. |
 | `23_matchq` | `matchq(u, pattern, cond)` (Rubi's `MatchQ`) in rule conditions: optional operands, the condition with the bindings, variables of the rule in the pattern. |
 | `24_roles` | `SYMBOLIC "role" = "symbol"`: the symbolic helpers with other function names, and back. |
+| `27_lists` | Lists of inc/list: building, `part` (also nested), `table`, `select`, `range`, `total`, and unevaluated calls. |
 | `26_sort_precedence` | Variant choice with subsorts: `real < complex` as fallback, exact variants first, fewest conversions, the warning for ties. |
 | `25_rule_functions` | Functions defined by rule lists (`ATT RULES`): a partial derivative with the rules of `D`, `deriv` of inc/helpers, and a rule function in the condition of a rule list. |
 | `ex_*` | The example programs of the original project, for example `LiNbO3/abso1`. |

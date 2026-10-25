@@ -1,0 +1,28 @@
+# inc/list (2026)
+# Lists as terms, like Mathematica's List: list(a,b,c), the empty list nil.
+# The elements may be any terms, also lists (list(list(1,2),list(3,4)) is a
+# matrix). Elements and results have the sort real, so that lists nest
+# freely. The functions are symbolic C functions (symfkt.c) that work on
+# the structure; they stay unevaluated if an argument is no list.
+# Needs inc/all:
+#     INC "inc/all"
+#     INC "inc/list"
+
+FUNC  list    : real++ >> real                                  # list(a,b,c)
+CONST nil     : real                                            # the empty list
+FUNC  listq   : real >> bool        ATT SYMBOLIC listq          # u is a list
+FUNC  length  : real >> real        ATT SYMBOLIC length         # number of elements
+OTHER part    : real++ >> real      ATT SYMBOLIC part           # part(l,i,j,..): element i (from 1; -1 the last)
+FUNC  first   : real >> real        ATT SYMBOLIC first
+FUNC  last    : real >> real        ATT SYMBOLIC last
+FUNC  rest    : real >> real        ATT SYMBOLIC rest           # without the first element
+FUNC  most    : real >> real        ATT SYMBOLIC most           # without the last element
+FUNC  append  : real,real >> real   ATT SYMBOLIC append         # x at the end
+FUNC  prepend : real,real >> real   ATT SYMBOLIC prepend        # x at the front
+FUNC  join    : real++ >> real      ATT SYMBOLIC join           # the lists one after another
+FUNC  reverse : real >> real        ATT SYMBOLIC reverse
+FUNC  range   : real++ >> real      ATT SYMBOLIC range          # range(n), range(a,b), range(a,b,d)
+FUNC  total   : real >> real        ATT SYMBOLIC total          # sum of the elements
+# with HOLD: the body and the condition are used with x replaced, unevaluated before
+FUNC  table   : real,real,real >> real ATT SYMBOLIC HOLD table  # table(body,x,l): body for each x in l (or 1..n)
+FUNC  select  : real,real,bool >> real ATT SYMBOLIC HOLD select # select(l,x,cond): the x in l with cond true

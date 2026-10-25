@@ -414,6 +414,7 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    Operatoren der Bibliothek ueber Rollen ("+", "cos", "pi", ...); eine
    Bibliothek mit anderen Namen ordnet sie zu: SYMBOLIC "cos" = "kos".
  - matchq(u, Muster, Bedingung): Rubis MatchQ mit dem Matcher der Regellisten.
+ - Listen als Terme (inc/list): list(a,b,c), nil, part, length, table, select, ...
  - SUBSORT real,complex: komplexe Funktionen nehmen auch reelle Argumente; eine
    genau passende Variante hat Vorrang vor Umwandlungen, die wenigsten
    Umwandlungen gewinnen, gleich gute Varianten werden gemeldet.

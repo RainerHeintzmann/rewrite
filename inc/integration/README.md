@@ -306,11 +306,11 @@ results are:
 
 | Result | Problems | Share of tested |
 | --- | --- | --- |
-| solved and verified | 1390 | 90.3% |
-| no antiderivative found | 126 | 8.2% |
+| solved and verified | 1392 | 90.4% |
+| no antiderivative found | 123 | 8.0% |
 | wrong | 3 | 0.2% |
 | crash or time-out | 0 | 0.0% |
-| not verifiable | 20 | 1.3% |
+| not verifiable | 21 | 1.4% |
 
 One problem uses a function that rewrite does not have and is not tested.
 Two wrong results contain special functions outside their real domain,

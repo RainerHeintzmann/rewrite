@@ -997,8 +997,15 @@ static int poly_in_power (Node * u, Node * x, int k)
 static Node * s_polyq (Node * a[], int n, Symbol * f)
 {
 	double deg, want, k;
-	Node * c = NULL;
+	Node * c = NULL, * v;
 	int ok;
+	/* Rubi's PolyQ[u_, v_] := False unless v is a symbol x or a power x^n:
+	 * PolyQ[x*Log[x], e*x] is False (as a generalized variable, e*x would
+	 * take x*Log[x] for a constant, and a rule for polynomials would apply) */
+	if (n < 2) return NULL;
+	v = deref(a[1]);
+	if (is_head(v, "^", 2)) v = arg(v, 0);
+	if (! atom_sym(v) || num_sym(v)) return mk_bool(0, f);
 	if (n == 2 && is_head(a[1], "^", 2) && ! is_head(arg(a[1], 0), "+", -1)
 	    && num_value(arg(a[1], 1), & k) && k == floor(k) && k >= 1)	/* PolyQ[u, x^n] */
 		return mk_bool(poly_in_power(a[0], arg(a[1], 0), (int) k), f);
@@ -3289,6 +3296,21 @@ static Node * expo_repl (Node * u, Node * x, Node * g, ExpoState * s)
 	}
 }
 
+/* functionofexponentialq(u, x): Rubi's FunctionOfExponentialQ, the test of
+ * substexp: u is a function of F^(c x), with an explicit exponential */
+static Node * s_functionofexponentialq (Node * a[], int n, Symbol * f)
+{
+	ExpoState s = {0};
+	Symbol * es = role_find("eE");
+	int i, ok;
+	if (n != 2) return NULL;
+	s.ee = es ? mknod(Const, (Node *) es, NULL) : NULL;
+	ok = expo_test(a[0], a[1], & s) && s.flag && s.n > 0;
+	for (i = 0; i < s.n; i++) delete(s.c[i]);
+	delete(s.ee);
+	return mk_bool(ok, f);
+}
+
 static Node * s_substexp (Node * a[], int n, Symbol * f)
 {
 	ExpoState s = {0};
@@ -3919,6 +3941,21 @@ void term_simplify_trivial (Node ** p)
 /* ================= table and call ================= */
 
 static Node * s_matchq (Node * a[], int n, Symbol * f);
+static Node * s_listq (Node * a[], int n, Symbol * f);
+static Node * s_length (Node * a[], int n, Symbol * f);
+static Node * s_part (Node * a[], int n, Symbol * f);
+static Node * s_first (Node * a[], int n, Symbol * f);
+static Node * s_last (Node * a[], int n, Symbol * f);
+static Node * s_rest (Node * a[], int n, Symbol * f);
+static Node * s_most (Node * a[], int n, Symbol * f);
+static Node * s_append (Node * a[], int n, Symbol * f);
+static Node * s_prepend (Node * a[], int n, Symbol * f);
+static Node * s_join (Node * a[], int n, Symbol * f);
+static Node * s_reverse (Node * a[], int n, Symbol * f);
+static Node * s_range (Node * a[], int n, Symbol * f);
+static Node * s_table (Node * a[], int n, Symbol * f);
+static Node * s_select (Node * a[], int n, Symbol * f);
+static Node * s_total (Node * a[], int n, Symbol * f);
 
 /* ---- functions defined by a rule list: FUNC f ... ATT RULES alglist ----
  * f(a1,..,an) is calculated as REWR f(a1,..,an) : alglist. If the result
@@ -4032,8 +4069,24 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "collect",         s_collect },
 	{ "hyp2exp", s_hyp2exp },
 	{ "substexp", s_substexp },
+	{ "functionofexponentialq", s_functionofexponentialq },
 	{ "binomsum", s_binomsum },
 	{ "matchq", s_matchq },
+	{ "listq", s_listq },		/* lists (inc/list) */
+	{ "length", s_length },
+	{ "part", s_part },
+	{ "first", s_first },
+	{ "last", s_last },
+	{ "rest", s_rest },
+	{ "most", s_most },
+	{ "append", s_append },
+	{ "prepend", s_prepend },
+	{ "join", s_join },
+	{ "reverse", s_reverse },
+	{ "range", s_range },
+	{ "table", s_table },
+	{ "select", s_select },
+	{ "total", s_total },
 	{ "functionofq", s_functionofq },
 	{ "substfor", s_substfor },
 	{ "derivdivides", s_derivdivides },
@@ -4090,6 +4143,254 @@ static Node * s_matchq (Node * a[], int n, Symbol * f)
 	ok = lm_matchq(a[1], u ? deref(u) : a[0], n == 3 ? a[2] : NULL);
 	delete(u);
 	return mk_bool(ok, f);
+}
+
+
+/* ---- lists (inc/list): list(a,b,c) and the empty list nil ----
+ * A list is a term with the head "list", as Mathematica's List: its
+ * elements and the results have the sort real, so that lists nest freely
+ * (the sort of part(m,1) cannot be known before the list is there). The
+ * functions work on the term structure and stay unevaluated if an argument
+ * is no list. Roles "list" and "nil". */
+
+#define MAXLIST 4096
+
+static int is_nil (Node * t)
+{
+	Symbol * s = role_find("nil");
+	t = deref(t);
+	return s && t && ((Symbol *) t == s || (t->type == Const && (Symbol *) t->l == s)
+	                  || (t->type == SYM_TYPE && (Symbol *) t == s));
+}
+
+static int is_list (Node * t)
+{
+	return is_head(t, "list", -1) || is_nil(t);
+}
+
+static int list_len (Node * t)
+{
+	return is_nil(t) ? 0 : term_nargs(deref(t));
+}
+
+static Node * mk_list (Node * e[], int n)	/* takes the elements */
+{
+	Node * args;
+	int i;
+	if (n == 0)
+		{
+		Symbol * s = role_find("nil");
+		if (! s) fatal("symfkt : nil is not declared (inc/list)");
+		return mknod(Const, (Node *) s, NULL);
+		}
+	args = e[n - 1];
+	for (i = n - 2; i >= 0; i--)
+		args = mknod(Terms, e[i], args);
+	return mknod(Func, (Node *) getsymbol(fsym("list"), args), args);
+}
+
+/* the elements of l (copies) into e; their number, or -1 */
+static int list_elems (Node * l, Node * e[], int max)
+{
+	int i, n;
+	if (! is_list(l)) return -1;
+	n = list_len(l);
+	if (n > max) return -1;
+	for (i = 0; i < n; i++) e[i] = tcpy(arg(deref(l), i));
+	return n;
+}
+
+static int index_of (Node * t, int n, int * k)	/* 1-based, negative from the end */
+{
+	double v;
+	if (! is_num(t, & v) || v != floor(v) || v == 0) return 0;
+	* k = v > 0 ? (int) v - 1 : n + (int) v;
+	return * k >= 0 && * k < n;
+}
+
+static Node * s_listq (Node * a[], int n, Symbol * f)
+{
+	if (n != 1) return NULL;
+	return mk_bool(is_list(a[0]), f);
+}
+
+static Node * s_length (Node * a[], int n, Symbol * f)
+{
+	if (n != 1 || ! is_list(a[0])) return NULL;
+	return mk_int(list_len(a[0]));
+}
+
+static Node * s_part (Node * a[], int n, Symbol * f)	/* part(l, i, j, ...) */
+{
+	Node * t = a[0];
+	int i, k;
+	if (n < 2) return NULL;
+	for (i = 1; i < n; i++)
+		{
+		if (! is_list(t) || ! index_of(a[i], list_len(t), & k)) return NULL;
+		t = arg(deref(t), k);
+		}
+	return tcpy(t);
+}
+
+static Node * list_slice (Node * l, int from, int to)	/* elements from..to-1 */
+{
+	Node * e[MAXLIST];
+	int i, n;
+	if (! is_list(l) || (n = list_len(l)) == 0 || n > MAXLIST) return NULL;
+	for (i = from; i < to; i++) e[i - from] = tcpy(arg(deref(l), i));
+	return mk_list(e, to - from);
+}
+
+static Node * s_first (Node * a[], int n, Symbol * f)
+{
+	if (n != 1 || ! is_list(a[0]) || list_len(a[0]) == 0) return NULL;
+	return tcpy(arg(deref(a[0]), 0));
+}
+
+static Node * s_last (Node * a[], int n, Symbol * f)
+{
+	if (n != 1 || ! is_list(a[0]) || list_len(a[0]) == 0) return NULL;
+	return tcpy(arg(deref(a[0]), list_len(a[0]) - 1));
+}
+
+static Node * s_rest (Node * a[], int n, Symbol * f)
+{
+	if (n != 1 || ! is_list(a[0]) || list_len(a[0]) == 0) return NULL;
+	return list_slice(a[0], 1, list_len(a[0]));
+}
+
+static Node * s_most (Node * a[], int n, Symbol * f)
+{
+	if (n != 1 || ! is_list(a[0]) || list_len(a[0]) == 0) return NULL;
+	return list_slice(a[0], 0, list_len(a[0]) - 1);
+}
+
+static Node * s_append (Node * a[], int n, Symbol * f)
+{
+	Node * e[MAXLIST];
+	int m;
+	if (n != 2 || (m = list_elems(a[0], e, MAXLIST - 1)) < 0) return NULL;
+	e[m++] = tcpy(a[1]);
+	return mk_list(e, m);
+}
+
+static Node * s_prepend (Node * a[], int n, Symbol * f)
+{
+	Node * e[MAXLIST];
+	int m;
+	if (n != 2 || (m = list_elems(a[0], e + 1, MAXLIST - 1)) < 0) return NULL;
+	e[0] = tcpy(a[1]);
+	return mk_list(e, m + 1);
+}
+
+static Node * s_join (Node * a[], int n, Symbol * f)
+{
+	Node * e[MAXLIST];
+	int i, m = 0, k;
+	for (i = 0; i < n; i++)
+		if (! is_list(a[i])) return NULL;
+	for (i = 0; i < n; i++)
+		{
+		if ((k = list_elems(a[i], e + m, MAXLIST - m)) < 0)
+			{
+			while (m > 0) delete(e[--m]);
+			return NULL;
+			}
+		m += k;
+		}
+	return mk_list(e, m);
+}
+
+static Node * s_reverse (Node * a[], int n, Symbol * f)
+{
+	Node * e[MAXLIST], * r[MAXLIST];
+	int i, m;
+	if (n != 1 || (m = list_elems(a[0], e, MAXLIST)) < 0) return NULL;
+	for (i = 0; i < m; i++) r[i] = e[m - 1 - i];
+	return mk_list(r, m);
+}
+
+static Node * s_range (Node * a[], int n, Symbol * f)	/* range(n), range(a,b), range(a,b,d) */
+{
+	Node * e[MAXLIST];
+	double lo = 1, hi, d = 1, v;
+	int m = 0, ex = 1, i;
+	if (n < 1 || n > 3) return NULL;
+	for (i = 0; i < n; i++)
+		{
+		if (! is_num(a[i], & v)) return NULL;
+		if (! is_exact(a[i])) ex = 0;
+		}
+	if (n == 1) is_num(a[0], & hi);
+	else { is_num(a[0], & lo); is_num(a[1], & hi); }
+	if (n == 3) is_num(a[2], & d);
+	if (d == 0 || (hi - lo) / d >= MAXLIST) return NULL;
+	for (v = lo; d > 0 ? v <= hi + 1e-12 : v >= hi - 1e-12; v += d)
+		e[m++] = mk_num_ex(v, ex);
+	return mk_list(e, m);
+}
+
+/* the elements of a list argument of a HOLD function: calculated first */
+static Node * held_list (Node * t, Node ** own)
+{
+	* own = has_builtin(t) ? tcalc(tcpy(t)) : NULL;
+	return * own ? deref(* own) : t;
+}
+
+static Node * s_table (Node * a[], int n, Symbol * f)	/* table(body, x, l or n) */
+{
+	Node * e[MAXLIST], * own, * l, * r = NULL;
+	int i, m;
+	double v;
+	if (n != 3) return NULL;
+	l = held_list(a[2], & own);
+	if (is_num(l, & v))			/* table(body, x, n): x = 1..n */
+		{
+		Node * ra[1];
+		ra[0] = l;
+		r = s_range(ra, 1, f);
+		delete(own);
+		if (! r) return NULL;
+		own = r;
+		l = r;
+		}
+	if ((m = list_elems(l, e, MAXLIST)) < 0) { delete(own); return NULL; }
+	for (i = 0; i < m; i++)
+		{
+		Node * t = replace(a[0], a[1], e[i]);
+		delete(e[i]);
+		e[i] = tcalc(t);
+		}
+	delete(own);
+	return mk_list(e, m);
+}
+
+static Node * s_select (Node * a[], int n, Symbol * f)	/* select(l, x, cond) */
+{
+	Node * e[MAXLIST], * own, * l;
+	int i, m, k = 0;
+	if (n != 3) return NULL;
+	l = held_list(a[0], & own);
+	if ((m = list_elems(l, e, MAXLIST)) < 0) { delete(own); return NULL; }
+	delete(own);
+	for (i = 0; i < m; i++)
+		{
+		Node * c = tcalc(replace(a[2], a[1], e[i]));
+		if (isnt_zero(c)) e[k++] = e[i];	/* true (bool) or a number != 0 */
+		else delete(e[i]);
+		delete(c);
+		}
+	return mk_list(e, k);
+}
+
+static Node * s_total (Node * a[], int n, Symbol * f)
+{
+	Node * e[MAXLIST], * r = NULL;
+	int i, m;
+	if (n != 1 || (m = list_elems(a[0], e, MAXLIST)) < 0) return NULL;
+	for (i = 0; i < m; i++) r = r ? mk_add(r, e[i]) : e[i];
+	return r ? r : mk_int(0);
 }
 
 Node * call_builtin (Node * term)

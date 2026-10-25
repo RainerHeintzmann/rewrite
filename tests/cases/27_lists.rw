@@ -1,0 +1,41 @@
+# Lists (inc/list): list(a,b,c), the empty list nil, nested lists. The
+# functions are symbolic, so the results are shown with REWR (a plain
+# expression is calculated numerically).
+INC "inc/all"
+INC "inc/exact"
+INC "inc/list"
+TERM L : real
+TERM MM : real
+CONST yy,aa,kk : real
+x = yy
+L = list(3, aa, x^2)
+length(L)
+REWR part(L, 2) : All
+REWR part(L, -1) : All
+REWR first(L) : All
+REWR rest(L) : All
+REWR most(L) : All
+REWR append(L, 7) : All
+REWR prepend(L, 0) : All
+REWR join(L, list(1,2), nil) : All
+REWR reverse(L) : All
+REWR range(5) : All
+REWR range(2, 10, 3) : All
+REWR range(1/2, 2, 1/2) : All
+# a list of lists: part with two indices
+MM = list(list(1,2), list(3,4))
+REWR part(MM, 2, 1) : All
+REWR part(part(MM, 1), 2) : All
+# table and select (HOLD): the variable must be declared
+REWR table(aa^kk, kk, list(1,2,3)) : All
+REWR table(kk^2, kk, 4) : All
+REWR select(range(10), kk, kk > 6) : All
+total(range(100))
+REWR total(L) : All
+listq(L)
+listq(aa)
+length(nil)
+REWR rest(list(1)) : All
+# no list or index out of range: unevaluated
+REWR part(L, 7) : All
+REWR first(aa) : All

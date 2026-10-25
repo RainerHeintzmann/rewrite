@@ -38,8 +38,8 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{1390}
-\newcommand{\psolved}{90.3\%}
+\newcommand{\nsolved}{1392}
+\newcommand{\psolved}{90.4\%}
 \newcommand{\nwrong}{3}
 \newcommand{\nfailed}{0}
 
@@ -561,9 +561,9 @@ from a file that the translator writes along with the rules.
 
 \subsection{Results}
 
-The translator converts 6881 of Rubi's 7432 rules (93\%; rules that Rubi
+The translator converts 6897 of Rubi's 7432 rules (93\%; rules that Rubi
 writes in two variants, with and without \texttt{ShowStep}, count twice),
-which become 7369 \texttt{rewrite} rules after the expansion of function
+which become 7385 \texttt{rewrite} rules after the expansion of function
 variables. Rules that Rubi writes as small programs (\texttt{Module} with
 several statements, \texttt{Sum}, lists) are replaced by C functions: the
 substitutions of section 9.3 and the partial fractions of
@@ -623,16 +623,28 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 126 & 8.2\% \\
+no antiderivative found   & 123 & 8.0\% \\
 wrong result              & \nwrong  & 0.2\% \\
 crash or time-out         & \nfailed & 0.0\% \\
-not verifiable            & 20 & 1.3\% \\
+not verifiable            & 21 & 1.4\% \\
 \bottomrule
 \end{tabular}
 \caption{Results on the \ntested{} tested problems of four independent
 integration problem collections in Rubi's test suite.}
 \label{tab:results}
 \end{table}
+
+These collections come from textbooks and are the problems on which the
+translation was developed. A sample of every 20th problem of the other
+sections of the test suite (about 4600 problems, of 72\,000) shows where
+the translation is less complete: algebraic functions 88\%, trigonometric
+functions 71\%, exponentials 67\%, hyperbolic functions 51\%, inverse
+hyperbolic functions 47\%, logarithms 34\% and inverse trigonometric
+functions 30\% are solved. Part of the difference is due to the problems
+themselves: 3--23\% of those in a section need complex numbers in Rubi's
+result, and some cannot be integrated by Rubi either. The rest points to
+missing or inexact helpers; a single wrong predicate (\texttt{PolyQ} with a
+non-symbol as variable) cost a fifth of the solved logarithm problems.
 
 The development of the translation went through several such measurements;
 each round of fixes, such as the normal form without multiplying out, the

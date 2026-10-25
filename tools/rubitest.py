@@ -59,9 +59,18 @@ import rubi2rewrite as r2r          # noqa: E402  (parser of the translator)
 # ----------------------------------------------------------------------
 
 
+def long_path(path):
+    """Windows: paths longer than 260 characters (long test file names in a
+    deep folder) need the \\?\\ prefix"""
+    if os.name != 'nt':
+        return path
+    p = os.path.abspath(path).replace('/', '\\')
+    return p if len(p) < 240 or p.startswith('\\\\?\\') else '\\\\?\\' + p
+
+
 def problems_of(path):
     """yields (line number, text) of the problems {...} in a test file"""
-    with open(path, encoding='utf-8', errors='replace') as f:
+    with open(long_path(path), encoding='utf-8', errors='replace') as f:
         text = f.read()
     text = re.sub(r'\(\*.*?\*\)', lambda m: '\n' * m.group(0).count('\n'), text, flags=re.S)
     stmt, depth, start = None, 0, 0
@@ -484,6 +493,10 @@ def main():
     totals = {}
     report = open(opts['report'], 'w', encoding='utf-8', newline='\n') if opts['report'] else None
     t0 = time.time()
+    # first all problems of all files, then all batches in one pool: with
+    # --every, a file has only a few problems, and one slow batch per file
+    # would otherwise make the run sequential
+    per_file = []
     for path in files:
         fname = os.path.basename(path)
         probs = []
@@ -505,13 +518,17 @@ def main():
                 probs.append((key, text, None, None, None, 'skipped', str(err)))
                 continue
             probs.append((key, text, integrand, f_py, params, None, None))
-
-        counts = {}
         todo = [p for p in probs if p[5] is None]
-        results = {}
         batches = [todo[b:b + opts['batch']] for b in range(0, len(todo), opts['batch'])]
-        with ThreadPoolExecutor(max_workers=max(1, opts['jobs'])) as pool:
-            founds = list(pool.map(lambda bt: run_checked(exe, bt, opts['timeout']), batches))
+        per_file.append((fname, probs, batches))
+
+    pool = ThreadPoolExecutor(max_workers=max(1, opts['jobs']))
+    futures = [[pool.submit(run_checked, exe, bt, opts['timeout']) for bt in batches]
+               for _, _, batches in per_file]
+    for (fname, probs, batches), futs in zip(per_file, futures):
+        counts = {}
+        results = {}
+        founds = [f.result() for f in futs]
         for batch, found in zip(batches, founds):
             for p in batch:
                 if p[0] in found:
@@ -528,7 +545,10 @@ def main():
             if opts['verbose']:
                 print(line)
         print('%-60s %s' % (fname[:60], '  '.join('%s %d' % kv for kv in sorted(counts.items()))))
+        if report:
+            report.flush()          # a crash later does not lose these lines
         sys.stdout.flush()
+    pool.shutdown()
     if report:
         report.close()
     n = sum(totals.values())

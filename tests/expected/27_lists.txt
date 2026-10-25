@@ -1,0 +1,27 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+3 
+aa 
+x ^ 2 
+3 
+list (aa ,x ^ 2 )
+list (3 ,aa )
+list (3 ,aa ,x ^ 2 ,7 )
+list (0 ,3 ,aa ,x ^ 2 )
+list (3 ,aa ,x ^ 2 ,1 ,2 )
+list (x ^ 2 ,aa ,3 )
+list (1 ,2 ,3 ,4 ,5 )
+list (2 ,5 ,8 )
+list ((1/2) ,1 ,(3/2) ,2 )
+3 
+2 
+list (aa ,aa ^ 2 ,aa ^ 3 )
+list (1 ,4 ,9 ,16 )
+list (7 ,8 ,9 ,10 )
+5050 
+3 + x ^ 2 + aa 
+true 
+false 
+0 
+nil 
+part (list (3 ,aa ,x ^ 2 ),7 )
+first (aa )

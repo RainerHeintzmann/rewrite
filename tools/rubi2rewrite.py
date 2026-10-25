@@ -362,6 +362,7 @@ PREDICATES = {
     'BinomialQ': 'binomialq', 'QuadraticQ': 'quadraticq',
     'RationalFunctionQ': 'rationalfunctionq', 'InverseFunctionFreeQ': 'inversefunctionfreeq',
     'FunctionOfQ': 'functionofq', 'FalseQ': 'falseq',
+    'FunctionOfExponentialQ': 'functionofexponentialq',
     'SimplerQ': 'simplerq', 'SumSimplerQ': 'sumsimplerq', 'SimplerSqrtQ': 'simplersqrtq',
     'KnownSineIntegrandQ': 'knownsineintegrandq', 'KnownTangentIntegrandQ': 'knowntangentintegrandq',
     'KnownCotangentIntegrandQ': 'knowncotangentintegrandq',

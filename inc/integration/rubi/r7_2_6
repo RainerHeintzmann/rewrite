@@ -90,11 +90,13 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_f), (igtq(O_n,0)) Int((P_f)^((O_c)*(
 #   Int[x_^m_.*f_^(c_.*ArcCosh[a_. + b_.*x_]^n_.), x_Symbol] := 1/b*Subst[Int[(-a/b + Cosh[x]/b)^m*f^(c*x^n)*Sinh[x], x], x, ArcCosh[a + b*x]] /; FreeQ[{a, b, c, f}, x] && IGtQ[m, 0] && IGtQ[n, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_f), (igtq(O_m,0)), (igtq(O_n,0)) Int(((Xv)^(O_m))*((P_f)^((O_c)*((arccosh((O_a)+((O_b)*(Xv))))^(O_n)))),Xv) = ((((O_b)^((-1))))*(intsubst((((((((((-1))*(O_a)*(((O_b)^((-1))))))+(((cosh(Xv))*(((O_b)^((-1))))))))^(O_m)))*(((P_f)^(((O_c)*(((Xv)^(O_n)))))))*(sinh(Xv))),Xv,arccosh(((O_a)+(((O_b)*(Xv))))))))
 
-# Rule 22 not translated: predicate FunctionOfExponentialQ
+# Rule 22 (1 variants):
 #   Int[ArcCosh[u_], x_Symbol] := x*ArcCosh[u] - Int[SimplifyIntegrand[x*D[u, x]/(Sqrt[-1 + u]*Sqrt[1 + u]), x], x] /; InverseFunctionFreeQ[u, x] && Not[FunctionOfExponentialQ[u, x]]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)), (not(functionofexponentialq(P_u,Xv))) Int(arccosh(P_u),Xv) = ((((Xv)*(arccosh(P_u))))+((((-1))*(Int(simp(((Xv)*(deriv(P_u,Xv))*((((((-1))+(P_u)))^((-(1/2)))))*(((((1)+(P_u)))^((-(1/2)))))),Xv),Xv)))))
 
-# Rule 23 not translated: predicate FunctionOfExponentialQ
+# Rule 23 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcCosh[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcCosh[u])/(d*(m + 1)) - b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)* D[u, x]/(Sqrt[-1 + u]*Sqrt[1 + u]), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && Not[FunctionOfExponentialQ[u, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (neq(O_m,(-1))), (inversefunctionfreeq(P_u,Xv)), (not(functionofq(((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))),P_u,Xv))), (not(functionofexponentialq(P_u,Xv))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((O_a)+((O_b)*(arccosh(P_u)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(arccosh(P_u))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(simp(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(deriv(P_u,Xv))*((((((-1))+(P_u)))^((-(1/2)))))*(((((1)+(P_u)))^((-(1/2)))))),Xv),Xv)))))
 
 # Rule 24 (18 variants):
 #   Int[v_*(a_. + b_.*ArcCosh[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcCosh[u]), w, x] - b*Int[SimplifyIntegrand[w*D[u, x]/(Sqrt[-1 + u]*Sqrt[1 + u]), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]]

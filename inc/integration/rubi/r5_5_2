@@ -78,17 +78,21 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_f), (igtq(O_n,0)) Int((O_u)*((P_f)^(
 #   Int[u_.*f_^(c_.*ArcCsc[a_. + b_.*x_]^n_.), x_Symbol] := -1/b*Subst[ Int[ReplaceAll[u, x -> -a/b + Csc[x]/b]*f^(c*x^n)*Csc[x]*Cot[x], x], x, ArcCsc[a + b*x]] /; FreeQ[{a, b, c, f}, x] && IGtQ[n, 0]
 ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_f), (igtq(O_n,0)) Int((O_u)*((P_f)^((O_c)*((arccsc((O_a)+((O_b)*(Xv))))^(O_n)))),Xv) = (((-1))*(((O_b)^((-1))))*(intsubst(((replaceall(O_u,Xv,(((((-1))*(O_a)*(((O_b)^((-1))))))+(((csc(Xv))*(((O_b)^((-1)))))))))*(((P_f)^(((O_c)*(((Xv)^(O_n)))))))*(csc(Xv))*(cot(Xv))),Xv,arccsc(((O_a)+(((O_b)*(Xv))))))))
 
-# Rule 19 not translated: predicate FunctionOfExponentialQ
+# Rule 19 (1 variants):
 #   Int[ArcSec[u_], x_Symbol] := x*ArcSec[u] - u/Sqrt[u^2]* Int[SimplifyIntegrand[x*D[u, x]/(u*Sqrt[u^2 - 1]), x], x] /; InverseFunctionFreeQ[u, x] && Not[FunctionOfExponentialQ[u, x]]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)), (not(functionofexponentialq(P_u,Xv))) Int(arcsec(P_u),Xv) = ((((Xv)*(arcsec(P_u))))+((((-1))*(P_u)*(((((P_u)^(2)))^((-(1/2)))))*(Int(simp(((Xv)*(deriv(P_u,Xv))*(((P_u)^((-1))))*(((((((P_u)^(2)))+((-1))))^((-(1/2)))))),Xv),Xv)))))
 
-# Rule 20 not translated: predicate FunctionOfExponentialQ
+# Rule 20 (1 variants):
 #   Int[ArcCsc[u_], x_Symbol] := x*ArcCsc[u] + u/Sqrt[u^2]* Int[SimplifyIntegrand[x*D[u, x]/(u*Sqrt[u^2 - 1]), x], x] /; InverseFunctionFreeQ[u, x] && Not[FunctionOfExponentialQ[u, x]]
+ADDSPEC RubiRules : IF (inversefunctionfreeq(P_u,Xv)), (not(functionofexponentialq(P_u,Xv))) Int(arccsc(P_u),Xv) = ((((Xv)*(arccsc(P_u))))+(((P_u)*(((((P_u)^(2)))^((-(1/2)))))*(Int(simp(((Xv)*(deriv(P_u,Xv))*(((P_u)^((-1))))*(((((((P_u)^(2)))+((-1))))^((-(1/2)))))),Xv),Xv)))))
 
-# Rule 21 not translated: predicate FunctionOfExponentialQ
+# Rule 21 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcSec[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcSec[u])/(d*(m + 1)) - b*u/(d*(m + 1)*Sqrt[u^2])* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(u*Sqrt[u^2 - 1]), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && Not[FunctionOfExponentialQ[u, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (neq(O_m,(-1))), (inversefunctionfreeq(P_u,Xv)), (not(functionofq(((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))),P_u,Xv))), (not(functionofexponentialq(P_u,Xv))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((O_a)+((O_b)*(arcsec(P_u)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(arcsec(P_u))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(P_u)*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))*(((((P_u)^(2)))^((-(1/2)))))*(Int(simp(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(deriv(P_u,Xv))*(((P_u)^((-1))))*(((((((P_u)^(2)))+((-1))))^((-(1/2)))))),Xv),Xv)))))
 
-# Rule 22 not translated: predicate FunctionOfExponentialQ
+# Rule 22 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcCsc[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcCsc[u])/(d*(m + 1)) + b*u/(d*(m + 1)*Sqrt[u^2])* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(u*Sqrt[u^2 - 1]), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && Not[FunctionOfExponentialQ[u, x]]
+ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m), (neq(O_m,(-1))), (inversefunctionfreeq(P_u,Xv)), (not(functionofq(((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))),P_u,Xv))), (not(functionofexponentialq(P_u,Xv))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*((O_a)+((O_b)*(arccsc(P_u)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(((O_a)+(((O_b)*(arccsc(P_u))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((O_b)*(P_u)*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))*(((((P_u)^(2)))^((-(1/2)))))*(Int(simp(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(deriv(P_u,Xv))*(((P_u)^((-1))))*(((((((P_u)^(2)))+((-1))))^((-(1/2)))))),Xv),Xv)))))
 
 # Rule 23 (18 variants):
 #   Int[v_*(a_. + b_.*ArcSec[u_]), x_Symbol] := With[{w = IntHide[v, x]}, Dist[(a + b*ArcSec[u]), w, x] - b*u/Sqrt[u^2]* Int[SimplifyIntegrand[w*D[u, x]/(u*Sqrt[u^2 - 1]), x], x] /; InverseFunctionFreeQ[w, x]] /; FreeQ[{a, b}, x] && InverseFunctionFreeQ[u, x] && Not[MatchQ[v, (c_. + d_.*x)^m_. /; FreeQ[{c, d, m}, x]]]

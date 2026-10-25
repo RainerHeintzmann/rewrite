@@ -478,6 +478,7 @@ the files are in German.
 
 | File | Contents |
 | --- | --- |
+| [inc/list](inc/list) | Lists as terms, `list(a,b,c)` and `nil`, with `part`, `length`, `table`, `select`, ... (load it after `inc/all`). |
 | [inc/exact](inc/exact) | Exact numbers: sorts `integer` and `rational` (GMP), subsorts of `real`. |
 | [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
@@ -550,6 +551,40 @@ derivative rule:
 
 `Gamma` is written with a capital G because `gamma` is a constant in
 [inc/physik](inc/physik). Outside their real domain the functions give NaN.
+
+### Lists
+
+[inc/list](inc/list) adds lists, as terms with the head `list`, like
+Mathematica's `List`: `list(a,b,c)`, the empty list `nil`, and lists of
+lists. Their elements and results have the sort `real`, so that lists nest
+freely; the sort system cannot know the sort of `part(m,1)` before the list
+is there. The functions are symbolic C functions, so their results are seen
+with `REWR` (a plain expression is calculated numerically), and they stay
+unevaluated if an argument is no list:
+
+| Function | Meaning |
+| --- | --- |
+| `list(a,b,..)`, `nil` | a list, the empty list |
+| `listq(u)`, `length(l)` | `u` is a list; the number of elements |
+| `part(l,i)`, `part(l,i,j)` | element `i` (from 1, `-1` is the last), element `j` of element `i` |
+| `first(l)`, `last(l)`, `rest(l)`, `most(l)` | first, last element; without the first, without the last |
+| `append(l,x)`, `prepend(l,x)`, `join(l1,l2,..)`, `reverse(l)` | |
+| `range(n)`, `range(a,b)`, `range(a,b,d)` | `1..n`, `a..b` in steps of 1 or `d` |
+| `table(body,x,l)`, `table(body,x,n)` | `body` for each `x` in `l` (or `1..n`), Mathematica's `Table` |
+| `select(l,x,cond)` | the elements `x` of `l` for which `cond` is true |
+| `total(l)` | the sum of the elements |
+
+`table` and `select` get their body and condition unevaluated (`HOLD`) and
+replace `x` first. `x` must be declared (`CONST kk : real`): an undeclared
+name is a numerical variable with the value 0.
+
+```text
+INC "inc/list"
+CONST aa,kk : real
+REWR table(aa^kk, kk, range(3)) : All           # list (aa ,aa ^ 2 ,aa ^ 3 )
+REWR select(range(10), kk, kk > 6) : All        # list (7 ,8 ,9 ,10 )
+REWR part(list(list(1,2),list(3,4)), 2, 1) : All   # 3
+```
 
 ### Symbolic helper functions
 
@@ -771,6 +806,8 @@ where the library [inc/](inc) and the tests are used from.
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
+- Lists as terms ([inc/list](inc/list)): `list(a,b,c)`, `part`, `table`,
+  `select`, ...
 - `SUBSORT real,complex`: complex functions take real arguments; exact
   variants keep precedence over conversions, ties are reported.
 - Functions defined by rule lists (`ATT RULES`), also usable in conditions
