@@ -154,8 +154,9 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int((Xv)*(((P_a)+((O_b)*((
 # Regel 38 nicht uebersetzt: parse error: expected ']', got ';'
 #   Int[x_^m_./(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[-a/b, n]], s = Denominator[Rt[-a/b, n]], k, u}, u = Int[(r*Cos[2*k*m*Pi/n] - s*Cos[2*k*(m + 1)*Pi/n]*x)/(r^2 - 2*r*s*Cos[2*k*Pi/n]*x + s^2*x^2), x] + Int[(r*Cos[2*k*m*Pi/n] + s*Cos[2*k*(m + 1)*Pi/n]*x)/(r^2 + 2*r*s*Cos[2*k*Pi/n]*x + s^2*x^2), x]; 2*r^(m + 2)/(a*n*s^m)*Int[1/(r^2 - s^2*x^2), x] + Dist[2*r^(m + 1)/(a*n*s^m), Sum[u, {k, 1, (n - 2)/4}], x]] /; FreeQ[{a, b}, x] && IGtQ[(n - 2)/4, 0] && IGtQ[m, 0] && LtQ[m, n - 1] && NegQ[a/b]
 
-# Regel 39 nicht uebersetzt: predicate AtomQ
+# Regel 39 (12 Varianten):
 #   Int[x_^2/(a_ + b_.*x_^4), x_Symbol] := With[{r = Numerator[Rt[a/b, 2]], s = Denominator[Rt[a/b, 2]]}, 1/(2*s)*Int[(r + s*x^2)/(a + b*x^4), x] - 1/(2*s)*Int[(r - s*x^2)/(a + b*x^4), x]] /; FreeQ[{a, b}, x] && (GtQ[a/b, 0] || PosQ[a/b] && AtomQ[SplitProduct[SumBaseQ, a]] && AtomQ[SplitProduct[SumBaseQ, b]])
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b), (((gtq(((P_a)*(((O_b)^((-1))))),0)))) Int(((Xv)^(2))*(((P_a)+((O_b)*((Xv)^(4))))^(K_1)),Xv) = (((((1/2))*(((denominator(rt(((P_a)*(((O_b)^((-1))))),2)))^((-1))))*(Int(((((numerator(rt(((P_a)*(((O_b)^((-1))))),2)))+(((denominator(rt(((P_a)*(((O_b)^((-1))))),2)))*(((Xv)^(2)))))))*(((((P_a)+(((O_b)*(((Xv)^(4)))))))^((-1))))),Xv))))+((((-(1/2)))*(((denominator(rt(((P_a)*(((O_b)^((-1))))),2)))^((-1))))*(Int(((((numerator(rt(((P_a)*(((O_b)^((-1))))),2)))+((((-1))*(denominator(rt(((P_a)*(((O_b)^((-1))))),2)))*(((Xv)^(2)))))))*(((((P_a)+(((O_b)*(((Xv)^(4)))))))^((-1))))),Xv)))))
 
 # Regel 40 (12 Varianten):
 #   Int[x_^2/(a_ + b_.*x_^4), x_Symbol] := With[{r = Numerator[Rt[-a/b, 2]], s = Denominator[Rt[-a/b, 2]]}, s/(2*b)*Int[1/(r + s*x^2), x] - s/(2*b)*Int[1/(r - s*x^2), x]] /; FreeQ[{a, b}, x] && Not[GtQ[a/b, 0]]

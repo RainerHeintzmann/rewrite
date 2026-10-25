@@ -942,6 +942,11 @@ else
 return;
 }
 
+/* 2026: in terms (tcalc, exact folding) 2^(1/2) stays exact; a value that
+   is asked for (an expression statement, a condition) is then calculated
+   with real numbers */
+int calc_exact_only = 0;
+
 Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 {
 	Symbol * sp;
@@ -964,7 +969,17 @@ Node * calkulate (Node * term) /* bekommt Zeiger auf kalkulierbare Fkt */
 		DEBG((4,"calkulated Term \n"));
 #endif
 
-	if (error==TRUE) return NULL;
+	if (error==TRUE)
+		{
+		Node * r = NULL;
+		if (! calc_exact_only)
+			{
+			calc_exact_only = 1;
+			r = numeric_real(term);
+			calc_exact_only = 0;
+			}
+		return r;
+		}
 	else
 		{
 
@@ -1014,7 +1029,10 @@ term->l = tcalc(term->l);
 term->r = tcalc(term->r);
 
 if ((term -> type) == Func && ! builtin(term->l))
+	{
+	exact_integers(term);	/* 2026: (1/2)*1.0 = 1/2, nicht 0.5 */
 	retype_node(term);	/* 2026: Argumente koennen jetzt exakte Zahlen sein (SUBSORT) */
+	}
 
 if ((term -> type) == Func && builtin(term->l))  /* symbolische C-Funktion (symfkt.c) */
 	{
@@ -1029,9 +1047,21 @@ if ((term -> type) == Func && builtin(term->l))  /* symbolische C-Funktion (symf
 
 if  ((term -> type) == Func) /* Rest wird darauf abgebildet */
 	{
-	Symbol * sp = (Symbol *) calkulate(term);
+	Symbol * sp;
+	Node * pp = exact_pow_pow(term);	/* 2026: (2^(1/2))^2 = 2 */
+	if (pp)
+		{
+		delete(term);
+		return tcalc(pp);
+		}
+	int save = calc_exact_only;
+	calc_exact_only = 1;		/* 2^(1/2) stays exact in a term */
+	sp = (Symbol *) calkulate(term);
+	calc_exact_only = save;
 
-	if (sp==(Symbol *) NULL) 
+	if (sp == NULL)		/* 2026: 2^(1/2)*0.7: a real number makes it numeric */
+		sp = (Symbol *) numeric_contagion(term);
+	if (sp==(Symbol *) NULL)
 		return term;
 	else
 		{

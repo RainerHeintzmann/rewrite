@@ -88,19 +88,45 @@ static int is_num (Node * t, double * v)
 	return 1;
 }
 
-/* numeric value, also of a calculable expression like 2*3-1 */
+static Node * real_copy (Node * t);
+static Node * mk_neg (Node * a);
+
+/* numeric value, also of a calculable expression like 2*3-1, and of an
+ * exact expression without an exact value like 2^(1/2) (calculated with
+ * real numbers) */
+static int nv_strict = 1;	/* no real fallback (see num_value_r) */
+
 static int num_value (Node * t, double * v)
 {
 	Node * r;
 	if (is_num(t, v)) return 1;
 	t = deref(t);
 	if (! t || t->type != Func) return 0;
-	r = calkulate(t);
+	if (nv_strict)		/* an exact value only (2^(1/2) has none) */
+		{
+		int save = calc_exact_only;
+		calc_exact_only = 1;
+		r = calkulate(t);
+		calc_exact_only = save;
+		}
+	else
+		r = calkulate(t);	/* with a real value for 2^(1/2) */
 	if (! r) return 0;
 	if (! num_to_double((Symbol *) r, v))
 		{ delnum((Symbol *) r, TRUE); return 0; }
 	delnum((Symbol *) r, TRUE);
 	return 1;
+}
+
+/* the value of t, with a real value for 2^(1/2): for signs and comparisons
+ * only, a term built from it would contain 1.41421 */
+static int num_value_r (Node * t, double * v)
+{
+	int save = nv_strict, r;
+	nv_strict = 0;
+	r = num_value(t, v);
+	nv_strict = save;
+	return r;
 }
 
 /* is the numeric value of t (see num_value) exact? */
@@ -280,6 +306,97 @@ static Node * tcpy (Node * t)
 	return mknod(t->type, tcpy(t->l), tcpy(t->r));
 }
 
+/* copy of a numeric expression with the exact numbers as real numbers
+ * (for the value of 2^(1/2)); NULL if it contains a symbol without value */
+static Node * real_copy (Node * t)
+{
+	Symbol * ns;
+	double d;
+	Node * l, * r;
+	t = deref(t);
+	if (! t) return NULL;
+	if ((ns = num_sym(t)) != NULL)
+		return num_to_double(ns, & d) ? mk_num(d) : NULL;
+	if (t->type == Func)
+		{
+		Node * a = real_copy(t->r);
+		return a ? mknod(Func, t->l, a) : NULL;
+		}
+	if (t->type != Terms) return NULL;		/* a symbol: no number */
+	l = real_copy(t->l);
+	r = l ? real_copy(t->r) : NULL;
+	if (! r) { delete(l); return NULL; }
+	return mknod(Terms, l, r);
+}
+
+/* real numbers with an integer value next to an exact number become exact
+ * integers: the 1 of a rule loaded before inc/exact is a real number, and
+ * (1/2)*1.0 would be 0.5 instead of 1/2. Changes the arguments of t. */
+void exact_integers (Node * t)
+{
+	Node ** slot;
+	int exact = 0, k, n;
+	double v;
+	t = deref(t);
+	if (! t || t->type != Func || ! exact_numbers()) return;
+	n = term_nargs(t);
+	for (k = 0; k < n; k++)
+		if (is_exact(arg(t, k))) exact = 1;
+	if (! exact) return;
+	slot = & t->r;
+	for (k = 0; k < n; k++)
+		{
+		Node ** cur = (k < n - 1) ? & (* slot)->l : slot;
+		Symbol * s = num_sym(* cur), * e;
+		if ((* cur)->type == Const && s && ! num_exact(s) && num_to_double(s, & v) && v == floor(v) && fabs(v) < 1e15
+		    && (e = make_exact((long long) v, 1)) != NULL)
+			{
+			delete(* cur);
+			* cur = mknod(Const, (Node *) e, NULL);
+			}
+		if (k < n - 1) slot = & (* slot)->r;
+		}
+}
+
+/* the value of t calculated with real numbers (2^(1/2) = 1.41421), or NULL
+ * (also for 1/0) */
+Node * numeric_real (Node * t)
+{
+	Node * c = real_copy(t), * r;
+	double v;
+	if (! c) return NULL;
+	retype_term(c);
+	r = calkulate(c);
+	delete(c);
+	if (r && num_to_double((Symbol *) r, & v) && ! isfinite(v))	/* 1/0 stays 1/0 */
+		{ delnum((Symbol *) r, TRUE); return NULL; }
+	return r;
+}
+
+/* numeric contagion, as in Mathematica: an operation on numbers that has no
+ * exact value (2^(1/2)*0.7) is calculated with real numbers if one of its
+ * arguments is a real number. The value (a number symbol) or NULL. */
+Node * numeric_contagion (Node * t)
+{
+	Node * c, * r;
+	int k, n, inexact = 0;
+	t = deref(t);
+	if (! t || t->type != Func || builtin(t->l)) return NULL;
+	n = term_nargs(t);
+	for (k = 0; k < n; k++)
+		{
+		Symbol * s = num_sym(arg(t, k));
+		double v;
+		/* a real 1 (from rules loaded before inc/exact) counts as exact */
+		if (s && ! num_exact(s) && num_to_double(s, & v) && v != floor(v)) inexact = 1;
+		}
+	if (! inexact || ! (c = real_copy(t))) return NULL;
+	retype_term(c);
+	r = calkulate(c);
+	delete(c);
+	return r;
+}
+
 Node * term_copy (Node * t)	/* exported tcpy */
 {
 	return tcpy(t);
@@ -331,8 +448,8 @@ static Node * mk_pow (Node * a, Node * b)
 	double va, vb;
 	if (is_num(b, & vb) && vb == 0) { delete(a); delete(b); return mk_int(1); }
 	if (is_num(b, & vb) && vb == 1) { delete(b); return a; }
-	if (is_exact(a) && is_exact(b) && is_num(b, & vb) && vb == floor(vb) && fabs(vb) < 1000)
-		return fold_exact("^", a, b);
+	if (is_exact(a) && is_exact(b) && is_num(b, & vb) && fabs(vb) < 1000)
+		return fold_exact("^", a, b);	/* 4^(1/2) = 2, 2^(1/2) stays (exact) */
 	if (is_num(a, & va) && is_num(b, & vb) && (va > 0 || vb == floor(vb)))
 		{ delete(a); delete(b); return mk_num(pow(va, vb)); }
 	return mk_f2("^", a, b);
@@ -341,10 +458,52 @@ static Node * mk_pow (Node * a, Node * b)
 /* a f b for two exact numbers, with the exact functions of inc/exact */
 static Node * fold_exact (const char * f, Node * a, Node * b)
 {
-	Node * t = mk_f2(f, a, b), * r = calkulate(t);
+	Node * t = mk_f2(f, a, b), * r;
+	int save = calc_exact_only;
+	calc_exact_only = 1;		/* 2^(1/2) stays a term */
+	r = calkulate(t);
+	calc_exact_only = save;
 	if (! r) return t;		/* e.g. division by zero: stays a term */
 	delete(t);
 	return mknod(Const, r, NULL);
+}
+
+/* exact powers in normal form, or NULL if there is nothing to do:
+ * (a^q)^n = a^(q*n) for exact a, q and an integer n (true for every a, also
+ * on the principal branch): (2^(1/2))^2 = 2; and roots of rationals as in
+ * Mathematica (rat_pow_norm): 8^(1/2) = 2*2^(1/2), (1/3)^(1/2) = 3^(-1/2) */
+Node * exact_pow_pow (Node * t)
+{
+	Node * b;
+	double n;
+	Symbol * sb, * se;
+	t = deref(t);
+	if (! t || ! is_head(t, "^", 2) || ! exact_numbers()) return NULL;
+	b = deref(arg(t, 0));
+	if ((sb = num_sym(b)) && (se = num_sym(arg(t, 1))) && num_exact(sb) && num_exact(se))
+		{
+		double vb, ve, p, q;
+		/* (-3)^(1/2) is complex: NaN as with real numbers, so that a rule
+		 * giving it counts as not applicable (Rubi's Rt[-3,2] is I*Sqrt[3]) */
+		if (num_to_double(sb, & vb) && vb < 0 && num_to_double(se, & ve) && ve != floor(ve)
+		    && rat_approx(ve, & p, & q) && fmod(q, 2.0) == 0)
+			return mk_num(NAN);
+		{
+		void * qb = exact_to_rat(sb), * qe = exact_to_rat(se), * rest, * fexp, * c;
+		Node * r = NULL;
+		if (qb && qe && (c = rat_pow_norm(qb, qe, & rest, & fexp)) != NULL)
+			r = mk_mul(mknod(Const, (Node *) make_exact_rat(c), NULL),
+			           mk_pow(mknod(Const, (Node *) make_exact_rat(rest), NULL),
+			                  mknod(Const, (Node *) make_exact_rat(fexp), NULL)));
+		if (qb) del_rat(qb);
+		if (qe) del_rat(qe);
+		return r;
+		}
+		}
+	if (! is_head(b, "^", 2) || ! is_exact(arg(b, 0)) || ! is_exact(arg(b, 1))
+	    || ! is_exact(arg(t, 1)) || ! is_num(arg(t, 1), & n) || n != floor(n))
+		return NULL;
+	return mk_pow(tcpy(arg(b, 0)), fold_exact("*", tcpy(arg(b, 1)), tcpy(arg(t, 1))));
 }
 
 /* ================= expansion into summands ================= */
@@ -478,7 +637,9 @@ static void mono_flatten (Node * t, Mono * m)	/* t is a product */
 {
 	double v, e;
 	t = deref(t);
-	if (num_value(t, & v)) { m->c *= v; if (! num_value_exact(t)) m->exact = 0; }
+	int num;
+	num = num_value(t, & v);	/* 3^(1/2) is a factor, not the number 1.73205 */
+	if (num) { m->c *= v; if (! num_value_exact(t)) m->exact = 0; }
 	else if (is_head(t, "*", 2)) { mono_flatten(arg(t, 0), m); mono_flatten(arg(t, 1), m); }
 	else if (is_head(t, "-", 1)) { m->c = -m->c; mono_flatten(arg(t, 0), m); }
 	else if (is_head(t, "^", 2) && num_value(arg(t, 1), & e))
@@ -486,9 +647,29 @@ static void mono_flatten (Node * t, Mono * m)	/* t is a product */
 	else mono_addfac(m, t, 1, 1);
 }
 
+/* a root of an integer and the coefficient, as in Mathematica: 2*2^(-1/2) =
+ * 2^(1/2), (1/2)*2^(1/2) = 2^(-1/2) */
+static void mono_roots (Mono * m)
+{
+	int i;
+	double b, p, q;
+	if (! m->exact) return;
+	for (i = 0; i < m->nf; i++)
+		{
+		Fac * f = & m->f[i];
+		if (! f->exact || f->e == floor(f->e) || fabs(f->e) >= 1
+		    || ! is_exact(f->base) || ! is_num(f->base, & b) || b != floor(b) || b < 2
+		    || ! rat_approx(m->c, & p, & q))
+			continue;
+		if (f->e < 0 && fmod(p, b) == 0) { m->c /= b; f->e += 1; }
+		else if (f->e > 0 && fmod(q, b) == 0) { m->c *= b; f->e -= 1; }
+		}
+}
+
 static void mono_normalize (Mono * m)	/* drop x^0, sort the bases */
 {
 	int i, j, k = 0;
+	mono_roots(m);
 	for (i = 0; i < m->nf; i++)
 		if (m->f[i].e != 0) m->f[k++] = m->f[i];
 	m->nf = k;
@@ -647,7 +828,7 @@ static int posaux (Node * u)		/* Rubi's PosAux */
 {
 	double v, e;
 	u = deref(u);
-	if (num_value(u, & v)) return v > 0;
+	if (num_value_r(u, & v)) return v > 0;
 	if (is_head(u, "^", 2))
 		{
 		if (is_num(arg(u, 1), & e) && e == floor(e))
@@ -689,7 +870,7 @@ static int eq_terms (Node * u, Node * v)
 	TList l = {0};
 	Node * d;
 	int zero;
-	if (num_value(u, & x) && num_value(v, & y))
+	if (num_value_r(u, & x) && num_value_r(v, & y))
 		return fabs(x - y) <= 1e-12 * (1.0 + fabs(x));
 	if (tequal(u, v)) return 1;
 	d = mk_add(tcpy(u), mk_mul(mk_int(-1), tcpy(v)));
@@ -786,7 +967,7 @@ static Node * order_q (Node * a[], int n, Symbol * f, int op)
 	double u, v;
 	int r;
 	if (n != 2) return NULL;
-	if (! num_value(a[0], & u) || ! num_value(a[1], & v)) return mk_bool(0, f);
+	if (! num_value_r(a[0], & u) || ! num_value_r(a[1], & v)) return mk_bool(0, f);
 	r = op == 0 ? u > v : op == 1 ? u < v : op == 2 ? u >= v : u <= v;
 	return mk_bool(r, f);
 }
@@ -946,11 +1127,28 @@ static int pf_collect (Node * u, double k, PowFac * pf, int * n, Node ** coef)
 static Node * simp_product (Node * u)
 {
 	PowFac pf[MAXPF];
-	Node * coef = mk_int(1), * r = NULL;
+	Node * coef = mk_int(1), * r = NULL, * own[MAXPF];
 	double c;
-	int n = 0, i, pass;
+	int n = 0, i, pass, nown = 0;
 	pf_merged = pf_numbers = 0;
 	if (! pf_collect(u, 1, pf, & n, & coef)) { delete(coef); return tcpy(u); }
+	for (i = 0; i < n; i++)	/* 2*2^(-1/2) = 2^(1/2), (1/3)*3^(1/2) = 3^(-1/2) */
+		{
+		Node * b = deref(pf[i].base);
+		double v, f, bb, p, q;
+		if (! is_head(b, "^", 2) || ! is_exact(arg(b, 0)) || ! is_num(arg(b, 0), & bb)
+		    || bb != floor(bb) || bb < 2 || ! is_exact(arg(b, 1)) || ! is_num(arg(b, 1), & f)
+		    || ! is_exact(coef) || ! is_num(coef, & v) || ! rat_approx(v, & p, & q))
+			continue;
+		f *= pf[i].e;
+		if (f == floor(f) || fabs(f) >= 1) continue;
+		if (f < 0 && fmod(p, bb) == 0) { coef = mk_mul(coef, mk_pow(tcpy(arg(b, 0)), mk_int(-1))); f += 1; }
+		else if (f > 0 && fmod(q, bb) == 0) { coef = mk_mul(coef, tcpy(arg(b, 0))); f -= 1; }
+		else continue;
+		pf[i].base = own[nown++] = mk_pow(tcpy(arg(b, 0)), mk_num_ex(f, 1));
+		pf[i].e = 1;
+		pf_merged++;
+		}
 	/* powers and atoms first, other functions (ln, arcsec, ...) last: the
 	 * matcher does not regroup products, and Rubi's patterns u*(a+b*f(x))
 	 * need the function at the top level */
@@ -964,6 +1162,7 @@ static Node * simp_product (Node * u)
 			t = pf[i].e == 1 ? tcpy(pf[i].base) : mk_pow(tcpy(pf[i].base), mk_int(pf[i].e));
 			r = r ? mk_mul(r, t) : t;
 			}
+	for (i = 0; i < nown; i++) delete(own[i]);
 	if (! r) return coef;
 	if (num_value(coef, & c) && c == 1) { delete(coef); return r; }
 	return mk_mul(coef, r);
@@ -1003,13 +1202,17 @@ static Node * s_rt (Node * a[], int n, Symbol * f)
 			if (r2) return mk_mul(mk_int(-1), mknod(Const, (Node *) r2, NULL));
 			}
 		}
-	if (num_value(a[0], & u))
+	if (num_value(a[0], & u) && ! (num_sym(a[0]) && is_exact(a[0])))
 		{
 		if (u < 0 && k == floor(k) && fmod(k, 2.0) != 0)
 			return mk_num(-pow(-u, 1.0 / k));
 		if (u >= 0)
 			return mk_num(pow(u, 1.0 / k));
 		}
+	/* an exact number without an exact root: 2^(1/2) stays symbolic */
+	if (num_sym(a[0]) && is_exact(a[0]) && num_value(a[0], & u) && u < 0
+	    && k == floor(k) && fmod(k, 2.0) != 0)
+		return mk_neg(mk_pow(mk_neg(tcpy(a[0])), mk_num_ex(1.0 / k, 1)));
 	return mk_pow(tcpy(a[0]), mk_num_ex(1.0 / k, num_value_exact(a[1])));
 }
 
@@ -1132,8 +1335,9 @@ static Node * numden (Node * u, int den)
 	TList l = {0};
 	Node * r = NULL;
 	double v, p, q, e;
-	int i;
-	if (num_value(u, & v))
+	int i, num;
+	num = num_value(u, & v);	/* 2^(1/2) is no fraction: numerator 2^(1/2) */
+	if (num)
 		{
 		if (! rat_approx(v, & p, & q)) return den ? mk_int(1) : mk_num(v);
 		return mk_int(den ? q : p);
@@ -1148,7 +1352,8 @@ static Node * numden (Node * u, int den)
 			}
 		else if (is_head(t, "/", 2))
 			part = tcpy(arg(t, den ? 1 : 0));
-		else if (num_value(t, & v) && rat_approx(v, & p, & q))
+		else if ((num = num_value(t, & v))
+		         && rat_approx(v, & p, & q))
 			part = mk_int(den ? q : p);
 		else if (! den)
 			part = tcpy(t);
@@ -1620,6 +1825,25 @@ static Node * s_removecontent (Node * a[], int n, Symbol * f)	/* Rubi's RemoveCo
 	s = pi2_shift(a[0]);
 	r = s_freefactors_aux(s ? s : a[0], a[1], 0);		/* without constant factors */
 	delete(s);
+	if (is_head(r, "+", 2) || is_head(r, "-", 2))
+		{
+		/* a sum whose first summand (in Mathematica's order the constant)
+		 * is negative: -u, as Rubi's RemoveContentAux (ln(1+x^2), not
+		 * ln(-1-x^2)) */
+		TList l = {0};
+		double v;
+		int i, neg = 0;
+		expand_to(r, & l);
+		for (i = 0; i < l.n; i++)
+			if (! contains(l.t[i], a[1]) && num_value_r(l.t[i], & v)) { neg = v < 0; break; }
+		if (neg)
+			{
+			for (i = 0; i < l.n; i++) l.t[i] = mk_neg(l.t[i]);
+			delete(r);
+			return tl_collect(& l);
+			}
+		tl_free(& l);
+		}
 	return r;
 }
 
@@ -2528,8 +2752,8 @@ static Node * s_simplersqrtq (Node * a[], int n, Symbol * f)
 	Node * ra[2], * qu, * qv;
 	int lu, lv, r, iu, iv, nu, nv;
 	if (n != 2) return NULL;
-	if (num_value(a[1], & v) && v < 0 && ! (num_value(a[0], & u) && u < 0)) return mk_bool(1, f);
-	if (num_value(a[0], & u) && u < 0 && ! (num_value(a[1], & v) && v < 0)) return mk_bool(0, f);
+	if (num_value_r(a[1], & v) && v < 0 && ! (num_value_r(a[0], & u) && u < 0)) return mk_bool(1, f);
+	if (num_value_r(a[0], & u) && u < 0 && ! (num_value_r(a[1], & v) && v < 0)) return mk_bool(0, f);
 	ra[1] = mk_int(2);
 	ra[0] = a[0]; qu = s_rt(ra, 2, f);
 	ra[0] = a[1]; qv = s_rt(ra, 2, f);
@@ -2539,7 +2763,7 @@ static Node * s_simplersqrtq (Node * a[], int n, Symbol * f)
 	nu = is_exact(qu); nv = is_exact(qv);
 	if (iu) r = iv ? su < sv : 1;
 	else if (iv) r = 0;
-	else if (nu) { num_value(qu, & su); r = nv ? (num_value(qv, & sv), su < sv) : 1; }
+	else if (nu) { num_value_r(qu, & su); r = nv ? (num_value_r(qv, & sv), su < sv) : 1; }
 	else if (nv) r = 0;
 	else if (posaux(a[0])) r = posaux(a[1]) ? leafcount(qu) < leafcount(qv) : 1;
 	else if (posaux(a[1])) r = 0;
@@ -2960,7 +3184,7 @@ static int nonnegq (Node * v)
 	Node * s;
 	v = deref(v);
 	if (! v) return 0;
-	if (num_value(v, & e)) return e >= 0;
+	if (num_value_r(v, & e)) return e >= 0;
 	s = arg_sort(v);
 	if (s && find_symbol("nonneg") && sort_dist(s, (Node *) find_symbol("nonneg")) >= 0) return 1;
 	if (is_head(v, "sqrt", 1) || is_head(v, "exp", 1) || is_head(v, "abs", 1)) return 1;
@@ -2970,7 +3194,7 @@ static int nonnegq (Node * v)
 		if (rat_approx(e, & p, & q) && fmod(q, 2.0) == 0) return 1;	/* even root */
 		return nonnegq(arg(v, 0));
 		}
-	if (is_head(v, "^", 2) && num_value(arg(v, 0), & e) && e > 0) return 1;	/* e^u, 2^u */
+	if (is_head(v, "^", 2) && num_value_r(arg(v, 0), & e) && e > 0) return 1;	/* e^u, 2^u */
 	if (is_head(v, "^", 2) && (s = arg_sort(arg(v, 0))) && find_symbol("nonneg")
 	    && sort_dist(s, (Node *) find_symbol("nonneg")) >= 0) return 1;	/* eE^u */
 	if (is_head(v, "*", 2) || is_head(v, "+", 2) || is_head(v, "/", 2))

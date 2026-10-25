@@ -456,8 +456,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "scan.l"
-#line 2 "scan.l"
+#line 1 "src/scan.l"
+#line 2 "src/scan.l"
 /*
  *	scan.l V1.00
  *	Copyright (c)  Rainer Heintzmann (1992)
@@ -713,7 +713,7 @@ YY_DECL
 		}
 
 	{
-#line 48 "scan.l"
+#line 48 "src/scan.l"
 
 
 #line 719 "<stdout>"
@@ -776,7 +776,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 50 "scan.l"
+#line 50 "src/scan.l"
 { int i;
 				  	for (i=1;yytext[i]!=0;i++)
 						;
@@ -786,22 +786,22 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 57 "scan.l"
+#line 57 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 58 "scan.l"
+#line 58 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 59 "scan.l"
+#line 59 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 60 "scan.l"
+#line 60 "src/scan.l"
 { double * value;
               Symbol * sp;
 				  if (strspn(yytext,"0123456789") == strlen(yytext)
@@ -823,7 +823,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 78 "scan.l"
+#line 78 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 7:
@@ -831,26 +831,26 @@ case 7:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 80 "scan.l"
+#line 80 "src/scan.l"
 ;			/* #... ignorieren */
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 81 "scan.l"
+#line 81 "src/scan.l"
 ;			/* Zwischenraum ignorieren */
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
-#line 84 "scan.l"
+#line 84 "src/scan.l"
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 84 "scan.l"
+#line 84 "src/scan.l"
 return (int) yytext[0];	/* 'x' fuer yyparse() */
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 86 "scan.l"
+#line 86 "src/scan.l"
 ECHO;
 	YY_BREAK
 #line 856 "<stdout>"
@@ -1858,7 +1858,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 86 "scan.l"
+#line 86 "src/scan.l"
 
 
 /*

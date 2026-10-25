@@ -65,6 +65,7 @@ OTHER /  : rational,rational >> rational ATT rat_div
 OTHER -  : rational >> rational          ATT rat_neg
 OTHER mi : rational >> rational          ATT rat_mi
 OTHER ^  : rational,integer >> rational  ATT rat_pow
+OTHER ^  : rational,rational >> rational ATT rat_qpow  # 4^(1/2) = 2; 2^(1/2) bleibt stehen
 OTHER abs : rational >> rational         ATT rat_abs
 OTHER >  : rational,rational >> bool     ATT rat_gt
 OTHER >= : rational,rational >> bool     ATT rat_ge
@@ -99,6 +100,7 @@ OTHER sqrt : positive >> positive       ATT r_sqrt
 # ---------------- Regeln uebernehmen ----------------
 # rational erbt die Regeln von real, integer die von rational
 LIFT (A+A,A-A,A*A,A/A,-A,mi(A),A^A) TO (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,mi(Aq),Aq^Az)
+LIFT (A^A) TO (Aq^Aq)                    # 2^(1/2) erbt die Regeln fuer Potenzen
 LIFT (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,Aq^Az) TO (Az+Az,Az-Az,Az*Az,Az/Az,-Az,Az^Az)
 LIFT (Az+Az,Az*Az,Az^Az) TO (Anat+Anat,Anat*Anat,Anat^Anat)
 LIFT (A+A,A*A,A/A,mi(A),A^A,sqrt(A)) TO (An+An,An*An,An/An,mi(An),An^A,sqrt(An))
@@ -114,6 +116,10 @@ ADDSPEC Real : sqrt(An^2) = An
 ADDSPEC Real : abs(An) = An
 ADDSPEC Real : ln(Ap*Y) = ln(Ap) + ln(Y)
 ADDSPEC Real : ln(Y*Ap) = ln(Y) + ln(Ap)
+
+# Ein Term der Sorte rational ohne exakten Wert (2+3^(1/2)) enthaelt keine
+# Variable (die sind reell): eine Konstante
+ADDSPEC diff : D(Aq,X) = 0
 
 # Zahlen ohne Punkt sind ab hier natuerliche Zahlen (natural); -3 ist
 # -(3) und damit integer

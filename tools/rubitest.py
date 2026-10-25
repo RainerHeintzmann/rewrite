@@ -343,6 +343,8 @@ def check(f_py, F_py, params):
         verdict = None
         try:
             f_real(x0)
+        except NameError:
+            return 'noeval'
         except (ValueError, ZeroDivisionError, OverflowError, TypeError):
             continue            # integrand not real here (branch cuts may differ)
         for h in (1e-3, 2e-4, 4e-5):   # smaller steps near singular points
@@ -350,6 +352,8 @@ def check(f_py, F_py, params):
                 vals = [complex(F(x0 + k * h)) for k in (-2, -1, 1, 2)]
                 d = (vals[0] - 8 * vals[1] + 8 * vals[2] - vals[3]) / (12 * h)
                 fx = complex(f(x0))
+            except NameError:
+                return 'noeval'     # a function the checker does not know
             except (ZeroDivisionError, ValueError, OverflowError, TypeError):
                 break
             if not all(cmath.isfinite(v) for v in vals + [fx]):

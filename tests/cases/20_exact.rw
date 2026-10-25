@@ -59,3 +59,19 @@ T1 = REWR abs(tn) : All
 T1
 tn = 9
 sqrt(tn), tn+1
+# ---- exact roots: perfect powers are numbers, the rest stays a term
+#      in Mathematica's normal form; a real number makes it numeric
+T1 = REWR x*4^(1/2) + x*8^(1/3) : All
+T1
+T1 = REWR x*8^(1/2) : All
+T1
+T1 = REWR x*(4/3)^(1/2) : All
+T1
+T1 = REWR x*2^(3/2) : All
+T1
+T1 = REWR x*(2^(1/2))^2 : All
+T1
+T1 = REWR x*2^(1/2)*0.5 : All
+T1
+T1 = REWR D(x^2*(2+3^(1/2)),x) : All
+T1

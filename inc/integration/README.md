@@ -62,9 +62,11 @@ the rules. Steps done inside C helpers (partial fractions, substitutions)
 appear as one step.
 
 Numbers are exact where possible: the integration package loads
-[inc/exact](../exact), so `1/3` stays the fraction `(1/3)`, and roots like
-`sqrt(3)` become real numbers. Rubi also uses complex numbers, which the
-rules here do not have:
+[inc/exact](../exact), so `1/3` stays the fraction `(1/3)`, and roots
+stay exact in Mathematica's normal form: `Int(1/(x^4+1),x)` gives
+`(1/2) * arctan (1 + 2 ^ (1/2) * x )/ 2 ^ (1/2) + ...` and `Int(1/sqrt(x^2+x+1),x)`
+gives `arcsinh (1 / 3 ^ (1/2) + 2 * x / 3 ^ (1/2) )`. Rubi also uses complex numbers,
+which the rules here do not have:
 
 - Rules whose result needs `I` (the imaginary unit) are not translated.
 - A rule whose result contains a NaN, for example the square root of a
@@ -201,7 +203,7 @@ have it, so a few steps are added:
   `x*x^-1 = 1`), and split integrals of sums.
 - Rubi's `ExpandIntegrand` splits rational functions into partial fractions
   (Mathematica's `Apart`). `expandintegrand` does this with exact rational
-  coefficients ([apart.c](../../apart.c)), as `c*p(x)*b(x)^-k` with the
+  coefficients ([apart.c](../../src/apart.c)), as `c*p(x)*b(x)^-k` with the
   number in front. Rubi's general rule `Int[u] := Int[ExpandIntegrand[u]]`
   for a sum then integrates a rational function term by term. `simp`
   combines like powers in a product, so that factors like

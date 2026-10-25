@@ -41,6 +41,7 @@ void delete _1p (Node * );
 Node * tcopy _1p(Node *);
 Node * tcalc _1p(Node *);
 Node * calkulate _1p(Node *);
+extern int calc_exact_only;   /* 2026: 1: no real value for 2^(1/2) */
 void print	_1p(Node *);
 Node * solve	_2p(Node * ,Node *);
 Node * rewrite _2p(Node * ,Node *);

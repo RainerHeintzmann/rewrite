@@ -280,6 +280,22 @@ instance of order-sorted algebra~\cite{goguen1992osa}; the novelty here is
 that the subsort relation, the conversions and the inheritance of rules
 are all defined in the library.
 
+Roots of exact numbers follow Mathematica. \texttt{4\^{}(1/2)} is the
+integer 2, but \texttt{2\^{}(1/2)} has no exact value: the C function
+for a rational power returns nothing, and the power stays a term inside
+another term. Such terms are kept in a normal form: perfect powers are
+taken out and exponents reduced ($\sqrt{8}=2\sqrt{2}$,
+$\sqrt{4/3}=2\cdot 3^{-1/2}$, $(\sqrt{2})^2=2$), and in a simplified
+product a coefficient is merged with a root of the same base
+($2/\sqrt{2}=\sqrt{2}$). This needed a distinction between two kinds of
+numerical evaluation that were the same before: subterms of a term are
+calculated exactly or not at all, while the value of a closed expression,
+for output or for a numerical test in a rule condition, falls back to real
+arithmetic ($\sqrt{2}$ prints 1.41421). A real number in an operation makes
+it numeric, as Mathematica's numeric contagion: $\sqrt{2}\cdot 0.5$ is
+0.707107, whereas a real 1.0 next to an exact number counts as the integer
+1, since the rules of the old library were written with real numbers.
+
 \subsection{Interleaving rewriting and numerics}
 
 After every single rewrite step, the interpreter evaluates all subterms
@@ -524,7 +540,7 @@ Table~\ref{tab:int} shows examples.
 \toprule
 Integrand & Result of \texttt{REWR Int(f,x) : RubiIntegrate} \\
 \midrule
-\texttt{1/(1+x\^{}3)} & \texttt{(1/3)*ln(1+x) + 0.57735*arctan(-0.57735+1.1547*x)} \\
+\texttt{1/(1+x\^{}3)} & \texttt{(1/3)*ln(1+x) + (1/3)*3\^{}(1/2)*arctan(-1/3\^{}(1/2)+2*x/3\^{}(1/2))} \\
                       & \texttt{\ \ - (1/6)*ln(1+x\^{}2-x)} \\
 \texttt{x/(1+x\^{}4)}  & \texttt{(1/2)*arctan(x\^{}2)} \\
 \texttt{sqrt(1-x\^{}2)} & \texttt{(1/2)*arcsin(x) + (1/2)*(1-x\^{}2)\^{}(1/2)*x} \\
@@ -539,8 +555,9 @@ Integrand & Result of \texttt{REWR Int(f,x) : RubiIntegrate} \\
 \bottomrule
 \end{tabular}
 \caption{Indefinite integrals computed with the automatically translated
-Rubi rules (output slightly condensed). Rational coefficients are exact;
-irrational ones such as $1/\sqrt{3}$ and $\sqrt{\pi}/2$ are real numbers.}
+Rubi rules (output slightly condensed). Rational coefficients and roots
+such as $1/\sqrt{3}$ are exact; $\sqrt{\pi}/2$ is a real number, since
+$\pi$ is.}
 \label{tab:int}
 \end{table}
 

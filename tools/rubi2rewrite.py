@@ -724,6 +724,10 @@ def translate_rule(text):
     for key, cond in REAL_CONDITIONS:
         if key in text and '/;' in text:
             text = text.rstrip() + ' && ' + cond
+    # an alternative for symbolic coefficients with Mathematica's internal
+    # structure tests; for numbers GtQ[a/b, 0] decides alone
+    text = text.replace(' || PosQ[a/b] && AtomQ[SplitProduct[SumBaseQ, a]] && '
+                        'AtomQ[SplitProduct[SumBaseQ, b]]', '')
     lhs_s, rhs_s = split_top(text, ':=')
     if rhs_s is None:
         raise Untranslatable("not a rule")

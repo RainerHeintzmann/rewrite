@@ -64,6 +64,7 @@ t_funct (userfunction [])  = {
 	FKT(rat_abs),
 	FKT(rat_mi),
 	FKT(rat_pow),
+	FKT(rat_qpow),
 	FKT(int_pow),
 	FKT(int2int),
 	FKT(int2real),

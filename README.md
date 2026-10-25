@@ -171,7 +171,7 @@ how the function is written:
   `f(x,y)`.
 
 `ATT name` connects the function to a C function in the list
-`userfunction` in [userfkt.c](userfkt.c). It is called when all arguments
+`userfunction` in [userfkt.c](src/userfkt.c). It is called when all arguments
 have numerical values. Otherwise the function stays symbolic.
 
 A function can also be written in the rewrite language itself, with
@@ -257,7 +257,7 @@ REWR fq(x,x) : tq             # prints gq (0 ,1 ,1 )
 **Rule lists.** Rules defined while `OPT`, `DEFAULT` or `COMM` is active
 are not merged into the rule tree. They are kept in a list in the order of
 their definition, like in Mathematica or Rubi, and the first rule that
-matches wins. The matcher ([listmatch.c](listmatch.c)) tries the swapped
+matches wins. The matcher ([listmatch.c](src/listmatch.c)) tries the swapped
 operands of commutative operators, the other groupings of nested
 operands (`u*f(x)` matches `x^2*f(x)*g` with `u = x^2*g`, up to six
 operands) and the missing optional operands by backtracking, and the
@@ -290,7 +290,7 @@ LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
 ### Exact numbers and subsorts
 
 Each sort has its own representation in C. [inc/exact](inc/exact) adds two
-number sorts implemented with the GMP library ([exact.c](exact.c)):
+number sorts implemented with the GMP library ([exact.c](src/exact.c)):
 `integer` (any size) and `rational` (fractions). Load it after `inc/all`:
 
 ```text
@@ -322,6 +322,22 @@ with the fewest conversions is used: `1/3+1/6` uses the rational `+`,
 to `(3/2) * x`. When a rule is applied, the operators of the new term are
 chosen again for the sorts of their actual arguments, so a rule written
 for `real` gives exact results for exact numbers.
+
+**Roots.** A power of exact numbers is exact when the result is
+rational: `4^(1/2)` is 2, `(8/27)^(2/3)` is `(4/9)`. Otherwise it stays a
+term inside a term, in the normal form Mathematica uses: perfect powers
+are taken out and the exponent is reduced, so `8^(1/2)` becomes
+`2 * 2 ^ (1/2)`, `(4/3)^(1/2)` becomes `2 * 3 ^ (-1/2)`, `(2^(1/2))^2`
+becomes 2, and in a simplified product `2/2^(1/2)` becomes `2^(1/2)`. A
+real number makes the expression numeric, as in Mathematica
+(`x*2^(1/2)*0.5` gives `0.707107 * x`). Asking for the value of a closed
+expression (`2^(1/2)` on its own) still prints the real number 1.41421.
+
+```text
+REWR x*8^(1/2) : All          # prints 2 * 2 ^ (1/2) * x
+REWR x*(4/3)^(1/2) : All      # prints 2 * 3 ^ (-1/2) * x
+REWR x*2^(1/2)*0.5 : All      # prints 0.707107 * x
+```
 
 **Sorts with a known sign.** A sort can have several wider sorts.
 `inc/exact` declares
@@ -469,7 +485,7 @@ covered and how the rules are translated.
 ### Special functions
 
 [inc/alg](inc/alg) declares special functions, implemented in
-[specfun.c](specfun.c) with Mathematica's definitions and parameter
+[specfun.c](src/specfun.c) with Mathematica's definitions and parameter
 conventions (so that the translated Rubi rules can use them), each with a
 derivative rule:
 
@@ -491,7 +507,7 @@ derivative rule:
 ### Symbolic helper functions
 
 [inc/helpers](inc/helpers) declares helper functions written in C
-([symfkt.c](symfkt.c)). Unlike numerical functions, they work on the terms
+([symfkt.c](src/symfkt.c)). Unlike numerical functions, they work on the terms
 themselves. Their names follow the helpers of Rubi in lower case. They are
 loaded by the integration rules and can also be used on their own:
 
@@ -549,7 +565,7 @@ REWR expand((x+1)^3) : t2            # prints x ^ 3 + 3 * x ^ 2 + 3 * x + 1
 The term functions are applied during rewriting, so they are used with
 `REWR`. Some are simpler than their Rubi counterparts. `expandintegrand`
 splits a rational function with exact rational coefficients into partial
-fractions ([apart.c](apart.c), like Mathematica's `Apart`); the
+fractions ([apart.c](src/apart.c), like Mathematica's `Apart`); the
 denominator is factored into its square-free parts and rational roots, and
 along the factors written in the input, but other irreducible factors of
 degree 2 and more are not found. Otherwise it multiplies out, and writes a
@@ -565,43 +581,47 @@ of LiNbO3), [inc/chaos](inc/chaos), [inc/molekuel](inc/molekuel) and
 ## Adding C functions
 
 New numerical functions are written in C and entered in the list
-`userfunction` in [userfkt.c](userfkt.c). A function gets an array of
+`userfunction` in [userfkt.c](src/userfkt.c). A function gets an array of
 pointers to its arguments and returns a pointer to a newly allocated result:
 
 ```c
 double * r_abs (double * arg[]) { return mkreal(fabs(* arg[0])); }
 ```
 
-Examples are in [real.c](real.c), [complex.c](complex.c),
-[vector.c](vector.c) and [matrix.c](matrix.c). The function is then
+Examples are in [real.c](src/real.c), [complex.c](src/complex.c),
+[vector.c](src/vector.c) and [matrix.c](src/matrix.c). The function is then
 connected with `ATT` in a `FUNC` or `OTHER` declaration.
 
 Symbolic functions, which work on terms instead of numbers, are entered in
-the list `symfunction` in [symfkt.c](symfkt.c). They get the argument terms
+the list `symfunction` in [symfkt.c](src/symfkt.c). They get the argument terms
 and return a new term, or `NULL` if they do not apply. `ATT name` finds them
 in the same way.
 
 ## Source files
 
+The sources are in [src/](src) (the headers of the original project in
+[src/include/](src/include)); `make` builds `rewrite` in the main folder,
+where the library [inc/](inc) and the tests are used from.
+
 | File | Purpose |
 | --- | --- |
-| [scan.l](scan.l) | Scanner (flex). |
-| [syn.y](syn.y) | Grammar (bison). The appendix of the manual summarizes it. |
-| [sync.c](sync.c) | Main program, input handling and runtime commands. |
-| [defs.c](defs.c) | Declarations, blocks and local symbols. |
-| [run.c](run.c), [forms.c](forms.c) | Rewriting engine and numerical evaluation. |
-| [expand.c](expand.c) | Settings `OPT`, `DEFAULT`, `COMM` and condition lists. |
-| [listmatch.c](listmatch.c) | Rule lists with a backtracking matcher. |
-| [symfkt.c](symfkt.c) | Symbolic helper functions (`expand`, `coeff`, `polyq`, ...). |
-| [numsort.c](numsort.c), [exact.c](exact.c) | Subsorts (`SUBSORT`, `INTNUM`) and the exact number sorts with GMP. |
-| [specfun.c](specfun.c) | Special functions (erf, Fresnel, Ei, Gamma, zeta, elliptic integrals, 2F1, ...). |
-| [apart.c](apart.c) | Partial fractions of rational functions with exact coefficients (GMP). |
+| [scan.l](src/scan.l) | Scanner (flex). |
+| [syn.y](src/syn.y) | Grammar (bison). The appendix of the manual summarizes it. |
+| [sync.c](src/sync.c) | Main program, input handling and runtime commands. |
+| [defs.c](src/defs.c) | Declarations, blocks and local symbols. |
+| [run.c](src/run.c), [forms.c](src/forms.c) | Rewriting engine and numerical evaluation. |
+| [expand.c](src/expand.c) | Settings `OPT`, `DEFAULT`, `COMM` and condition lists. |
+| [listmatch.c](src/listmatch.c) | Rule lists with a backtracking matcher. |
+| [symfkt.c](src/symfkt.c) | Symbolic helper functions (`expand`, `coeff`, `polyq`, ...). |
+| [numsort.c](src/numsort.c), [exact.c](src/exact.c) | Subsorts (`SUBSORT`, `INTNUM`) and the exact number sorts with GMP. |
+| [specfun.c](src/specfun.c) | Special functions (erf, Fresnel, Ei, Gamma, zeta, elliptic integrals, 2F1, ...). |
+| [apart.c](src/apart.c) | Partial fractions of rational functions with exact coefficients (GMP). |
 | [tools/rubi2rewrite.py](tools/rubi2rewrite.py) | Translator of Rubi's integration rules. |
 | [tools/rubitest.py](tools/rubitest.py) | Runs Rubi's test suite and checks the results numerically. |
-| [nodes.h](nodes.h) | Named access to the node structures built by the parser. |
-| [sym.c](sym.c), [node.c](node.c), [stack.c](stack.c) | Symbol table and memory for nodes and symbols. |
-| [userfkt.c](userfkt.c), [real.c](real.c), [bool.c](bool.c), [complex.c](complex.c), [vector.c](vector.c), [matrix.c](matrix.c) | Built-in numerical functions. |
-| [inout.c](inout.c) | Output, output redirection and data input. |
+| [nodes.h](src/nodes.h) | Named access to the node structures built by the parser. |
+| [sym.c](src/sym.c), [node.c](src/node.c), [stack.c](src/stack.c) | Symbol table and memory for nodes and symbols. |
+| [userfkt.c](src/userfkt.c), [real.c](src/real.c), [bool.c](src/bool.c), [complex.c](src/complex.c), [vector.c](src/vector.c), [matrix.c](src/matrix.c) | Built-in numerical functions. |
+| [inout.c](src/inout.c) | Output, output redirection and data input. |
 
 ## Known limitations
 
@@ -646,12 +666,12 @@ in the same way.
 - New pattern features: optional parts (`OPT`, `DEFAULT`), commutative
   operators (`COMM`) and lists of conditions (`IF c1, c2`). A condition
   that cannot be calculated no longer crashes the interpreter.
-- Symbolic helper functions in C ([symfkt.c](symfkt.c), [inc/helpers](inc/helpers))
+- Symbolic helper functions in C ([symfkt.c](src/symfkt.c), [inc/helpers](inc/helpers))
   and further elementary functions (`csc`, `sec`, `cot`, `arccot`, the
   hyperbolic and inverse hyperbolic functions, `polylog`, `productlog`).
-- Special functions ([specfun.c](specfun.c)) with derivative rules, and
-  more of Rubi's helper functions in [symfkt.c](symfkt.c), among them
-  partial fractions ([apart.c](apart.c)).
+- Special functions ([specfun.c](src/specfun.c)) with derivative rules, and
+  more of Rubi's helper functions in [symfkt.c](src/symfkt.c), among them
+  partial fractions ([apart.c](src/apart.c)).
 - Exact numbers: sorts `integer` and `rational` with GMP ([inc/exact](inc/exact)),
   the statements `SUBSORT` and `INTNUM`, and the choice of operator
   variants by the sorts of their arguments.
@@ -663,7 +683,7 @@ in the same way.
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
 - Internal cleanup: named accessors for the node structures
-  ([nodes.h](nodes.h)) instead of chains like `np->r->r->l`.
+  ([nodes.h](src/nodes.h)) instead of chains like `np->r->r->l`.
 - [LiNbO3/abso1](LiNbO3/abso1) runs again, and the test suite was added.
 
 ## License

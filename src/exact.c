@@ -297,6 +297,85 @@ void * rat_root_exact (void * qv, long k)
 	return r;
 }
 
+/* z = c^k * z' with the largest c found (primes below 1000 and a perfect
+ * k-th power rest): sets c, z becomes z' */
+static void split_power (mpz_ptr z, long k, mpz_ptr c)
+{
+	mpz_t pk, r;
+	unsigned long p;
+	mpz_set_ui(c, 1);
+	mpz_init(pk); mpz_init(r);
+	for (p = 2; p < 1000; p += (p == 2) ? 1 : 2)
+		{
+		mpz_ui_pow_ui(pk, p, (unsigned long) k);
+		if (mpz_cmp(pk, z) > 0) break;
+		while (mpz_divisible_p(z, pk))
+			{
+			mpz_divexact(z, z, pk);
+			mpz_mul_ui(c, c, p);
+			}
+		}
+	if (mpz_cmp_ui(z, 1) > 0 && mpz_root(r, z, (unsigned long) k))
+		{
+		mpz_mul(c, c, r);
+		mpz_set_ui(z, 1);
+		}
+	mpz_clear(pk); mpz_clear(r);
+}
+
+/* normal form of a root of a positive rational, as in Mathematica:
+ * base^expo = c * rest^fexp with 8^(1/2) = 2*2^(1/2), (4/3)^(1/2) =
+ * 2*3^(-1/2), 2^(3/2) = 2*2^(1/2), |fexp| < 1. Returns c (and sets rest,
+ * fexp), or NULL if base^expo is already in that form. */
+void * rat_pow_norm (void * basev, void * expov, void ** rest, void ** fexp)
+{
+	mpq_ptr b = (mpq_ptr) basev, e = (mpq_ptr) expov, c, r, f;
+	mpz_t n, d, cn, cd, t;
+	long p, k, ip, fp;
+	int change;
+	if (mpq_sgn(b) <= 0 || ! mpz_fits_slong_p(mpq_numref(e)) || ! mpz_fits_slong_p(mpq_denref(e))) return NULL;
+	p = mpz_get_si(mpq_numref(e));
+	k = mpz_get_si(mpq_denref(e));
+	if (k < 2 || k > 1000 || p > MAXEXP || p < -MAXEXP) return NULL;
+	ip = p / k;				/* 2^(-1/2) stays, 2^(3/2) = 2*2^(1/2) */
+	fp = p % k;
+	mpz_init_set(n, mpq_numref(b)); mpz_init_set(d, mpq_denref(b));
+	mpz_init(cn); mpz_init(cd); mpz_init(t);
+	split_power(n, k, cn);
+	split_power(d, k, cd);
+	change = mpz_cmp_ui(cn, 1) != 0 || mpz_cmp_ui(cd, 1) != 0 || ip != 0
+	         || (mpz_cmp_ui(n, 1) == 0 && mpz_cmp_ui(d, 1) != 0);
+	if (! change) { mpz_clear(n); mpz_clear(d); mpz_clear(cn); mpz_clear(cd); mpz_clear(t); return NULL; }
+	c = new_rat();				/* (cn/cd)^p * (n/d)^ip */
+	mpz_pow_ui(mpq_numref(c), cn, (unsigned long) labs(p));
+	mpz_pow_ui(mpq_denref(c), cd, (unsigned long) labs(p));
+	mpz_pow_ui(t, n, (unsigned long) labs(ip));
+	mpz_mul(mpq_numref(c), mpq_numref(c), t);
+	mpz_pow_ui(t, d, (unsigned long) labs(ip));
+	mpz_mul(mpq_denref(c), mpq_denref(c), t);
+	mpq_canonicalize(c);
+	if (p < 0) mpq_inv(c, c);
+	r = new_rat();
+	f = new_rat();
+	if (mpz_cmp_ui(n, 1) == 0 && mpz_cmp_ui(d, 1) != 0)	/* (1/3)^(1/2) = 3^(-1/2) */
+		{
+		mpz_set(mpq_numref(r), d);
+		mpq_set_si(f, - fp, (unsigned long) k);
+		}
+	else
+		{
+		mpz_set(mpq_numref(r), n);
+		mpz_set(mpq_denref(r), d);
+		mpq_set_si(f, fp, (unsigned long) k);
+		}
+	mpq_canonicalize(r);
+	mpq_canonicalize(f);
+	* rest = r;
+	* fexp = f;
+	mpz_clear(n); mpz_clear(d); mpz_clear(cn); mpz_clear(cd); mpz_clear(t);
+	return c;
+}
+
 void * rat_num (void * arg[])		/* numerator */
 {
 	mpz_ptr z = new_int();
@@ -328,4 +407,25 @@ void * rat_numer (void * q)
 	mpz_ptr z = new_int();
 	mpz_set(z, mpq_numref((mpq_ptr) q));
 	return z;
+}
+
+/* rational ^ rational: exact if the root is exact ((8/27)^(2/3) = 4/9),
+ * else NULL: the term stays as it is (2^(1/2)), as in Mathematica */
+void * rat_qpow (void * arg[])
+{
+	mpq_ptr e = Q(1), root, r;
+	long p, k;
+	if (! mpz_fits_slong_p(mpq_numref(e)) || ! mpz_fits_slong_p(mpq_denref(e))) return NULL;
+	p = mpz_get_si(mpq_numref(e));
+	k = mpz_get_si(mpq_denref(e));
+	if (p > MAXEXP || p < -MAXEXP || k > 1000) return NULL;
+	if (! (root = (mpq_ptr) rat_root_exact(Q(0), k))) return NULL;
+	if (p < 0 && mpq_sgn(root) == 0) { del_rat(root); return NULL; }
+	r = new_rat();
+	mpz_pow_ui(mpq_numref(r), mpq_numref(root), (unsigned long) labs(p));
+	mpz_pow_ui(mpq_denref(r), mpq_denref(root), (unsigned long) labs(p));
+	mpq_canonicalize(r);
+	if (p < 0) mpq_inv(r, r);
+	del_rat(root);
+	return r;
 }

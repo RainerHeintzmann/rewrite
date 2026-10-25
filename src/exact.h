@@ -45,6 +45,7 @@ void * rat_neg (void * arg[]);
 void * rat_abs (void * arg[]);
 void * rat_mi (void * arg[]);
 void * rat_pow (void * arg[]);
+void * rat_qpow (void * arg[]);      /* NULL if not exact */
 void * int_pow (void * arg[]);
 void * rat_num (void * arg[]);
 void * int2int (void * arg[]);
@@ -54,6 +55,7 @@ void * nat_pow (void * arg[]);
 void * int_from_ll (long long v);
 void * rat_from_ll (long long p, long long q);
 void * rat_root_exact (void * q, long k);    /* NULL if not exact */
+void * rat_pow_norm (void * base, void * expo, void ** rest, void ** fexp);	/* 8^(1/2) = 2*2^(1/2) */
 void * rat_den (void * arg[]);
 int rat_is_integer (void * q);
 int rat_sgn (void * q);
