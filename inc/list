@@ -40,3 +40,8 @@ OTHER prepend : number,number >> number ATT SYMBOLIC prepend
 OTHER join    : number++ >> number  ATT SYMBOLIC join
 OTHER reverse : number >> number    ATT SYMBOLIC reverse
 OTHER total   : number >> number    ATT SYMBOLIC total
+
+# printed by their shape (symmat.c): a matrix that is the whole printed
+# term as a grid, otherwise {a, b, ...}; SHOW list (without ATT) prints
+# list(a,b) again
+SHOW list ATT show_list

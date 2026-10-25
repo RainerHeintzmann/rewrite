@@ -69,6 +69,7 @@ static const Reserved words [] = {	/* sorted */
 	{ "RIGHT",  RIGHT },    /* DEFAULT RIGHT (2026) */
 	{ "RU",     RU  },			/* right-unary */
 	{ "RULES",  RULES },    /* ATT RULES alglist: function defined by a rule list (2026) */
+	{ "SHOW",   SHOW },     /* SHOW f ATT name: print function of f (2026) */
 	{ "SORT",   SORT },
 	{ "SPEC",   SPEC },
 	{ "STEP",   STEP },

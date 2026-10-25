@@ -818,3 +818,147 @@ static Node * s_dot (Node * a[], int n, Symbol * f) { return with_thread(dot_imp
 static Node * s_det (Node * a[], int n, Symbol * f) { return with_thread(det_impl, a, n, f); }
 static Node * s_linsolve (Node * a[], int n, Symbol * f) { return with_thread(linsolve_impl, a, n, f); }
 static Node * s_inverse (Node * a[], int n, Symbol * f) { return with_thread(inverse_impl, a, n, f); }
+
+/* ---- printing of lists (SHOW list ATT show_list, inc/list) ----
+ * As Julia prints arrays by their shape: a rectangular list of lists of
+ * depth 2 that is the whole printed term as a grid with aligned columns,
+ * deeper ones as slices [i, :, :] = grid; everything else inline as
+ * {a, b, {c, d}}. */
+
+extern Node * print_root;	/* run.c */
+
+static char * entry_text (Node * t)	/* the printed form of t, without trailing blanks */
+{
+	char * s;
+	size_t n;
+	out_capture_begin();
+	tprint(t, 0);
+	s = out_capture_end();
+	n = strlen(s);
+	while (n > 0 && s[n - 1] == ' ') s[--n] = 0;
+	return s;
+}
+
+static void show_inline (Node * t)
+{
+	int k, n = list_len(t);
+	printfOut("{");
+	for (k = 0; k < n; k++)
+		{
+		char * s = entry_text(arg(deref(t), k));
+		printfOut("%s%s", k ? ", " : "", s);
+		free(s);
+		}
+	printfOut("} ");
+}
+
+/* the dimensions of a rectangular nested list: their number (depth), 0 if
+ * it is not rectangular */
+static int list_shape (Node * t, int dims[], int maxd)
+{
+	int d = 0;
+	t = deref(t);
+	while (is_head(t, "list", -1) && d < maxd)
+		{
+		dims[d++] = list_len(t);
+		t = deref(arg(t, 0));
+		}
+	return d;
+}
+
+static int list_rect (Node * t, int dims[], int d, int level)	/* all elements have the shape */
+{
+	int k;
+	t = deref(t);
+	if (level == d) return ! is_head(t, "list", -1);
+	if (! is_head(t, "list", -1) || list_len(t) != dims[level]) return 0;
+	for (k = 0; k < dims[level]; k++)
+		if (! list_rect(arg(t, k), dims, d, level + 1)) return 0;
+	return 1;
+}
+
+static void show_grid (Node * m, int rows, int cols)
+{
+	char ** e = (char **) malloc(rows * cols * sizeof(char *));
+	int * w = (int *) calloc(cols, sizeof(int)), * num = (int *) calloc(cols, sizeof(int)), i, j;
+	if (! e || ! w || ! num) fatal("symmat : no room");
+	for (j = 0; j < cols; j++) num[j] = 1;
+	for (i = 0; i < rows; i++)
+		for (j = 0; j < cols; j++)
+			{
+			e[i * cols + j] = entry_text(mat_entry(m, i, j));
+			if ((int) strlen(e[i * cols + j]) > w[j]) w[j] = (int) strlen(e[i * cols + j]);
+			if (! num_sym(mat_entry(m, i, j))) num[j] = 0;
+			}
+	for (i = 0; i < rows; i++)		/* columns of numbers right-aligned, as in Julia */
+		{
+		printfOut("%s[ ", i ? "\n" : "");
+		for (j = 0; j < cols; j++)
+			printfOut(num[j] ? "%*s%s" : "%-*s%s", w[j], e[i * cols + j], j < cols - 1 ? "  " : " ]");
+		}
+	free(num);
+	for (i = 0; i < rows * cols; i++) free(e[i]);
+	free(e);
+	free(w);
+}
+
+static void show_slices (Node * t, int dims[], int d, int level, int idx[])
+{
+	int k, j;
+	if (d - level == 2)
+		{
+		printfOut("\n[");
+		for (j = 0; j < level; j++) printfOut("%d, ", idx[j] + 1);
+		printfOut(":, :] =\n");
+		show_grid(t, dims[level], dims[level + 1]);
+		printfOut("\n");
+		return;
+		}
+	for (k = 0; k < dims[level]; k++)
+		{
+		idx[level] = k;
+		show_slices(arg(deref(t), k), dims, d, level + 1, idx);
+		}
+}
+
+static int show_list (Node * t, int prec)
+{
+	int dims[8], idx[8], d;
+	t = deref(t);
+	if (! is_head(t, "list", -1)) return 0;
+	d = list_shape(t, dims, 8);
+	if (t == print_root && d >= 2 && list_rect(t, dims, d, 0) && dims[d - 1] > 0)
+		{
+		if (d == 2) show_grid(t, dims[0], dims[1]);
+		else show_slices(t, dims, d, 0, idx);
+		printfOut(" ");
+		}
+	else
+		show_inline(t);
+	return 1;
+}
+
+static const struct { const char * name; show_function * fn; } pfkt_tab[] = {
+	{ "show_list", show_list },
+	{ NULL, NULL } };
+
+show_function * give_pfkt (const char * name)
+{
+	int i;
+	for (i = 0; pfkt_tab[i].name; i++)
+		if (! strcmp(pfkt_tab[i].name, name)) return pfkt_tab[i].fn;
+	printfErr(" --ERROR SHOW : print function %s is not implemented\n", name);
+	return NULL;
+}
+
+void show_def (Node * np)		/* FUNC(show_def, PARAM(f, print function or NULL)) */
+{
+	Node * p = np->r;
+	Symbol * f = (Symbol *) p->l, * s = f;
+	show_function * fn = (show_function *) p->r;
+	p->l = p->r = NULL;		/* a symbol and a C function: not deleted */
+	do	{
+		showfn(s) = (void *) fn;
+		s = kette(s);
+		} while (s && s != f);
+}

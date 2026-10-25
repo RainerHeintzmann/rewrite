@@ -418,9 +418,16 @@ Node * solve _2a ((term,alglist), Node * term ,Node * alglist)
 }
 
 
+Node * print_root = NULL;	/* 2026: the term printed by print (SHOW functions: two-dimensional only there) */
+
 void print _1a((np),Node * np)
 {
+	Node * save = print_root;
+	print_root = np;
+	while (print_root && print_root->type == SYM_TYPE && lexval((Symbol *) print_root) == Term && print_root->l)
+		print_root = print_root->l;
 	tprint(np,0);
+	print_root = save;
 }
 
 void tprint _2a((np,last_func_type),Node * np,int last_func_type)
@@ -484,6 +491,8 @@ int	this_type;					/* since La1 .. La5 are entered in the tree as Func ! */
 		tprint(np -> l,0);			/* symbol table entry */
 		break;
 	case Func :
+		if (showfn(np->l) && ((show_function *) showfn(np->l))(np, last_func_type))
+			return;			/* 2026: own print function (SHOW) */
 		if (lexval((Symbol *) (np -> l)) == Func)
 			{
 			tprint(np -> l,0);		/* print name of the function */

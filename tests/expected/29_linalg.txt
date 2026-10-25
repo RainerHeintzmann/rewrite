@@ -1,8 +1,13 @@
  Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
-list (list (a ,1 ),list (b ,2 ),list (g ,3 ))
-list (list (1 ,0 ,0 ),list (0 ,1 ,0 ),list (0 ,0 ,1 ))
-list (list (a * p + b * r ,a * qq + b * ss ),list (g * p + n * r ,g * qq + n * ss ))
-list (a * x + b * y ,g * x + n * y )
+[ a  1 ]
+[ b  2 ]
+[ g  3 ] 
+[ 1  0  0 ]
+[ 0  1  0 ]
+[ 0  0  1 ] 
+[ a * p + b * r  a * qq + b * ss ]
+[ g * p + n * r  g * qq + n * ss ] 
+{a * x + b * y, g * x + n * y} 
 a * x + b * y 
 -2 
 a * n - b * g 
@@ -10,21 +15,40 @@ a * p * t + b * qq * r + g * n * ss - a * qq * ss - b * n * t - g * p * r
 0 
 x ^ 2 * z + x * y ^ 2 + y * z ^ 2 - x ^ 2 * y - x * z ^ 2 - y ^ 2 * z 
 a * qq * v + a * r * w * y + a * ss * u * z + b * p * w * z + b * r * t + b * ss * v * x + g * p * u + g * qq * w * x + g * ss * t * y + n * p * v * y + n * qq * t * z + n * r * u * x - a * qq * w * z - a * r * u - a * ss * v * y - b * p * v - b * r * w * x - b * ss * t * z - g * p * w * y - g * qq * t - g * ss * u * x - n * p * u * z - n * qq * v * x - n * r * t * y 
-list ((4/5) ,(7/5) )
-list ((-3/14) ,(9/4) ,(47/28) ,(2/7) )
-list ((n * p - b * qq )/ (a * n - b * g ),(a * qq - g * p )/ (a * n - b * g ))
-list (1 / (a + 2 ),1 / (a + 2 ),1 / (a + 2 ))
-list (1 / a ,3 / (2 * b ))
-list ((1/2) * a + (1/2) * b ,(1/2) * a - (1/2) * b )
-list (list (n / (a * n - b * g ),- b / (a * n - b * g )),list (- g / (a * n - b * g ),a / (a * n - b * g )))
-list (list (-24 ,18 ,5 ),list (20 ,-15 ,-4 ),list (-5 ,4 ,1 ))
-list (list (-1 / (a ^ 2 - 1 ),a / (a ^ 2 - 1 )),list (a / (a ^ 2 - 1 ),-1 / (a ^ 2 - 1 )))
-linsolve (list (list (1 ,2 ),list (2 ,4 )),list (1 ,1 ))
+{(4/5), (7/5)} 
+{(-3/14), (9/4), (47/28), (2/7)} 
+{(n * p - b * qq )/ (a * n - b * g ), (a * qq - g * p )/ (a * n - b * g )} 
+{1 / (a + 2 ), 1 / (a + 2 ), 1 / (a + 2 )} 
+{1 / a, 3 / (2 * b )} 
+{(1/2) * a + (1/2) * b, (1/2) * a - (1/2) * b} 
+[ n / (a * n - b * g )    - b / (a * n - b * g ) ]
+[ - g / (a * n - b * g )  a / (a * n - b * g )   ] 
+[ -24   18   5 ]
+[  20  -15  -4 ]
+[  -5    4   1 ] 
+[ -1 / (a ^ 2 - 1 )  a / (a ^ 2 - 1 )  ]
+[ a / (a ^ 2 - 1 )   -1 / (a ^ 2 - 1 ) ] 
+linsolve ({{1, 2}, {2, 4}} ,{1, 1} )
 2 
-list (a / (a ^ 2 - b ^ 2 ),b * im / (a ^ 2 - b ^ 2 ))
-list (list (1 ,0 ),list (0 ,1 ))
+{a / (a ^ 2 - b ^ 2 ), b * im / (a ^ 2 - b ^ 2 )} 
+[ 1  0 ]
+[ 0  1 ] 
 x ^ 2 + 3 - 4 * x 
-list (x + a ,2 * x + b )
-list (sin (x ),sin (2 * x ))
-list (list (4 + a ,2 ),list (2 ,4 + a ))
-list (2 * x + y - 3 ,x + 2 * y - 3 )
+{x + a, 2 * x + b} 
+{sin (x ), sin (2 * x )} 
+[ 4 + a  2     ]
+[ 2      4 + a ] 
+{2 * x + y - 3, x + 2 * y - 3} 
+[ 2  1 ]
+[ 1  2 ] 
+
+[1, :, :] =
+[ 1  2 ]
+[ 3  4 ]
+
+[2, :, :] =
+[ 5  6 ]
+[ 7  8 ]
+ 
+{1, {2, 3}} 
+list (list (2 ,1 ),list (1 ,2 ))

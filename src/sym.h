@@ -33,6 +33,7 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
   Symbol * IS_Verbindung; /* links functions and constants that were assigned with 'term IS term'  */
 	int		def_in_blk;       /* block level in which it was defined */
 	int		builtin;          /* 2026: symbolic C function (symfkt.c), gets terms instead of numbers */
+	void *	showfn;           /* 2026: print function of a function (SHOW f ATT name), see tprint */
 };
 
 #define NOFLAG		0
@@ -75,6 +76,7 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 #define IS_Verbindung(p_sym)	(((Symbol *) (p_sym)) -> IS_Verbindung) /* used by function,const,sort */
 #define urs_fkt(p_sym)	(((Symbol *) (p_sym)) -> urs_fkt) /* only for functions */
 #define defined_in_block(p_sym)	(((Symbol *) (p_sym)) -> def_in_blk) /* only for terms,constants,functions */
+#define showfn(p_sym)	(((Symbol *) (p_sym)) -> showfn) /* 2026: SHOW */
 #define builtin(p_sym)	(((Symbol *) (p_sym)) -> builtin) /* symbolic C function */
 
 #define show(p_sym)	(((Symbol *) (p_sym)) -> value) /* redefined for SORT (showfkt.) */

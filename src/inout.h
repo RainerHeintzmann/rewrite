@@ -12,6 +12,8 @@
 extern int changeOut(const char * filename); /* "stdout" -> stdout */
 
 extern int printfOut(const char * format,...);
+extern void out_capture_begin (void);	/* 2026: printfOut into a string */
+extern char * out_capture_end (void);
 
 extern int printfErr(const char * format,...);
 

@@ -419,6 +419,9 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    linsolve, inverse mit Bareiss' bruchfreier Elimination auf duennen
    Polynomen, dot, transpose, identity; Rechnen mit Listen elementweise
    (thread, Listable), z.B. det(m - x*identity(2)).
+ - SHOW f ATT name: eigene C-Ausgabefunktion fuer eine Funktion. Listen werden
+   damit nach ihrer Form ausgegeben (wie in Julia): als {a, b}, eine Matrix
+   als ganzer ausgegebener Term als Gitter mit ausgerichteten Spalten.
  - SUBSORT real,complex: komplexe Funktionen nehmen auch reelle Argumente; eine
    genau passende Variante hat Vorrang vor Umwandlungen, die wenigsten
    Umwandlungen gewinnen, gleich gute Varianten werden gemeldet.

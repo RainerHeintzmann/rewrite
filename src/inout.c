@@ -9,7 +9,9 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
 #include "inout.h"
+#include "fatal.h"
 
 #ifdef NEXT
 extern int display(const char * text);
@@ -25,11 +27,57 @@ FILE * datafp= 0; /* for reading data */
 
 static int debug=0;
 
+/* 2026: the output can be captured into a string (stack of buffers), e.g.
+ * to measure the entries of a matrix before printing it as a grid */
+#define MAXCAP 8
+static char * cap_buf[MAXCAP];
+static size_t cap_len[MAXCAP], cap_size[MAXCAP];
+static int cap_depth = 0;
+
+void out_capture_begin (void)
+{
+	if (cap_depth == MAXCAP) fatal("inout : output captured too deeply");
+	cap_buf[cap_depth] = NULL;
+	cap_len[cap_depth] = cap_size[cap_depth] = 0;
+	cap_depth++;
+}
+
+char * out_capture_end (void)		/* the captured text (malloc), "" if none */
+{
+	char * s;
+	if (cap_depth == 0) return NULL;
+	cap_depth--;
+	s = cap_buf[cap_depth];
+	if (! s) { s = (char *) malloc(1); if (s) * s = 0; }
+	return s;
+}
+
 int printfOut(const char * format,...)
 {
 	int rt;
 	va_list mylist;
 	va_start(mylist,format);
+	if (cap_depth > 0)
+		{
+		int d = cap_depth - 1;
+		va_list cp;
+		va_copy(cp, mylist);
+		rt = vsnprintf(NULL, 0, format, cp);
+		va_end(cp);
+		if (rt > 0)
+			{
+			if (cap_len[d] + rt + 1 > cap_size[d])
+				{
+				cap_size[d] = 2 * (cap_len[d] + rt + 1);
+				cap_buf[d] = (char *) realloc(cap_buf[d], cap_size[d]);
+				if (! cap_buf[d]) fatal("inout : no room");
+				}
+			vsnprintf(cap_buf[d] + cap_len[d], rt + 1, format, mylist);
+			cap_len[d] += rt;
+			}
+		va_end(mylist);
+		return rt;
+		}
 	if (!fp) fp=stdout;
 	if (fp==stdout)
 	{

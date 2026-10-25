@@ -61,7 +61,7 @@ static Node * sym_att (Node * id, int hold);	/* below */
 %token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD RULES
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD RULES SHOW
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -121,6 +121,10 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	VORRANG att {	$$=mknod(FUNC,(
 			| NUM Sort	 			  			 {$$=mknod(FUNC,(Node *) set_numbertype,(Node *) ($2)); /* sets numbertype for mknum */}
 			| SUBSORT Sort ',' Sort ATT Id	 {$$=mknod(FUNC,(Node *) subsort_def,   /* 2026: subsort */
 										      mknod(PARAM,(Node *) $2,mknod(PARAM,(Node *) $4,(Node *) give_ufkt(name($6)))));}
+			| SHOW func ATT Id		 {$$=mknod(FUNC,(Node *) show_def,      /* 2026: print function */
+										      mknod(PARAM,(Node *) $2,(Node *) give_pfkt(name($4))));}
+			| SHOW func			 {$$=mknod(FUNC,(Node *) show_def,      /* 2026: the usual printing again */
+										      mknod(PARAM,(Node *) $2,NULL));}
 			| INTNUM Sort ATT Id		 {$$=mknod(FUNC,(Node *) intnum_def,    /* 2026: sort of integers */
 										      mknod(PARAM,(Node *) $2,(Node *) give_ufkt(name($4))));}
 			| NUM idlist ':' Sort			 { /* Variables for numeric numbers */

@@ -346,6 +346,7 @@ at run time. Two statements connect the sorts:
 
 | Command | Meaning |
 | --- | --- |
+| `SHOW f ATT name` | Prints the terms with the function `f` (all its variants) with the C print function `name` instead of the usual form; `SHOW f` alone switches back. [inc/list](inc/list) uses it for lists (`show_list`). |
 | `SUBSORT integer,rational ATT int2rat` | Every `integer` is also a `rational`; the C function converts a value. A sort may have several wider sorts. |
 | `INTNUM integer ATT read_int` | Numbers without point and exponent are of sort `integer`, made by the C function from the text. |
 
@@ -611,6 +612,19 @@ unevaluated if an argument is no list:
 | `select(l,x,cond)` | the elements `x` of `l` for which `cond` is true |
 | `total(l)` | the sum of the elements |
 
+Lists are printed by their shape, as Julia prints arrays: inline as
+`{a, b, {c, d}}`, and a rectangular list of lists that is the whole printed
+term as a grid with aligned columns (numbers right-aligned), deeper ones in
+slices `[1, :, :] = ...`. This is a print function attached with
+`SHOW list ATT show_list`; `SHOW list` prints `list(a,b)` again, in the form
+that can be read back.
+
+```text
+REWR identity(2) : All          # [ 1  0 ]
+                                # [ 0  1 ]
+REWR list(1,list(2,3)) : All    # {1, {2, 3}}
+```
+
 `table` and `select` get their body and condition unevaluated (`HOLD`) and
 replace `x` first. `x` must be declared (`CONST kk : real`): an undeclared
 name is a numerical variable with the value 0.
@@ -618,8 +632,8 @@ name is a numerical variable with the value 0.
 ```text
 INC "inc/list"
 CONST aa,kk : real
-REWR table(aa^kk, kk, range(3)) : All           # list (aa ,aa ^ 2 ,aa ^ 3 )
-REWR select(range(10), kk, kk > 6) : All        # list (7 ,8 ,9 ,10 )
+REWR table(aa^kk, kk, range(3)) : All           # {aa, aa ^ 2, aa ^ 3}
+REWR select(range(10), kk, kk > 6) : All        # {7, 8, 9, 10}
 REWR part(list(list(1,2),list(3,4)), 2, 1) : All   # 3
 ```
 
@@ -657,9 +671,9 @@ INC "inc/linalg"
 CONST g : real
 REWR det(list(list(a,b),list(g,n))) : All                    # a * n - b * g
 REWR linsolve(list(list(a,1,1),list(1,a,1),list(1,1,a)),list(1,1,1)) : All
-                                                             # list (1 / (2 + a ),1 / (2 + a ),1 / (2 + a ))
+                                                             # {1 / (2 + a ), 1 / (2 + a ), 1 / (2 + a )}
 REWR det(list(list(2,1),list(1,2)) - x*identity(2)) : All    # 3 + x ^ 2 - 4 * x
-REWR list(1,2)*x + list(a,b) : Listable                      # list (x + a ,2 * x + b )
+REWR list(1,2)*x + list(a,b) : Listable                      # {x + a, 2 * x + b}
 ```
 
 ### Symbolic helper functions

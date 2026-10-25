@@ -21,6 +21,9 @@ void rules_fn_register (Symbol * f, Node * algs); /* ATT RULES alglist */
 s_function * rules_sfkt (void);               /* the C function behind ATT RULES */
 void role_fkt (Node * np);                    /* SYMBOLIC "role" = "symbol" */
 Node * call_builtin (Node * term);
+typedef int show_function (Node * term, int prec);	/* 2026: SHOW: 1 if it printed the term */
+show_function * give_pfkt (const char * name);	/* print function by name, NULL if unknown (reported) */
+void show_def (Node * np);			/* SHOW f ATT name */
 int profiling (void);                         /* REWRITE_PROFILE set? */
 double profile_now (void);
 void profile_add (const char * name, double secs);
