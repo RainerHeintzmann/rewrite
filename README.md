@@ -515,6 +515,7 @@ the files are in German.
 | File | Contents |
 | --- | --- |
 | [inc/list](inc/list) | Lists as terms, `list(a,b,c)` and `nil`, with `part`, `length`, `table`, `select`, ... (load it after `inc/all`). |
+| [inc/linalg](inc/linalg) | Symbolic matrices on lists: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread` (load it after `inc/list`). |
 | [inc/exact](inc/exact) | Exact numbers: sorts `integer` and `rational` (GMP), subsorts of `real`. |
 | [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
@@ -620,6 +621,45 @@ CONST aa,kk : real
 REWR table(aa^kk, kk, range(3)) : All           # list (aa ,aa ^ 2 ,aa ^ 3 )
 REWR select(range(10), kk, kk > 6) : All        # list (7 ,8 ,9 ,10 )
 REWR part(list(list(1,2),list(3,4)), 2, 1) : All   # 3
+```
+
+### Symbolic matrices
+
+[inc/linalg](inc/linalg) (load it after `inc/list`) works with matrices as
+lists of rows, `list(list(a,b),list(c,d))`, and vectors as lists. The
+entries may be any terms. The functions are symbolic C functions
+([symmat.c](src/symmat.c)):
+
+| Function | Meaning |
+| --- | --- |
+| `transpose(m)`, `identity(n)` | rows as columns; the n x n unit matrix |
+| `dot(a,b)` | matrix product, matrix times vector, scalar product (like terms collected, sums not multiplied out) |
+| `det(m)` | determinant |
+| `linsolve(m,b)` | the solution `x` of `m.x = b`, `b` a vector or a matrix (several right-hand sides); unevaluated if `m` is singular |
+| `inverse(m)` | the inverse matrix |
+| `thread(u)` | arithmetic and functions of lists element by element: `list(1,2)*x + list(a,b)` is `list(x+a, 2*x+b)` |
+
+`det`, `linsolve` and `inverse` use Bareiss' fraction-free elimination:
+the entries become sparse polynomials in their atoms (every factor that is
+no number and no natural power, such as `sin(x)`, `a^-1` or `2^(1/2)`), and
+every division during the elimination is an exact division of polynomials,
+so no nested fractions arise. A solution is a polynomial divided by the
+determinant; common monomial factors, a common polynomial factor in a
+single atom and integer contents are cancelled (`1/(a+2)`), a common
+factor of several variables is not yet. The matrix functions thread their
+arguments first, so `det(m - x*identity(2))` is the characteristic
+polynomial of `m`; the rule set `Listable` does this for any term, like
+Mathematica's `Listable` functions:
+
+```text
+INC "inc/list"
+INC "inc/linalg"
+CONST g : real
+REWR det(list(list(a,b),list(g,n))) : All                    # a * n - b * g
+REWR linsolve(list(list(a,1,1),list(1,a,1),list(1,1,a)),list(1,1,1)) : All
+                                                             # list (1 / (2 + a ),1 / (2 + a ),1 / (2 + a ))
+REWR det(list(list(2,1),list(1,2)) - x*identity(2)) : All    # 3 + x ^ 2 - 4 * x
+REWR list(1,2)*x + list(a,b) : Listable                      # list (x + a ,2 * x + b )
 ```
 
 ### Symbolic helper functions
@@ -778,6 +818,7 @@ where the library [inc/](inc) and the tests are used from.
 | [numsort.c](src/numsort.c), [exact.c](src/exact.c) | Subsorts (`SUBSORT`, `INTNUM`) and the exact number sorts with GMP. |
 | [specfun.c](src/specfun.c) | Special functions (erf, Fresnel, Ei, Gamma, zeta, elliptic integrals, 2F1, ...). |
 | [apart.c](src/apart.c) | Partial fractions of rational functions with exact coefficients (GMP). |
+| [symmat.c](src/symmat.c) | Symbolic matrices on lists: Bareiss elimination on sparse polynomials (included by symfkt.c). |
 | [tools/rubi2rewrite.py](tools/rubi2rewrite.py) | Translator of Rubi's integration rules. |
 | [tools/rubitest.py](tools/rubitest.py) | Runs Rubi's test suite and checks the results numerically. |
 | [nodes.h](src/nodes.h) | Named access to the node structures built by the parser. |
@@ -844,6 +885,9 @@ where the library [inc/](inc) and the tests are used from.
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
+- Symbolic matrices on lists ([inc/linalg](inc/linalg)): `det`, `linsolve`,
+  `inverse`, `dot`, `transpose` with fraction-free elimination; arithmetic
+  on lists element by element.
 - Lists as terms ([inc/list](inc/list)): `list(a,b,c)`, `part`, `table`,
   `select`, ...
 - `SUBSORT real,complex`: complex functions take real arguments; exact

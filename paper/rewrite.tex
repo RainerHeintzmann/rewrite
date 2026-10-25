@@ -783,12 +783,18 @@ organize mathematical knowledge in algebraic hierarchies and simplification
 rule sets~\cite{mathlib2020}. \texttt{rewrite} anticipated several of these
 ideas in a small and self-contained system.
 
-\paragraph{Outlook.} Natural next steps are complex numbers on top of the
-number tower, which would also open the 245 Rubi rules with the imaginary
-unit but require complex versions of the helper and special functions;
-Rubi's substitution machinery; an associative-commutative matcher for sums
-and products of any length; and code generation that turns symbolically
-derived expressions into compiled numerical code.
+\paragraph{Outlook.} The same approach carries beyond integration. A
+library of symbolic matrices represents a matrix as a list of rows;
+determinants, linear systems and inverses use Bareiss' fraction-free
+elimination on sparse polynomials in the atoms of the entries, so that
+every division is exact, and arithmetic on lists works element by element,
+so that $\det(A-x I)$ is the characteristic polynomial. Natural next steps
+are equation solving with rules in the style of PRESS~\cite{bundy1981press}
+on top of it, a multivariate polynomial gcd for the cancellation of
+symbolic fractions, the general simplification for the sort
+\texttt{number}, an associative-commutative matcher for sums and products
+of any length, and code generation that turns symbolically derived
+expressions into compiled numerical code.
 
 \section{Conclusion}
 

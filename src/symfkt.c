@@ -4789,6 +4789,14 @@ static Node * s_range (Node * a[], int n, Symbol * f);
 static Node * s_table (Node * a[], int n, Symbol * f);
 static Node * s_select (Node * a[], int n, Symbol * f);
 static Node * s_total (Node * a[], int n, Symbol * f);
+static Node * s_transpose (Node * a[], int n, Symbol * f);	/* symmat.c */
+static Node * s_identity (Node * a[], int n, Symbol * f);
+static Node * s_dot (Node * a[], int n, Symbol * f);
+static Node * s_det (Node * a[], int n, Symbol * f);
+static Node * s_linsolve (Node * a[], int n, Symbol * f);
+static Node * s_inverse (Node * a[], int n, Symbol * f);
+static Node * s_thread (Node * a[], int n, Symbol * f);
+static Node * s_threadq (Node * a[], int n, Symbol * f);
 
 /* ---- functions defined by a rule list: FUNC f ... ATT RULES alglist ----
  * f(a1,..,an) is calculated as REWR f(a1,..,an) : alglist. If the result
@@ -4923,6 +4931,14 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "table", s_table },
 	{ "select", s_select },
 	{ "total", s_total },
+	{ "transpose", s_transpose },
+	{ "identity", s_identity },
+	{ "dot", s_dot },
+	{ "det", s_det },
+	{ "linsolve", s_linsolve },
+	{ "inverse", s_inverse },
+	{ "thread", s_thread },
+	{ "threadq", s_threadq },
 	{ "functionofq", s_functionofq },
 	{ "substfor", s_substfor },
 	{ "derivdivides", s_derivdivides },
@@ -5329,3 +5345,6 @@ Node * call_builtin (Node * term)
 	retype_term(res);	/* function variants matching the sorts of the new arguments */
 	return res;
 }
+
+/* symbolic matrices on lists (2026) */
+#include "symmat.c"

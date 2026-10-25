@@ -26,3 +26,17 @@ FUNC  total   : real >> real        ATT SYMBOLIC total          # sum of the ele
 # with HOLD: the body and the condition are used with x replaced, unevaluated before
 FUNC  table   : real,real,real >> real ATT SYMBOLIC HOLD table  # table(body,x,l): body for each x in l (or 1..n)
 FUNC  select  : real,real,bool >> real ATT SYMBOLIC HOLD select # select(l,x,cond): the x in l with cond true
+# the same for the sort number (inc/alg), e.g. lists with im
+OTHER list    : number++ >> number
+OTHER listq   : number >> bool      ATT SYMBOLIC listq
+OTHER length  : number >> number    ATT SYMBOLIC length
+OTHER part    : number++ >> number  ATT SYMBOLIC part
+OTHER first   : number >> number    ATT SYMBOLIC first
+OTHER last    : number >> number    ATT SYMBOLIC last
+OTHER rest    : number >> number    ATT SYMBOLIC rest
+OTHER most    : number >> number    ATT SYMBOLIC most
+OTHER append  : number,number >> number ATT SYMBOLIC append
+OTHER prepend : number,number >> number ATT SYMBOLIC prepend
+OTHER join    : number++ >> number  ATT SYMBOLIC join
+OTHER reverse : number >> number    ATT SYMBOLIC reverse
+OTHER total   : number >> number    ATT SYMBOLIC total

@@ -375,7 +375,13 @@ BOOLEAN match2 (Node * term,Node * Baum)
 
 		if  (lexval((Symbol *) Baum) == Var) /* Replace variable */
 			{
-			if ((term->type != Const) 
+			if (term->type == SYM_TYPE)	/* 2026: the symbol inside a Const node, reached
+							   by the traversal: a variable matches the Const */
+				{
+				RESTORE
+				return FALSE;
+				}
+			if ((term->type != Const)
 					&& (term->type != Func)) /* Wanted : Const,Func */
 				{
 				printfErr("match2: ERROR : unexpected term-type : ");

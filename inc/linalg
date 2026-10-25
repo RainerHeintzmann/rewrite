@@ -1,0 +1,36 @@
+# inc/linalg (2026)
+# Symbolic matrices on lists (inc/list): a matrix is a list of rows,
+# list(list(a,b),list(c,d)), a vector a list. The functions are symbolic C
+# functions (symmat.c); they stay unevaluated if an argument does not fit.
+# det, linsolve and inverse use Bareiss' fraction-free elimination: the
+# entries may be any terms, the results are polynomials in them, divided
+# by the determinant at the end.
+# Needs inc/all and inc/list:
+#     INC "inc/all"
+#     INC "inc/list"
+#     INC "inc/linalg"
+
+FUNC  transpose : real >> real       ATT SYMBOLIC transpose      # rows become columns
+FUNC  dot       : real,real >> real  ATT SYMBOLIC dot            # matrix.matrix, matrix.vector, vector.vector
+FUNC  identity  : real >> real       ATT SYMBOLIC identity       # identity(n): the n x n unit matrix
+FUNC  det       : real >> real       ATT SYMBOLIC det            # determinant
+FUNC  linsolve  : real,real >> real  ATT SYMBOLIC linsolve       # x with m.x = b (b a vector or a matrix)
+FUNC  inverse   : real >> real       ATT SYMBOLIC inverse        # inverse matrix
+FUNC  thread    : real >> real       ATT SYMBOLIC thread         # arithmetic on lists element by element
+FUNC  threadq   : real >> bool       ATT SYMBOLIC threadq        # thread would change u
+# the same for the sort number (e.g. with im of inc/integration/base)
+OTHER transpose : number >> number   ATT SYMBOLIC transpose
+OTHER dot       : number,number >> number ATT SYMBOLIC dot
+OTHER det       : number >> number   ATT SYMBOLIC det
+OTHER linsolve  : number,number >> number ATT SYMBOLIC linsolve
+OTHER inverse   : number >> number   ATT SYMBOLIC inverse
+OTHER thread    : number >> number   ATT SYMBOLIC thread
+OTHER threadq   : number >> bool     ATT SYMBOLIC threadq
+
+# Arithmetic and functions of lists element by element, as Mathematica's
+# Listable functions: REWR list(1,2)*x + list(a,b) : Listable gives
+# list(x+a, 2*x+b). The matrix functions above do this with their
+# arguments themselves: det(m - x*identity(2)) is the characteristic
+# polynomial of m.
+ALG Listable
+SPEC Listable : IF (threadq(Xnu)) Xnu = thread(Xnu)
