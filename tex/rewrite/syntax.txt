@@ -1,0 +1,227 @@
+%token SYM PAT SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUMPAT ATT
+%token   IS EQ INFO
+%token LA1 LA2 LA3 LA4 LA5 LOCAL RU RA COMMU LB IN NIN PARAM FOR TO STEP DO DBG
+%token   LAST
+%token BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT
+%token   RETURN
+%token OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS MAXSTEPS MAXDEPTH SYMBOLIC
+%token   HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS
+%token <y_sym> Id String
+%token <y_sym> Sort Alg Term
+%token <y_sym> La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
+%token Terms Form Sorts Functs Forms Algs Cond2 Cond
+%type <y_int> PRECEDENCE
+%type <y_nod> vinstr definition instruction aninstruction instructions prntexpr
+%type    tinstructions oinstructions
+%type <y_nod> idlist l_thing l_list sortlist vsortlist funclist formlist
+%type    termlist alglist Alg2 prntlist
+%type <y_nod> term func step att namedId d_list
+%type <y_nod> formula cformula condition condfunc
+%left La1
+%left La2
+%left La3
+%left La4
+%left La5
+%right Ra
+%right Ru
+%left Func
+%%
+
+prog : line
+        | prog line
+
+line : instructions '\n'
+
+definition : FUNC namedId ':' vsortlist PFEIL Sort PRECEDENCE att
+        | OTHER func ':' vsortlist PFEIL Sort att
+        | ATT Sort Id ',' Id ',' Id ',' Id
+        | BRA Id Id ':' vsortlist PFEIL Sort att
+        | PAT idlist ':' Sort
+        | REALNUM Sort
+        | SUBSORT Sort ',' Sort ATT Id
+        | SUBSORT Sort ',' Sort
+        | SHOW func ATT Id
+        | SHOW func
+        | INTNUM Sort ATT Id
+        | NUMPAT idlist ':' Sort
+        | SYM idlist ':' Sort
+        | TYPEOF term
+        | TYPEOF func
+        | HELP String String
+        | SPEC Alg ':' alglist
+        | SPEC Alg ':' formlist
+        | ADDSPEC Alg ':' formlist
+        | SORT idlist
+        | ALG idlist
+        | TERM idlist ':' Sort
+
+idlist : namedId
+        | namedId ',' idlist
+
+l_thing : Const
+        | Term
+
+l_list : l_thing
+        | l_thing ',' l_list
+
+att :
+        | ATT namedId
+        | ATT SYMBOLIC namedId
+        | ATT RULES alglist
+        | ATT SYMBOLIC HOLD namedId
+        | ATT '(' d_list ')' instruction
+
+namedId : Id
+        | Const
+        | Var
+        | func
+        | Sort
+        | Alg
+        | Term
+
+PRECEDENCE :
+        | LA1
+        | LA2
+        | LA3
+        | LA4
+        | LA5
+        | RA
+        | RU
+
+condition : condfunc
+        | condfunc ',' condition
+
+condfunc : LB '(' termlist ')'
+        | IN '(' termlist ')'
+        | NIN '(' termlist ')'
+        | '(' term ')'
+
+instructions : instruction
+        | instruction ';' instructions
+
+tinstructions : oinstructions
+        | oinstructions '\n' tinstructions
+
+oinstructions : instructions
+
+separator : '\n'
+        | ';'
+
+d_list : definition
+        | definition ';' d_list
+
+instruction : aninstruction
+        | definition
+        | '{' tinstructions '}'
+        | WHILE condition instruction
+        | IF condition instruction
+        | IF condition instruction ELSE instruction
+        | FOR term EQ term TO term step DO instruction
+
+aninstruction :
+        | SYS String
+        | INC String
+        | INFO namedId
+        | REWR term ':' alglist
+        | prntlist
+        | PRTNUM String
+        | PRT prntlist
+        | OUT String
+        | DATA String
+        | DATA Const
+        | Term EQ term
+        | Term EQ REWR term ':' alglist
+        | Const EQ term
+        | EXE func Id
+        | LIFT '(' termlist ')' TO '(' termlist ')'
+        | DBG Const
+        | MAXSTEPS Const
+        | MAXSTEPS
+        | MAXDEPTH Const
+        | MAXDEPTH
+        | STEPS Alg String
+        | SYMBOLIC String EQ String
+        | SYMBOLIC
+        | ALIAS String EQ String
+        | RETURN term
+        | QUIT
+        | OPT idlist
+        | OPT
+        | COMM funclist
+        | COMM
+        | DEFAULT
+        | DEFAULT func EQ term
+        | DEFAULT RIGHT func EQ term
+
+step :
+        | STEP term
+
+prntexpr : term
+        | String
+
+prntlist : prntexpr
+        | prntexpr ',' prntlist
+
+alglist : Alg2
+        | Alg2 ',' alglist
+
+Alg2 : Alg
+        | '(' alglist ')'
+
+sortlist : Sort
+        | Sort ',' sortlist
+
+vsortlist : sortlist
+        | sortlist VARPAR
+
+func : Func
+        | La1
+        | La2
+        | La3
+        | La4
+        | La5
+        | Ra
+        | Ru
+        | Bra
+        | Bra1
+
+funclist : func
+        | func ',' funclist
+
+term : Term
+        | LAST
+        | Const
+        | Const Bra1 termlist Bra2
+        | Var
+        | '(' term ')'
+        | term Ru
+        | Func term
+        | La1 term
+        | La2 term
+        | La3 term
+        | La4 term
+        | La5 term
+        | Bra termlist Bra
+        | Bra1 termlist Bra2
+        | Func '(' termlist ')'
+        | term La1 term
+        | term La2 term
+        | term La3 term
+        | term La4 term
+        | term La5 term
+        | term Ra term
+
+termlist : term
+        | term ',' termlist
+
+formula : term EQ term
+
+vinstr :
+        | DO instruction
+
+cformula : formula vinstr
+        | IF condition formula vinstr
+
+formlist : cformula
+
+%%

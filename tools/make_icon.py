@@ -30,17 +30,28 @@ def stroke(points, width0, width1, color):
         d.ellipse((x - w / 2, y - w / 2, x + w / 2, y + w / 2), fill=color)
 
 # the integral sign: a slanted S, thin at the ends, thick in the middle
-top = bezier([(690, 170), (560, 60), (470, 260), (480, 470)])
-bottom = bezier([(480, 470), (490, 690), (420, 900), (300, 820)])
-white = (245, 245, 240, 255)
-stroke(top, 30, 84, white)
-stroke(bottom, 30, 84, white)
-for (x, y) in ((690, 170), (300, 820)):          # the round ends
-    d.ellipse((x - 26, y - 26, x + 26, y + 26), fill=white)
+DX = 70                                            # the sign, moved to the right
+TURN = math.radians(5)                             # and turned to the left
+CENTER = (480 + DX, 470)
 
-# the stylus: from the lower right, its tip at the lower end of the integral
-tip = (300, 820)
-ang = math.radians(-14)                            # direction tip -> back end
+def R(x, y):
+    """the point (x, y) of the upright sign, moved and turned about CENTER"""
+    a, b = x + DX - CENTER[0], y - CENTER[1]
+    return (CENTER[0] + a * math.cos(TURN) + b * math.sin(TURN),
+            CENTER[1] - a * math.sin(TURN) + b * math.cos(TURN))
+
+top = bezier([R(690, 170), R(560, 60), R(470, 260), R(480, 470)])
+bottom = bezier([R(480, 470), R(490, 690), R(420, 900), R(300, 820)])
+green = (50, 190, 70, 255)                         # the sign: green
+stroke(top, 30, 84, green)
+stroke(bottom, 30, 84, green)
+for (x, y) in (R(690, 170), R(300, 820)):          # the round ends
+    d.ellipse((x - 26, y - 26, x + 26, y + 26), fill=green)
+
+# the stylus: from the upper right, its tip at the lower end of the integral
+end = R(300, 820)                                  # the lower end of the sign
+tip = (end[0] + 100, end[1] - 100)                  # the pen a bit up and right
+ang = math.radians(-38)                            # direction tip -> back end
 ux, uy = math.cos(ang), math.sin(ang)              # along the pen
 vx, vy = -uy, ux                                   # across
 def P(a, b):                                       # a along, b across

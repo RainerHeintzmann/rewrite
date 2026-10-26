@@ -1,601 +1,598 @@
-\documentstyle[german]{article}
+% Das Handbuch von rewrite. Übersetzen: pdflatex readme (zweimal, für das
+% Inhaltsverzeichnis). Der Anhang syntax.txt entsteht mit
+% python tools/gen_syntax.py aus src/syn.y.
+\documentclass[a4paper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\AtBeginDocument{\shorthandoff{"}}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{verbatim}		% \verbatiminput
+\usepackage{fancyvrb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amssymb}
+\usepackage{newunicodechar}
+\usepackage[hidelinks]{hyperref}
+
+% Unicode-Zeichen in den Beispielen
+\newunicodechar{α}{\ensuremath{\alpha}}
+\newunicodechar{θ}{\ensuremath{\theta}}
+\newunicodechar{π}{\ensuremath{\pi}}
+\newunicodechar{ħ}{\ensuremath{\hbar}}
+\newunicodechar{₁}{\ensuremath{_1}}
+\newunicodechar{≤}{\ensuremath{\le}}
+\newunicodechar{≥}{\ensuremath{\ge}}
+\newunicodechar{≠}{\ensuremath{\ne}}
+\newunicodechar{⋅}{\ensuremath{\cdot}}
+\newunicodechar{−}{\ensuremath{-}}
+\newunicodechar{∧}{\ensuremath{\wedge}}
+\newunicodechar{∨}{\ensuremath{\vee}}
+\newunicodechar{√}{\ensuremath{\surd}}
+\newunicodechar{∂}{\ensuremath{\partial}}
+\newunicodechar{∇}{\ensuremath{\nabla}}
+\newunicodechar{∞}{\ensuremath{\infty}}
+\newunicodechar{⊕}{\ensuremath{\oplus}}
+
+\newcommand{\rw}{\texttt{rewrite}}
+\newcommand{\kw}[1]{\texttt{#1}}
+\DefineVerbatimEnvironment{beispiel}{Verbatim}{xleftmargin=1.5em,fontsize=\small}
+
+\pagestyle{myheadings}
+\markright{Rewrite}
+
+\title{Rewrite --- ein Mathematiksystem\\[0.5ex]\large Handbuch}
+\author{Rainer Heintzmann}
+\date{1992--1996, überarbeitet 2026}
+
 \begin{document}
-
-\pagestyle{myheadings} \markright{Rewrite} \pagenumbering{roman}
-\title{Rewrite --- ein Mathematiksystem}
-\author{
-Rainer Heintzmann\thanks{Blumenhaller Weg 138,49078 Osnabr"uck}
-}
+\emergencystretch=3em	% lange Wörter in \texttt
 \maketitle
-\begin{abstract}
-Rewrite ist ein Sytem zur Beieinflu"sung symbolischer Ausdr"ucke,
-und zum Durchf"uhren numerischer Rechnungen.
-Mittels Umschreiben der Ausdr"ucke in einem Regelsystem von `Algebren'
-lassen sich einfache algebraische Funktionen wie Differenzieren, L"osen
-von quadratischen Gleichungen usw. von Termen ausf"uhren.
-Die Regelsysteme sind selbst zu definieren. Unter dem Verzeichnis `inc' 
-sind einige Beispiele.
 
-Numerisches Auswerten der Terme ist auch m"oglich. Benutzer k"onnen 
-eigene Funktionen schreiben und sie in die Liste vorhandener
-Funktionen in dem Modul `userfkt.c' einf"ugen.
+\begin{abstract}
+Rewrite ist ein System zur Umformung symbolischer Ausdrücke und zum
+Durchführen numerischer Rechnungen. Ausdrücke werden in Regelsystemen
+(`Algebren') umgeschrieben; so lassen sich Ableitungen, Vereinfachungen,
+Integrale und Lösungen von Gleichungen berechnen. Die Sprache selbst kennt
+keine Datentypen und keine Operatoren: Sorten, Funktionen und Regeln
+werden in Bibliotheken definiert. Die Standardbibliothek \kw{inc/all}
+enthält die reellen, komplexen und exakten Zahlen, die elementaren und
+viele spezielle Funktionen, Listen und Matrizen, das Lösen von Gleichungen
+und eine regelbasierte Integration (eine Übersetzung der Rubi-Regeln).
+Numerische Funktionen sind in C geschrieben und werden mit \kw{ATT} an
+Funktionen der Sprache gebunden.
+
+Dieses Handbuch beschreibt die Sprache. Die englische Beschreibung
+\kw{README.md} enthält dazu die Bibliotheken ausführlicher.
 \end{abstract}
 
-\section{Starten des Programms}
-Starten sie das Programm `rewrite' von der shell aus.
-Geben Sie nun `INC ''inc/all''' ein. Es werden nun eine Reihe von Include-Files
-geladen. Nun k"onnen Sie Ihre Aufgabe stellen z.B:
-`REWR D(sin cos x,x) : All'
-Das Programm bestimmt nun die Ableitung der Funktion `sin(cos(x))' nach x durch 
-Umschreiben dieses Terms in der Algebraliste `All'.
+\tableofcontents
 
-\section{Benutzung von `Rewrite'}
+\section{Übersetzen und Starten}
 
-Generell wird die Eingabe immer Zeilenweise verarbeitet. Bei gr"o"seren
-Bl"ocken mu"s die Zeile durch ein `$\backslash$' am Zeilenende fortgesetzt werden.
-Wichtig ist, da"s kein Zeichen (auch kein Leerzeichen) hinter dem `$\backslash$' steht.
-Kommentare beginnen mit `\#' und gehen bis zum Ende der Zeile oder bis zum
-n"achsten `$\backslash$' gefolgt von einem Zeilentrenner.
-\newpage
-\section{Liste aller Rewritebefehle}
+\subsection{Übersetzen}
+Benötigt werden \kw{gcc}, \kw{flex}, \kw{bison}, \kw{make} und die
+GMP-Bibliothek (für die exakten Zahlen).
 \begin{description}
-\item[Befehl] Erkl"arung
-\item[INC ''filename'']
-								Unter `filename' abgespeicherte Programme werden ausgef"uhrt.
-                `Filename' ist ein von `''' umschlossener String.
-                Mehrfache INCLUDES sind m"oglich bis zu einer maximalen Tiefe. 
-
-                Bsp.: INC `'inc/all'' : alle wichtigen Include-files werden 
-                gelesen.
-
-                Der INC-Befehl wird einmalig beim verarbeiten der Eingabe
-                ausgef"uhrt. Zeilen, die `INC' enthalten d"urfen nicht mit
-                `$\backslash$' fortgesetzt werden. (Einzige Ausnahme !)
-
-\item[REWR term : algname [,algname ..\symbol{93}]
-                Der Term `term' wird in den Algebren (Regellisten) `algname'
-                nacheinander umgeschrieben. Die Algebren werden durch Kommas getrennt
-                (nicht durch `;' wie in "alteren Versionen), z.B. \texttt{REWR I(0,1,x\^{}2,x) : numerik,rechne}.
-
-\item[PRTNUM ''String'']
-								Das Standartformat f"ur die Ausgabe von reelen Zahlen wird in
-                `String' ge"andert. Z.B. : PRTNUM ''\% 2.15g ''
-
-\item[OUT ''filename'']
-								Die Ausgabe wird in das File `filename' umgelenkt; dieses wird vorher
-                gel"oscht. Zus"atzlich ist noch `OUT ''stdout''' m"oglich. Dadurch
-                findet die Ausgabe wieder auf stdout (normalerweise der Bildschirm)
-								statt. Bei jeder Ausgabe"anderung wird die noch offene Datei
-								geschlossen.
-                Grafische Darstellung von Funktionen mittels anderer Programme
-                ist so einfach m"oglich.
-
-\item[DATA Const]
-								Liest eine Real-Zahl aus der ge"offneten Datei in die Konstante
-                `Const'. So lassen sich z.B. auch Me"swerte weiterverarbeiten.
-
-\item[DATA ''filename'']
-								Zus"atzlich zu der normalen Standarteingabe besteht die
-                M"oglichkeit mit `DATA Const' aus einer Datei zu lesen.
-                Diese Datei mu"s mit `DATA ''filename''' ge"offnet werden.
-								W"ahrend des Lesens wird beim Erreichen von nicht numerischen Daten
-								der Rest, bis zum Zeilenende "ubersprungen.
-
-\item[SYS ''String'']
-								f"urt den in `String' angegebenen Befehl in der shell aus.
-
-\item[SORT name [,name ..\symbol{93}]
-								Erzeugung eines Datentyps. Der Typ wird bei der Definition von
-								Funktionen, Variablen und Konstanten gebraucht.
-
-\item[NUM sortname]
-								Standartm"a"sig wird mit dem Datentyp `double' gerechnet
-                Alle eingegebenen Zahlen (z.B.: 1.234) werden als `double'
-                abgespeichert. Sie m"ussen aber einem selbstdefiniertem
-                Datentyp (mit `SORT typname' erzeugt) zugeordnet werden.
-
-                Bsp.: SORT real
-
-											NUM real    \# ordnet Nummern den Typ real zu.
-
-\item[CONST name [,name ..\symbol{93} : sortname]
-								Deklaration einer Konstanten. Es wird eigentlich
-                eine Konstante erzeugt, die beliebige Werte annehmen kann.
-                (Also eine Variable). Im Gegensatz zu mit VAR erzeugten
-								Metha-Variablen kann sie aber nicht als Ersatz f"ur ganze Terme
-                benutzt werden.
-
-\item[VAR name [,name ..\symbol{93} : sortname]
-								Erzeugung einer Metha-Variablen. Man kann diese Variable
-                als Platzhalter in Spezifikationen f"ur Algebren (Regellisten)
-								verwenden.
-
-                Bsp.:
-											VAR A : real  SPEC xyz A+0=A
-
-\item[NUM name [,name ..\symbol{93} : sortname]  
-								Erzeugung einer Metha-Variablen. Man kann diese Variable
-                als Platzhalter nur f"ur Numerische Werte in Spezifikationen 
-                f"ur Algebren (Regellisten) verwenden.
-
-                Bsp.: NUM N : real 
-
-											SPEC xyz N+0=N
-
-\item[FUNC name : sortlist \frq \frq\ sortname [LA1..5|RU\symbol{93} [ATT name\symbol{93}]
-                Erzeugung einer Funktion. Die erste `sortlist' gibt die
-                Anzahl und Typen der Argumente an. Es mu"s mindestens
-								eines sein. Sie werden jeweils durch Kommata voneinander getrennt.
-								Ein ++ hinter dem letzten Argument steht f"ur variabel viele Argumente des 
-								letzen Types. Der andere `sortname' gibt den
-                Resulttattyp der Funktion an. LA1 bis LA5 legt das Ein- bzw.
-                Ausgabeformat der zu definierenden Funktion fest. Es bedeuten: \\
-                   {\bf LA1 bis LA5}   : Links-assoziativer Operator (2 Argumente)
-                                   LA5 klammert vor LA4 usw. \\
-                   {\bf RU}            : Rechts-un"arer Operotor. (z.B. Fakult"at) \\
-									 {\bf RA}            : Rechts-assoziativer Operator (z.B. a\^b)\\
-
-                Ist kein spezielles Ein/Ausgabeformat angegeben, so wird die
-                Funktion in der Form : `sin x' , `sin(x)' bzw. `f(x,y)'
-                eingelesen.
-
-                {\bf ATT name} legt den Namen der Funktion in der Liste 
-                `userfunction' im Modul userfkt.c fest, die aufgerufen wird, 
-                wenn alle Argumente der Funktion einen numerischen Wert besitzen.
-								`name' ist nicht in `''' zu setzen. 
-								Name darf frei gew"ahlt werden (auch gleichlautend mit
-								einem Funktionsnamen).
-
-                z.B.: FUNC + : real,real \frq \frq\ real LA1 ATT 2
-
-								auch m"oglich ist: \\
-							  {\bf ATT ( Argdefs ) Block}
-								H"angt eine selbstdefinierte Funktion an. ( Argdefs ) sind 
-								vollst"andige Definitionen f"ur die Argumente ( Konstanten,Terme
-								oder Funktionen ).
-							  Der entsprechende Funktionsk"orper wird ausgef"uhrt, wenn eine
-								Zuweisung eines Terms an eine Konstante erfolgt, oder ein Term
-								ausgegeben werden soll.
-
-							  z.B. FUNC test : real,real,real \frq \frq\ real ATT $\backslash$ \\
-							       (CONST a,b : real; TERM c : real) \{ RETURN c+a*b \}
-
-\item[RETURN Term]
-								Setzt den Resultatwert (einen Term) der Funktion. Die Ausf"uhrung
-                der Funktion wird NICHT!! beendet. Enth"alt dieser Term lokale
-								Variablen, so gibt es eine Fehlermeldung, und die Funktion gild
-								als nicht ausgef"uhrt.
-
-\item[OTHER name : sortlist \frq \frq\ sortname [ATT name\symbol{93}]
-                Definiert zu einem existierenden Funktionsnamen eine weitere
-                Abbildung mit anderen Argument- und Resultattypen. 
-								Funktionen k"onnen anhand ihrer Argumenttypen unterschieden werden.
-
-                z.B.: OTHER + : vector,vector \frq \frq\ vector
-
-\item[BRA  auf zu : sortlist \frq \frq\ sortname [ATT name\symbol{93}]
-                Definiert eine Funktion, die in Klammerschreibweise benutzt
-                werden kann. `auf' bezeichnet das Symbol f"ur Klammer auf,
-                und `zu' das Symbol f"ur Klammer zu.
-								Es ist folgende zusaetzliche Notation bei der Benutzung erlaubt:
-
-								a[b,c] statt [a,b,c]           ([ = auf, ] = zu)
-								damit lassen sich z.B. Vectoren mit a[5] indizieren.
-
-                z.B: BRA \flq \frq : vector,vector \frq \frq\ real \# Skalarprodukt \flq a ,b \frq \\
-                Kennzeichnend f"ur OTHER ist die erste Klammer.\\
-                z.B.: OTHER \flq : compl,compl \frq \frq\ real\\
-
-\item[ALG algname] Definiert eine neue Algebra (Regelliste) , die Spezifikationen enthalten kann
-
-\item[SPEC algname : [Fkt ...\symbol{93} was = zuwas [DO Block\symbol{93}]
-               Alte Spezifikationen werden gel"oscht, diese neue Regel wird eingetragen.
-
-\item[SPEC algname : algnamelist]
-               Alte Spezifikationen werden gel"oscht, `algname' kann anstelle der
-               gesamten algnamelist verwendet werden. In der
-							 `algnamelist' stehen `algnames', die durch Kommata voneinander
-							 getrennt sind. Hintereinander Umschreiben
-               in mehreren Algebren kann so elegant geschrieben werden. 
-               Prinzipiell d"urfen Listen von Algebren immer mit `(' `)' Klammern
-               umgeben werden, was bedeutet, da"s beim Umschreiben die Algebren
-               innerhalb der Klammern solange ausgef"uhrt werden, bis kein weiteres
-               Umschreiben mehr m"oglich ist.
-
-\item[ADDSPEC algname : [IF ( Fkt )\symbol{93} was = zuwas [DO Block\symbol{93}]
-               Hinzuf"ugen einer Ersetzungsregel (Spezifikation) zur Algebra
-                `algname'. Es d"urfen Metha-Variablen auf beiden Seiten
-               verwendet werden. Mit NUM definierte Metha-Variablen werden
-               nur bei Zahlen ersetzt.
-
-							 Fkt ist selbstdefiniert (siehe IF ) oder eine der Funktionen :
-
-                     LB(term,term)            `Lower or between' vergleicht 
-                                              zwei Terme. \\
-                     ISINT(term)              stellt fest ob term ein int-wert
-                                              ist. \\
-                     IN(terma,termb)          stellt fest ob terma in termb
-                                              enthalten ist. \\
-                     NIN(terma,termb)         verneinung von IN. \\
-
-               Abh"angig vom Resultat der Funktionen wird die Regel angewandt
-               oder eben nicht. Das Hintereinanderschreiben mehrerer Funktionen
-               bewirkt eine und-Verkn"upfung der Resultate.
-
-               Bsp.: ADDSPEC real : LB(A,B) A+B=B+A\\
-               Ist DO in Verkn"upfung mit einem Block (oder einem Befehl)
-               angegeben, so wird vor dem Ersetzen der linken durch die rechten
-               Seite der Block ausgef"uhrt. Mehrere Befehle m"ussen in dem Block
-							 von `\{' und `\}' umgeben sein.
-
-               Bsp.: ADDSPEC real : Tay(A,B,D)=q DO \{ q=0 \\
-                                    FOR i=1 TO N STEP 1 DO $\backslash$ \\
-                                    q=q+D\^i/i!*Dp(B,D) \}\\
-
-\item[LIFT (Fktlist(Args)) TO (Fktlist(Args))]
-							 "Ubertragung s"amtlicher auf eine Menge von Funktionen und
-							 Konstanten zutreffender Regeln auf eine andere solche Menge.
-							 Fktlist(Args) ist eine durch Kommas getrennte Liste von Funktionen
-							 mit irgentwelchen Argumenten des gew"unschten Datentyps oder
-							 Konstanten.
-
-               Die jeweiligen Funktionen werden durch den Typ ihrer Argumente
-               eindeutig charakterisiert. Die Argumente spielen sonst im weiteren
-               keine Rolle. Als Konstanten sind auch die reellen Zahlen 1 und 0
-               m"oglich.
-
-							 Alle Regeln, die in der linken Menge gelten werden
-							 nun automatisch auch auf die rechte Menge angewandt.
-
-							 Bsp. :\\
-\begin{verbatim}
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
-\end{verbatim}
-               mit diesem Trick lassen sich die Eigenschaften eines
-               Ringes leicht aufgrund schon spezifizierter Gruppeneigenschaften
-               definieren.
-
-\item[TERM name : sortname]
-               Deklaration einer Term-Variable.
-               Eine Term-Variable kann einen beliebigen Ausdruck des gleichen
-               Typs aufnehmen.Ineianderschachtelung von Term-Variablen bewirkt
-               ein Einsetzen der aktuellen Ausdr"ucke. Die Abh"angigkeit zu der anderen
-               Term-Variablen wird nicht gespeichert.
-
-               Immer vorhanden ist der Term `\%'. Er enth"alt den jeweils
-               zuletzt ausgegebenen Ausdruck. Soll dieser weiterhin gespeichert
-               werden, so mu"s er an eine andere Term-Variable zugewiesen werden.
-
-               Term-Variablen werden eigentlich im Sinne von Funktionen
-               verwendet. So ist die Zuweisung `TERM q  q=x\^y*a' im Sinne von 
-               `q(x,y,a)' zu verstehen. Durch Zuweisungen an die einzelnen
-               Variablen `x=4 y=2 a=3' kann dann einfach der Funktionswert von
-               q(4,2,3) mit `q' ausgerechnet werden.
-               
-
-\item[ATT sortname Name1 , Name2 , Name3 , Name4] 
-               Einem Typ wird Anzeige- ,Vergleichs- , Kopier- und L"oschfunktion
-               f"ur numerische Werte zugewiesen. Dei `Namen' stehen hierbei nicht
-							 in doppelten Anf"uhrunsstrichen.
-
-               `Name1' bezeichnet die Anzeigefunktion in `userfunction' mit der
-               numerische Werte vom Typ sortname angezeigt werden sollen. \\
-               `Name2' bezeichnet die Vergleichsfunktion mit der zwei numerische
-               Werte verglichen werden (1 : Zahl1 \frq\ Zahl2,0: Zahl1 == Zahl2,
-               -1 : Zahl1 \flq Zahl2). \\
-               `Name3' bezeichnet die Kopierfunktion in `userfunction' mit der
-               Numerische Werte kopiert werden. \\
-               `Name4' bezeichnet die L"oschfunktion in `userfunction' mit der
-               Numerische Werte gel"oscht werden.
-
-               Bsp.: ATT complex show\_complex,cmp\_complex,cpy\_complex,del\_complex\\
-               siehe Modul userfkt.c
-
-
-\item[FOR Constname = N1 TO N2 [STEP N3\symbol{93} DO Block]
-							For-Schleife.
-
-							Bsp.: FOR i = 20 TO 10 STEP -1 DO i
-
-\item[IF ( Fkt ) Block [ ELSE Block \symbol{93}] 
-              IF-Bedingung. Fkt ist der Name einer Funktion mit double Resultat, die
-              TRUE/FALSE (1.0/0.0) zur"uckgibt.
-
-              Bsp.: CONST inc\_xxx : real \\
-                    inc\_xxx = 1\\
-                    IF (inc\_xxx \frq 0) INC ''inc/xxx''\\
-
-\item[WHILE ( Fkt ) Block]
-              WHILE-Schleife. F"ur `Fkt' siehe `IF'.
-
-              Bsp.: i = 1\\
-                    WHILE (10\frq i) 2\verb|^|i
-
-\item[Zuweisungen: Termname = term]
-               term wird in Termname gespeichert
-
-               Bsp.: TERM q : real   \\
-							 q=1+1+a
-
-               Der letzte ausgegebene Ausdruck ist unter `\%' als Termname
-               immer verf"ugbar. Er wird also automatisch an `\%' zugewiesen.
-               In selbstdefinierten Funktionen d"urfen lokale Variablen nicht an globalere Terme zugewiesen werden.
-               (daraus resultiert eine Fehlermeldung bei der Ausgabe. (Zuweisung an \%))
-               Werden Term-Variablen an Term-Variablen zugewiesen, so wird der
-               Inhalt kopiert und gegebenenfalls numerisch ausgewertet. Wird also
-               eine Term-Variable ver"andert hat dies keinen einflu"s auf andere
-               Term-Variablen.
-
-
-\item[Constname = value]
-               Die Konstante `Constname' bekommt einen Wert
-
-               z.B.: x=1+1+3    (wenn + mit Funktion verbunden )
-
-               Steht bei `value' kein Wert (z.B. andere Konstante ohne
-               Wert oder Funktion, die nicht rechnet) so wird der Wert der 
-               Konstanten gel"oscht und sie erscheint in der Ausgabe wieder
-							 mit ihrem Namen `Constname'.
-
-               Sowohl eine Const- als auch eine Term-Variable k"onnen durch einfaches
-               hinschreiben des Namens ausgegeben werden.
-							 Ausgegebene Ausdr"ucke werden an `\%' zugewiesen.
-
-							 zur Verdeutlichung ein Beispiel :
-
-
-
-\begin{verbatim}
-1+1 
-2                  # wird ausgegeben 
-TERM q : real 
-q=1+1 
-q 
-2                  # wird ausgegeben (q bleibt aber erhalten) 
-Der letzte Ausgedruckte Wert ist unter dem Term \% wieder zu erreichen.
-Bestehende Abh"angigkeiten zu anderen Termen werden hier ignoriert.
-Bsp.:
-TERM q
-q=b
-a+q
-a+b                # wird ausgegeben
-q=c
-%+2
-a+b+2              # wird ausgegeben
-\end{verbatim}
+\item[Linux:] \kw{make}, danach \kw{make test} für die Tests.
+\item[Windows:] MSYS2 installieren (z.\,B.\ mit \kw{winget install
+  MSYS2.MSYS2}) und in der MSYS2-Shell einmalig die Werkzeuge:
+\begin{beispiel}
+pacman -S mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-gmp flex bison make diffutils
+\end{beispiel}
+  Danach im Projektverzeichnis \kw{build\_windows.bat} aufrufen
+  (\kw{build\_windows.bat test} für die Tests). Das erzeugte
+  \kw{rewrite.exe} braucht keine weiteren DLLs.
 \end{description}
 
-\section{Allgemeines}
-Werden von `''' begrenzte Strings hingeschrieben, so wird der Text ausgegeben.
-Sie k"onnen nicht zugewiesen werden. (ein String darf auch `''' enthalten.)
+\subsection{Starten}
+Starten Sie \rw\ in der Shell im Projektverzeichnis (die Pfade in
+\kw{INC} und \kw{DATA} gelten relativ zum aktuellen Verzeichnis) und
+geben Sie \kw{INC "inc/all"} ein. Dann können Sie Ihre Aufgabe stellen:
+\begin{beispiel}
+> INC "inc/all"
+> REWR D(sin cos x,x) : All
+- cos (cos (x ))* sin (x )
+> REWR I(0,1,x^2,x) : numerik,calc
+(1/3)
+> [[1,2],[3,4]] * [5,6]
+[17,
+ 39]
+\end{beispiel}
+Das Programm bestimmt die Ableitung von $\sin(\cos x)$ nach $x$ durch
+Umschreiben des Terms in der Regelliste \kw{All}.
 
-Eine Reihe `benutzerdefinierter' Funktionen sind schon implementiert.
-Dazu geh"oren wichtige Funktionen auf reelen Zahlen (real.c),
-complexen Zahlen (complex.c), reelen Vectoren (rvector.c) und reelen
-Matrizen (rmatrix.c) und Verbindungen der Datentypen. Alle Funktionen
-sind im Modul (userfkt.c) eingetragen.
+\medskip
+\noindent
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+Aufruf & Bedeutung \\
+\midrule
+\kw{rewrite} & interaktiv: Begrüßung, dann eine Eingabeaufforderung
+  \kw{>} für jede Zeile (\kw{-->} in einem offenen Block) \\
+\kw{rewrite datei ...} & führt die Dateien aus (wie \kw{INC "datei"}) und endet \\
+\kw{rewrite -i datei ...} & führt die Dateien aus und geht interaktiv weiter \\
+\kw{rewrite < datei} & liest das Programm aus einer Datei oder Pipe, ohne
+  Begrüßung und Eingabeaufforderung (für Skripte und die Tests) \\
+\kw{rewrite -h} & zeigt die Optionen \\
+\kw{--no-startup} & interaktiv ohne die Startdatei \\
+\kw{--max-steps n} & die Schrittgrenze von \kw{REWR} (wie \kw{MAXSTEPS n}) \\
+\kw{--max-depth n} & die Tiefengrenze von \kw{REWR} (wie \kw{MAXDEPTH n}) \\
+\bottomrule
+\end{tabularx}
 
-Neue Funktionen m"ussen immer
-ein array von Zeigern auf Argumente als Argument bekommen und einen Zeiger
-auf das Resultat zur"uckliefern. Beispiele sind in den genannten c-Modulen
-zu finden.
+\medskip
+Eine interaktive Sitzung führt zuerst die Startdatei
+\kw{.rewrite/startup.rw} aus, wenn es sie gibt (wie \kw{startup.jl} in
+Julia). Sie wird in \kw{HOME} gesucht, dann im Windows-Benutzerverzeichnis.
+Eine Zeile \kw{INC "inc/all"} darin lädt die Bibliothek in jeder Sitzung.
+\kw{QUIT} oder das Dateiende (Strg-D, unter Windows Strg-Z und Enter)
+beendet \rw. Strg-C bricht eine laufende Rechnung ab, ohne \rw\ zu
+beenden.
 
-Die grundlegenden mathematischen Datentypen, Funktionen und Regeln sind
-im Modul `alg' im Verzeichni"s `inc' definiert. Dort kann man auch nachlesen
-welche mathematischen Funktionen definiert sind.\\ \\
-{\bf Wichtigste Fehler des Systems:} \\
-Der Speicher wird nur unzureichend freigegeben.\\
-{\bf M"angel des Systems:} \\
-W"unschend w"ahre ein mehr Objekt-orientierter Ansatz; einfache Dinge wie
-differenzieren usw. sind dann deutlich schneller (verschicken von Nachrichten).
-Es existieren keine bisher `Container-Datentypen' wie Arrays, Matritzen, usw. .
-Diese m"ussen durch entsprechende Funktionen nachgebildet werden, was Rechenzeit
-kostet.
+\subsection{Terminal mit Zeileneditor}
+Das Skript \kw{tools/rewrite-rl} startet \rw\ mit \kw{rlwrap}: Zeilen
+lassen sich editieren, die Eingaben bleiben über Sitzungen hinweg erhalten
+(\kw{\textasciitilde/.rewrite\_history}), die Pfeiltasten suchen wie in
+Julia nach früheren Zeilen mit dem gleichen Anfang, TAB ergänzt
+Schlüsselwörter und Funktionsnamen, und wie in Julia wird \verb|\alpha|
+mit TAB zu α. Schlüsselwörter, Funktionen und Sorten werden farbig
+angezeigt. Unter Windows legt \kw{tools/make\_shortcut.ps1} eine
+Verknüpfung auf dem Desktop an.
 
-\begin{appendix}
-\section{Zusammenfassung der yacc-syntax}
+\section{Eingabe}
+\begin{itemize}
+\item Die Eingabe wird zeilenweise verarbeitet; jede Zeile wird gleich
+  nach dem Lesen ausgeführt.
+\item Eine lange Zeile wird mit \verb|\| am Zeilenende fortgesetzt. Hinter
+  dem \verb|\| darf kein Zeichen stehen, auch kein Leerzeichen.
+\item Ein Block in \verb|{ ... }| darf über mehrere Zeilen gehen.
+\item Mehrere Befehle in einer Zeile werden durch \kw{;} getrennt.
+\item Kommentare beginnen mit \kw{\#} und gehen bis zum Zeilenende.
+\item Eine Zeile, die mit \kw{?} beginnt, zeigt eine Hilfe wie in Julia:
+  \kw{?REWR}, \kw{?Int}, \kw{?sin}; \kw{?} allein listet alle Namen mit
+  einem Hilfetext. Die Texte stehen in der Bibliothek
+  (\kw{HELP "name" "text"}, siehe \kw{inc/help}). Ohne Text zeigt
+  \kw{?f} die Varianten einer Funktion und \kw{?x} Art und Wert eines
+  Namens.
+\item Ein Text in doppelten Anführungszeichen wird ausgegeben. Eine durch
+  Kommas getrennte Liste gibt mehreres aus: \verb|"x = ",x|.
+\item Ein hingeschriebener Term wird ausgegeben, so weit wie möglich
+  ausgerechnet. Der zuletzt ausgegebene Term ist immer als Term \kw{\%}
+  verfügbar.
+\item Fehler werden mit der fehlerhaften Zeile gemeldet; danach geht es
+  mit der nächsten Zeile weiter.
+\item Namen dürfen Unicode-Buchstaben enthalten (UTF-8):
+  \kw{SYM α, θ₁ : real}. Wie in Julia werden LaTeX-artige Namen bei der
+  Eingabe ersetzt: \verb|\alpha| wird zu α, \verb|\_1| zu ₁, \verb|\hbar|
+  zu ħ (Julias Tabelle mit etwa 2500 Namen, \kw{src/latex.c}). Ein Name,
+  der auf einen Buchstaben endet, darf nicht von einem Buchstaben gefolgt
+  sein: \verb|\alphax| bleibt stehen.
+\item Unicode-Operatoren sind eigene Zeichen, auch ohne Leerzeichen:
+  \kw{a≤b} ist \kw{a ≤ b}, \kw{3×4} ist \kw{3 × 4}. Das sind die Zeichen
+  × ÷ · ± ¬, die Pfeile und die mathematischen Operatoren, außer denen,
+  die als Namen dienen (∂ ∇ ∞, Summen und Integrale). Ihre Bedeutung
+  kommt aus der Bibliothek (\kw{ALIAS}, Abschnitt~\ref{sec:sorten}):
+  \kw{inc/alg} liest × als \kw{*}, ebenso ≤ ≥ ≠ ⋅ · ÷ − ∧ ∨ ¬ √ π
+  (\kw{√16} ist \kw{sqrt 16}).
+\end{itemize}
 
-\begin{verbatim}
+\section{Datentypen und Operatoren}\label{sec:sorten}
+Ohne Bibliothek kennt die Sprache weder Datentypen noch Operatoren. Dieses
+vollständige Programm definiert sie selbst:
+\begin{beispiel}
+SORT real                                   # ein Datentyp
+REALNUM real                                # Zahlen wie 1.5 haben den Typ real
+FUNC + : real,real >> real LA2 ATT plus     # Operatoren mit Rang und der
+FUNC * : real,real >> real LA3 ATT mult     # C-Funktion, die sie ausrechnet
+FUNC ^ : real,real >> real RA  ATT power
+1+2*3                                       # gibt 7 aus
+SYM x,y : real
+x+y*2                                       # gibt x + y * 2 aus
+x=4
+x+y*2                                       # gibt 4 + y * 2 aus
+\end{beispiel}
 
-%token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ
-%token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
-%token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token	<y\_sym>	Id String
-%token	<y\_sym>	Sort Alg Term
-%token	<y\_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
-%token			Terms Form Sorts Functs Forms Algs Cond2 Cond
-%type	<y\_int>	VORRANG
-%type	<y\_nod>	vinstr definition instruction aninstruction instructions prntexpr  tinstructions oinstructions
-%type	<y\_nod> idlist l\_thing l\_list sortlist vsortlist funclist formlist termlist alglist Alg2 prntlist
-%type	<y\_nod>	term func step att namedId d\_list
-%type	<y\_nod> formula cformula condition condfunc
+\begin{description}
+\item[SORT name {[},name ..{]}]
+  Erzeugt einen Datentyp (eine `Sorte'). Sorten werden bei Funktionen,
+  Symbolen und Termen gebraucht.
 
-%left	La1 
-%left	La2 
-%left	La3 
-%left	La4 
-%left	La5
-%right	Ra 
-%right	Ru 
-%left	Func 
-%%
+\item[REALNUM sortname]
+  Alle eingegebenen Zahlen (z.\,B.\ \kw{1.234}) bekommen diese Sorte; sie
+  werden als \kw{double} gespeichert. Vor \kw{REALNUM} ist eine Zahl ein
+  Fehler. Bsp.: \kw{SORT real} \quad \kw{REALNUM real}
 
+\item[INTNUM sortname ATT name]
+  Zahlen ohne Punkt und Exponent bekommen diese Sorte; die C-Funktion
+  \kw{name} erzeugt den Wert aus dem Text. So macht \kw{inc/exact} sie zu
+  exakten ganzen Zahlen (GMP).
 
-prog		: line
-				| prog line
+\item[SUBSORT a,b {[}ATT name{]}]
+  Jeder Wert der Sorte \kw{a} ist auch einer der Sorte \kw{b}
+  (\kw{integer} $<$ \kw{rational} $<$ \kw{real}); die C-Funktion wandelt
+  einen Wert um. Eine Funktion für \kw{real} nimmt dann auch exakte
+  Argumente. Passen mehrere Varianten einer Funktion, so hat eine genau
+  passende Vorrang, sonst gewinnt die mit den wenigsten Umwandlungen.
+  Ohne \kw{ATT} hat \kw{b} keine eigenen Werte: so sind \kw{number}
+  (oberhalb von \kw{real} und \kw{complex}), \kw{algebra}, \kw{vector}
+  und \kw{matrix} Sorten für symbolische Ausdrücke. Regeln für \kw{number}
+  gelten für alle Terme darunter.
 
-line		: instructions '\n' 
-													
-definition	: FUNC namedId ':' vsortlist PFEIL Sort	VORRANG att 
-			| OTHER func ':' vsortlist PFEIL Sort att 
-			| ATT Sort Id ',' Id ',' Id ',' Id 
-			| BRA Id Id	':'  vsortlist PFEIL Sort	att 
-			| VAR idlist ':' Sort			 
-			| NUM Sort	 			  			 
-			| NUM idlist ':' Sort			 
-			| CST idlist ':' Sort			 
-			| SPEC Alg ':' alglist	   
-			| SPEC Alg ':' formlist		 
-			| ADDSPEC Alg ':' formlist 
-			| SORT idlist					     
+\item[SYM name {[},name ..{]} : sortname]
+  Deklariert ein Symbol (bis 2026 \kw{CONST}). Es steht für sich selbst
+  und wird mit seinem Namen ausgegeben, oder es hat einen Wert seiner
+  Sorte (\kw{x = 4}); es ist also eine Variable im üblichen Sinn. Ein
+  Symbol einer Sorte ohne Werte (\kw{number}) hat keinen Wert.
 
-			| ALG idlist	             
-			| TERM idlist ':' Sort	   
+\item[TERM name {[},name ..{]} : sortname]
+  Deklariert eine Term-Variable, die einen ganzen Ausdruck speichert
+  (Abschnitt~\ref{sec:zuweisung}).
 
-idlist	: namedId						
-			| namedId ',' idlist		
+\item[PAT name {[},name ..{]} : sortname]
+  Deklariert eine Muster-Variable (bis 2026 \kw{VAR}). Sie steht in Regeln
+  für einen beliebigen Term ihrer Sorte oder einer Sorte darunter.
+  Bsp.: \kw{PAT A : real} \quad \kw{SPEC xyz : A+0=A}
 
-l_thing : Const					
-			| Term						
+\item[NUMPAT name {[},name ..{]} : sortname]
+  Deklariert eine Muster-Variable, die nur für Zahlen steht (bis 2026
+  \kw{NUM}). Bsp.: \kw{NUMPAT N : real} \quad \kw{SPEC xyz : N+0=N}
 
-l_list	: l_thing			     
-			| l_thing ',' l_list 
+\item[TYPEOF term, TYPEOF f]
+  Gibt die Sorte eines Terms aus; für einen Namen auch seine Art
+  (\kw{SYM}, \kw{TERM}, \kw{PAT}, \kw{NUMPAT}) und seinen Wert oder Term,
+  für eine Funktion alle Varianten mit ihren Sorten.
 
-att 		: /* NULL */		
-			  | ATT namedId		
-				| ATT '(' 
-								 d_list ')' instruction 
+\item[FUNC name : sortliste >{}> sortname {[}LA1..LA5|RA|RU{]} {[}ATT ..{]}]
+  Erzeugt eine Funktion. Die Sortenliste gibt Anzahl und Sorten der
+  Argumente an; ein \kw{++} hinter der letzten Sorte steht für beliebig
+  viele Argumente dieser Sorte. Der zweite Sortenname ist die Sorte des
+  Ergebnisses. Das Ein- und Ausgabeformat:
+  \begin{description}
+  \item[LA1 bis LA5] links-assoziativer Operator mit zwei Argumenten;
+    \kw{LA5} bindet stärker als \kw{LA4} usw.
+  \item[RA] rechts-assoziativer Operator, z.\,B.\ \verb|a^b|.
+  \item[RU] rechts-unärer Operator, z.\,B.\ die Fakultät \kw{3!}.
+  \item[ohne] die Funktion wird als \kw{sin x}, \kw{sin(x)} oder
+    \kw{f(x,y)} geschrieben.
+  \end{description}
+  Was die Funktion ausrechnet, legt \kw{ATT} fest:
+  \begin{description}
+  \item[ATT name] die C-Funktion \kw{name} aus der Liste
+    \kw{userfunction} in \kw{src/userfn.c}. Sie wird aufgerufen, wenn alle
+    Argumente einen Zahlenwert haben; sonst bleibt die Funktion symbolisch.
+    Bsp.: \kw{FUNC sqrt : real >{}> real ATT r\_sqrt}
+  \item[ATT SYMBOLIC name] eine symbolische C-Funktion aus
+    \kw{src/symfn.c}; sie bekommt die Argumente als Terme und gibt einen
+    neuen Term zurück (z.\,B.\ \kw{expand}, \kw{coeff}, \kw{normform}).
+    Mit \kw{ATT SYMBOLIC HOLD name} bekommt sie die Argumente
+    unausgewertet.
+  \item[ATT RULES algliste] die Funktion wird durch Umschreiben berechnet:
+    \kw{f(a,b)} wird zu \kw{REWR f(a,b) : algliste}. Ist das Ergebnis
+    wieder ein Aufruf von \kw{f}, so bleibt der Aufruf stehen. So ist die
+    Ableitung \kw{deriv} in \kw{inc/helpers} definiert.
+  \item[ATT ( Argdefs ) Block] eine in der Sprache selbst geschriebene
+    Funktion. \kw{( Argdefs )} sind Definitionen der Argumente (Symbole,
+    Terme oder Funktionen). Der Block wird ausgeführt, wenn der Term
+    berechnet wird:
+\begin{beispiel}
+FUNC fma3 : real,real,real >> real ATT (SYM aa,bb : real; TERM cc : real) \
+            { RETURN cc+aa*bb }
+fma3(2,3,4)          # gibt 10 aus
+\end{beispiel}
+  \end{description}
 
-namedId : Id           
-        | Const        
-        | Var	         
-        | func         
-        | Sort         
-        | Alg          
-        | Term         
+\item[RETURN term]
+  Setzt das Ergebnis einer selbst geschriebenen Funktion. Die Ausführung
+  der Funktion wird dadurch \emph{nicht} beendet.
 
+\item[OTHER name : sortliste >{}> sortname {[}ATT name{]}]
+  Gibt einem vorhandenen Funktionsnamen eine weitere Bedeutung für andere
+  Argument- und Ergebnissorten. Funktionen werden anhand der Sorten ihrer
+  Argumente unterschieden. Bsp.: \kw{OTHER + : vector,vector >{}> vector}
 
-VORRANG		: /* nothing */				
-			| LA1						
-			| LA2						
-			| LA3						
-			| LA4						
-			| LA5						
-			| RA						
-			| RU						
+\item[BRA auf zu : sortliste >{}> sortname {[}ATT name{]}]
+  Definiert eine Funktion in Klammerschreibweise; \kw{auf} und \kw{zu}
+  sind die Klammersymbole. Statt \kw{[a,b,c]} darf man \kw{a[b,c]}
+  schreiben, so lassen sich Vektoren mit \kw{v[1]} indizieren. Bei
+  \kw{OTHER} kennzeichnet die erste Klammer die Funktion.
+  Bsp.: \kw{BRA < > : vector,vector >{}> real} \quad \# Skalarprodukt \kw{<a,b>}
 
-condition : condfunc					
+\item[ATT sortname Name1,Name2,Name3,Name4]
+  Gibt einer Sorte die C-Funktionen zum Anzeigen, Vergleichen, Kopieren
+  und Löschen ihrer Werte (aus \kw{userfunction}). Die
+  Vergleichsfunktion liefert 1, 0 oder $-1$ für $>$, $=$, $<$.
+  Bsp.:
+\begin{beispiel}
+ATT complex show_complex,cmp_complex,cpy_complex,del_complex
+\end{beispiel}
 
-condfunc : LB '(' termlist ')'
-			| IN '(' termlist ')' 	
-			| NIN '(' termlist ')'	
-			| '(' term ')'   				
+\item[SHOW f {[}ATT name{]}]
+  Terme mit der Funktion \kw{f} werden mit der C-Funktion \kw{name}
+  ausgegeben; \kw{SHOW f} allein schaltet zurück. So gibt \kw{inc/list}
+  einen Vektor als Spalte und eine Matrix als Gitter aus.
 
-instructions  : instruction	
-							| instruction ';' instructions 
+\item[ALIAS "name" = "symbol"]
+  Der Name wird von nun an als das Symbol gelesen; die Ausgabe zeigt das
+  Symbol. Bsp.: \kw{ALIAS "×" = "*"}, dann ist \kw{3×4} gleich 12.
 
-tinstructions : oinstructions	
-							| oinstructions '\n' tinstructions 			
+\item[SYMBOLIC "rolle" = "symbol"]
+  Die symbolischen C-Funktionen kennen die Operatoren der Bibliothek über
+  Rollen (\kw{"+"}, \kw{"cos"}, \kw{"pi"}, \ldots). Eine Bibliothek mit
+  anderen Namen ordnet sie so zu: \kw{SYMBOLIC "cos" = "kos"}.
+  \kw{SYMBOLIC} allein löscht die Zuordnung.
 
-oinstructions : instructions			
+\item[HELP "name" "text"]
+  Fügt der Hilfe zu \kw{name} eine Zeile hinzu, die \kw{?name} anzeigt.
+\end{description}
 
-trenner : '\n' 
-				| ';'
+\section{Regelsysteme und Umschreiben}
+\begin{description}
+\item[ALG name {[},name ..{]}]
+  Definiert ein neues Regelsystem (eine `Algebra').
 
-d_list : definition						 
-			 | definition ';' d_list 
+\item[SPEC alg : {[}IF bedingung{]} links = rechts {[}DO block{]}]
+  Löscht die alten Regeln von \kw{alg} und trägt diese Regel ein.
 
-instruction : aninstruction     
-			| definition		    			
-			| '{'
-				tinstructions '}' 			
-			| WHILE condition instruction	
-			| IF condition instruction	
-			| IF condition instruction ELSE instruction	
-			| FOR term EQ term TO term step DO instruction
+\item[ADDSPEC alg : {[}IF bedingung{]} links = rechts {[}DO block{]}]
+  Fügt \kw{alg} eine Regel hinzu. Muster-Variablen dürfen auf beiden
+  Seiten stehen. Ist \kw{DO} mit einem Block angegeben, so wird der Block
+  vor dem Ersetzen ausgeführt.
 
-aninstruction	: /* Nichts */ 	
-			| SYS String					
-			| INC String					
-			| REWR term ':' alglist	
-			| prntlist						
-			| PRTNUM String				
-			| PRT prntlist				
-			| OUT String					
-			| DATA String					
-			| DATA Const					
-			| Term EQ term				
-			| Term EQ REWR term ':' alglist	
-			| Const EQ term			
-			| EXE func Id 			
-			| LIFT '(' termlist ')' TO '(' termlist ')'	
-			| DBG Const 	      	
-			| RETURN term								
-			| QUIT                      
+\item[SPEC alg : alg1, alg2, ..]
+  \kw{alg} steht für die Liste der Regelsysteme, die nacheinander
+  angewandt werden. Eine Liste in Klammern, z.\,B.\
+  \kw{(Linear,Compl,diff)}, wird so lange angewandt, bis sich nichts mehr
+  ändert. Die Regelsysteme werden durch Kommas getrennt (in älteren
+  Versionen durch \kw{;}).
 
-step  : /* NULL */	
-			| STEP term	
+\item[REWR term : alg {[},alg ..{]}]
+  Schreibt den Term mit den Regelsystemen nacheinander um und gibt das
+  Ergebnis aus. Mit \kw{t = REWR term : alg} wird es in der Term-Variablen
+  \kw{t} gespeichert.
 
-prntexpr : term						
-			| String							
+\item[LIFT (funktionen) TO (funktionen)]
+  Überträgt alle Regeln, die für eine Menge von Funktionen und Konstanten
+  gelten, auf eine andere. Die Funktionen werden durch die Sorten ihrer
+  Argumente gekennzeichnet; die Argumente selbst spielen sonst keine Rolle.
+  Als Konstanten sind auch 0 und 1 möglich. Mit diesem Trick folgen die
+  Ringregeln aus den Gruppenregeln:
+\begin{beispiel}
+LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
+LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
+\end{beispiel}
+\end{description}
 
-prntlist : prntexpr						
-			| prntexpr ',' prntlist	
+\subsection{Bedingungen}
+Eine Regel gilt nur, wenn ihre Bedingungen erfüllt sind:
+\begin{description}
+\item[LB(term,term)] `lower or between': eine Ordnung der Terme, z.\,B.\
+  zum Sortieren von Summen: \kw{ADDSPEC real : IF LB(A,B) B+A=A+B}.
+\item[IN(a,b)] der Term \kw{a} kommt in \kw{b} vor. \kw{NIN(a,b)} ist
+  die Verneinung; \kw{NIN(x,a,b,c)} prüft, dass \kw{x} in keinem von
+  \kw{a}, \kw{b}, \kw{c} vorkommt.
+\item[(term)] ein Ausdruck mit einem Wahrheitswert, z.\,B.\
+  \kw{(is\_int(N))} oder \kw{(N > 0)}. Lässt er sich nicht ausrechnen
+  (etwa weil \kw{N} symbolisch ist), so gilt die Bedingung nicht.
+\end{description}
+Mehrere Bedingungen werden durch Kommas getrennt und müssen alle gelten:
+\kw{IF NIN(x,A), (N > 0) \ldots}
 
-alglist		: Alg2						
-			| Alg2 ',' alglist		
+\begin{beispiel}
+PAT A : real
+ALG einfach
+SPEC einfach : A*1=A
+ADDSPEC einfach : A+0=A
+SYM u : real
+REWR (u*1)+0 : einfach      # gibt u aus
+\end{beispiel}
 
-Alg2 : Alg									
-			| '(' alglist ')'			
+\subsection{Optionale Teile und kommutative Operatoren}
+Drei Befehle lassen eine Regel viele Formen eines Terms erfassen. Sie
+gelten für die danach definierten Regeln:
+\begin{description}
+\item[OPT A,B] die Muster-Variablen \kw{A}, \kw{B} dürfen im Term fehlen.
+\item[DEFAULT + = 0] ein fehlender Operand von \kw{+} hat den Wert 0;
+  \kw{DEFAULT RIGHT \^{} = 1}: nur der rechte Operand von \kw{\^{}} darf
+  fehlen.
+\item[COMM +,*] Muster mit \kw{+} und \kw{*} passen auch mit vertauschten
+  Operanden.
+\item[OPT, DEFAULT, COMM] ohne Argumente: löscht die Liste wieder.
+\end{description}
+Solche Regeln stehen nicht im Regelbaum, sondern in einer geordneten
+Regelliste (wie in Mathematica oder Rubi): die erste passende Regel
+gewinnt. Der Matcher (\kw{src/listmatch.c}) probiert vertauschte
+Operanden, andere Klammerungen und fehlende Operanden mit Backtracking
+durch; schlägt eine Bedingung fehl, so wird die nächste Möglichkeit
+versucht. Ein Ergebnis, das dem Term gleicht, einen NaN enthält oder einen
+Zyklus schließt, wird übersprungen.
 
-sortlist	: Sort							
-			| Sort ',' sortlist			
+\subsection{Grenzen und Lösungsschritte}
+\begin{description}
+\item[MAXSTEPS {[}n{]}]
+  Ein \kw{REWR} bricht nach \kw{n} Umschreibschritten ab (voreingestellt
+  100000) mit der Meldung \kw{REWR : step limit ... reached}. Regeln, die
+  sich im Kreis drehen, halten \rw\ so nicht auf. Ohne \kw{n} wird die
+  Grenze angezeigt.
+\item[MAXDEPTH {[}n{]}]
+  Eine Regel, die den Term bei jedem Schritt tiefer macht, etwa
+  \kw{lin(c) = c*lin(1)} (sie passt wieder auf \kw{lin(1)}), würde den
+  Stapel des Interpreters lange vor der Schrittgrenze überlaufen lassen.
+  \kw{REWR} bricht deshalb auch ab, wenn der Term tiefer als \kw{n} Ebenen
+  wird (voreingestellt 1000; eine Summe von 1000 Summanden ist 1000 Ebenen
+  tief). Eine höhere Grenze kostet bei einer solchen Regel Zeit, eine sehr
+  hohe kann \rw\ zum Absturz bringen.
+\item[STEPS alg "datei"]
+  Zeigt jede angewandte Regel der Regelliste von \kw{alg} (die
+  Lösungsschritte), beschriftet aus \kw{datei} (Zeilen
+  \kw{nummer<TAB>name<TAB>text}); \kw{STEPS alg ""} schaltet es ab.
+\end{description}
 
-vsortlist : sortlist					
-			| sortlist VARPAR				
+\section{Term-Variablen und Zuweisungen}\label{sec:zuweisung}
+\begin{description}
+\item[termname = term]
+  Speichert den Term in der Term-Variablen. Wird eine Term-Variable einer
+  anderen zugewiesen, so wird der Inhalt kopiert (und, wo möglich,
+  ausgerechnet); spätere Änderungen wirken sich nicht aus. Lokale Symbole
+  eines Blocks dürfen nicht in globale Terme gelangen.
+\item[symbol = wert]
+  Gibt einem Symbol einen Wert, z.\,B.\ \kw{x = 1+1+3}. Lässt sich der
+  Wert nicht ausrechnen, so verliert das Symbol seinen Wert und wird
+  wieder mit seinem Namen ausgegeben. Das Symbol \kw{nothing} der
+  Bibliothek hat nie einen Wert, so löscht \kw{a = nothing} den Wert von
+  \kw{a}.
+\end{description}
+Symbole und Term-Variablen werden durch Hinschreiben ihres Namens
+ausgegeben. Eine Term-Variable wirkt wie eine Funktion ihrer Symbole:
+\begin{beispiel}
+TERM tt,qq : real
+tt = a+b
+tt*2                # gibt (a + b )* 2 aus
+%+1                 # gibt (a + b )* 2 + 1 aus
+qq = x^y*a          # wie eine Funktion qq(x,y,a)
+x=4
+y=2
+a=3
+qq                  # gibt 48 aus
+a = nothing
+a + 1               # gibt a + 1 aus
+\end{beispiel}
 
-func		: Func				
-			| La1						
-			| La2						
-			| La3						
-			| La4						
-			| La5						
-			| Ra						
-			| Ru						
-			| Bra						
-			| Bra1					
+\section{Kontrollstrukturen}
+\begin{description}
+\item[FOR symbol = n1 TO n2 {[}STEP n3{]} DO block]
+  Schleife über ein Symbol. Bsp.: \kw{FOR n = 20 TO 10 STEP -1 DO n}
+\item[IF (bedingung) block {[}ELSE block{]}]
+  Bedingung mit einem Wahrheitswert. Bsp.:
+  \kw{IF (n > 3) "gross" ELSE "klein"}
+\item[WHILE (bedingung) block]
+  Schleife. Bsp.: \kw{WHILE (n < 100) n = n*2}
+\item[\{ \ldots\ \}]
+  Block. Die in einem Block deklarierten Symbole sind lokal und werden
+  bei jedem Schleifendurchlauf neu angelegt:
+\begin{beispiel}
+FOR n = 1 TO 3 DO { SYM s : real
+                    s = n*10
+                    PRT s }
+\end{beispiel}
+\end{description}
 
-funclist	: func						
-			| func ',' funclist		
+\section{Ein- und Ausgabe}
+\begin{description}
+\item[INC "datei"]
+  Liest die Datei und führt sie aus. \kw{INC} darf geschachtelt werden.
+  Eine Zeile mit \kw{INC} darf nicht mit \verb|\| fortgesetzt werden.
+  Steht \kw{INC} in einem Block, so sind die Definitionen der Datei
+  trotzdem global.
+\item[PRT liste]
+  Gibt aus, ohne Zeilenende.
+\item[PRTNUM "format"]
+  Das C-Format für reelle Zahlen, z.\,B.\ \kw{PRTNUM "\%.10g "}.
+\item[OUT "datei"]
+  Lenkt die Ausgabe in die Datei um, die vorher gelöscht wird;
+  \kw{OUT "stdout"} schaltet zurück. So lassen sich Daten für
+  Grafikprogramme erzeugen.
+\item[DATA "datei"]
+  Öffnet eine Datei zum Lesen von Zahlen.
+\item[DATA symbol]
+  Liest die nächste Zahl aus der geöffneten Datei in das Symbol;
+  nichtnumerischer Text bis zum Zeilenende wird übersprungen. So lassen
+  sich z.\,B.\ Messwerte weiterverarbeiten.
+\item[SYS "befehl"]
+  Führt einen Befehl der Shell aus.
+\item[DEBUG n]
+  Setzt die Debug-Stufe des Interpreters.
+\item[INFO name]
+  Art und Sorten eines Namens (ältere Form von \kw{TYPEOF}).
+\item[QUIT]
+  Beendet \rw.
+\end{description}
 
-term		: Term							
-			| LAST								
-			| Const								
-			| Var				      		
-			| '(' term ')'		    
-			| term Ru				      
-			| Func term				    
-			| La1 term				    
-			| La2 term				    
-			| La3 term				    
-			| La4 term				    
-			| La5 term				    
-			| Bra termlist Bra	  
-			| Bra1 termlist Bra2	
-			| Func '(' termlist ')'		
-			| term La1 term		    
-			| term La2 term				
-			| term La3 term				
-			| term La4 term				
-			| term La5 term				
-			| term Ra  term				
+\section{Die Standardbibliothek}
+\kw{INC "inc/all"} lädt die mathematische Bibliothek:
 
-termlist	: term						
-			| term ',' termlist		
+\medskip
+\noindent
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+\toprule
+Datei & Inhalt \\
+\midrule
+\kw{inc/alg} & Grundsorten (\kw{real}, \kw{bool}, \kw{complex},
+  \kw{number}, \kw{algebra}, Gruppe, Ring, Körper), Operatoren, elementare
+  und spezielle Funktionen, Vereinfachung, Ableitung \kw{D}, die
+  Regelliste \kw{All}, die Unicode-Operatoren \\
+\kw{inc/pdiff} & partielle Ableitungen \\
+\kw{inc/numerik} & Numerik mit \kw{numerik,calc}: Integral
+  \kw{I(a,b,f,x)}, Nullstelle \kw{newton(start,f,f',x)}, \kw{fmin},
+  \kw{fmax} \\
+\kw{inc/mathnum} & die Zahlenwerte von \kw{e} und \kw{pi}, Winkeleinheiten \\
+\kw{inc/integration/all} & exakte Zahlen (\kw{inc/exact}: \kw{integer},
+  \kw{rational}), die symbolischen Hilfsfunktionen (\kw{inc/helpers}:
+  \kw{deriv}, \kw{expand}, \kw{cancel}, \ldots), Integration mit
+  \kw{Integrate} \\
+\kw{inc/integration/rubi/all} & die übersetzten Rubi-Regeln,
+  \kw{RubiIntegrate} \\
+\kw{inc/list} & Listen \kw{[a,b,c]} (Sorte \kw{vector}) und Matrizen
+  \kw{[[a,b],[c,d]]} (Sorte \kw{matrix}) mit ihrer Arithmetik,
+  \kw{part}, \kw{length}, \kw{table}, \kw{select}, \ldots \\
+\kw{inc/linalg} & \kw{transpose}, \kw{dot}, \kw{det}, \kw{linsolve},
+  \kw{inverse}, Kovektoren, symbolische Matrizen \\
+\kw{inc/solve} & Gleichungen: \kw{solve(lhs == rhs, x)}, auch Systeme \\
+\kw{inc/simplify} & \kw{All} endet mit der Normalform (\kw{normform}) \\
+\kw{inc/help} & die Hilfetexte für \kw{?name} \\
+\bottomrule
+\end{tabularx}
 
-formula		: term EQ term		
+\medskip
+Wahlweise nach \kw{inc/all}: \kw{inc/rvector} und \kw{inc/rmatrix}
+(numerische Vektoren und Matrizen in C), \kw{inc/physics} (Einheiten,
+physikalische Konstanten, Lagrange-Formalismus), \kw{inc/eqnsolve} (der
+alte Gleichungslöser). Das Verzeichnis \kw{examples} enthält kleine
+Beispielprogramme.
 
-vinstr : /* */							
-			| DO instruction			
+\section{Eigene C-Funktionen}
+Neue numerische Funktionen werden in C geschrieben und in die Liste
+\kw{userfunction} in \kw{src/userfn.c} eingetragen. Eine Funktion bekommt
+ein Feld von Zeigern auf ihre Argumente und gibt einen Zeiger auf ein neu
+angelegtes Ergebnis zurück:
+\begin{beispiel}
+double * r_abs (double * arg[]) { return mkreal(fabs(* arg[0])); }
+\end{beispiel}
+Beispiele stehen in \kw{real.c}, \kw{complex.c}, \kw{vector.c} und
+\kw{matrix.c}. Mit \kw{ATT} in einer \kw{FUNC}- oder
+\kw{OTHER}-Deklaration wird die Funktion angebunden.
 
-cformula	: formula	vinstr					
-          | IF condition formula	vinstr 
+Symbolische Funktionen, die auf Termen statt auf Zahlen arbeiten, stehen
+in der Liste \kw{symfunction} in \kw{src/symfn.c}. Sie bekommen die
+Argumente als Terme und geben einen neuen Term zurück, oder \kw{NULL},
+wenn sie nicht passen; angebunden werden sie mit \kw{ATT SYMBOLIC name}.
+Den Code halten sie frei von Namen der Bibliothek: sie erkennen und bauen
+Terme über Rollen (\kw{is\_head(t, "+", 2)}, \kw{fsym("cos")}), die
+\kw{SYMBOLIC} zuordnet.
 
-formlist	: cformula					
-			/* | cformula ';' formlist 
+\section{Bekannte Einschränkungen}
+\begin{itemize}
+\item Bei Syntaxfehlern und beim Überdefinieren von Definitionen geht noch
+  etwas Speicher verloren. Wiederholte Rechnungen, Umschreibungen und
+  Schleifen laufen ohne Speicherverlust.
+\item Nicht jede Regel, die man erwarten könnte, ist vorhanden; so werden
+  \kw{ln(exp x)} und $\sin^2 x+\cos^2 x$ nicht vereinfacht.
+\item Symbole ohne Wert dürfen von jeder Variablen abhängen, deshalb
+  bleibt \kw{D(a,x)} im Ergebnis stehen (gewollt: Differentialgleichungen
+  benutzen \kw{D(y,x)}). \kw{deriv} behandelt dagegen jeden Term ohne
+  \kw{x} als Konstante.
+\item Das kommutative Matching vertauscht nur die zwei Operanden eines
+  Operators; Summen und Produkte sind binäre Bäume, deren Summanden nicht
+  über Ebenen hinweg umgeordnet werden. \kw{COMM *} gilt auch für Regeln
+  mit Matrixprodukten; \kw{COMM} allein schaltet es nach den Regeln, die
+  es brauchen, wieder ab.
+\end{itemize}
 
-%%
-\end{verbatim}
-\end{appendix}
+\appendix
+\section{Die Grammatik}
+Die Zusammenfassung der Grammatik (\kw{src/syn.y}, ohne die Aktionen in
+C); \kw{python tools/gen\_syntax.py} erzeugt sie neu.
+{\small \verbatiminput{syntax.txt}}
+
 \end{document}
