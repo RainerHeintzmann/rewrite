@@ -43,7 +43,43 @@ $filter -> completion_handler(\&complete);
 $filter -> input_handler(\&save_line);
 $filter -> output_handler(\&colour);
 $filter -> prompt_handler(\&prompt);
+$filter -> hotkey_handler(\&hotkey);
 $filter -> run;
+
+# ---- the arrow keys as in Julia's REPL (bound to rlwrap-hotkey in
+# tools/rewrite.inputrc): up shows the earlier lines that begin with what
+# was typed, down the later ones, and after the newest one the typed text
+# again. Editing the line starts a new search.
+
+my ($typed, $at, $shown);	# the typed text, the history index shown, its line
+
+sub hotkey {
+	my ($key, $prefix, $postfix, $history, $histpos) = @_;
+	my $up = $key eq "\e[A" || $key eq "\eOA";
+	my $down = $key eq "\e[B" || $key eq "\eOB";
+	return @_ unless $up || $down;
+	my @lines = split /\n/, $history;
+	my $line = $prefix . $postfix;
+	if (! defined $shown || $line ne $shown) {	# a new search
+		return @_ if $down;
+		($typed, $at, $shown) = ($line, scalar @lines, undef);
+	}
+	my $step = $up ? -1 : 1;
+	for (my $i = $at + $step; $i >= 0 && $i < @lines; $i += $step) {
+		my $h = $lines[$i];
+		next if substr($h, 0, length $typed) ne $typed;
+		next if defined $shown && $h eq $shown;		# no line twice in a row
+		next if $h eq $typed && ! defined $shown;
+		($at, $shown) = ($i, $h);
+		return ("", $h, "", $history, $histpos);
+	}
+	if ($down) {			# past the newest: the typed text again
+		my $t = $typed;
+		($typed, $at, $shown) = (undef, undef, undef);
+		return ("", $t, "", $history, $histpos);
+	}
+	return @_;			# no earlier line: unchanged
+}
 
 # ---- colours (NO_COLOR: none). The output: errors red, warnings yellow,
 # the repeated faulty line grey, keywords bold magenta, sort names cyan.

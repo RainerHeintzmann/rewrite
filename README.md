@@ -59,6 +59,13 @@ There are an interactive and a non-interactive way to run rewrite:
 | `rewrite -i file ...` | Runs the files, then continues interactively, e.g. with a library already loaded. |
 | `rewrite < file` | Reads the program from a pipe or file, without welcome message and prompts (for scripts and the tests). |
 | `rewrite -h` | Shows these options. |
+| `rewrite --no-startup` | Interactive without the startup file. |
+
+An interactive session first runs the startup file `~/.rewrite/startup.rw`
+if it exists, as Julia's `startup.jl`; `~` is `HOME` (in the MSYS2 shell
+`C:\msys64\home\<user>`), otherwise `USERPROFILE` (`C:\Users\<user>`).
+Scripts and pipes do not run it. A line `INC "inc/all"` in it loads the
+library in every session.
 
 `QUIT` or the end-of-file key (Ctrl-D, on Windows Ctrl-Z and Enter) ends an
 interactive session. Whether the input is interactive is decided by the
@@ -103,8 +110,10 @@ and TAB completion, start it through
 completes the keywords and the names of the libraries (`TYP` TAB gives
 `TYPEOF`, `RubiInt` TAB `RubiIntegrate`), and the LaTeX-like names as in
 Julia: `\alpha` TAB gives `α`, `\al` TAB lists the names. As in Julia, the
-arrow keys browse the earlier lines that begin with what is typed already
-([tools/rewrite.inputrc](tools/rewrite.inputrc)); the history is kept in
+arrow keys browse the earlier lines that begin with what is typed already,
+and down after the newest one gives the typed text back (bound in
+[tools/rewrite.inputrc](tools/rewrite.inputrc), done by the filter); pasted
+text arrives as it is (bracketed paste off); the history is kept in
 `~/.rewrite_history`, every line is saved at once. The session is
 coloured: the prompt green, errors red, warnings yellow, keywords magenta,
 sort names cyan and comments grey, also in the entered lines, which are

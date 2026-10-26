@@ -1,8 +1,11 @@
 # readline settings of tools/rewrite-rl (INPUTRC), as in Julia's REPL:
-# the arrow keys browse the history lines that begin with what is typed
-# already (with nothing typed: all lines).
+# the arrow keys browse the earlier lines that begin with what is typed
+# already (with nothing typed: all lines), and down after the newest one
+# gives the typed text back; done by the filter tools/latex.rlwrap.
 $include /etc/inputrc
-"\e[A": history-search-backward
-"\e[B": history-search-forward
-"\eOA": history-search-backward
-"\eOB": history-search-forward
+"\e[A": rlwrap-hotkey
+"\e[B": rlwrap-hotkey
+"\eOA": rlwrap-hotkey
+"\eOB": rlwrap-hotkey
+# pasted text arrives as it is (no ESC[200~ ... ESC[201~ around it)
+set enable-bracketed-paste off

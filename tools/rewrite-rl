@@ -14,11 +14,12 @@
 # -z: the filter tools/latex.rlwrap replaces a complete \alpha by α and
 #     saves every line in the history file;
 #     it also colours the prompt, the entered lines and the output;
+# -A, -pGreen: the prompt is coloured (also when rlwrap redraws it);
 # -i: rewrite stays interactive (under rlwrap its input is no terminal).
 dir=$(cd "$(dirname "$0")/.." && pwd)
 exe="$dir/rewrite.exe"
 [ -f "$exe" ] || exe="$dir/rewrite"
 export REWRITE_HISTORY="$HOME/.rewrite_history"
 export INPUTRC="$dir/tools/rewrite.inputrc"
-exec rlwrap -b '(){}[],+-*/=&^%$#@";|?' -f "$dir/tools/rewrite_words.txt" \
+exec rlwrap -A -pGreen -b '(){}[],+-*/=&^%$#@";|?' -f "$dir/tools/rewrite_words.txt" \
      -z "$dir/tools/latex.rlwrap" -H "$REWRITE_HISTORY" "$exe" -i "$@"

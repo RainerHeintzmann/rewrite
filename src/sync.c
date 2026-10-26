@@ -1113,6 +1113,13 @@ int read_input _1a ((fp), FILE * fp)
 			break;
 		}
 
+		/* 2026: a UTF-8 byte order mark (Notepad, PowerShell pipes) is no input */
+		if (bp - buf >= 3 && (unsigned char) buf[0] == 0xEF && (unsigned char) buf[1] == 0xBB
+		    && (unsigned char) buf[2] == 0xBF)
+			{
+			memmove(buf, buf + 3, bp - buf - 2);
+			bp -= 3;
+			}
 		if (bp > buf && ! help_line(buf))	/* 2026: ?name prints the help (help.c) */
 			{
 			ActualLine=buf;
@@ -1136,11 +1143,39 @@ return 0;
 
 static void usage (void)
 {
-	printf("Usage: rewrite [-i] [file ...]\n"
+	printf("Usage: rewrite [-i] [--no-startup] [file ...]\n"
 	       "  rewrite              read statements from the keyboard (or a pipe)\n"
 	       "  rewrite file ...     run the files, then exit\n"
 	       "  rewrite -i file ...  run the files, then continue interactively\n"
-	       "  rewrite < file       run a file without prompts (as in scripts)\n");
+	       "  rewrite < file       run a file without prompts (as in scripts)\n"
+	       "An interactive session first runs ~/.rewrite/startup.rw if it exists\n"
+	       "(~ is HOME, else USERPROFILE); --no-startup skips it.\n");
+}
+
+/* 2026: the startup file of an interactive session, as Julia's startup.jl:
+   ~/.rewrite/startup.rw (~ is HOME, else USERPROFILE); the path or NULL */
+static char startup_path[1024];
+
+static const char * startup_file (void)
+{
+	/* HOME first, then the Windows home: in the MSYS2 shell HOME is
+	   C:\msys64\home\<user>, elsewhere only USERPROFILE C:\Users\<user> */
+	const char * homes[2];
+	FILE * f;
+	int i;
+	homes[0] = getenv("HOME");
+	homes[1] = getenv("USERPROFILE");
+	for (i = 0; i < 2; i++)
+		{
+		if (! homes[i] || ! * homes[i]) continue;
+		snprintf(startup_path, sizeof startup_path, "%s/.rewrite/startup.rw", homes[i]);
+		if ((f = fopen(startup_path, "r")) != NULL)
+			{
+			fclose(f);
+			return startup_path;
+			}
+		}
+	return NULL;
 }
 
 static void welcome (void)
@@ -1154,22 +1189,28 @@ static void welcome (void)
 
 int main(int argc, char * argv []) /* no space between main and '(' ! */
 {
-	int i, files = 0, force = 0;
+	int i, files = 0, force = 0, nostart = 0;
+	const char * start = NULL;
 	inc_level=0;
 	console_utf8();		/* 2026: Unicode names, console.c */
 	for (i = 1; i < argc; i++)		/* 2026: options and files */
 		{
 		if (! strcmp(argv[i], "-h") || ! strcmp(argv[i], "--help")) { usage(); return 0; }
 		else if (! strcmp(argv[i], "-i")) force = 1;
+		else if (! strcmp(argv[i], "--no-startup")) nostart = 1;
 		else files++;
 		}
+	/* an interactive session (not a script, a pipe or the tests): the startup file first */
+	if (! nostart && (force || (! files && isatty(fileno(stdin)))) && (start = startup_file()) != NULL)
+		include(start);
 	for (i = 1; i < argc; i++)
-		if (strcmp(argv[i], "-i"))
+		if (strcmp(argv[i], "-i") && strcmp(argv[i], "--no-startup"))
 			include(argv[i]);	/* like INC "file" */
 	if (files && ! force) return 0;
 	interactive = force || isatty(fileno(stdin));
 	if (interactive && files) putchar(10);	/* finish the output of the files */
 	if (interactive) welcome();
+	if (interactive && start) printf("(the startup file %s was run)\n", start);
 	read_input(stdin);
 	if (interactive) putchar(10);
 	return 0;
