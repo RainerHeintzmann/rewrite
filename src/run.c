@@ -9,6 +9,7 @@
 #include <string.h> /* for strcmp */
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>	/* 2026: Ctrl-C */
 #include "strsave.h"
 
 #include "inout.h"
@@ -67,6 +68,17 @@ Node * rewrite _2a ((term,rtree) , Node * term ,Node * rtree)
 		return match_list(term,rtree);
 	return match(term,rtree);
 
+}
+
+/* 2026: Ctrl-C in an interactive session stops the running REWR or loop
+   (as in Julia) instead of ending rewrite; set by the signal handler, cleared
+   before each input line (sync.c) */
+volatile sig_atomic_t rw_interrupted = 0;
+
+void on_interrupt (int sig)
+{
+	rw_interrupted = 1;
+	signal(SIGINT, on_interrupt);	/* Windows resets the handler */
 }
 
 /* 2026: step limit, so that a rule loop does not let REWR run forever */
@@ -273,6 +285,11 @@ BOOLEAN find_position _2a ((p_term,rtree), Node * * p_term, Node * rtree)
 	Node * lt, * rt,* repl ,* maintype;
 	BOOLEAN rewritten;
 
+	if (rw_interrupted && ! step_limit_hit)	/* 2026: Ctrl-C */
+		{
+		step_limit_hit = TRUE;
+		printfErr("REWR : interrupted (Ctrl-C), the result is not complete\n");
+		}
 	if (* p_term == NULL || step_limit_hit)
 		return FALSE;
 

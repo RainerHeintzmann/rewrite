@@ -277,6 +277,19 @@ written for \texttt{number} still calculates \texttt{m > 0} for a real
 way and apply to real integrands and to integrands with \texttt{im}
 alike, while a real integrand keeps its real operators.
 
+The sort \texttt{number} has no values of its own: it is declared above
+\texttt{real} and \texttt{complex} by a \texttt{SUBSORT} without a
+conversion function, and a value keeps its sort. Whether a sort can have
+values at all follows from the declarations alone (a print function, a
+numerical C function with this result sort, or a conversion into it), so
+the interpreter needs no list of sort names. It uses this, for example, to
+reject the assignment of a list to a numerical constant with a clear
+message, and to convert a term of a sort without values where a value is
+expected: with \texttt{SUBSORT vector,rvector ATT constr\_vec} a list of
+numbers becomes a compact numerical vector when it is assigned to a
+constant of that sort or passed to a numerical C function, while
+\texttt{[1,2]*x} stays symbolic.
+
 \paragraph{Non-commuting quantities.} Above \texttt{number} the library
 declares the sort \texttt{algebra} of the elements of an associative
 algebra, whose product need not commute, and below it the sort
@@ -297,6 +310,14 @@ product is taken element by element or as a matrix product. Thus
 \texttt{[[1,2],[3,4]]*[5,6]} is the vector \texttt{[17, 39]}, explicit
 matrices mix with symbolic ones, and the solutions of a system of
 equations, a list of tuples, are printed as the rows of a matrix.
+A transposed vector is a term of its own sort \texttt{covector}, like
+Julia's \texttt{Transpose}: \texttt{transpose(u)*v} is a number (the inner
+product), \texttt{u*transpose(v)} a matrix (the outer product), and
+\texttt{transpose(u)*m} again a covector. For symbolic vectors the sort
+alone tells the matrix rules that $u^{\mathsf T}v$ is a scalar that
+commutes with matrices, and since transposition is linear, sums and
+multiples of covectors are taken back to vectors, so that a handful of
+declarations suffice.
 
 \paragraph{Sorts with a known sign.} A sort may have several wider sorts,
 and the conversion follows the shortest path in the resulting graph. The
@@ -736,10 +757,11 @@ negative arguments.
 
 \section{Implementation and revival}
 
-The interpreter consists of about 8800 lines of C, of which about 3900 were
-added in 2026 for the rule lists, subsorts, exact numbers, special and
-helper functions, and a grammar of about 490 lines for the scanner and
-parser generators flex and bison. Terms are binary trees of nodes taken
+The interpreter consists of about 17\,900 lines of C (about 8400 in the
+original program); the additions of 2026 are the rule lists, subsorts,
+exact numbers, special and symbolic helper functions, lists and matrices,
+equation solving and the interactive environment. The grammar for the
+scanner and parser generators flex and bison has about 540 lines. Terms are binary trees of nodes taken
 from memory pools; symbols carry their sort, value and the links used by
 \texttt{LIFT}. The rules of an algebra are merged into a single tree, in
 which rules with a common left-hand-side structure share nodes and
@@ -753,11 +775,16 @@ with current tools. The port to 64-bit Linux and Windows (MSYS2) required
 only small changes to the C code itself. The main problems were changed
 semantics in the scanner generator, the release of static memory that old
 C libraries tolerated, and errors in the handling of declarations inside
-loops and included files. A regression test suite with 28 test programs
+loops and included files. A regression test suite with 50 test programs
 now covers the core language, the library, the pattern features, exact
-numbers, helper and special functions, the integration rules and the
-original example programs; the integration tests check every result by
-differentiating it again. Memory leaks were removed with an instrumented
+numbers, helper and special functions, lists, matrices and equations, the
+integration rules, the original example programs and the example programs
+for new users; the integration tests check every result by
+differentiating it again. Writing them also uncovered old faults: a
+second declaration of a function left its earlier variants in a broken
+ring, so that a later lookup did not end, and every message was formatted
+into a fixed buffer of 1024 bytes, whose overflow overwrote the file
+pointers stored behind it. Memory leaks were removed with an instrumented
 build that counts allocations per source line, so that repeated
 calculations run in constant memory. All parser structures are now
 accessed through named macros instead of chains like
@@ -767,13 +794,40 @@ behaviour. \texttt{rewrite} runs interactively with a prompt, runs program
 files given as arguments, or reads a program from a pipe for scripts and
 the tests.
 
-Performance is adequate for interactive use. Loading the standard library
-and computing a derivative takes well below 0.1\,s on a current laptop;
-loading the 7329 integration rules about half a second. A scalar loop
+Performance is adequate for interactive use. Loading the standard library,
+including the translated integration rules, and computing a derivative
+takes about 0.9\,s on a current laptop. A scalar loop
 written in the language itself needs about 0.25\,$\mu$s per iteration
 (measured for $10^7$ iterations of \texttt{s = s + k*k}). We estimate this
 to be about two orders of magnitude slower than an equivalent compiled
 loop. Operations on whole vectors and matrices run in C.
+
+\paragraph{Library organisation.} \texttt{INC "inc/all"} loads the
+mathematical library: the basic sorts and rules, exact numbers, the
+symbolic helpers, lists, matrices, equations and both integration rule
+sets. The physical units and constants of the original application, whose
+many short names (\texttt{c}, \texttt{g}, \texttt{m}, \texttt{t}) would
+otherwise not be free symbols, are a separate library \texttt{inc/physics}.
+The rule list \texttt{All} ends with the normal form of the symbolic
+helpers, guarded by a predicate that is true once a term is in it, so that
+the step ends; differentiating the result of an integration now gives the
+integrand back, where formerly a sum subtracted in brackets stayed
+uncollected.
+
+\paragraph{Interactive use.} \texttt{TYPEOF t} prints the sort the sort
+system chose for a term, and for a name its kind and value; \texttt{TYPEOF
+f} lists the variants of a function. Help texts are part of the library,
+declared by \texttt{HELP "name" "text"}; a line beginning with \texttt{?}
+shows them, as in Julia, and for a function without a text its variants.
+Names may contain Unicode letters, and the LaTeX-like names of Julia's
+table (\verb|\alpha| for $\alpha$, about 2500 of them) are replaced on
+input. With the line editor wrapper \texttt{rlwrap} and a small filter,
+the session behaves like Julia's REPL: \texttt{TAB} completes keywords,
+library names and \verb|\alpha|, the arrow keys search the history by the
+typed prefix, prompt, keywords, sorts and errors are coloured, and a
+startup file is run at the beginning. \texttt{Ctrl-C} stops a running
+rewrite or loop instead of ending the program. A folder of short example
+programs, run by the tests as well, serves as an introduction.
 
 \section{Discussion}
 

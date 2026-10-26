@@ -64,3 +64,8 @@ BOOLEAN in_tree       _1p (Node *);
 BOOLEAN not_in_tree   _1p (Node *);
 BOOLEAN isnt_zero		  _1p (Node *);
 #endif
+
+/* 2026: Ctrl-C stops the running REWR or loop (run.c) */
+#include <signal.h>
+extern volatile sig_atomic_t rw_interrupted;
+void on_interrupt (int sig);

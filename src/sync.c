@@ -484,7 +484,7 @@ numassign2(ASSIGN_TERM(np),(Symbol *) ASSIGN_TARGET(np));
 
 void while_fn (Node * np)
 {
-	while (COND_CALL(WHILE_COND(np)))
+	while (! rw_interrupted && COND_CALL(WHILE_COND(np)))	/* 2026: Ctrl-C ends it */
 		CALLFUNCT(WHILE_BODY(np));
 }
 
@@ -570,7 +570,7 @@ hasval(p_symbol) = TRUE;
 
 value(p_symbol)= & counter;
 
-for (i=0;i<nsteps;i++)
+for (i=0;i<nsteps && ! rw_interrupted;i++)	/* 2026: Ctrl-C ends it */
 	{
 	counter = ((double) i)*step+from_val;
 	if (FOR_BODY(np))				/* otherwise effectively a NOP (instruction is NULL) */
@@ -1120,6 +1120,8 @@ int read_input _1a ((fp), FILE * fp)
 			memmove(buf, buf + 3, bp - buf - 2);
 			bp -= 3;
 			}
+		if (ferror(fp)) clearerr(fp);	/* 2026: a Ctrl-C while reading (Windows console) */
+		rw_interrupted = 0;		/* 2026: a Ctrl-C before this line does not count */
 		if (bp > buf && ! help_line(buf))	/* 2026: ?name prints the help (help.c) */
 			{
 			ActualLine=buf;
@@ -1201,9 +1203,14 @@ int main(int argc, char * argv []) /* no space between main and '(' ! */
 		else if (! strcmp(argv[i], "--no-startup")) nostart = 1;
 		else files++;
 		}
-	/* an interactive session (not a script, a pipe or the tests): the startup file first */
-	if (! nostart && (force || (! files && isatty(fileno(stdin)))) && (start = startup_file()) != NULL)
-		include(start);
+	/* an interactive session (not a script, a pipe or the tests): Ctrl-C stops a
+	   computation instead of ending rewrite; the startup file first */
+	if (force || (! files && isatty(fileno(stdin))))
+		{
+		signal(SIGINT, on_interrupt);
+		if (! nostart && (start = startup_file()) != NULL)
+			include(start);
+		}
 	for (i = 1; i < argc; i++)
 		if (strcmp(argv[i], "-i") && strcmp(argv[i], "--no-startup"))
 			include(argv[i]);	/* like INC "file" */
