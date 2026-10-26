@@ -1121,6 +1121,7 @@ int main(int argc, char * argv []) /* no space between main and '(' ! */
 {
 	int i, files = 0, force = 0;
 	inc_level=0;
+	console_utf8();		/* 2026: Unicode names, console.c */
 	for (i = 1; i < argc; i++)		/* 2026: options and files */
 		{
 		if (! strcmp(argv[i], "-h") || ! strcmp(argv[i], "--help")) { usage(); return 0; }

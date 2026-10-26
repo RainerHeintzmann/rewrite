@@ -1199,6 +1199,14 @@ static int list_rect (Node * t, int dims[], int d, int level)	/* all elements ha
 	return 1;
 }
 
+static int text_width (const char * s)	/* characters of a UTF-8 text */
+{
+	int n = 0;
+	for ( ; * s; s++)
+		if ((* s & 0xc0) != 0x80) n++;
+	return n;
+}
+
 static void show_grid (Node * m, int rows, int cols)
 {
 	char ** e = (char **) malloc(rows * cols * sizeof(char *));
@@ -1209,14 +1217,18 @@ static void show_grid (Node * m, int rows, int cols)
 		for (j = 0; j < cols; j++)
 			{
 			e[i * cols + j] = entry_text(mat_entry(m, i, j));
-			if ((int) strlen(e[i * cols + j]) > w[j]) w[j] = (int) strlen(e[i * cols + j]);
+			if (text_width(e[i * cols + j]) > w[j]) w[j] = text_width(e[i * cols + j]);
 			if (! num_sym(mat_entry(m, i, j))) num[j] = 0;
 			}
 	for (i = 0; i < rows; i++)		/* columns of numbers right-aligned, as in Julia */
 		{
 		printfOut("%s[ ", i ? "\n" : "");
 		for (j = 0; j < cols; j++)
-			printfOut(num[j] ? "%*s%s" : "%-*s%s", w[j], e[i * cols + j], j < cols - 1 ? "  " : " ]");
+			{
+			int pad = w[j] - text_width(e[i * cols + j]);	/* numbers right-aligned */
+			printfOut("%*s%s%*s%s", num[j] ? pad : 0, "", e[i * cols + j], num[j] ? 0 : pad, "",
+			          j < cols - 1 ? "  " : " ]");
+			}
 		}
 	free(num);
 	for (i = 0; i < rows * cols; i++) free(e[i]);

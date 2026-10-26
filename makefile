@@ -16,7 +16,7 @@ endif
 O	= $(addprefix $(S)/, scan.o sym.o sync.o defs.o syn.o run.o stack.o \
 userfn.o forms.o node.o inout.o \
 real.o bool.o complex.o matrix.o vector.o \
-fatal.o strsave.o expand.o symfn.o listmatch.o numsort.o exact.o specfun.o apart.o)
+fatal.o strsave.o expand.o symfn.o listmatch.o numsort.o exact.o specfun.o apart.o latex.o console.o)
 
 T	= rewrite
 

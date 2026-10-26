@@ -1,0 +1,13 @@
+#!/bin/sh
+# rewrite with line editing, a history (arrow keys) and completion of the
+# LaTeX-like names with TAB (\al TAB -> \alpha), via rlwrap.
+# Start it from the project folder (the INC paths are relative to it):
+#     tools/rewrite-rl                 or with files:  tools/rewrite-rl my.rw
+# Needs rlwrap: in MSYS2  pacman -S rlwrap,  on Linux e.g.  apt install rlwrap
+# -b: the word separators without the backslash, so \alpha is one word;
+# -i: rewrite stays interactive (under rlwrap its input is no terminal).
+dir=$(cd "$(dirname "$0")/.." && pwd)
+exe="$dir/rewrite.exe"
+[ -f "$exe" ] || exe="$dir/rewrite"
+exec rlwrap -b '(){}[],+-*/=&^%$#@";|' -f "$dir/tools/latex_words.txt" \
+     -H "$HOME/.rewrite_history" "$exe" -i "$@"

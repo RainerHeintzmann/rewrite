@@ -13,6 +13,7 @@
 #include "node.h"		/* mknum */
 #include "numsort.h"		/* int_literal (2026) */
 #include "inout.h"		/* printfErr (2026) */
+#include "latex.h"		/* \alpha -> alpha (2026) */
 
 #ifdef	FLEX_SCANNER
 
@@ -42,8 +43,9 @@ static int i;
 alfa	([a-zA-Z_])
 digit ([0-9])
 numb  ({digit}*"."?{digit}+([eE][\+\-]?{digit}+)?)
-alnum	(['%'$?a-zA-Z_0-9\])
-sp_ops ([><&|=*/^!§`\\])
+	/* 2026: the bytes of UTF-8 characters are letters (names like alpha) */
+alnum	(['%'$?a-zA-Z_0-9\x80-\xff])
+sp_ops ([><&|=*/^!`\\])
 sp_ops1 ([\[\]])
 sp_ops2 ([\-\+])
 %%
@@ -100,8 +102,13 @@ static const char * buf, * bp;	/* current line */
 static int avail;		/* # characters left */
 #endif
 
+static char * converted = NULL;	/* 2026: the line with the LaTeX-like names replaced */
+
 void lexi_buf _1a ((cp), const char * cp)
 {
+	free(converted);
+	converted = latex_convert(cp);	/* \alpha -> the character (latex.c) */
+	if (converted) cp = converted;
 	buf = bp = cp;
 #ifdef	FLEX_SCANNER
 	avail = strlen(buf);

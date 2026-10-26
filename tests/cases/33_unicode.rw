@@ -1,0 +1,16 @@
+# Unicode names: UTF-8 characters are letters, and LaTeX-like names as in
+# Julia (\alpha, \_1) are replaced on input; the output prints the
+# characters, and grids are aligned by characters, not bytes.
+INC "inc/all"
+INC "inc/list"
+SYM α, \beta, x\_1 : real
+α + 2*\beta
+REWR D(sin(\alpha^2), α) : All
+α = 3
+α*2
+TYPEOF α
+TYPEOF x₁
+SYM \theta : real
+[[\theta, 1], [22, \theta^2]]
+# a name followed by a letter is no name: \alphax stays
+PRT "\alphax and \alpha and \hbar\n"

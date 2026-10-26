@@ -31,6 +31,7 @@ extern void history_store (Node * np);
 extern void printterm (Node * np);
 extern void typeof_fn (Node * np);		/* 2026: TYPEOF term */
 extern void typeof_func (Node * np);	/* 2026: TYPEOF f */
+void console_utf8 (void);			/* 2026: console.c */
 
 extern void printstring (Node * np);
 

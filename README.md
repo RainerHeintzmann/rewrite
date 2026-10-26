@@ -93,6 +93,42 @@ After that, run `build_windows.bat` in the project folder, or `make` in the
 `build_windows.bat clean` removes all generated files. The resulting
 `rewrite.exe` needs no extra DLLs and also runs from `cmd` or PowerShell.
 
+### Terminal with line editing, history and `\alpha` completion
+
+rewrite reads plain lines. For line editing, a history across sessions
+(arrow keys) and TAB completion of the LaTeX-like names (`\al` TAB gives
+`\alpha`, which rewrite prints as `α`), start it through
+[rlwrap](https://github.com/hanslub42/rlwrap) with the script
+[tools/rewrite-rl](tools/rewrite-rl), from the project folder:
+
+```text
+tools/rewrite-rl                 # interactive
+tools/rewrite-rl my.rw           # runs my.rw, then interactive
+```
+
+**Linux:** `sudo apt install rlwrap` (Debian/Ubuntu), then run the script in
+any terminal.
+
+**Windows:** rlwrap runs in the MSYS2 shell, not in PowerShell or `cmd`.
+
+1. Open the shell: "MSYS2 UCRT64" in the Start menu, or
+   `C:\msys64\ucrt64.exe`. In Windows Terminal, add a profile with the
+   command line `C:\msys64\msys2_shell.cmd -defterm -here -no-start -ucrt64`.
+2. Install rlwrap once: `pacman -S rlwrap`.
+3. Go to the project folder (drive `C:` is `/c`) and start rewrite:
+
+   ```text
+   cd /c/path/to/rewrite
+   tools/rewrite-rl
+   ```
+
+With `alias rewrite='tools/rewrite-rl'` in `~/.bashrc` (in the MSYS2 home
+folder, `C:\msys64\home\<user>`), `rewrite` starts it this way; the paths
+in `INC` are relative to the current folder, so start it in the project
+folder. Without rlwrap, rewrite runs in any terminal (also PowerShell and
+`cmd`); there `\alpha` is converted as well, only without completion.
+Unicode characters need a font that has them, as in Windows Terminal.
+
 The old 32-bit Unix makefile is kept as `makefile.unix32.orig`, and the
 Amiga makefile as `makefile.amiga`.
 
@@ -136,6 +172,13 @@ REWRITE_PROFILE=1 ./rewrite.exe < problem.rw
   term is always available as the term `%`.
 - Errors are reported with the offending line, and the interpreter goes on
   with the next line.
+- Names may contain Unicode letters (UTF-8): `SYM α, θ₁ : real`. As in
+  Julia, LaTeX-like names are replaced on input: `\alpha` is `α`, `\theta`
+  is `θ`, `\_1` is `₁`, `\hbar` is `ħ` (Julia's table of about 2500
+  names, [src/latex.c](src/latex.c)). A name that ends in a letter must not
+  be followed by a letter, so `\alphax` stays as it is. The output prints
+  the characters. For now Unicode operators such as `≤` or `×` are read as
+  letters, so they need blanks around them.
 
 ### Defining data types and operators
 
