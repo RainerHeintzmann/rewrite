@@ -468,7 +468,12 @@ int	this_type;					/* since La1 .. La5 are entered in the tree as Func ! */
 
 	case SYM_TYPE :
 		if (lexval((Symbol *) np) == Term)
-			tprint(np->l,last_func_type); /* last type */
+			{
+			if (np->l)
+				tprint(np->l,last_func_type); /* last type */
+			else
+				printfOut("%s ",name((Symbol *) np));	/* 2026: no term yet */
+			}
 		else
 			if ((lexval((Symbol *) np) == Const)
 				&& (hasval(np) == TRUE)
@@ -1275,7 +1280,7 @@ if (term==NULL)
 if (term->type == SYM_TYPE)
 	{
 	if (lexval((Symbol *) term) == Term) /* replace term */
-		return tcopy(term->l);
+		return term->l ? tcopy(term->l) : term;	/* 2026: a TERM without a term stays its name */
 
 	if ((hasval((Symbol *) term)) && lexval((Symbol *) term)==Const
 	    && ! symbolic_constant((Symbol *) term))	/* 2026: pi stays a symbol (exact mode) */

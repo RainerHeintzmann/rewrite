@@ -2,3 +2,7 @@
 5 
 0 
 survived
+
+>> REWR D(tq,x) : All
+Error in stdin : TERM tq has no term yet: assign one first, e.g. tq = REWR ... : All
+tq 

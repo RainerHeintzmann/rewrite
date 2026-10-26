@@ -647,9 +647,36 @@ else
 	if (hasval((Symbol *) np->r)) printfOut("is attached to a C-function \n");
 }
 
+/* 2026: the first TERM in t that has no term yet (declared, never
+   assigned), or NULL */
+static Symbol * empty_term (Node * t)
+{
+	Symbol * s;
+	if (! t) return NULL;
+	if (t->type == SYM_TYPE)
+		{
+		if (lexval((Symbol *) t) != Term) return NULL;
+		return t->l ? empty_term(t->l) : (Symbol *) t;
+		}
+	if ((s = empty_term(t->l)) != NULL) return s;
+	return empty_term(t->r);
+}
+
+/* TRUE (and an error message) if t uses a TERM without a term */
+static int term_missing (Node * t)
+{
+	Symbol * s = empty_term(t);
+	if (! s) return FALSE;
+	ErrorMsg("");
+	printfErr("TERM %s has no term yet: assign one first, e.g. %s = REWR ... : All\n", name(s), name(s));
+	return TRUE;
+}
+
 void rewrite_ass_fn (Node * np)
 {
-Node * to_rewr = tcopy(REWRASS_TERM(np)); /* no replacing inside terms (TERM t) ; tcopy skips the symbols 'TERM' */
+Node * to_rewr;
+if (term_missing(REWRASS_TERM(np))) return;
+to_rewr = tcopy(REWRASS_TERM(np)); /* no replacing inside terms (TERM t) ; tcopy skips the symbols 'TERM' */
 rewrite_begin();
 to_rewr = solve(to_rewr,REWRASS_ALGS(np));
 rewrite_end();
@@ -659,7 +686,9 @@ delete(to_rewr);
 
 void rewrite_fn (Node * np)
 {
-Node * to_rewr = tcopy(REWR_TERM(np)); /* no replacing inside terms (TERM t) ; tcopy skips the symbols 'TERM' */
+Node * to_rewr;
+if (term_missing(REWR_TERM(np))) return;
+to_rewr = tcopy(REWR_TERM(np)); /* no replacing inside terms (TERM t) ; tcopy skips the symbols 'TERM' */
 rewrite_begin();
 to_rewr = solve(to_rewr,REWR_ALGS(np));
 rewrite_end();
