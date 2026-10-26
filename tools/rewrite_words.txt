@@ -1,6 +1,5 @@
 ADDSPEC
 ALG
-ALL
 ATT
 All
 BRA
@@ -14,7 +13,6 @@ Dn
 Dp
 Dpn
 ELSE
-EQN
 EXE
 FOR
 FUNC
@@ -2712,6 +2710,7 @@ msolve
 natural
 newton
 nonneg
+normalq
 not
 number
 numer
@@ -2719,7 +2718,6 @@ numerik
 onemat
 onevec
 part
-poly
 polygamma
 polylog
 polyroots

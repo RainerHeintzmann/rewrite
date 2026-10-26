@@ -7,10 +7,13 @@
 #   inc/integration/all       exact numbers (inc/exact), the symbolic
 #                  helpers (inc/helpers), integration with Integrate
 #   inc/integration/rubi/all  the translated Rubi rules (RubiIntegrate)
+#   inc/list       lists [a,b] (vector), matrices [[a,b],[c,d]] (matrix)
+#   inc/linalg     det, inverse, linsolve, transpose, covectors, symbolic matrices
+#   inc/solve      equations: solve(lhs == rhs, x) : Solve
 #   inc/simplify   All ends with the normal form
 #   inc/help       the help texts for ?name
-# Optional, after it: inc/list, inc/linalg, inc/solve, inc/rvector,
-# inc/rmatrix, inc/eqnsolve (the old equation solver), and the physics:
+# Optional, after it: inc/rvector, inc/rmatrix (numerical vectors and
+# matrices), inc/eqnsolve (the old equation solver), and the physics:
 #   INC "inc/physics"
 
 INC "inc/alg"
@@ -19,5 +22,8 @@ INC "inc/numerik"
 INC "inc/mathnum"
 INC "inc/integration/all"
 INC "inc/integration/rubi/all"
+INC "inc/list"
+INC "inc/linalg"
+INC "inc/solve"
 INC "inc/simplify"
 INC "inc/help"

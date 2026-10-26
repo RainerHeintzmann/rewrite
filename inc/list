@@ -9,9 +9,7 @@
 # [[1,2],[3,4]] * [5,6] = [17, 39]; inc/linalg has det, inverse, ...
 # The functions are symbolic C functions (symfn.c, symmat.c) that work on
 # the structure; they stay unevaluated if an argument is no list.
-# Needs inc/all:
-#     INC "inc/all"
-#     INC "inc/list"
+# Loaded by inc/all.
 
 # vector and matrix have no ATT: like number, they are purely symbolic
 # sorts without numerical values (a list is stored in a TERM, not in a SYM)

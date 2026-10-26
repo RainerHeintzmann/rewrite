@@ -1,6 +1,5 @@
-# Needs inc/all, inc/list, inc/rvector and inc/rmatrix (numerical vectors and matrices):
+# Needs inc/all, inc/rvector and inc/rmatrix (numerical vectors and matrices):
 #     INC "inc/all"
-#     INC "inc/list"
 #     INC "inc/rvector"
 #     INC "inc/rmatrix"
 DATA "LiNbO3/struct2"

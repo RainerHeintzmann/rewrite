@@ -3,7 +3,7 @@
 # condition refers to them. Declared ATT SYMBOLIC HOLD in inc/helpers.
 INC "inc/all"
 PAT Uu,Xx : real
-PAT Mc,Md,Mm : real
+PAT Mq,Md,Mm : real
 OPT Md,Mm
 DEFAULT + = 0
 DEFAULT * = 1
@@ -11,7 +11,7 @@ DEFAULT RIGHT ^ = 1
 COMM +,*
 FUNC lin : real,real >> real
 ALG tm
-SPEC tm : IF (matchq(Uu, (Mc+Md*Xx)^Mm, freeq(Mc,Xx) && freeq(Md,Xx) && freeq(Mm,Xx))) lin(Uu,Xx) = 1
+SPEC tm : IF (matchq(Uu, (Mq+Md*Xx)^Mm, freeq(Mq,Xx) && freeq(Md,Xx) && freeq(Mm,Xx))) lin(Uu,Xx) = 1
 ADDSPEC tm : lin(Uu,Xx) = 0
 SYM zz : real
 # c required: (3+2x)^5 and zz+2x match, x^5 and x do not
@@ -25,7 +25,7 @@ REWR lin((3+2*x)^x,x) : tm
 # a variable of the rule in the pattern: the same x as in lin(u,x)
 FUNC lin2 : real,real,real >> real
 ALG tm2
-SPEC tm2 : IF (matchq(Uu, Md*Xx^Mm)) lin2(Uu,Xx,Mc) = 1
-ADDSPEC tm2 : lin2(Uu,Xx,Mc) = 0
+SPEC tm2 : IF (matchq(Uu, Md*Xx^Mm)) lin2(Uu,Xx,Mq) = 1
+ADDSPEC tm2 : lin2(Uu,Xx,Mq) = 0
 REWR lin2(3*x^4,x,0) : tm2
 REWR lin2(3*zz^4,x,0) : tm2

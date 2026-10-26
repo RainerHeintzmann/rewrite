@@ -10,13 +10,13 @@ SPEC raw : never(X) = X
 # a rule for number matches a real term; its conditions are calculated with
 # the real variants (Uq > 2, 2*Uq)
 PAT Uq : number
-ALG Tn
-SPEC Tn : IF (Uq > 2), (integerq(2*Uq)) Int(Uq,Xv) = Uq*Xv
-TN = REWR Int(3,x) : Tn
+ALG Tnum
+SPEC Tnum : IF (Uq > 2), (integerq(2*Uq)) Int(Uq,Xv) = Uq*Xv
+TN = REWR Int(3,x) : Tnum
 TN
-TN = REWR Int(1,x) : Tn
+TN = REWR Int(1,x) : Tnum
 TN
-TN = REWR Int(im2,x) : Tn
+TN = REWR Int(im2,x) : Tnum
 TN
 # im^2 = -1 in the helpers
 REWR collect(im*im*x + 2*im*x - im*x) : raw

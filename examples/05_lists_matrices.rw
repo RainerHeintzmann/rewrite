@@ -1,7 +1,5 @@
 # 05_lists_matrices.rw: lists, vectors and matrices
 INC "inc/all"
-INC "inc/list"
-INC "inc/linalg"
 
 "---- a list is a vector: arithmetic element by element"
 [1,2,3] + [10,20,30]

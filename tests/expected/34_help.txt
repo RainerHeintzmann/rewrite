@@ -5,11 +5,12 @@ rewrite: term rewriting with rule sets, see README.md and examples/.
   QUIT           ends rewrite
 
 Help on: ADDSPEC ALG ATT All BRA COMM D DATA DEBUG DEFAULT EXE FOR FUNC HELP
-        HOLD I IF IN INC INFO INTNUM Int Integrate LA1 LB LIFT NIN NUMPAT OPT
-        OTHER OUT PAT PRT PRTNUM QUIT RA REALNUM RETURN REWR RIGHT RU RULES
-        RubiIntegrate SHOW SORT SPEC STEPS SUBSORT SYM SYMBOLIC SYS TERM TYPEOF
-        WHILE [ im length list newton nil normform part pi range select table
-        total
+        HOLD I IF IN INC INFO INTNUM Int Integrate LA1 LB LIFT MatrixRules
+        MatrixSolve NIN NUMPAT OPT OTHER OUT PAT PRT PRTNUM QUIT RA REALNUM
+        RETURN REWR RIGHT RU RULES RubiIntegrate SHOW SORT SPEC STEPS SUBSORT
+        SYM SYMBOLIC SYS Solve TERM TYPEOF WHILE [ det dot identity im inverse
+        length linsolve list newton nil normform part pi range select solve
+        table thread total transpose
 REWR term : alg [,alg ..]   rewrites term with the rule sets and prints the result
 t = REWR term : alg         stores the result in the TERM t
 rule sets: All (simplification), Integrate, RubiIntegrate, Solve (inc/solve), ...

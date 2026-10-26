@@ -4,9 +4,8 @@
 #     SYM v : rvector
 #     v = [1,2,3]
 #     [1,0,0]*v              # scalar product
-# Needs inc/all and inc/list:
+# Needs inc/all:
 #     INC "inc/all"
-#     INC "inc/list"
 #     INC "inc/rvector"
 SORT rvector
 ATT rvector  show_vec,cmp_vec,cpy_vec,del_vec

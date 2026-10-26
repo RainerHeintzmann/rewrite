@@ -2,8 +2,6 @@
 # methods, attraction of logarithms, a new unknown, removal of square roots;
 # the solutions are checked; linear systems with Bareiss' elimination.
 INC "inc/all"
-INC "inc/list"
-INC "inc/solve"
 # ---- polynomials
 REWR solve(2*x + 3 == 7, x) : Solve
 REWR solve(x^2 - 3*x + 2 == 0, x) : Solve

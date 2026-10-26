@@ -30,7 +30,6 @@ $ rewrite
 0.333333
 > sqrt(16), ln(e), sin(pi/2)
 4 1 1
-> INC "inc/list"
 > [[1,2],[3,4]] * [5,6]
 [17, 39]
 > a = 3
@@ -46,8 +45,8 @@ a + 1
 term with the rule list `All`, here computing the derivative of
 `sin(cos(x))`. Constants such as `a` either have a value or stand for
 themselves: `a = nothing` removes the value again, because the library
-constant `nothing` never has one. `INC "inc/list"` adds lists and matrices in
-brackets, whose product is the matrix product. `?REWR` (or `?` alone) shows
+constant `nothing` never has one. Lists and matrices are written in
+brackets; the product of matrices is the matrix product. `?REWR` (or `?` alone) shows
 help, and [examples/](examples/README.md) has small programs to start from,
 e.g. `rewrite examples/03_integration.rw`.
 
@@ -625,6 +624,9 @@ The comments in the older files are in German.
 | [inc/mathnum](inc/mathnum) | The numerical values of `e` and `pi`, angle units `_deg`, `_rad`. |
 | [inc/integration/all](inc/integration/all) | Exact numbers ([inc/exact](inc/exact): `integer` and `rational`, GMP), the symbolic helpers ([inc/helpers](inc/helpers): `deriv`, `normform`, `cancel`, `expand`, ...), and integration with `Integrate`. |
 | [inc/integration/rubi/all](inc/integration/rubi/all) | The translated Rubi rules, `RubiIntegrate` (about 1 s to load). |
+| [inc/list](inc/list) | Lists `[a,b,c]` (sort `vector`) and `nil`, matrices `[[a,b],[c,d]]` (sort `matrix`), their arithmetic, `part`, `length`, `table`, `select`, ... |
+| [inc/linalg](inc/linalg) | Matrices: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread`, covectors, symbolic matrices with `MatrixRules` and `MatrixSolve`. |
+| [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), systems. |
 | [inc/simplify](inc/simplify) | `All` ends with the normal form (`normform`): like terms collected, also in subtracted sums, so `D` and `deriv` give tidy results. |
 | [inc/help](inc/help) | The help texts for `?name`. |
 
@@ -632,10 +634,7 @@ Optional libraries, loaded after `inc/all`:
 
 | File | Contents |
 | --- | --- |
-| [inc/list](inc/list) | Lists `[a,b,c]` (sort `vector`) and `nil`, matrices `[[a,b],[c,d]]` (sort `matrix`), their arithmetic, `part`, `length`, `table`, `select`, ... |
-| [inc/linalg](inc/linalg) | Matrices: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread`, covectors, symbolic matrices with `MatrixRules` and `MatrixSolve` (after `inc/list`). |
-| [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), systems (after `inc/list`). |
-| [inc/rvector](inc/rvector) | Numerical real vectors (C arrays): scalar product, cross product `_x_`, `abs`, element access (after [inc/list](inc/list)). A list becomes an rvector where one is expected: `SYM v : rvector`, `v = [1,2,3]`, `[1,0,0]*v`. |
+| [inc/rvector](inc/rvector) | Numerical real vectors (C arrays): scalar product, cross product `_x_`, `abs`, element access A list becomes an rvector where one is expected: `SYM v : rvector`, `v = [1,2,3]`, `[1,0,0]*v`. |
 | [inc/rmatrix](inc/rmatrix) | Numerical real matrices: `onemat`, `zeromat`, `chmat`, `trans`, products. Indices start at 0 (after `inc/rvector`). |
 | [inc/physics](inc/physics) | Physics: the names of quantities and units ([inc/physik](inc/physik)), the constants with their SI values ([inc/physnum](inc/physnum): `c`, `e0`, `hq`, `g`, ...), the Lagrange formalism ([inc/theophys](inc/theophys), [inc/lagrange](inc/lagrange)). It declares many short names (`c`, `g`, `m`, `t`, `v`, `F`, `T`, ...), most of them with values, so load it only when needed. |
 | [inc/eqnsolve](inc/eqnsolve) | The old rule-based equation solver (`EQN`, `SLV`); see `inc/solve` for the new one. |
@@ -726,7 +725,6 @@ the matrix products:
 
 ```text
 INC "inc/all"
-INC "inc/list"
 [1,2]*x + [a,b]                     # [x + a, 2 * x + b]
 [[1,2],[3,4]] * [[0,1],[1,0]]       # [ 2  1 ]
                                     # [ 4  3 ]
@@ -773,7 +771,7 @@ part([[1,2],[3,4]], 2, 1)                       # 3
 
 ### Matrix functions and symbolic matrices
 
-[inc/linalg](inc/linalg) (load it after `inc/list`) has the functions of
+[inc/linalg](inc/linalg) (loaded by `inc/all`) has the functions of
 linear algebra. The entries may be any terms. The functions are symbolic
 C functions ([symmat.c](src/symmat.c)):
 
@@ -798,8 +796,6 @@ polynomial of `m`; the rule set `Listable` does this for any term, like
 Mathematica's `Listable` functions:
 
 ```text
-INC "inc/list"
-INC "inc/linalg"
 SYM g : real
 det([[a,b],[g,n]])                                # a * n - b * g
 linsolve([[a,1,1],[1,a,1],[1,1,a]],[1,1,1])       # [1 / (a + 2 ), 1 / (a + 2 ), 1 / (a + 2 )]
@@ -882,8 +878,6 @@ methods themselves are an ordered rule list.
 
 ```text
 INC "inc/all"
-INC "inc/list"
-INC "inc/solve"
 REWR solve(x^2 + 4*x + 7 == 0, x) : Solve               # [3 ^ (1/2) * im - 2, -2 - 3 ^ (1/2) * im]
 REWR solve(exp(2*x) - 3*exp(x) + 2 == 0, x) : Solve     # [0.693147, 0]
 REWR solve(sqrt(x+1) == x - 1, x) : Solve               # [3]

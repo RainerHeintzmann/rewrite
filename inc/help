@@ -1,7 +1,7 @@
 # inc/help (2026): the help texts for ?name (loaded by inc/all).
 # HELP "name" "text" adds a line to the help of name; a line that begins
-# with ? shows it:  ?REWR   ?Int   ? alone lists the names. The optional
-# libraries (inc/list, inc/linalg, inc/solve, inc/rvector) have their own.
+# with ? shows it:  ?REWR   ?Int   ? alone lists the names. inc/list,
+# inc/linalg, inc/solve and inc/rvector have their own help lines.
 
 HELP "?" "rewrite: term rewriting with rule sets, see README.md and examples/."
 HELP "?" "  ?name          help on a keyword, function or name (?REWR, ?Int, ?sin)"

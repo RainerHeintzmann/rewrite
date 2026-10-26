@@ -3,7 +3,6 @@
 # a list becomes a numerical rvector where one is expected: assigned to a
 # SYM of sort rvector, or as the argument of an rvector function.
 INC "inc/all"
-INC "inc/list"
 INC "inc/rvector"
 INC "inc/rmatrix"
 (1+2*i)*(3-i)

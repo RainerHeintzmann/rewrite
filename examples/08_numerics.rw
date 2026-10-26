@@ -12,7 +12,6 @@ sqrt(2)
 PRTNUM "%g "
 
 "---- numerical vectors (C arrays) for fast arithmetic"
-INC "inc/list"
 INC "inc/rvector"
 SYM vv, ww : rvector
 vv = [1, 2, 3]

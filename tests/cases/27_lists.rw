@@ -1,7 +1,6 @@
 # Lists (inc/list): [a,b,c] (sort vector), the empty list nil, nested
 # lists (a list of vectors is a matrix); list(a,b) is the old name.
 INC "inc/all"
-INC "inc/list"
 TERM LL : vector
 TERM MM : matrix
 SYM yy,aa,kk : real

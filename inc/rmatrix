@@ -8,7 +8,7 @@ OTHER * : rmatrix,real >> rmatrix     ATT mat_mul_real # real times matrix
 OTHER * : rmatrix,rvector >> rvector  ATT mat_mul_vec  # matrix times vector
 FUNC trans : rmatrix >> rmatrix ATT mat_trans
 
-FUNC det  : rmatrix >> real
+OTHER det : rmatrix >> real
 OTHER elem : rmatrix,real,real >> real ATT elem_mat        # matrix,row,column
 OTHER [ : rmatrix,real,real >> real ATT elem_mat          # Matrix[row,column]
 FUNC zeromat : real,real >> rmatrix ATT zero_mat          # rows,columns

@@ -1,7 +1,5 @@
 # 06_equations.rw: solving equations with the rule set Solve
 INC "inc/all"
-INC "inc/list"
-INC "inc/solve"
 
 "---- polynomials"
 REWR solve(x^2 - 3*x + 2 == 0, x) : Solve

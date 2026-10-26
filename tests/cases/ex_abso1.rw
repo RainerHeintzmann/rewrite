@@ -1,7 +1,6 @@
 # Example script LiNbO3/abso1 from the original project (regression test).
 INC "inc/all"
 INC "inc/physics"
-INC "inc/list"
 INC "inc/rvector"
 INC "inc/rmatrix"
 INC "LiNbO3/abso1"
