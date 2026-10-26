@@ -1,12 +1,11 @@
- Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
 2 + 3 * x ^ 2 
-2 * sin (x )* cos (x )
-2 * x * exp (- x )+ -1 * x ^ 2 * exp (- x )
+2 * cos (x )* sin (x )
+2 * x * exp (- x )- x ^ 2 * exp (- x )
 cos (x )/ sin (x )
 2 / (1 + 4 * x ^ 2 )
 ---- a second derivative
-12 * x ^ 2 * cos (x )- (8 * x ^ 3 * sin (x )+ x ^ 4 * cos (x ))
+12 * x ^ 2 * cos (x )- 8 * x ^ 3 * sin (x )- x ^ 4 * cos (x )
 ---- D(f,x) does not assume that other symbols are constant (D(y,x) stays);
 ---- deriv(f,x) does: a partial derivative
 3 * y ^ 2 + x ^ 2 
-cos (kk * x )* kk + 2 * kk * x 
+kk * cos (kk * x )+ 2 * kk * x 

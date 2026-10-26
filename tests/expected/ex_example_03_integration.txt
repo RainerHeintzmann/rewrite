@@ -1,9 +1,8 @@
- Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
 ---- with Integrate
 (1/3) * x ^ 3 
-sin (x )- cos (x )* x 
+sin (x )- x * cos (x )
 (1/2) * ln (3 + 2 * x )
-(1/2) * exp (2 * x )* x - (1/4) * exp (2 * x )
+(1/2) * x * exp (2 * x )- (1/4) * exp (2 * x )
 ---- with RubiIntegrate
 arctan (x )
 (1/2) * x - (1/2) * cos (x )* sin (x )

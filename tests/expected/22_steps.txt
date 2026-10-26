@@ -1,4 +1,3 @@
- Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
 Step 1: 1.1.2.2 (c x)^m (a+b x^2)^p, rule 9
   Int[(c_.*x_)^m_.*(a_+b_.*x_^2)^p_,x_Symbol] := (c*x)^(m+1)*(a+b*x^2)^p/(c*(m+2*p+1)) + 2*a*p/(m+2*p+1) \[Star] Int[(c*x)^m*(a+b*x^2)^(p-1),x] /; FreeQ[{a,b,c,m},x] && GtQ[p,0] && NeQ[m+2*p+1,0] && IntBinomialQ[a,b,c,2,m,p,x]
   Int (x ^ 2 * (1 + -1 * x ^ 2 )^ (1/2) ,x )

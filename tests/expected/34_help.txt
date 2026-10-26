@@ -1,4 +1,3 @@
- Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
 rewrite: term rewriting with rule sets, see README.md and examples/.
   ?name          help on a keyword, function or name (?REWR, ?Int, ?sin)
   TYPEOF term    the sort of a term;  TYPEOF f  the variants of a function

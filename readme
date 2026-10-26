@@ -434,6 +434,11 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Unicode-Namen (UTF-8): SYM α : real ist erlaubt; wie in Julia werden
    LaTeX-artige Namen bei der Eingabe ersetzt (\alpha -> das Zeichen alpha,
    Tabelle aus Julia, src/latex.c); die Ausgabe zeigt die Zeichen.
+ - inc/all ist jetzt die mathematische Bibliothek (mit exakten Zahlen, Integration
+   und Hilfe ?name); die Physik (Einheiten, Konstanten wie c, g, e0) laedt
+   INC "inc/physics", LiNbO3/comp nur die LiNbO3-Beispiele selbst. Die Regelliste
+   All endet mit der Normalform (normform): D und deriv liefern zusammengefasste
+   Ergebnisse.
  - Kovektoren (inc/linalg): transpose(v) eines Vektors hat die Sorte
    covector (ein Zeilenvektor wie Transpose in Julia); die Sorten waehlen
    das Produkt: transpose(u)*v ist eine Zahl, u*transpose(v) eine Matrix.

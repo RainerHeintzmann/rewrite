@@ -229,6 +229,16 @@ Symbol * declaresym(Symbol * sp,Node * rtps,Node * atps,int lexv,int hasv)
 	if (lexval(sp) != Sort) delete(atypes(sp));
 	rtypes(sp) = (Node *)(rtps);
 	atypes(sp) = (Node *)(atps);
+	if (variants(sp))	/* 2026: declared again: the old variants (OTHER) leave the */
+		{		/* circle, else a walk from one of them never comes back */
+		Symbol * v = variants(sp), * next;
+		while (v && v != sp)
+			{
+			next = variants(v);
+			variants(v) = NULL;
+			v = next;
+			}
+		}
 	variants(sp)  = NULL;
   hasval(sp) = (hasv);
 	specials(sp,lexv);

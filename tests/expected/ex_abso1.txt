@@ -1,5 +1,4 @@
  Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
- Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
 1.54967 
 warning : G was previosly defined to be of type real !
 # This file containes data related to LiNbO3-crytals

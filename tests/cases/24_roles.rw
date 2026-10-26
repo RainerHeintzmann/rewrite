@@ -2,7 +2,6 @@
 # terms with roles ("+", "cos", "pi", ...). By default a role is the symbol
 # of the same name; a library with other names maps them.
 INC "inc/all"
-INC "inc/helpers"
 TERM T : real
 SYM yy : real
 x = yy

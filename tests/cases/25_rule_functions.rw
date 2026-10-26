@@ -3,7 +3,6 @@
 # call of f, f does not apply. Used for deriv (inc/helpers) and Rubi's
 # FixInertTrigFunction (fixinert).
 INC "inc/all"
-INC "inc/helpers"
 TERM T : real
 SYM yy,nn : real
 x = yy

@@ -52,6 +52,24 @@ char * out_capture_end (void)		/* the captured text (malloc), "" if none */
 	return s;
 }
 
+/* 2026: the formatted text in buf, or in a larger buffer for a longer one
+   (formerly vsprintf into buf: a text over 1024 bytes overwrote tmpline,
+   fp and datafp behind it). The caller frees the result if it is not buf. */
+static char * format_text (const char * format, va_list ap)
+{
+	va_list cp;
+	char * big;
+	int n;
+	va_copy(cp, ap);
+	n = vsnprintf(buf, sizeof buf, format, cp);
+	va_end(cp);
+	if (n < (int) sizeof buf) return buf;
+	big = (char *) malloc(n + 1);
+	if (! big) fatal("inout : no room");
+	vsnprintf(big, n + 1, format, ap);
+	return big;
+}
+
 int printfOut(const char * format,...)
 {
 	int rt;
@@ -81,12 +99,13 @@ int printfOut(const char * format,...)
 	if (!fp) fp=stdout;
 	if (fp==stdout)
 	{
-		vsprintf(buf,format,mylist);
+		char * text = format_text(format, mylist);
 #ifndef NEXT
-		rt=printf("%s",buf);
+		rt=printf("%s",text);
 #else
-		rt=display(buf);
+		rt=display(text);
 #endif
+		if (text != buf) free(text);
 	}
 	else
 	{
@@ -103,13 +122,15 @@ int printfErr(const char * format,...)
 	int rt;
 	va_list mylist;
 	va_start(mylist,format);
-
-	vsprintf(buf,format,mylist);
+	{
+	char * text = format_text(format, mylist);
 #ifndef NEXT
-	rt=fprintf(stderr,"%s",buf);
+	rt=fprintf(stderr,"%s",text);
 #else
-	rt=display(buf);
+	rt=display(text);
 #endif
+	if (text != buf) free(text);
+	}
 	va_end(mylist);
 	return rt;
 }
@@ -200,14 +221,16 @@ int printfDebug(int pri,const char * format,...)
 	if (debug<=pri) return rt;
 
 	va_start(mylist,format);
-
-	vsprintf(buf,format,mylist);
+	{
+	char * text = format_text(format, mylist);
 #ifndef NEXT
-	rt=fprintf(stderr,"%s",buf);
+	rt=fprintf(stderr,"%s",text);
 	fflush(stderr);
 #else
-	rt=display(buf);
+	rt=display(text);
 #endif
+	if (text != buf) free(text);
+	}
 	va_end(mylist);
 	return rt;
 }

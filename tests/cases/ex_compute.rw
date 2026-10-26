@@ -1,6 +1,9 @@
 # Example script LiNbO3/compute from the original project (regression test).
 INC "inc/all"
+INC "inc/physics"
 INC "inc/list"
 INC "inc/rvector"
 INC "inc/rmatrix"
+INC "LiNbO3/comp"           # the constants of the crystal (formerly in inc/all)
+l=6
 INC "LiNbO3/compute"

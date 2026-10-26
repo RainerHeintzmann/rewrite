@@ -614,27 +614,37 @@ This prints `10 20 30`.
 
 ## The standard library
 
-`INC "inc/all"` loads the following files in this order. The comments in
-the files are in German.
+`INC "inc/all"` loads the mathematical standard library, in this order.
+The comments in the older files are in German.
 
 | File | Contents |
 | --- | --- |
-| [inc/list](inc/list) | Lists `[a,b,c]` (sort `vector`) and `nil`, matrices `[[a,b],[c,d]]` (sort `matrix`), their arithmetic, `part`, `length`, `table`, `select`, ... (load it after `inc/all`). |
-| [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), linear systems (load it after `inc/list`). |
-| [inc/linalg](inc/linalg) | Matrices: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread`, symbolic matrices with `MatrixRules` and `MatrixSolve` (load it after `inc/list`). |
-| [inc/exact](inc/exact) | Exact numbers: sorts `integer` and `rational` (GMP), subsorts of `real`. |
-| [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
+| [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, `number`, `algebra`, group, ring, field), operators, elementary functions, simplification rules and differentiation `D`. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
-| [inc/rvector](inc/rvector) | Numerical real vectors (C arrays): scalar product, cross product `_x_`, `abs`, element access. Not loaded by `inc/all` any more: load it after [inc/list](inc/list). A list becomes an rvector where one is expected: `SYM v : rvector`, `v = [1,2,3]`, `[1,0,0]*v`. |
-| [inc/rmatrix](inc/rmatrix) | Numerical real matrices: `onemat`, `zeromat`, `chmat`, `trans`, products. Indices start at 0. Load it explicitly after `inc/rvector`. |
-| [inc/physik](inc/physik), [inc/theophys](inc/theophys), [inc/lagrange](inc/lagrange) | Physical units and formulas, Lagrange formalism. |
-| [inc/physnum](inc/physnum), [inc/mathnum](inc/mathnum) | Numerical values of physical and mathematical constants such as `c`, `e` and `pi`. |
-| [inc/eqnsolve](inc/eqnsolve) | Solving equations. |
 | [inc/numerik](inc/numerik) | Numerics with the rule lists `numerik,calc`: integral `I(a,b,f,x)`, Newton zero `newton(start,f,f',x)`, `fmin`, `fmax`, `flzero`, `flext`. |
-| [LiNbO3/comp](LiNbO3/comp) | Material constants of lithium niobate crystals. |
+| [inc/mathnum](inc/mathnum) | The numerical values of `e` and `pi`, angle units `_deg`, `_rad`. |
+| [inc/integration/all](inc/integration/all) | Exact numbers ([inc/exact](inc/exact): `integer` and `rational`, GMP), the symbolic helpers ([inc/helpers](inc/helpers): `deriv`, `normform`, `cancel`, `expand`, ...), and integration with `Integrate`. |
+| [inc/integration/rubi/all](inc/integration/rubi/all) | The translated Rubi rules, `RubiIntegrate` (about 1 s to load). |
+| [inc/simplify](inc/simplify) | `All` ends with the normal form (`normform`): like terms collected, also in subtracted sums, so `D` and `deriv` give tidy results. |
+| [inc/help](inc/help) | The help texts for `?name`. |
 
-Note that the library defines many short names, for example `c` (speed of
-light), `e`, `pi`, `i` (imaginary unit), `x`, `y`, `z`, `a`, `b`, `n`.
+Optional libraries, loaded after `inc/all`:
+
+| File | Contents |
+| --- | --- |
+| [inc/list](inc/list) | Lists `[a,b,c]` (sort `vector`) and `nil`, matrices `[[a,b],[c,d]]` (sort `matrix`), their arithmetic, `part`, `length`, `table`, `select`, ... |
+| [inc/linalg](inc/linalg) | Matrices: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread`, covectors, symbolic matrices with `MatrixRules` and `MatrixSolve` (after `inc/list`). |
+| [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), systems (after `inc/list`). |
+| [inc/rvector](inc/rvector) | Numerical real vectors (C arrays): scalar product, cross product `_x_`, `abs`, element access (after [inc/list](inc/list)). A list becomes an rvector where one is expected: `SYM v : rvector`, `v = [1,2,3]`, `[1,0,0]*v`. |
+| [inc/rmatrix](inc/rmatrix) | Numerical real matrices: `onemat`, `zeromat`, `chmat`, `trans`, products. Indices start at 0 (after `inc/rvector`). |
+| [inc/physics](inc/physics) | Physics: the names of quantities and units ([inc/physik](inc/physik)), the constants with their SI values ([inc/physnum](inc/physnum): `c`, `e0`, `hq`, `g`, ...), the Lagrange formalism ([inc/theophys](inc/theophys), [inc/lagrange](inc/lagrange)). It declares many short names (`c`, `g`, `m`, `t`, `v`, `F`, `T`, ...), most of them with values, so load it only when needed. |
+| [inc/eqnsolve](inc/eqnsolve) | The old rule-based equation solver (`EQN`, `SLV`); see `inc/solve` for the new one. |
+
+The examples of the original project use their own files: [LiNbO3/comp](LiNbO3/comp)
+has the material constants of lithium niobate crystals.
+
+Note that `inc/all` defines some short names: `e` and `pi` (with their
+values), `i` (the imaginary unit of `complex`), `x`, `y`, `z`, `a`, `b`, `n`.
 Some examples:
 
 ```text
@@ -693,7 +703,8 @@ derivative rule:
 | `hyp2f1(a,b,c,z)`, `appellf1(a,b1,b2,c,x,y)`, `besselj(nu,x)` | hypergeometric functions and the Bessel function |
 
 `Gamma` is written with a capital G because `gamma` is a constant in
-[inc/physik](inc/physik). Outside their real domain the functions give NaN.
+[inc/physik](inc/physik) (inc/physics). Outside their real domain the
+functions give NaN.
 
 ### Lists, vectors and matrices
 

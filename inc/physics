@@ -1,0 +1,17 @@
+# inc/physics (2026): physical quantities, units, constants and formulas,
+# after inc/all:
+#     INC "inc/all"
+#     INC "inc/physics"
+# It declares many short names (c, e0, g, G, m, t, v, F, T, alpha, ...),
+# most of them with values (c = 2.99792e8, g = 9.80665, ...), so they are
+# not free symbols any more after it.
+#   inc/physik     the names of quantities, units (_m, _eV, _Ang, ...) and
+#                  the constants
+#   inc/theophys   a TERM Coordinate for the Lagrange formalism
+#   inc/lagrange   the Lagrange equation DGL of the TERMs L, Coordinate
+#   inc/physnum    the numerical values (SI units)
+
+INC "inc/physik"
+INC "inc/theophys"
+INC "inc/lagrange"
+INC "inc/physnum"

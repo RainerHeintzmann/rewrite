@@ -2,7 +2,6 @@
 # lists. The pattern variables are bound only during the test; the
 # condition refers to them. Declared ATT SYMBOLIC HOLD in inc/helpers.
 INC "inc/all"
-INC "inc/helpers"
 PAT Uu,Xx : real
 PAT Mc,Md,Mm : real
 OPT Md,Mm

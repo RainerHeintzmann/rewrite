@@ -2994,6 +2994,29 @@ static Node * s_normform (Node * a[], int n, Symbol * f)
 	return r;
 }
 
+/* normalq(u): normform would not change u, so that a rule
+   IF (not(normalq(X))) X = normform(X) ends (the last step of All). After
+   a rule the term is calculated again (tcalc), which may change normform's
+   result a little ((-1/2)*c for - (1/2)*c): u is normal if it is that
+   calculated normal form. */
+static Node * s_normalq (Node * a[], int n, Symbol * f)
+{
+	Node * r;
+	int same;
+	if (n != 1) return NULL;
+	if (nf_known(nf_hash(a[0], 0))) return mk_bool(1, f);
+	r = s_normform(a, 1, NULL);
+	same = r && term_equal(r, a[0]);
+	if (r && ! same)
+		{
+		r = tcalc(r);
+		same = r && term_equal(r, a[0]);
+		}
+	delete(r);
+	if (same) nf_hash(a[0], 1);		/* known as normal from now on */
+	return mk_bool(same, f);
+}
+
 
 /* ---- exact mode: functions of exact numbers stay symbolic ----
  * With exact numbers (inc/exact), as in Mathematica: ln(2), sin(1/3),
@@ -5124,6 +5147,7 @@ void term_simplify_trivial (Node ** p)
 
 static Node * s_matchq (Node * a[], int n, Symbol * f);
 static Node * s_normform (Node * a[], int n, Symbol * f);
+static Node * s_normalq (Node * a[], int n, Symbol * f);
 static Node * s_hyp2trig (Node * a[], int n, Symbol * f);
 static Node * s_imagfn (Node * a[], int n, Symbol * f);
 static Node * s_listq (Node * a[], int n, Symbol * f);
@@ -5299,6 +5323,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "binomsum", s_binomsum },
 	{ "matchq", s_matchq },
 	{ "normform", s_normform },
+	{ "normalq", s_normalq },
 	{ "hyp2trig", s_hyp2trig },
 	{ "imagfn", s_imagfn },
 	{ "listq", s_listq },		/* lists (inc/list) */

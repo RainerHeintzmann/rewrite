@@ -1,4 +1,3 @@
- Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
 1.1884 1.85082 0.642093 0.463648 
 1.31304 0.648054 0.850918 
 0.881374 1.31696 0.549306 0.549306 

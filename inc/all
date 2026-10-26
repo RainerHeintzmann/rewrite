@@ -1,29 +1,23 @@
-# this include file includes all important mathematical and physical
-# formulas in the right order
+# inc/all: the mathematical standard library, in this order:
+#   inc/alg        sorts, operators, elementary and special functions, the
+#                  rules (simplification, derivatives D), the rule list All
+#   inc/pdiff      partial derivatives
+#   inc/numerik    numerics: I, newton, fmin, fmax, ... (numerik,calc)
+#   inc/mathnum    numerical values of e and pi, angle units _deg, ...
+#   inc/integration/all       exact numbers (inc/exact), the symbolic
+#                  helpers (inc/helpers), integration with Integrate
+#   inc/integration/rubi/all  the translated Rubi rules (RubiIntegrate)
+#   inc/simplify   All ends with the normal form
+#   inc/help       the help texts for ?name
+# Optional, after it: inc/list, inc/linalg, inc/solve, inc/rvector,
+# inc/rmatrix, inc/eqnsolve (the old equation solver), and the physics:
+#   INC "inc/physics"
 
 INC "inc/alg"
-# INC "inc/bool"
 INC "inc/pdiff"
-INC "inc/physik"
-INC "inc/theophys"
-INC "inc/lagrange"
-
-INC "inc/physnum"
-INC "inc/eqnsolve"
-#  INC "inc/numerik.ini" ??
 INC "inc/numerik"
 INC "inc/mathnum"
-INC "inc/physnum"
-INC "LiNbO3/comp"
-l=6
-# INC "LiNbO3/compute"
-
-# 2026: exact numbers (1/3 stays a fraction; plain expressions are still
-# calculated numerically), the symbolic helpers, and the integration:
-# REWR Int(f,x) : Integrate (a small rule list) or : RubiIntegrate (the
-# translated Rubi rules, about 1 s to load)
 INC "inc/integration/all"
 INC "inc/integration/rubi/all"
-
-# 2026: the help texts for ?name (?REWR, ?Int, ? alone lists the names)
+INC "inc/simplify"
 INC "inc/help"

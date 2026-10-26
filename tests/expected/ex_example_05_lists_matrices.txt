@@ -1,4 +1,3 @@
- Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
 ---- a list is a vector: arithmetic element by element
 [11,
  22,
