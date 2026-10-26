@@ -16,6 +16,9 @@ FUNC eqq       : real,real >> bool        ATT SYMBOLIC eqq        # u = v
 FUNC neq       : real,real >> bool        ATT SYMBOLIC neq        # u not equal to v
 FUNC igtq      : real,real >> bool        ATT SYMBOLIC igtq       # u integer and > n
 FUNC iltq      : real,real >> bool        ATT SYMBOLIC iltq       # u integer and < n
+FUNC igeq      : real,real >> bool        ATT SYMBOLIC igeq       # u integer and >= n
+FUNC ileq      : real,real >> bool        ATT SYMBOLIC ileq       # u integer and <= n
+FUNC oddq      : real >> bool             ATT SYMBOLIC oddq       # u odd integer
 FUNC polyq     : real,real >> bool        ATT SYMBOLIC polyq      # polynomial in x
 OTHER polyq    : real,real,real >> bool   ATT SYMBOLIC polyq      # polynomial of degree n
 FUNC linearq   : real,real >> bool        ATT SYMBOLIC linearq    # polynomial of degree 1
@@ -76,6 +79,8 @@ FUNC cancel    : real >> real             ATT SYMBOLIC cancel     # N/D over a c
 OTHER cancel   : number >> number         ATT SYMBOLIC cancel
 FUNC polygcd   : real,real >> real        ATT SYMBOLIC polygcd    # gcd of two polynomials (several variables)
 OTHER polygcd  : number,number >> number  ATT SYMBOLIC polygcd
+OTHER polygcd  : real,real,real >> real   ATT SYMBOLIC polygcd    # Rubi PolyGCD[p,q,x]
+OTHER polygcd  : number,number,number >> number ATT SYMBOLIC polygcd
 # 2026: more helper functions of Rubi
 FUNC replaceall : real,real,real >> real  ATT SYMBOLIC replaceall   # u with x -> v (at once)
 FUNC binomialq  : real,real >> bool       ATT SYMBOLIC binomialq    # u = a + b x^n
@@ -126,6 +131,9 @@ OTHER eqq               : number,number >> bool ATT SYMBOLIC eqq
 OTHER neq               : number,number >> bool ATT SYMBOLIC neq
 OTHER igtq              : number,number >> bool ATT SYMBOLIC igtq
 OTHER iltq              : number,number >> bool ATT SYMBOLIC iltq
+OTHER igeq              : number,number >> bool ATT SYMBOLIC igeq
+OTHER ileq              : number,number >> bool ATT SYMBOLIC ileq
+OTHER oddq              : number >> bool ATT SYMBOLIC oddq
 OTHER polyq             : number,number >> bool ATT SYMBOLIC polyq
 OTHER polyq             : number,number,number >> bool ATT SYMBOLIC polyq
 OTHER linearq           : number,number >> bool ATT SYMBOLIC linearq

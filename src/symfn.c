@@ -300,6 +300,19 @@ int term_equal (Node * a, Node * b)	/* structural equality (exported) */
 	return tequal(a, b);
 }
 
+static Node * collected (Node * t);
+static Node * tcpy (Node * t);
+
+static int node_count (Node * t, int limit)	/* number of nodes of t, at most limit */
+{
+	int i, n, c = 1;
+	t = deref(t);
+	if (! t || t->type != Func) return 1;
+	n = term_nargs(t);
+	for (i = 0; i < n && c < limit; i++) c += node_count(arg(t, i), limit - c);
+	return c;
+}
+
 int term_has_nan (Node * t)	/* contains NaN, infinity or a division by zero */
 {
 	double v;
@@ -313,6 +326,16 @@ int term_has_nan (Node * t)	/* contains NaN, infinity or a division by zero */
 	if (is_head(t, "^", 2) && is_num(arg(t, 0), & v) && v == 0
 	    && is_num(arg(t, 1), & v) && v < 0) return 1;
 	if (is_head(t, "mi", 1) && is_num(arg(t, 0), & v) && v == 0) return 1;
+	/* (c f - d e)^-1 with c f - d e = 0 after collecting: a division by
+	 * zero as well (Mathematica's ComplexInfinity); small sums only */
+	if (is_head(t, "^", 2) && is_num(arg(t, 1), & v) && v < 0
+	    && is_head(arg(t, 0), "+", 2) && node_count(arg(t, 0), 40) < 40)
+		{
+		Node * c = collected(tcpy(arg(t, 0)));
+		int zero = is_num(c, & v) && v == 0;
+		delete(c);
+		if (zero) return 1;
+		}
 	/* a polynomial division that was not possible (no polynomial), or an
 	 * expansion that did not apply (partial fractions with symbolic
 	 * coefficients): the rule assumed Mathematica's semantics, its result is
@@ -601,7 +624,8 @@ Node * exact_pow_pow (Node * t)
 		return r;
 		}
 		}
-	if (! is_head(b, "^", 2) || ! is_exact(arg(b, 0)) || ! is_exact(arg(b, 1))
+	/* (u^a)^k = u^(a k) for an integer k, whatever u is: ((2+3^(1/2))^(1/2))^2 = 2+3^(1/2) */
+	if (! is_head(b, "^", 2) || ! is_exact(arg(b, 1))
 	    || ! is_exact(arg(t, 1)) || ! is_num(arg(t, 1), & n) || n != floor(n))
 		return NULL;
 	return mk_pow(tcpy(arg(b, 0)), fold_exact("*", tcpy(arg(b, 1)), tcpy(arg(t, 1))));
@@ -748,6 +772,8 @@ static void mono_addfac (Mono * m, Node * base, double e, int exact)
 	m->nf++;
 }
 
+static void mono_flatten_pow (Node * b, double k, int exact, Mono * m);
+
 static void mono_flatten (Node * t, Mono * m)	/* t is a product */
 {
 	double v, e;
@@ -758,8 +784,29 @@ static void mono_flatten (Node * t, Mono * m)	/* t is a product */
 	else if (is_head(t, "*", 2)) { mono_flatten(arg(t, 0), m); mono_flatten(arg(t, 1), m); }
 	else if (is_head(t, "-", 1)) { m->c = -m->c; mono_flatten(arg(t, 0), m); }
 	else if (is_head(t, "^", 2) && num_value(arg(t, 1), & e))
-		mono_addfac(m, arg(t, 0), e, num_value_exact(arg(t, 1)));
+		{
+		Node * b = deref(arg(t, 0));
+		if (e == floor(e) && (is_head(b, "^", 2) || is_head(b, "*", 2) || is_head(b, "-", 1)))
+			mono_flatten_pow(b, e, num_value_exact(arg(t, 1)), m);
+		else
+			mono_addfac(m, arg(t, 0), e, num_value_exact(arg(t, 1)));
+		}
 	else mono_addfac(m, t, 1, 1);
+}
+
+/* b^k for an integer k into the monomial: (b^e1)^k = b^(e1 k), (a*b)^k =
+ * a^k b^k, (-a)^k = (-1)^k a^k: (d^(-1/2))^2*d = 1, (pi*im)^-1*pi*im = 1 */
+static void mono_flatten_pow (Node * b, double k, int exact, Mono * m)
+{
+	double v, e1;
+	b = deref(b);
+	if (num_value(b, & v)) { m->c *= pow(v, k); if (! num_value_exact(b) || ! exact) m->exact = 0; }
+	else if (is_head(b, "*", 2)) { mono_flatten_pow(arg(b, 0), k, exact, m); mono_flatten_pow(arg(b, 1), k, exact, m); }
+	else if (is_head(b, "-", 1)) { if (fmod(fabs(k), 2.0) == 1) m->c = -m->c; mono_flatten_pow(arg(b, 0), k, exact, m); }
+	else if (is_head(b, "^", 2) && num_value(arg(b, 1), & e1))
+		mono_addfac(m, arg(b, 0), e1 * k, exact && num_value_exact(arg(b, 1)));
+	else
+		mono_addfac(m, b, k, exact);
 }
 
 /* a root of an integer and the coefficient, as in Mathematica: 2*2^(-1/2) =
@@ -970,6 +1017,8 @@ static Node * s_rationalq (Node * a[], int n, Symbol * f)
 	return mk_bool(n > 0, f);
 }
 
+static Node * im_node (void);
+
 static int posaux (Node * u)		/* Rubi's PosAux */
 {
 	double v, e;
@@ -977,7 +1026,8 @@ static int posaux (Node * u)		/* Rubi's PosAux */
 	if (num_value_r(u, & v)) return v > 0;
 	if (is_head(u, "^", 2))
 		{
-		if (is_num(arg(u, 1), & e) && e == floor(e))
+		/* num_value: in a rule condition the exponent can still be -(1) */
+		if (num_value(arg(u, 1), & e) && e == floor(e))
 			return fmod(e, 2.0) == 0 || posaux(arg(u, 0));
 		return 1;
 		}
@@ -996,15 +1046,63 @@ static int is_zero (Node * u)
 	return num_value(u, & v) && v == 0;
 }
 
+/* Rubi's PosQ for a term with im: collected first (im*(-1*im) = 1); a
+ * complex a + b*im by the sign of a, or of b if a is 0. 1: positive form,
+ * 0: negative form, -1: zero */
+static int posq_im (Node * u, Node * im)
+{
+	TList l = {0};
+	Node * c = collected(tcpy(u)), * re = NULL, * ip = NULL;
+	int i, r;
+	if (! contains(c, im))
+		{
+		r = is_zero(c) ? -1 : posaux(c);
+		delete(c);
+		return r;
+		}
+	summands_to(c, & l, 0);
+	for (i = 0; i < l.n; i++)
+		if (contains(l.t[i], im))
+			{
+			Node * t = collected(mk_mul(tcpy(l.t[i]), mk_neg(tcpy(im))));	/* -im*(b*im) = b */
+			ip = ip ? mk_add(ip, t) : t;
+			}
+		else
+			re = re ? mk_add(re, tcpy(l.t[i])) : tcpy(l.t[i]);
+	tl_free(& l);
+	delete(c);
+	if (re && ! is_zero(re)) r = posaux(re);
+	else r = ip ? posaux(ip) : -1;
+	delete(re);
+	delete(ip);
+	return r;
+}
+
 static Node * s_posq (Node * a[], int n, Symbol * f)
 {
+	Node * im;
 	if (n != 1) return NULL;
+	if ((im = im_node()) && contains(a[0], im))
+		{
+		int r = posq_im(a[0], im);
+		delete(im);
+		return mk_bool(r == 1, f);
+		}
+	delete(im);
 	return mk_bool(! is_zero(a[0]) && posaux(a[0]), f);
 }
 
 static Node * s_negq (Node * a[], int n, Symbol * f)
 {
+	Node * im;
 	if (n != 1) return NULL;
+	if ((im = im_node()) && contains(a[0], im))
+		{
+		int r = posq_im(a[0], im);
+		delete(im);
+		return mk_bool(r == 0, f);
+		}
+	delete(im);
 	return mk_bool(! is_zero(a[0]) && ! posaux(a[0]), f);
 }
 
@@ -1045,6 +1143,27 @@ static Node * s_igtq (Node * a[], int n, Symbol * f)
 	double u, m;
 	if (n != 2) return NULL;
 	return mk_bool(num_value(a[0], & u) && u == floor(u) && num_value(a[1], & m) && u > m, f);
+}
+
+static Node * s_igeq (Node * a[], int n, Symbol * f)	/* Rubi IGeQ: an integer >= n */
+{
+	double u, m;
+	if (n != 2) return NULL;
+	return mk_bool(num_value(a[0], & u) && u == floor(u) && num_value(a[1], & m) && u >= m, f);
+}
+
+static Node * s_ileq (Node * a[], int n, Symbol * f)	/* Rubi ILeQ: an integer <= n */
+{
+	double u, m;
+	if (n != 2) return NULL;
+	return mk_bool(num_value(a[0], & u) && u == floor(u) && num_value(a[1], & m) && u <= m, f);
+}
+
+static Node * s_oddq (Node * a[], int n, Symbol * f)	/* an odd integer */
+{
+	double u;
+	if (n != 1) return NULL;
+	return mk_bool(num_value(a[0], & u) && u == floor(u) && fmod(fabs(u), 2.0) == 1, f);
 }
 
 static Node * s_iltq (Node * a[], int n, Symbol * f)
@@ -1656,6 +1775,33 @@ static int is_canon_trig (const char * h)	/* sin, cos, tan, sinh, cosh, tanh */
 	    || ! strcmp(h, "sinh") || ! strcmp(h, "cosh") || ! strcmp(h, "tanh");
 }
 
+static int x_outside_trig (Node * t, Node * x)	/* x in t, not inside a trig or hyperbolic function */
+{
+	int i, n;
+	t = deref(t);
+	if (! t) return 0;
+	if (tequal(t, x)) return 1;
+	if (t->type != Func) return 0;
+	if (term_nargs(t) == 1 && trig_recip(role_of(TERM_HEAD(t)))) return 0;
+	n = term_nargs(t);
+	for (i = 0; i < n; i++)
+		if (x_outside_trig(arg(t, i), x)) return 1;
+	return 0;
+}
+
+static int contains_sym (Node * t, Symbol * s)	/* the symbol s (e.g. pi) somewhere in t */
+{
+	int i, n;
+	t = deref(t);
+	if (! t) return 0;
+	if (atom_sym(t) == s) return 1;
+	if (t->type != Func) return 0;
+	n = term_nargs(t);
+	for (i = 0; i < n; i++)
+		if (contains_sym(arg(t, i), s)) return 1;
+	return 0;
+}
+
 static Node * s_trignorm (Node * a[], int n, Symbol * f)
 {
 	TList l = {0};
@@ -1702,6 +1848,50 @@ static Node * s_trignorm (Node * a[], int n, Symbol * f)
 		}
 	l.n = 0;			/* the factors belong to a[0] */
 	tl_free(& l);
+	/* as Mathematica: sin^s cos^c of one angle with s > 0 > c becomes
+	 * tan^k sin^(s-k) cos^(c+k), k = min(s, -c) (sin^2/cos = sin tan,
+	 * tan cos = sin); the same with cot and for sinh, cosh, tanh */
+	{
+	static const char * tri[2][3] = { { "sin", "cos", "tan" }, { "sinh", "cosh", "tanh" } };
+	int h, shifted = 0;
+	Symbol * ps = role_find("pi");
+	/* not while Rubi's unification has shifted angles (cos(pi/2 + x) next to
+	 * cot(x)): Mathematica never sees that mixture */
+	if (ps && contains_sym(a[0], ps)) shifted = 1;
+	/* only with x outside the trig functions (x*sin^3/cos, x*cot(x)): a pure
+	 * trig integrand goes to Rubi's rules for sin and cos (in Rubi through
+	 * the inert functions, which Mathematica does not pair) */
+	if (! x_outside_trig(a[0], x)) shifted = 1;
+	for (h = 0; h < 2 && ! shifted; h++)
+		for (i = 0; i < nf; i++)
+			{
+			Node * w;
+			int idx[3] = { -1, -1, -1 }, q;
+			double ex[3], s, c, t, k;
+			if (trig[i] != 1) continue;
+			w = arg(fb[i], 0);
+			for (j = 0; j < nf; j++)
+				if (trig[j] == 1 && tequal(arg(fb[j], 0), w))
+					for (q = 0; q < 3; q++)
+						if (is_head(fb[j], tri[h][q], 1)) idx[q] = j;
+			for (q = 0; q < 3; q++) ex[q] = idx[q] >= 0 ? fe[idx[q]] : 0;
+			s = ex[0] + ex[2];		/* tan = sin/cos */
+			c = ex[1] - ex[2];
+			t = 0;
+			if (s > 0 && c < 0) { k = s < -c ? s : -c; t = k; s -= k; c += k; }
+			else if (s < 0 && c > 0) { k = -s < c ? -s : c; t = -k; s += k; c -= k; }
+			if (s == ex[0] && c == ex[1] && t == ex[2]) continue;
+			ex[0] = s; ex[1] = c; ex[2] = t;
+			for (q = 0; q < 3; q++)
+				{
+				if (idx[q] >= 0) { fe[idx[q]] = ex[q]; continue; }
+				if (ex[q] == 0 || nf >= MAXPF) continue;
+				fb[nf] = mk_f1(tri[h][q], tcpy(w));
+				fe[nf] = ex[q];
+				trig[nf++] = 1;
+				}
+			}
+	}
 	for (i = 0; i < nf; i++)		/* negative exponents: csc^3, sec, ... */
 		if (trig[i] == 1 && fe[i] < 0)
 			{
@@ -2860,15 +3050,32 @@ static int small_rational (double v, double * p, double * q)
 	return 0;
 }
 
+static int has_function_value (Node * t)	/* ln(4) somewhere in t (not only + * ^ of numbers, pi) */
+{
+	int i, n;
+	t = deref(t);
+	if (! t || t->type != Func) return 0;
+	if (! (is_head(t, "+", -1) || is_head(t, "-", -1) || is_head(t, "*", -1) || is_head(t, "/", -1)
+	       || is_head(t, "^", -1) || is_head(t, "mi", -1)))
+		return 1;
+	n = term_nargs(t);
+	for (i = 0; i < n; i++)
+		if (has_function_value(arg(t, i))) return 1;
+	return 0;
+}
+
 Node * special_value (Node * t)
 {
 	static const char * arith[] = { "+", "-", "*", "/", "^", "mi", NULL };
 	static const char * inv[] = { "arcsin", "arccos", "arctan", "arccot", "arcsec", "arccsc", NULL };
 	Node * c;
 	double v, p, q;
-	int i, save;
+	int i, save, arithmetic = 0;
 	for (i = 0; arith[i]; i++)
-		if (is_head(t, arith[i], -1)) return NULL;	/* pi/6 stays as it is */
+		if (is_head(t, arith[i], -1)) arithmetic = 1;
+	/* arithmetic: pi/6 stays as it is; with function values only a rational
+	 * result is taken (ln(4)/ln(2) = 2, 2^(1/2)*8^(1/2) is done exactly) */
+	if (arithmetic && ! has_function_value(t)) return NULL;
 	save = calc_exact_only;
 	calc_exact_only = 0;
 	c = calculate(t);
@@ -2878,6 +3085,7 @@ Node * special_value (Node * t)
 	delnum((Symbol *) c, TRUE);
 	if (! i || ! isfinite(v)) return NULL;
 	if (small_rational(v, & p, & q)) return mk_num_ex(p / q, 1);
+	if (arithmetic) return NULL;
 	if (v != 0 && small_rational(v * v, & p, & q))		/* sin(pi/3) = 3^(1/2)/2 */
 		return mk_mul(mk_int(v < 0 ? -1 : 1), mk_pow(mk_num_ex(p / q, 1), mk_num_ex(0.5, 1)));
 	for (i = 0; inv[i]; i++)
@@ -4053,6 +4261,39 @@ static int neg_factor (Node * t)	/* -3, -3*u (a product with a negative number) 
 	return neg;
 }
 
+/* exp(u) with summands q*pi*im (q rational) in u: their value
+ * cos(q pi) + im sin(q pi) times exp(the rest), as Mathematica evaluates
+ * E^(I Pi) = -1; NULL if there is none */
+static Node * cos_pi (long p, long q);
+
+static Node * exp_pi_im (Node * e, Node * im)
+{
+	Symbol * ps = role_find("pi");
+	TList l = {0};
+	Node * rest = NULL, * pim, * r;
+	double qsum = 0, v, p, q;
+	int i, found = 0;
+	if (! ps) return NULL;
+	pim = mk_mul(mknod(Const, (Node *) ps, NULL), tcpy(im));
+	summands_to(arg(e, 0), & l, 0);
+	for (i = 0; i < l.n; i++)
+		{
+		Node * c = collected(mk_mul(tcpy(l.t[i]), mk_pow(tcpy(pim), mk_int(-1))));
+		if (is_num(c, & v) && small_rational(v, & p, & q)) { qsum += v; found = 1; }
+		else rest = rest ? mk_add(rest, tcpy(l.t[i])) : tcpy(l.t[i]);
+		delete(c);
+		}
+	tl_free(& l);
+	delete(pim);
+	if (! found || ! small_rational(qsum, & p, & q)) { delete(rest); return NULL; }
+	{
+	long pp = (long) p, qq = (long) q;
+	Node * unit = collected(mk_add(cos_pi(pp, qq), mk_mul(tcpy(im), cos_pi(qq - 2 * pp, 2 * qq))));
+	r = rest ? mk_mul(unit, mk_f1("exp", rest)) : unit;
+	}
+	return r;
+}
+
 static Node * imagfn (Node * u, Node * im)
 {
 	Node * args = NULL, ** tail = & args, * r;
@@ -4073,6 +4314,11 @@ static Node * imagfn (Node * u, Node * im)
 		}
 	r = mknod(Func, u->l, args);
 	if (n != 1) return r;
+	if (is_head(r, "exp", 1))		/* exp(q pi im + w) = (cos(q pi) + im sin(q pi)) exp(w) */
+		{
+		Node * g = exp_pi_im(r, im);
+		if (g) { delete(r); return g; }
+		}
 	if (neg_factor(arg(r, 0)))		/* sin(-2*w) = -sin(2*w), cos(-2*w) = cos(2*w) */
 		for (i = 0; odd_even[i].f; i++)
 			if (is_head(r, odd_even[i].f, 1))
@@ -4918,7 +5164,19 @@ static Node * s_isoeach (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_linsys (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_linsysq (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_cancel (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_igeq (Node * a[], int n, Symbol * f);
+static Node * s_ileq (Node * a[], int n, Symbol * f);
+static Node * s_oddq (Node * a[], int n, Symbol * f);
 static Node * s_polygcd (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_resultant (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_sysstep (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_sysstepq (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_systuple (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_sysback (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_sysext (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_sysy (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_syscheck (Node * a[], int n, Symbol * f);	/* symsolve.c */
+static Node * s_sysnorm (Node * a[], int n, Symbol * f);	/* symsolve.c */
 
 /* ---- functions defined by a rule list: FUNC f ... ATT RULES alglist ----
  * f(a1,..,an) is calculated as REWR f(a1,..,an) : alglist. If the result
@@ -5076,7 +5334,19 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "linsys", s_linsys },
 	{ "linsysq", s_linsysq },
 	{ "cancel", s_cancel },
+	{ "igeq", s_igeq },
+	{ "ileq", s_ileq },
+	{ "oddq", s_oddq },
 	{ "polygcd", s_polygcd },
+	{ "resultant", s_resultant },
+	{ "sysstep", s_sysstep },
+	{ "sysstepq", s_sysstepq },
+	{ "systuplec", s_systuple },
+	{ "sysbackc", s_sysback },
+	{ "sysextc", s_sysext },
+	{ "sysyc", s_sysy },
+	{ "syscheckc", s_syscheck },
+	{ "sysnorm", s_sysnorm },
 	{ "functionofq", s_functionofq },
 	{ "substfor", s_substfor },
 	{ "derivdivides", s_derivdivides },

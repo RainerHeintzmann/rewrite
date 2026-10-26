@@ -86,8 +86,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d,P_p), (neq(((((O_b)*(P_c)))+((((-1
 #   Int[(a_+b_.*x_^2)^p_*(c_+d_.*x_^2),x_Symbol] := d*x*(a+b*x^2)^(p+1)/(b*(2*p+3)) - (a*d-b*c*(2*p+3))/(b*(2*p+3)) \[Star] Int[(a+b*x^2)^p,x] /; FreeQ[{a,b,c,d},x] && NeQ[b*c-a*d,0] && NeQ[2*p+3,0]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)), (neq(((((2)*(P_p)))+(3)),0)) Int((((P_a)+((O_b)*((Xv)^(2))))^(P_p))*((P_c)+((O_d)*((Xv)^(2)))),Xv) = ((((O_d)*(Xv)*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((O_b)^((-1))))*(((((((2)*(P_p)))+(3)))^((-1))))))+((((-1))*(((((P_a)*(O_d)))+((((-1))*(O_b)*(P_c)*(((((2)*(P_p)))+(3)))))))*(((O_b)^((-1))))*(((((((2)*(P_p)))+(3)))^((-1))))*(Int(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)),Xv)))))
 
-# Rule 21 not translated: function PolynomialDivide
+# Rule 21 (72 variants):
 #   Int[(a_+b_.*x_^2)^p_*(c_+d_.*x_^2)^q_,x_Symbol] := Int[PolynomialDivide[(a+b*x^2)^p,(c+d*x^2)^(-q),x],x] /; FreeQ[{a,b,c,d},x] && NeQ[b*c-a*d,0] && IGtQ[p,0] && ILtQ[q,0] && GeQ[p,-q]
+ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d), (neq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)), (igtq(P_p,0)), (iltq(P_q,0)), (((geq(P_p,(((-1))*(P_q)))))) Int((((P_a)+((O_b)*((Xv)^(2))))^(P_p))*(((P_c)+((O_d)*((Xv)^(2))))^(P_q)),Xv) = Int((polyquotient(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)),((((P_c)+(((O_d)*(((Xv)^(2)))))))^((((-1))*(P_q)))),Xv)+polyremainder(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(P_p)),((((P_c)+(((O_d)*(((Xv)^(2)))))))^((((-1))*(P_q)))),Xv)*((((((P_c)+(((O_d)*(((Xv)^(2)))))))^((((-1))*(P_q)))))^(-1))),Xv)
 
 # Rule 22 (144 variants):
 #   Int[(a_+b_.*x_^2)^p_./(c_+d_.*x_^2),x_Symbol] := b/d \[Star] Int[(a+b*x^2)^(p-1),x] - (b*c-a*d)/d \[Star] Int[(a+b*x^2)^(p-1)/(c+d*x^2),x] /; FreeQ[{a,b,c,d},x] && NeQ[b*c-a*d,0] && GtQ[p,0] && (EqQ[p,1/2] || EqQ[Denominator[p],4] || EqQ[p,2/3] && EqQ[b*c+3*a*d,0])

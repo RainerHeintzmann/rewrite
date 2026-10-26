@@ -3,7 +3,7 @@
 # functions (4.1.0.1, Rubi 4.17.3, MIT license, see LICENSE.Rubi),
 #   Int[u_, x_Symbol] := Int[DeactivateTrig[u, x], x] /; FunctionOfTrigOfLinearQ[u, x]
 # Trig functions are always active here; DeactivateTrig only writes the
-# hyperbolic functions as trig functions of im*v (hyp2trig, symfkt.c:
+# hyperbolic functions as trig functions of im*v (hyp2trig, symfn.c:
 # sinh(v) = -im*sin(im*v), ...), so that the trig rules apply to them.
 # Rubi 4.17 has no basic rules for sinh, cosh, ... RubiOut turns the
 # result back (imagfn: sin(im*w) = im*sinh(w), ...). hyp2trig leaves u

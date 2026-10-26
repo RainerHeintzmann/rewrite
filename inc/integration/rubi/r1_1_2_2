@@ -62,8 +62,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c), (((ltq(P_p,(-1))))), (((gtq(O_m,1)))
 #   Int[(c_.*x_)^m_.*(a_+b_.*x_^2)^p_,x_Symbol] := -(c*x)^(m+1)*(a+b*x^2)^(p+1)/(2*a*c*(p+1)) + (m+2*p+3)/(2*a*(p+1)) \[Star] Int[(c*x)^m*(a+b*x^2)^(p+1),x] /; FreeQ[{a,b,c,m},x] && LtQ[p,-1] && IntBinomialQ[a,b,c,2,m,p,x]
 ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_m), (((ltq(P_p,(-1))))), (((igtq(P_p,0)) || (((rationalq(O_m)) && (integersq(2,((2)*(P_p)))))) || (integerq(((((((O_m)+(1)))*((1/2))))+(P_p)))) || (((((eqq(2,2)) || (eqq(2,4)))) && (integersq(((2)*(O_m)),((4)*(P_p)))))) || (((eqq(2,2)) && (integerq(((6)*(P_p)))) && (((integerq(O_m)) || (integerq(((O_m)+((((-1))*(P_p)))))))))))) Int((((O_c)*(Xv))^(O_m))*(((P_a)+((O_b)*((Xv)^(2))))^(P_p)),Xv) = (((((-(1/2)))*(((((O_c)*(Xv)))^(((O_m)+(1)))))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))*(((P_a)^((-1))))*(((O_c)^((-1))))*(((((P_p)+(1)))^((-1))))))+(((((O_m)+(((2)*(P_p)))+(3)))*((1/2))*(((P_a)^((-1))))*(((((P_p)+(1)))^((-1))))*(Int(((((((O_c)*(Xv)))^(O_m)))*(((((P_a)+(((O_b)*(((Xv)^(2)))))))^(((P_p)+(1)))))),Xv)))))
 
-# Rule 15 not translated: function PolynomialDivide
+# Rule 15 (12 variants):
 #   Int[x_^m_/(a_+b_.*x_^2),x_Symbol] := Int[PolynomialDivide[x^m,(a+b*x^2),x],x] /; FreeQ[{a,b},x] && IGtQ[m,3]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b), (igtq(P_m,3)) Int(((Xv)^(P_m))*(((P_a)+((O_b)*((Xv)^(2))))^(K_1)),Xv) = Int((polyquotient(((Xv)^(P_m)),((P_a)+(((O_b)*(((Xv)^(2)))))),Xv)+polyremainder(((Xv)^(P_m)),((P_a)+(((O_b)*(((Xv)^(2)))))),Xv)*((((P_a)+(((O_b)*(((Xv)^(2)))))))^(-1))),Xv)
 
 # Rule 16 (24 variants):
 #   Int[Sqrt[c_*x_]/(a_+b_.*x_^2)^(1/4),x_Symbol] := x*Sqrt[c*x]/(a+b*x^2)^(1/4) - a/2 \[Star] Int[Sqrt[c*x]/(a+b*x^2)^(5/4),x] /; FreeQ[{a,b,c},x] && PosQ[b/a]

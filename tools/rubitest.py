@@ -256,7 +256,9 @@ def _inv(f):
 NUMENV = {
     'sin': cmath.sin, 'cos': cmath.cos, 'tan': cmath.tan,
     'cot': lambda z: 1 / cmath.tan(z), 'sec': _inv(cmath.cos), 'csc': _inv(cmath.sin),
-    'asin': cmath.asin, 'acos': cmath.acos, 'atan': cmath.atan,
+    'asin': cmath.asin, 'acos': cmath.acos,
+    # arctan(x, y): the angle of the point (x, y), as ArcTan[x, y] in Mathematica
+    'atan': lambda z, w=None: cmath.atan(z) if w is None else cmath.phase(complex(z) + 1j * complex(w)),
     'acot': lambda z: cmath.atan(1 / z),
     'sinh': cmath.sinh, 'cosh': cmath.cosh, 'tanh': cmath.tanh,
     'coth': lambda z: 1 / cmath.tanh(z), 'sech': _inv(cmath.cosh), 'csch': _inv(cmath.sinh),
@@ -300,7 +302,7 @@ REALENV = {
     'sin': math.sin, 'cos': math.cos, 'tan': math.tan,
     'cot': lambda z: 1 / math.tan(z), 'sec': lambda z: 1 / math.cos(z),
     'csc': lambda z: 1 / math.sin(z), 'asin': math.asin, 'acos': math.acos,
-    'atan': math.atan, 'acot': lambda z: math.atan(1 / z),
+    'atan': lambda z, w=None: math.atan(z) if w is None else math.atan2(w, z), 'acot': lambda z: math.atan(1 / z),
     'sinh': math.sinh, 'cosh': math.cosh, 'tanh': math.tanh,
     'coth': lambda z: 1 / math.tanh(z), 'sech': lambda z: 1 / math.cosh(z),
     'csch': lambda z: 1 / math.sinh(z), 'asinh': math.asinh, 'acosh': math.acosh,

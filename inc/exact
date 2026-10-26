@@ -54,6 +54,7 @@ OTHER <= : integer,integer >> bool      ATT int_le
 OTHER == : integer,integer >> bool      ATT int_eq
 OTHER != : integer,integer >> bool      ATT int_ne
 FUNC  mod  : integer,integer >> integer ATT int_mod    # remainder, sign of the divisor
+OTHER mod  : number,number >> number                   # symbolic (rules for number)
 FUNC  quot : integer,integer >> integer ATT int_quot   # integer quotient
 FUNC  gcd_int : integer,integer >> integer ATT int_gcd
 

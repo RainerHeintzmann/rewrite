@@ -350,12 +350,14 @@ RHS_HELPERS = {
     'ExpandTrig': 'expandintegrand', 'ExpandTrigReduce': 'expandtrigreduce',
     'LeafCount': 'leafcount', 'BinomialDegree': 'binomialdegree',
     'Numer': 'numerator', 'SubstFor': 'substfor', 'DerivativeDivides': 'derivdivides',
+    'Exponent': 'expon', 'PolyGCD': 'polygcd', 'NormalizeIntegrand': 'normpoly',
+    'Mod': 'mod', 'Sign': 'sgn',
 }
 # predicates in conditions
 PREDICATES = {
     'EqQ': 'eqq', 'NeQ': 'neq', 'IntegerQ': 'integerq', 'IntegersQ': 'integersq',
     'RationalQ': 'rationalq', 'PosQ': 'posq', 'NegQ': 'negq', 'IGtQ': 'igtq',
-    'ILtQ': 'iltq', 'PolyQ': 'polyq', 'LinearQ': 'linearq', 'SumQ': 'sumq', 'NonsumQ': 'nonsumq',
+    'ILtQ': 'iltq', 'IGeQ': 'igeq', 'ILeQ': 'ileq', 'OddQ': 'oddq', 'PolyQ': 'polyq', 'LinearQ': 'linearq', 'SumQ': 'sumq', 'NonsumQ': 'nonsumq',
     'ProductQ': 'productq', 'PowerQ': 'powerq',
     'FractionQ': 'fractionq', 'HalfIntegerQ': 'halfintegerq',
     'PolynomialQ': 'polyq', 'NiceSqrtQ': 'nicesqrtq',
@@ -514,6 +516,9 @@ def tr_rhs(e, ctx):
             and len(args[0][2]) == 2 and args[0][2][1] == args[1]):
         # Subst[Int[u, x], x, v]: integrate in a fresh variable (nonneg for roots)
         return 'intsubst' + paren(','.join(tr_rhs(a, ctx) for a in [args[0][2][0], args[1], args[2]]))
+    if head == 'PolynomialDivide' and len(args) == 3:  # quotient + remainder/divisor
+        u, v, x = (tr_rhs(a, ctx) for a in args)
+        return paren('polyquotient(%s,%s,%s)+polyremainder(%s,%s,%s)*%s' % (u, v, x, u, v, x, paren(paren(v) + '^(-1)')))
     if head == 'Complex' and len(args) == 2:          # Complex[a, b] = a + b*I
         return paren(paren(tr_rhs(args[0], ctx)) + '+' + paren(tr_rhs(args[1], ctx)) + '*im')
     if head == 'ReplaceAll' and len(args) == 2 and args[1][0] == 'call' and args[1][1] == 'Rule':

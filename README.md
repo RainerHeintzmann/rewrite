@@ -401,6 +401,15 @@ with variables of sort `number` apply to every term below it:
   `Int(3,x)` satisfies a rule `IF (Uq > 2) Int(Uq,Xv) = ...` written for
   `number`.
 
+Above `number` there is the sort `algebra`, the elements of an associative
+algebra, whose product need not be commutative; the symbolic matrices of
+[inc/linalg](inc/linalg) are of the sort `matrix` below it. Rules for
+`algebra` hold for numbers as well, while the rules for `number` (with a
+commutative product, like the integration) never see a matrix product.
+A pattern matches the narrower variants of a function whenever its own
+variant is symbolic (no numerical C function), so the order of the sorts
+alone decides which rules apply.
+
 The derivative rules (ALG `diff`) and the Rubi rules are written for
 `number` in this way, so `deriv(sin(im*x),x)` gives `im*cos(im*x)` and
 `REWR Int(sin(im*x),x) : RubiIntegrate` gives `im * cos (im * x )`. The
@@ -694,6 +703,25 @@ REWR det(list(list(2,1),list(1,2)) - x*identity(2)) : All    # 3 + x ^ 2 - 4 * x
 REWR list(1,2)*x + list(a,b) : Listable                      # {x + a, 2 * x + b}
 ```
 
+**Symbolic matrices.** `CONST A,B : matrix` declares symbolic matrices,
+whose product does not commute; `mat(list(list(1,2),list(3,4)))` is an
+explicit one. The rule set `MatrixRules` knows the laws of the algebra and
+of matrices, and `MatrixSolve` isolates an unknown matrix from the left or
+from the right:
+
+```text
+CONST A,B,C,X : matrix
+REWR transpose(A*B) : MatrixRules                      # transpose (B )* transpose (A )
+REWR inverse(A*B*C) : MatrixRules                      # inverse (C )* inverse (B )* inverse (A )
+REWR A*(B+C) - A*B : MatrixRules                       # A * C
+REWR A*B - B*A : MatrixRules                           # stays: no commutation
+REWR msolve(X*A + C == B, X) : (MatrixSolve, MatrixRules)   # (B - C )* inverse (A )
+REWR det(mat(list(list(a,b),list(n,y)))) : MatrixRules      # a * y - b * n
+```
+
+(In a library loaded after inc/alg, `A`, `B`, `C` are variables already;
+the tests use `MA`, `MB`, ...)
+
 ### Equations
 
 [inc/solve](inc/solve) solves equations with rules in the style of PRESS
@@ -706,7 +734,7 @@ this order:
 | Method | Applies when | Example |
 | --- | --- | --- |
 | isolation | `x` occurs once: the functions around it are inverted | `(x+1)^3 = 8`, `exp(2x+1) = 5`, `sin(x) = 1/2` |
-| polynomials | degree 1 and 2, `x^n = c`, polynomials in `x^2`, rational roots; after a common denominator | `x^3 - 6x^2 + 11x - 6 = 0`, `1/x + 1/(x+1) = 1` |
+| polynomials | degree 1 and 2, `x^n = c`, polynomials in `x^2`, rational roots, the cubic (Cardano) and quartic (Ferrari) formulas; after a common denominator | `x^3 - 6x^2 + 11x - 6 = 0`, `1/x + 1/(x+1) = 1`, `x^3 + x + 1 = 0` |
 | attraction | several logarithms with `x`: `ln(u) + ln(v) = ln(u v)` | `ln(x) + ln(x+1) = ln(6)` |
 | new unknown | `f` is a polynomial in `g(x)` (`exp(c x)`, `x^(1/n)`, `sin(x)`, ...) | `exp(2x) - 3 exp(x) + 2 = 0`, `x + sqrt(x) - 6 = 0` |
 | radicals | `a + b c^(1/2) = 0` is squared to `a^2 - b^2 c = 0` | `sqrt(x+1) = x - 1` |
@@ -717,7 +745,12 @@ constant. Every solution is checked (numerically where possible), so the
 extra solutions of squaring and those that make the equation undefined are
 removed. A system of linear equations, `solve(list(eq1, eq2), list(x, y))`,
 gives the list of the values of the unknowns, solved with Bareiss'
-elimination of [inc/linalg](inc/linalg); nonlinear systems stay unevaluated.
+elimination of [inc/linalg](inc/linalg). A nonlinear system gives the list
+of the solution tuples: an unknown that occurs linearly is eliminated by
+substitution, and two polynomial equations by their resultant
+(`resultant(f, g, y)`, the determinant of the Sylvester matrix); every
+tuple is checked in all equations. `solve(list(x^2 + y^2 == 5, x - y == 1),
+list(x, y))` gives the tuples `{2, 1}` and `{-1, -2}`.
 The analysis is done by C helpers ([symsolve.c](src/symsolve.c)), the
 methods themselves are an ordered rule list.
 
@@ -957,10 +990,13 @@ where the library [inc/](inc) and the tests are used from.
 - Rule lists with a backtracking matcher for rules with `OPT`, `DEFAULT`
   and `COMM`, instead of expanding each rule into its variants. Rules that
   make no progress or give NaN are skipped, and `REWR` has a step limit.
-- [tools/rubi2rewrite.py](tools/rubi2rewrite.py) translates 96% of
+- [tools/rubi2rewrite.py](tools/rubi2rewrite.py) translates 97% of
   Rubi's rules automatically ([inc/integration/rubi](inc/integration/rubi),
   `RubiIntegrate`); [tools/rubitest.py](tools/rubitest.py) measures them
   with Rubi's test suite.
+- The sorts `algebra` (non-commutative product) above `number` and
+  `matrix` below it: symbolic matrices with `MatrixRules` and matrix
+  equations (`msolve`).
 - Exact results: functions of exact numbers stay terms (`ln(2)`, `pi/6`) unless
   their value is exact (`cos(pi/3) = 1/2`, `arcsin(1/2) = pi/6`); a gcd of
   polynomials in several variables (`polygcd`, `cancel`).

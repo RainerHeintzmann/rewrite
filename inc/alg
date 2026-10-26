@@ -51,6 +51,15 @@ SUBSORT real,number ATT real2cpx
 SUBSORT complex,number ATT cpx2num
 # variables of sort number: they match terms of every sort below number
 VAR Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
+# 2026: algebra, the sort of the elements of an associative algebra above
+# number: its product need not be commutative (matrices, inc/linalg). Rules
+# written for algebra hold for numbers as well; the rules for number (with
+# a commutative product, like the integration) do not see the elements of
+# algebra that are no numbers.
+SORT algebra
+ATT algebra show_complex,cmp_complex,cpy_complex,del_complex
+SUBSORT number,algebra ATT cpx2num
+VAR Aal,Bal,Cal,Xal,Yal,Zal : algebra
 
 VAR A,B,C,X,Y,Z : real
 VAR As,Bs,Cs,Xs,Ys,Zs : sort
@@ -322,6 +331,13 @@ OTHER /         : number,number >> number
 OTHER -         : number >> number
 OTHER mi        : number >> number
 OTHER ^         : number,number >> number
+# the operations of algebra (symbolic, no division)
+OTHER +         : algebra,algebra >> algebra
+OTHER -         : algebra,algebra >> algebra
+OTHER *         : algebra,algebra >> algebra
+OTHER -         : algebra >> algebra
+OTHER mi        : algebra >> algebra
+OTHER ^         : algebra,number >> algebra
 OTHER abs       : number >> number
 OTHER sgn       : number >> number
 OTHER D         : number,number >> number

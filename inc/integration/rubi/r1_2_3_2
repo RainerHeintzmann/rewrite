@@ -78,8 +78,9 @@ ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,O_c,O_d,P_p), (eqq(O_n2,((2)*(P_n)))), (ne
 #   Int[(d_.*x_)^m_/(a_ + b_.*x_^n_ + c_.*x_^n2_.), x_Symbol] := (d*x)^(m + 1)/(a*d*(m + 1)) - 1/(a*d^n)* Int[(d*x)^(m + n)*(b + c*x^n)/(a + b*x^n + c*x^(2*n)), x] /; FreeQ[{a, b, c, d}, x] && EqQ[n2, 2*n] && NeQ[b^2 - 4*a*c, 0] && IGtQ[n, 0] && LtQ[m, -1]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c,O_d), (eqq(O_n2,((2)*(P_n)))), (neq(((((O_b)^(2)))+((((-4))*(P_a)*(O_c)))),0)), (igtq(P_n,0)), (((ltq(P_m,(-1))))) Int((((O_d)*(Xv))^(P_m))*(((P_a)+((O_b)*((Xv)^(P_n)))+((O_c)*((Xv)^(O_n2))))^(K_1)),Xv) = ((((((((O_d)*(Xv)))^(((P_m)+(1)))))*(((P_a)^((-1))))*(((O_d)^((-1))))*(((((P_m)+(1)))^((-1))))))+((((-1))*(((P_a)^((-1))))*(((((O_d)^(P_n)))^((-1))))*(Int(((((((O_d)*(Xv)))^(((P_m)+(P_n)))))*(((O_b)+(((O_c)*(((Xv)^(P_n)))))))*(((((P_a)+(((O_b)*(((Xv)^(P_n)))))+(((O_c)*(((Xv)^(((2)*(P_n)))))))))^((-1))))),Xv)))))
 
-# Rule 19 not translated: function PolynomialDivide
+# Rule 19 (144 variants):
 #   Int[x_^m_/(a_ + b_.*x_^n_ + c_.*x_^n2_.), x_Symbol] := Int[PolynomialDivide[x^m, (a + b*x^n + c*x^(2*n)), x], x] /; FreeQ[{a, b, c}, x] && EqQ[n2, 2*n] && NeQ[b^2 - 4*a*c, 0] && IGtQ[n, 0] && IGtQ[m, 3*n - 1]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b,O_c), (eqq(O_n2,((2)*(P_n)))), (neq(((((O_b)^(2)))+((((-4))*(P_a)*(O_c)))),0)), (igtq(P_n,0)), (igtq(P_m,((((3)*(P_n)))+((-1))))) Int(((Xv)^(P_m))*(((P_a)+((O_b)*((Xv)^(P_n)))+((O_c)*((Xv)^(O_n2))))^(K_1)),Xv) = Int((polyquotient(((Xv)^(P_m)),((P_a)+(((O_b)*(((Xv)^(P_n)))))+(((O_c)*(((Xv)^(((2)*(P_n)))))))),Xv)+polyremainder(((Xv)^(P_m)),((P_a)+(((O_b)*(((Xv)^(P_n)))))+(((O_c)*(((Xv)^(((2)*(P_n)))))))),Xv)*((((P_a)+(((O_b)*(((Xv)^(P_n)))))+(((O_c)*(((Xv)^(((2)*(P_n)))))))))^(-1))),Xv)
 
 # Rule 20 (432 variants):
 #   Int[(d_.*x_)^m_/(a_ + b_.*x_^n_ + c_.*x_^n2_.), x_Symbol] := d^(2*n - 1)*(d*x)^(m - 2*n + 1)/(c*(m - 2*n + 1)) - d^(2*n)/c* Int[(d*x)^(m - 2*n)*(a + b*x^n)/(a + b*x^n + c*x^(2*n)), x] /; FreeQ[{a, b, c, d}, x] && EqQ[n2, 2*n] && NeQ[b^2 - 4*a*c, 0] && IGtQ[n, 0] && GtQ[m, 2*n - 1]

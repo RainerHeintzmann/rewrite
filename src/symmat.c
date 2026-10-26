@@ -1153,8 +1153,22 @@ static int show_list (Node * t, int prec)
 	return 1;
 }
 
+/* mat(list of rows): printed as its list (a grid when it is the whole term) */
+static int show_mat (Node * t, int prec)
+{
+	Node * l, * save = print_root;
+	t = deref(t);
+	if (term_nargs(t) != 1 || ! is_head(arg(t, 0), "list", -1)) return 0;
+	l = deref(arg(t, 0));
+	if (t == print_root) print_root = l;
+	show_list(l, prec);
+	print_root = save;
+	return 1;
+}
+
 static const struct { const char * name; show_function * fn; } pfn_tab[] = {
 	{ "show_list", show_list },
+	{ "show_mat", show_mat },
 	{ NULL, NULL } };
 
 show_function * give_pfn (const char * name)

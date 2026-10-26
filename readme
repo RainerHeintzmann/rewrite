@@ -423,9 +423,13 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    ausser ihr Wert ist exakt (cos(pi/3) = 1/2, arcsin(1/2) = pi/6);
    ggT von Polynomen in mehreren Variablen (polygcd, cancel).
  - Gleichungen (inc/solve, symsolve.c): solve(lhs == rhs, x) mit Regeln im
-   Stil von PRESS (Isolieren, Polynome, neue Unbekannte, Logarithmen
-   zusammenfassen, Wurzeln quadrieren), Loesungen werden geprueft;
-   lineare Gleichungssysteme mit Bareiss-Elimination.
+   Stil von PRESS (Isolieren, Polynome bis Grad 4 mit den Formeln von Cardano
+   und Ferrari, neue Unbekannte, Logarithmen zusammenfassen, Wurzeln
+   quadrieren), Loesungen werden geprueft; lineare Gleichungssysteme mit
+   Bareiss-Elimination, nichtlineare durch Einsetzen und Resultanten.
+ - Die Sorte algebra (nicht kommutatives Produkt) oberhalb von number und die
+   Sorte matrix darunter (inc/linalg): symbolische Matrizen mit den Regeln
+   MatrixRules, explizite Matrizen mat(list(..)), Matrixgleichungen (msolve).
  - SHOW f ATT name: eigene C-Ausgabefunktion fuer eine Funktion. Listen werden
    damit nach ihrer Form ausgegeben (wie in Julia): als {a, b}, eine Matrix
    als ganzer ausgegebener Term als Gitter mit ausgerichteten Spalten.
@@ -445,7 +449,7 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Exakte Wurzeln: 4^(1/2) = 2, 8^(1/2) = 2*2^(1/2), (2^(1/2))^2 = 2; nicht
    exakte Wurzeln bleiben Terme (Normalform wie in Mathematica). Eine reelle
    Zahl macht den Ausdruck numerisch (x*2^(1/2)*0.5 = 0.707107*x).
- - tools/rubi2rewrite.py uebersetzt etwa 96% der Rubi-Regeln
+ - tools/rubi2rewrite.py uebersetzt etwa 97% der Rubi-Regeln
    automatisch nach inc/integration/rubi (RubiIntegrate); tools/rubitest.py
    prueft sie mit Rubis Testsammlung.
 

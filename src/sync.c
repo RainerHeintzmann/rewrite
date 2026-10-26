@@ -562,14 +562,15 @@ BOOLEAN IS_follows(Symbol * from,Symbol * to) /* to is in an IS connection */
 	return FALSE;
 }
 
-/* 2026: a pattern with a variant of a function on top sorts (number) also
-   matches the narrower variants: + : number,number matches + : real,real
-   and + : complex,real, as a method for Number in Julia applies to Float64.
-   Variants on sorts below others (real, integer) match only themselves, as
-   before. */
+/* 2026: a pattern with a symbolic variant of a function (one without a
+   numerical C function, like + : number,number, or a symbolic C function
+   like deriv) also matches the variants on narrower
+   sorts: + : real,real and + : complex,real, as a method for Number in
+   Julia applies to Float64. Variants with a C function (+ : real,real,
+   + : integer,integer) match only themselves, as before. */
 static BOOLEAN sort_fits (Node * t, Node * p)
 {
-	return t && p && sort_top(p) && sort_dist(t, p) >= 0;
+	return t && p && sort_dist(t, p) >= 0;
 }
 
 BOOLEAN variant_fits (Symbol * t, Symbol * p)
@@ -577,6 +578,7 @@ BOOLEAN variant_fits (Symbol * t, Symbol * p)
 	Node * at = atypes(t), * ap = atypes(p);
 	if (t == p) return TRUE;
 	if (! at || ! ap || name(t)[0] != name(p)[0] || strcmp(name(t), name(p)) != 0) return FALSE;
+	if (hasval(p) && ! builtin(p)) return FALSE;	/* no numerical C function: a symbolic variant */
 	if (! sort_fits(rtypes(t), rtypes(p))) return FALSE;
 	if ((at->type == VARPAR) != (ap->type == VARPAR)) return FALSE;
 	if (at->type == VARPAR) { at = at->l; ap = ap->l; }

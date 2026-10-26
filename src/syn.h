@@ -79,7 +79,7 @@ extern int yydebug;
     LOCAL = 280,                   /* LOCAL  */
     RU = 281,                      /* RU  */
     RA = 282,                      /* RA  */
-    KOMMU = 283,                   /* KOMMU  */
+    COMMU = 283,                   /* COMMU  */
     LB = 284,                      /* LB  */
     IN = 285,                      /* IN  */
     NIN = 286,                     /* NIN  */

@@ -136,7 +136,7 @@ static Node * s_polygcd (Node * a[], int n, Symbol * f)
 {
 	MPoly pa, pb, g;
 	Node * r;
-	if (n != 2) return NULL;
+	if (n != 2 && n != 3) return NULL;		/* polygcd(p, q) or Rubi's PolyGCD[p, q, x] */
 	pa = mp_from(a[0]);
 	pb = mp_from(a[1]);
 	g = mp_gcd(& pa, & pb);
@@ -214,6 +214,9 @@ static void add_root (Node * e[], int * n, Node * r)	/* without duplicates (take
 }
 
 /* the roots of c[0] + c[1] x + ... + c[deg] x^deg into e; 0 if not all found */
+static int cardano (Node * cf[], Node * e[], int * ne);
+static int ferrari (Node * cf[], Node * e[], int * ne);
+
 static int poly_solve (Node * cin[], int deg, Node * e[], int * ne)
 {
 	Node * c[MAXDEG];		/* borrowed: the caller owns the coefficients */
@@ -276,9 +279,11 @@ static int poly_solve (Node * cin[], int deg, Node * e[], int * ne)
 	/* rational roots of a polynomial with integer coefficients: divide them out */
 	{
 	double cv[MAXDEG];
+	int integral = 1;
 	for (k = 0; k <= deg; k++)
 		if (! is_num(c[k], & cv[k]) || ! is_exact(c[k]) || cv[k] != floor(cv[k]) || fabs(cv[k]) > 1e9)
-			return 0;
+			integral = 0;
+	if (integral)
 	{
 	double a0 = fabs(cv[0]), an = fabs(cv[deg]), p, q;
 	for (p = 1; p <= a0 && p <= 1000; p++)
@@ -310,7 +315,149 @@ static int poly_solve (Node * cin[], int deg, Node * e[], int * ne)
 		}
 	}
 	}
+	if (deg == 3) return cardano(c, e, ne);
+	if (deg == 4) return ferrari(c, e, ne);
 	return 0;
+}
+
+/* ---- the cubic and the quartic formulas ---- */
+
+static Node * q_(double p, double q) { return mk_num_ex(p / q, 1); }	/* the fraction p/q */
+
+static Node * cbrt_any (Node * u)	/* some cube root of u: real for a negative number */
+{
+	double v;
+	if (is_num(u, & v) && v < 0)
+		return mk_neg(mk_pow(mk_neg(u), q_(1, 3)));
+	return mk_pow(u, q_(1, 3));
+}
+
+static int is_zero_node (Node * u)
+{
+	double v;
+	Node * c = collected(tcpy(u));
+	int z = is_num(c, & v) && v == 0;
+	delete(c);
+	return z;
+}
+
+/* a x^3 + b x^2 + c x + d = 0 (Cardano): x = t - b/(3a), t^3 + p t + q = 0,
+ * t = w C - p/(3 w C) with C^3 = -q/2 + (q^2/4 + p^3/27)^(1/2), w^3 = 1 */
+static int cardano (Node * cf[], Node * e[], int * ne)
+{
+	Node * a = cf[3], * b = cf[2], * c = cf[1], * d = cf[0], * im = im_node(), * p, * q, * shift, * D, * C;
+	int k;
+	if (! im) return 0;
+	/* p = (3ac - b^2)/(3a^2), q = (2b^3 - 9abc + 27a^2 d)/(27a^3) */
+	p = collected(mk_mul(mk_add(mk_mul(mk_int(3), mk_mul(tcpy(a), tcpy(c))), mk_neg(mk_pow(tcpy(b), mk_int(2)))),
+	                     mk_pow(mk_mul(mk_int(3), mk_pow(tcpy(a), mk_int(2))), mk_int(-1))));
+	q = collected(mk_mul(mk_add(mk_add(mk_mul(mk_int(2), mk_pow(tcpy(b), mk_int(3))),
+	                                   mk_mul(mk_int(-9), mk_mul(tcpy(a), mk_mul(tcpy(b), tcpy(c))))),
+	                            mk_mul(mk_int(27), mk_mul(mk_pow(tcpy(a), mk_int(2)), tcpy(d)))),
+	                     mk_pow(mk_mul(mk_int(27), mk_pow(tcpy(a), mk_int(3))), mk_int(-1))));
+	shift = collected(mk_neg(mk_mul(tcpy(b), mk_pow(mk_mul(mk_int(3), tcpy(a)), mk_int(-1)))));
+	if (is_zero_node(p))				/* t^3 = -q */
+		{
+		Node * l = nroots(collected(mk_neg(tcpy(q))), 3);
+		int i;
+		if (l)
+			{
+			for (i = 0; i < list_len(l); i++)
+				add_root(e, ne, nice(collected(mk_add(tcpy(arg(l, i)), tcpy(shift)))));
+			delete(l);
+			}
+		delete(p); delete(q); delete(shift); delete(im);
+		return l != NULL;
+		}
+	D = collected(mk_add(mk_mul(q_(1, 4), mk_pow(tcpy(q), mk_int(2))), mk_mul(q_(1, 27), mk_pow(tcpy(p), mk_int(3)))));
+	{
+	Node * s = sqrt_im(D), * h = collected(mk_add(mk_mul(q_(-1, 2), tcpy(q)), tcpy(s)));
+	if (is_zero_node(h))				/* take the other sign */
+		{
+		delete(h);
+		h = collected(mk_add(mk_mul(q_(-1, 2), tcpy(q)), mk_neg(tcpy(s))));
+		}
+	delete(s);
+	C = cbrt_any(h);
+	}
+	for (k = 0; k < 3; k++)
+		{
+		Node * w = unit_root(2 * k, 3, im), * wc = mk_mul(w, tcpy(C));
+		Node * t = mk_add(tcpy(wc), mk_neg(mk_mul(tcpy(p), mk_pow(mk_mul(mk_int(3), wc), mk_int(-1)))));
+		add_root(e, ne, nice(mk_add(t, tcpy(shift))));
+		}
+	delete(p); delete(q); delete(shift); delete(C); delete(im);
+	return 1;
+}
+
+/* a x^4 + b x^3 + c x^2 + d x + f = 0 (Ferrari): x = y - b/(4a),
+ * y^4 + p y^2 + q y + r = 0; with a root m != 0 of the resolvent cubic
+ * 8 m^3 + 8 p m^2 + (2 p^2 - 8 r) m - q^2 = 0 and s = (2m)^(1/2):
+ * y = (+-1 s +-2 (-(2p + 2m +-1 2q/s))^(1/2)) / 2 */
+static int ferrari (Node * cf[], Node * e[], int * ne)
+{
+	Node * a = cf[4], * b = cf[3], * c = cf[2], * d = cf[1], * f = cf[0], * p, * q, * r, * shift, * rc[4], * m[64], * s;
+	int nm = 0, k, s1, s2;
+	Node * ia = mk_pow(tcpy(a), mk_int(-1));
+	/* p = c/a - 3b^2/(8a^2), q = b^3/(8a^3) - bc/(2a^2) + d/a,
+	 * r = -3b^4/(256a^4) + b^2 c/(16a^3) - bd/(4a^2) + f/a */
+	p = collected(mk_add(mk_mul(tcpy(c), tcpy(ia)), mk_mul(q_(-3, 8), mk_mul(mk_pow(tcpy(b), mk_int(2)), mk_pow(tcpy(ia), mk_int(2))))));
+	q = collected(mk_add(mk_add(mk_mul(q_(1, 8), mk_mul(mk_pow(tcpy(b), mk_int(3)), mk_pow(tcpy(ia), mk_int(3)))),
+	                            mk_mul(q_(-1, 2), mk_mul(mk_mul(tcpy(b), tcpy(c)), mk_pow(tcpy(ia), mk_int(2))))),
+	                     mk_mul(tcpy(d), tcpy(ia))));
+	r = collected(mk_add(mk_add(mk_mul(q_(-3, 256), mk_mul(mk_pow(tcpy(b), mk_int(4)), mk_pow(tcpy(ia), mk_int(4)))),
+	                            mk_mul(q_(1, 16), mk_mul(mk_mul(mk_pow(tcpy(b), mk_int(2)), tcpy(c)), mk_pow(tcpy(ia), mk_int(3))))),
+	                     mk_add(mk_mul(q_(-1, 4), mk_mul(mk_mul(tcpy(b), tcpy(d)), mk_pow(tcpy(ia), mk_int(2)))),
+	                            mk_mul(tcpy(f), tcpy(ia)))));
+	shift = collected(mk_mul(q_(-1, 4), mk_mul(tcpy(b), tcpy(ia))));
+	delete(ia);
+	if (is_zero_node(q))				/* biquadratic: y^2 = z, z^2 + p z + r = 0 */
+		{
+		Node * h[3] = { r, p, NULL }, * z[64];
+		int nz = 0, i, ok;
+		h[2] = mk_int(1);
+		ok = poly_solve(h, 2, z, & nz);
+		delete(h[2]);
+		for (i = 0; i < nz; i++)
+			{
+			Node * sq = sqrt_im(tcpy(z[i]));
+			add_root(e, ne, nice(mk_add(tcpy(sq), tcpy(shift))));
+			add_root(e, ne, nice(mk_add(mk_neg(sq), tcpy(shift))));
+			delete(z[i]);
+			}
+		delete(p); delete(q); delete(r); delete(shift);
+		return ok;
+		}
+	rc[3] = mk_int(8);				/* the resolvent cubic */
+	rc[2] = collected(mk_mul(mk_int(8), tcpy(p)));
+	rc[1] = collected(mk_add(mk_mul(mk_int(2), mk_pow(tcpy(p), mk_int(2))), mk_mul(mk_int(-8), tcpy(r))));
+	rc[0] = collected(mk_neg(mk_pow(tcpy(q), mk_int(2))));
+	k = poly_solve(rc, 3, m, & nm);
+	for (k = 0; k < 4; k++) delete(rc[k]);
+	for (k = 0; k < nm && is_zero_node(m[k]); k++)
+		;
+	if (k == nm)
+		{
+		for (k = 0; k < nm; k++) delete(m[k]);
+		delete(p); delete(q); delete(r); delete(shift);
+		return 0;
+		}
+	s = sqrt_im(mk_mul(mk_int(2), tcpy(m[k])));
+	for (s1 = -1; s1 <= 1; s1 += 2)
+		{
+		Node * inner = collected(mk_neg(mk_add(mk_add(mk_mul(mk_int(2), tcpy(p)), mk_mul(mk_int(2), tcpy(m[k]))),
+		                                       mk_mul(mk_int(2 * s1), mk_mul(tcpy(q), mk_pow(tcpy(s), mk_int(-1)))))));
+		Node * t = sqrt_im(inner);
+		for (s2 = -1; s2 <= 1; s2 += 2)
+			{
+			Node * y = mk_mul(q_(1, 2), mk_add(mk_mul(mk_int(s1), tcpy(s)), mk_mul(mk_int(s2), tcpy(t))));
+			add_root(e, ne, nice(mk_add(y, tcpy(shift))));
+			}
+		delete(t);
+		}
+	for (k = 0; k < nm; k++) delete(m[k]);
+	delete(s); delete(p); delete(q); delete(r); delete(shift);
+	return 1;
 }
 
 static Node * s_polyroots (Node * a[], int n, Symbol * f)
@@ -796,4 +943,325 @@ static Node * s_linsysq (Node * a[], int n, Symbol * f)	/* a linear system linsy
 	Node * r = s_linsys(a, n, f);
 	delete(r);
 	return mk_bool(r != NULL, f);
+}
+
+/* ---- nonlinear systems ----
+ * solve(list(eqs), list(vars)) for a nonlinear system (inc/solve):
+ *   syssol(F, V)     the solutions of the equations F = 0 (f = lhs - rhs) in V,
+ *                    a list of tuples (lists in the order of V)
+ *   sysstep(F, V)    the next step: one equation in one unknown; an unknown
+ *                    that occurs linearly with a constant coefficient is
+ *                    eliminated by substitution (sysback); two polynomial
+ *                    equations by the resultant (sysext); NULL if none fits
+ *   sysback, sysext  the solutions of the smaller system completed
+ *   syscheck         tuples that make an equation false (numerically) removed */
+
+static Node * sys_vars_except (Node * V, int j)
+{
+	Node * e[MAXDIM];
+	int k, n = list_len(V), m = 0;
+	for (k = 0; k < n; k++)
+		if (k != j) e[m++] = tcpy(arg(deref(V), k));
+	return mk_list(e, m);
+}
+
+static int free_of_vars (Node * u, Node * V)
+{
+	int k;
+	for (k = 0; k < list_len(V); k++)
+		if (contains(u, arg(deref(V), k))) return 0;
+	return 1;
+}
+
+/* the resultant of f and g in y: the determinant of the Sylvester matrix */
+static Node * resultant (Node * f, Node * g, Node * y)
+{
+	Node * cf[MAXDEG], * cg[MAXDEG], * rows[MAXDIM], * m, * r, * a[1];
+	int df, dg, n, i, j;
+	if (! poly_coeffs(f, y, cf, & df)) return NULL;
+	if (! poly_coeffs(g, y, cg, & dg)) { for (i = 0; i <= df; i++) delete(cf[i]); return NULL; }
+	n = df + dg;
+	if (df < 1 || dg < 1 || n > MAXDIM)
+		{
+		for (i = 0; i <= df; i++) delete(cf[i]);
+		for (i = 0; i <= dg; i++) delete(cg[i]);
+		return NULL;
+		}
+	for (i = 0; i < n; i++)
+		{
+		Node * e[MAXDIM];
+		for (j = 0; j < n; j++)
+			{
+			int k;
+			if (i < dg) { k = df - (j - i); e[j] = (k >= 0 && k <= df) ? tcpy(cf[k]) : mk_int(0); }
+			else { k = dg - (j - (i - dg)); e[j] = (k >= 0 && k <= dg) ? tcpy(cg[k]) : mk_int(0); }
+			}
+		rows[i] = mk_list(e, n);
+		}
+	for (i = 0; i <= df; i++) delete(cf[i]);
+	for (i = 0; i <= dg; i++) delete(cg[i]);
+	m = mk_list(rows, n);
+	a[0] = m;
+	r = det_impl(a, 1, NULL);
+	delete(m);
+	return r;
+}
+
+static Node * s_resultant (Node * a[], int n, Symbol * f)
+{
+	Node * p, * q, * r;
+	if (n != 3) return NULL;
+	p = eqnorm(a[0], a[2]);
+	q = eqnorm(a[1], a[2]);
+	r = resultant(p, q, a[2]);
+	delete(p);
+	delete(q);
+	return r;
+}
+
+static Node * mk_fn (const char * f, Node * args[], int n)	/* f(args) (takes them) */
+{
+	Node * t = args[n - 1];
+	int i;
+	for (i = n - 2; i >= 0; i--) t = mknod(Terms, args[i], t);
+	return mknod(Func, (Node *) getsymbol(fsym(f), t), t);
+}
+
+static Node * sysstep (Node * F, Node * V)
+{
+	int nf = list_len(F), nv = list_len(V), i, j, k;
+	if (nf < 1 || nv < 1 || nf > MAXDIM || nv > MAXDIM) return NULL;
+	if (nf == 1 && nv == 1)			/* one equation: the solver, then tuples */
+		{
+		Node * s[2], * t[1];
+		s[0] = tcpy(arg(deref(F), 0));
+		s[1] = tcpy(arg(deref(V), 0));
+		t[0] = mk_fn("sol", s, 2);
+		return mk_fn("systuple", t, 1);
+		}
+	for (i = 0; i < nf; i++)			/* linear in an unknown: substitution */
+		for (j = 0; j < nv; j++)
+			{
+			Node * v = arg(deref(V), j), * fi = eqnorm(arg(deref(F), i), v), * c[MAXDEG];
+			int deg;
+			if (poly_coeffs(fi, v, c, & deg))
+				{
+				if (deg == 1 && free_of_vars(c[1], V) && ! is_zero_node(c[1]))
+					{
+					Node * expr = nice(collected(mk_neg(mk_mul(tcpy(c[0]), mk_pow(tcpy(c[1]), mk_int(-1))))));
+					Node * fe[MAXDIM], * args[5], * inner[2];
+					int m = 0;
+					for (k = 0; k <= deg; k++) delete(c[k]);
+					delete(fi);
+					for (k = 0; k < nf; k++)
+						if (k != i) fe[m++] = replace(arg(deref(F), k), v, expr);
+					if (m == 0)			/* the other unknowns are free */
+						{
+						delete(expr);
+						return NULL;
+						}
+					inner[0] = mk_list(fe, m);
+					inner[1] = sys_vars_except(V, j);
+					args[0] = mk_fn("syssol", inner, 2);
+					args[1] = sys_vars_except(V, j);
+					args[2] = tcpy(V);
+					args[3] = mk_int(j);
+					args[4] = expr;
+					return mk_fn("sysback", args, 5);
+					}
+				for (k = 0; k <= deg; k++) delete(c[k]);
+				}
+			delete(fi);
+			}
+	if (nf == 2 && nv == 2)			/* two polynomial equations: the resultant in the last unknown */
+		{
+		Node * y = arg(deref(V), 1), * f1 = eqnorm(arg(deref(F), 0), y), * f2 = eqnorm(arg(deref(F), 1), y);
+		Node * r = resultant(f1, f2, y), * args[5], * inner[2], * one[1];
+		if (! r || occurs(r, arg(deref(V), 0)) == 0)
+			{
+			delete(r); delete(f1); delete(f2);
+			return NULL;
+			}
+		one[0] = r;
+		inner[0] = mk_list(one, 1);
+		inner[1] = sys_vars_except(V, 1);
+		args[0] = mk_fn("syssol", inner, 2);
+		args[1] = sys_vars_except(V, 1);
+		args[2] = tcpy(y);
+		args[3] = f1;
+		args[4] = f2;
+		return mk_fn("sysext", args, 5);
+		}
+	return NULL;
+}
+
+static Node * s_sysstep (Node * a[], int n, Symbol * f)
+{
+	if (n != 2 || ! is_head(a[0], "list", -1) || ! is_head(a[1], "list", -1)) return NULL;
+	return sysstep(a[0], a[1]);
+}
+
+static Node * s_sysstepq (Node * a[], int n, Symbol * f)
+{
+	Node * r = (n == 2 && is_head(a[0], "list", -1) && is_head(a[1], "list", -1)) ? sysstep(a[0], a[1]) : NULL;
+	delete(r);
+	return mk_bool(r != NULL, f);
+}
+
+static Node * s_systuple (Node * a[], int n, Symbol * f)	/* list(r1, r2) -> list(list(r1), list(r2)) */
+{
+	Node * e[64];
+	int k, len;
+	if (n != 1) return NULL;
+	if (is_nil(a[0])) return tcpy(a[0]);
+	if (! is_head(a[0], "list", -1)) return NULL;
+	len = list_len(a[0]);
+	if (len > 64) len = 64;
+	for (k = 0; k < len; k++)
+		{
+		Node * v = tcpy(arg(deref(a[0]), k));
+		e[k] = mk_list(& v, 1);
+		}
+	return mk_list(e, len);
+}
+
+static Node * subst_tuple (Node * u, Node * vars, Node * tuple)	/* u with vars -> values */
+{
+	Node * r = tcpy(u);
+	int k;
+	for (k = 0; k < list_len(vars); k++)
+		{
+		Node * t = replace(r, arg(deref(vars), k), arg(deref(tuple), k));
+		delete(r);
+		r = t;
+		}
+	return r;
+}
+
+/* sysback(tuples of Vrest, Vrest, V, j, expr): the value of the j-th unknown
+ * inserted into each tuple */
+static Node * s_sysback (Node * a[], int n, Symbol * f)
+{
+	Node * e[64];
+	double jv;
+	int k, len, j, i, nv;
+	if (n != 5 || ! is_num(a[3], & jv)) return NULL;
+	if (is_nil(a[0])) return tcpy(a[0]);
+	if (! is_head(a[0], "list", -1)) return NULL;
+	j = (int) jv;
+	nv = list_len(a[2]);
+	len = list_len(a[0]);
+	if (len > 64) len = 64;
+	for (k = 0; k < len; k++)
+		if (! is_head(arg(deref(a[0]), k), "list", -1)) return NULL;
+	for (k = 0; k < len; k++)
+		{
+		Node * t = arg(deref(a[0]), k), * vals[MAXDIM];
+		int m = 0;
+		for (i = 0; i < nv; i++)
+			vals[i] = (i == j) ? nice(subst_tuple(a[4], a[1], t)) : tcpy(arg(deref(t), m++));
+		e[k] = mk_list(vals, nv);
+		}
+	return mk_list(e, len);
+}
+
+/* sysext(tuples of x, list(x), y, f1, f2): for each tuple the solutions y
+ * of f1 = 0 (the solver) that also make f2 zero: sysy terms joined by union */
+static Node * s_sysext (Node * a[], int n, Symbol * f)
+{
+	Node * r = NULL;
+	int k, len;
+	if (n != 5) return NULL;
+	if (is_nil(a[0])) return tcpy(a[0]);
+	if (! is_head(a[0], "list", -1)) return NULL;
+	len = list_len(a[0]);
+	for (k = len - 1; k >= 0; k--)
+		{
+		Node * t = arg(deref(a[0]), k), * s[2], * args[4], * term;
+		s[0] = subst_tuple(a[3], a[1], t);
+		s[1] = tcpy(a[2]);
+		args[0] = tcpy(t);
+		args[1] = mk_fn("sol", s, 2);
+		args[2] = subst_tuple(a[4], a[1], t);
+		args[3] = tcpy(a[2]);
+		term = mk_fn("sysy", args, 4);
+		r = r ? mk_f2("union", term, r) : term;
+		}
+	return r;
+}
+
+static int zero_value (Node * u)	/* 1: zero, 0: not zero, -1: unknown */
+{
+	double v;
+	Node * c;
+	if (num_value_r(u, & v)) return isfinite(v) && fabs(v) < 1e-7;
+	c = collected(tcpy(u));
+	if (is_num(c, & v)) { delete(c); return fabs(v) < 1e-9; }
+	delete(c);
+	return -1;
+}
+
+/* sysy(tuple, list(y1, ..), f2, y): tuple ++ y_k for the y_k with f2 = 0 */
+static Node * s_sysy (Node * a[], int n, Symbol * f)
+{
+	Node * e[64];
+	int k, len, ne = 0, i;
+	if (n != 4) return NULL;
+	if (is_nil(a[1])) return tcpy(a[1]);
+	if (! is_head(a[1], "list", -1) || ! is_head(a[0], "list", -1)) return NULL;
+	len = list_len(a[1]);
+	for (k = 0; k < len && ne < 64; k++)
+		{
+		Node * yk = arg(deref(a[1]), k), * v = replace(a[2], a[3], yk), * vals[MAXDIM];
+		int z = zero_value(v), m = list_len(a[0]);
+		delete(v);
+		if (z == 0) continue;
+		for (i = 0; i < m; i++) vals[i] = tcpy(arg(deref(a[0]), i));
+		vals[m] = tcpy(yk);
+		e[ne++] = mk_list(vals, m + 1);
+		}
+	return mk_list(e, ne);
+}
+
+/* syscheck(tuples, F, V): tuples that make an equation false removed, no duplicates */
+static Node * s_syscheck (Node * a[], int n, Symbol * f)
+{
+	Node * e[64];
+	int k, len, ne = 0, i, j;
+	if (n != 3) return NULL;
+	if (is_nil(a[0])) return tcpy(a[0]);
+	if (! is_head(a[0], "list", -1)) return NULL;
+	len = list_len(a[0]);
+	for (k = 0; k < len && ne < 64; k++)
+		{
+		Node * t = arg(deref(a[0]), k);
+		int keep = is_head(t, "list", -1);
+		for (i = 0; i < list_len(a[1]) && keep; i++)
+			{
+			Node * v = subst_tuple(arg(deref(a[1]), i), a[2], t);
+			if (zero_value(v) == 0) keep = 0;
+			delete(v);
+			}
+		for (j = 0; j < ne && keep; j++)
+			if (eq_terms(e[j], t)) keep = 0;
+		if (keep) e[ne++] = tcpy(t);
+		}
+	return mk_list(e, ne);
+}
+
+/* sysnorm(list(lhs1 == rhs1, ..)): list(lhs1 - rhs1, ..) */
+static Node * s_sysnorm (Node * a[], int n, Symbol * f)
+{
+	Node * e[MAXDIM];
+	int k, len;
+	if (n != 1 || ! is_head(a[0], "list", -1)) return NULL;
+	len = list_len(a[0]);
+	if (len > MAXDIM) return NULL;
+	for (k = 0; k < len; k++)
+		{
+		Node * eq = deref(arg(deref(a[0]), k));
+		if (! is_head(eq, "==", 2)) { while (--k >= 0) delete(e[k]); return NULL; }
+		e[k] = mk_add(tcpy(arg(eq, 0)), mk_neg(tcpy(arg(eq, 1))));
+		}
+	return mk_list(e, len);
 }

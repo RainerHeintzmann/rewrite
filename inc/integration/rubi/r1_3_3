@@ -26,11 +26,13 @@ ADDSPEC RubiRules : IF NIN(Xv,O_p), (polyq(P_Pq,Xv)), (trinomialq(P_u,Xv)), (not
 #   Int[(d_.*x_)^m_.*Pq_*u_^p_.,x_Symbol] := Int[(d*x)^m*Pq*ExpandToSum[u,x]^p,x] /; FreeQ[{d,m,p},x] && PolyQ[Pq,x] && TrinomialQ[u,x] && Not[TrinomialMatchQ[u,x]]
 ADDSPEC RubiRules : IF NIN(Xv,O_d,O_m,O_p), (polyq(P_Pq,Xv)), (trinomialq(P_u,Xv)), (not(matchq(P_u,(O_mq_a)+((O_mq_b)*((Xv)^(O_mq_n)))+((O_mq_c)*((Xv)^(O_mq_j))),((((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv) && freeq(O_mq_c,Xv) && freeq(O_mq_n,Xv))) && (eqq(((O_mq_j)+((((-2))*(O_mq_n)))),0))))))) Int((((O_d)*(Xv))^(O_m))*(P_Pq)*((P_u)^(O_p)),Xv) = Int(((((((O_d)*(Xv)))^(O_m)))*(P_Pq)*(((expandtosum(P_u,Xv))^(O_p)))),Xv)
 
-# Rule 6 not translated: function PolyGCD
+# Rule 6 (6 variants):
 #   Int[u_.*Px_^p_*Qx_^q_,x_Symbol] := Module[{Rx=PolyGCD[Px,Qx,x]}, Int[u*Rx^(p+q)*PolynomialQuotient[Px,Rx,x]^p*PolynomialQuotient[Qx,Rx,x]^q,x] /; NeQ[Rx,1]] /; IGtQ[p,0] && ILtQ[q,0] && PolyQ[Px,x] && PolyQ[Qx,x]
+ADDSPEC RubiRules : IF (igtq(P_p,0)), (iltq(P_q,0)), (polyq(P_Px,Xv)), (polyq(P_Qx,Xv)), (neq(polygcd(P_Px,P_Qx,Xv),1)) Int((O_u)*((P_Px)^(P_p))*((P_Qx)^(P_q)),Xv) = Int(((O_u)*(((polygcd(P_Px,P_Qx,Xv))^(((P_p)+(P_q)))))*(((polyquotient(P_Px,polygcd(P_Px,P_Qx,Xv),Xv))^(P_p)))*(((polyquotient(P_Qx,polygcd(P_Px,P_Qx,Xv),Xv))^(P_q)))),Xv)
 
-# Rule 7 not translated: function PolyGCD
+# Rule 7 (6 variants):
 #   Int[u_.*Px_*Qx_^q_,x_Symbol] := Module[{Rx=PolyGCD[Px,Qx,x]}, Int[u*Rx^(q+1)*PolynomialQuotient[Px,Rx,x]*PolynomialQuotient[Qx,Rx,x]^q,x] /; NeQ[Rx,1]] /; ILtQ[q,0] && PolyQ[Px,x] && PolyQ[Qx,x]
+ADDSPEC RubiRules : IF (iltq(P_q,0)), (polyq(P_Px,Xv)), (polyq(P_Qx,Xv)), (neq(polygcd(P_Px,P_Qx,Xv),1)) Int((O_u)*(P_Px)*((P_Qx)^(P_q)),Xv) = Int(((O_u)*(((polygcd(P_Px,P_Qx,Xv))^(((P_q)+(1)))))*(polyquotient(P_Px,polygcd(P_Px,P_Qx,Xv),Xv))*(((polyquotient(P_Qx,polygcd(P_Px,P_Qx,Xv),Xv))^(P_q)))),Xv)
 
 # Rule 8 (2 variants):
 #   Int[Pn_^p_.,x_Symbol] := With[{S=Coeff[Pn,x,Expon[Pn,x]-1]/(Expon[Pn,x]*Coeff[Pn,x,Expon[Pn,x]])}, Subst[Int[ExpandToSum[ReplaceAll[Pn,x->x-S],x]^p,x],x,x+S] /; BinomialQ[ReplaceAll[Pn,x->x-S],x] || IntegerQ[Expon[Pn,x]/2] && TrinomialQ[ReplaceAll[Pn,x->x-S],x]] /; FreeQ[p,x] && PolyQ[Pn,x] && GtQ[Expon[Pn,x],2] && NeQ[Coeff[Pn,x,Expon[Pn,x]-1],0]

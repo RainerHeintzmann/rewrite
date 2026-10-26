@@ -4,7 +4,7 @@
 # It writes products of trig functions in the forms the rules expect:
 # sec(u)^m*sin(u)^n = cos(u)^-m*sin(u)^n, and so on. Here it is the function
 # fixinert(u, x), defined by the rule list FixInert (ATT RULES); trignorm
-# (symfkt.c) calls it after Mathematica's 1/sin = csc.
+# (symfn.c) calls it after Mathematica's 1/sin = csc.
 ALG FixInert
 FUNC fixinert : real,real >> real ATT RULES FixInert
 OTHER fixinert : number,number >> number ATT RULES FixInert

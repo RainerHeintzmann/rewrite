@@ -53,6 +53,22 @@ FUNC  isoeach   : number,number,number >> number ATT SYMBOLIC isoeach
 FUNC  solfilter : number,number,number >> number ATT SYMBOLIC solfilter
 FUNC  linsys    : number,number >> number ATT SYMBOLIC linsys     # linear system: the values of the unknowns
 FUNC  linsysq   : number,number >> bool   ATT SYMBOLIC linsysq    # a solvable linear system
+# nonlinear systems: the steps (rules below) and their C functions
+FUNC  syssol    : number,number >> number                # syssol(list(f1,..), list(x,..)): list of tuples
+FUNC  systuple  : number >> number
+FUNC  sysback   : number,number,number,number,number >> number
+FUNC  sysext    : number,number,number,number,number >> number
+FUNC  sysy      : number,number,number,number >> number
+FUNC  syscheck  : number,number,number >> number
+FUNC  sysnorm   : number >> number          ATT SYMBOLIC sysnorm    # list(lhs == rhs, ..) -> list(lhs - rhs, ..)
+FUNC  sysstep   : number,number >> number   ATT SYMBOLIC sysstep    # substitution or resultant
+FUNC  sysstepq  : number,number >> bool     ATT SYMBOLIC sysstepq
+FUNC  systuplec : number >> number          ATT SYMBOLIC systuplec
+FUNC  sysbackc  : number,number,number,number,number >> number ATT SYMBOLIC sysbackc
+FUNC  sysextc   : number,number,number,number,number >> number ATT SYMBOLIC sysextc
+FUNC  sysyc     : number,number,number,number >> number ATT SYMBOLIC sysyc
+FUNC  syscheckc : number,number,number >> number ATT SYMBOLIC syscheckc
+FUNC  resultant : number,number,number >> number ATT SYMBOLIC resultant  # resultant(f, g, y): y eliminated
 
 VAR Sf,Sg,Su,Sv,Sr,Sx,Sa,Sn,Sp,Sy,Sl,Sm : number
 
@@ -61,6 +77,15 @@ ALG Solve
 # ---- the equation
 SPEC    Solve : solve(Su == Sv, Sx) = solcheck(sol(Su - Sv, Sx), Su - Sv, Sx)
 ADDSPEC Solve : IF (linsysq(Sl, Sm)) solve(Sl, Sm) = linsys(Sl, Sm)
+# a nonlinear system: substitution of an unknown that occurs linearly,
+# else (two polynomial equations) the resultant; the tuples are checked
+ADDSPEC Solve : IF (listq(Sl)), (listq(Sm)) solve(Sl, Sm) = syscheck(syssol(sysnorm(Sl), Sm), sysnorm(Sl), Sm)
+ADDSPEC Solve : IF (sysstepq(Sl, Sm)) syssol(Sl, Sm) = sysstep(Sl, Sm)
+ADDSPEC Solve : IF (listq(Sl)) systuple(Sl) = systuplec(Sl)
+ADDSPEC Solve : IF (listq(Sl)) sysback(Sl, Sm, Sv, Sn, Sa) = sysbackc(Sl, Sm, Sv, Sn, Sa)
+ADDSPEC Solve : IF (listq(Sl)) sysext(Sl, Sm, Sy, Sf, Sg) = sysextc(Sl, Sm, Sy, Sf, Sg)
+ADDSPEC Solve : IF (listq(Sm)) sysy(Sl, Sm, Sf, Sy) = sysyc(Sl, Sm, Sf, Sy)
+ADDSPEC Solve : IF (listq(Sl)) syscheck(Sl, Sf, Sm) = syscheckc(Sl, Sf, Sm)
 ADDSPEC Solve : IF (listq(Sl)) solcheck(Sl, Sf, Sx) = solfilter(Sl, Sf, Sx)
 ADDSPEC Solve : IF (listq(Sl)), (listq(Sm)) union(Sl, Sm) = join(Sl, Sm)
 ADDSPEC Solve : IF (listq(Sl)) isomap(Sg, Sl, Sx) = isoeach(Sg, Sl, Sx)

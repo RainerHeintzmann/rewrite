@@ -239,7 +239,7 @@ ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
 ALG RubiCollect
 ADDSPEC RubiCollect : Uv+Vv = collect(Uv+Vv)
 ADDSPEC RubiCollect : Uv*Vv = simp(Uv*Vv)       # x^2*e/x^2 = e
-# the result in its final form for output (normform, symfkt.c): collected,
+# the result in its final form for output (normform, symfn.c): collected,
 # numbers distributed, positive summands first, A/B; in one pass, instead of
 # the general simplification All, which needs many steps for large results
 ALG RubiOut

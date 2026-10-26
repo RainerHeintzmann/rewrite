@@ -175,8 +175,9 @@ ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b), (igtq(((P_n)*((1/4))),0))
 #   Int[x_^m_/(a_ + b_.*x_^n_), x_Symbol] := With[{r = Numerator[Rt[-a/b, 2]], s = Denominator[Rt[-a/b, 2]]}, s/(2*b)*Int[x^(m - n/2)/(r + s*x^(n/2)), x] - s/(2*b)*Int[x^(m - n/2)/(r - s*x^(n/2)), x]] /; FreeQ[{a, b}, x] && IGtQ[n/4, 0] && IGtQ[m, 0] && LeQ[n/2, m] && LtQ[m, n] && Not[GtQ[a/b, 0]]
 ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b), (igtq(((P_n)*((1/4))),0)), (igtq(P_m,0)), (((leq(((P_n)*((1/2))),P_m)))), (((ltq(P_m,P_n)))), (not(((gtq(((P_a)*(((O_b)^((-1))))),0))))) Int(((Xv)^(P_m))*(((P_a)+((O_b)*((Xv)^(P_n))))^(K_1)),Xv) = ((((denominator(rt((((-1))*(P_a)*(((O_b)^((-1))))),2)))*((1/2))*(((O_b)^((-1))))*(Int(((((Xv)^(((P_m)+((((-(1/2)))*(P_n)))))))*(((((numerator(rt((((-1))*(P_a)*(((O_b)^((-1))))),2)))+(((denominator(rt((((-1))*(P_a)*(((O_b)^((-1))))),2)))*(((Xv)^(((P_n)*((1/2))))))))))^((-1))))),Xv))))+((((-(1/2)))*(denominator(rt((((-1))*(P_a)*(((O_b)^((-1))))),2)))*(((O_b)^((-1))))*(Int(((((Xv)^(((P_m)+((((-(1/2)))*(P_n)))))))*(((((numerator(rt((((-1))*(P_a)*(((O_b)^((-1))))),2)))+((((-1))*(denominator(rt((((-1))*(P_a)*(((O_b)^((-1))))),2)))*(((Xv)^(((P_n)*((1/2))))))))))^((-1))))),Xv)))))
 
-# Rule 44 not translated: function PolynomialDivide
+# Rule 44 (12 variants):
 #   Int[x_^m_/(a_ + b_.*x_^n_), x_Symbol] := Int[PolynomialDivide[x^m, (a + b*x^n), x], x] /; FreeQ[{a, b}, x] && IGtQ[m, 0] && IGtQ[n, 0] && GtQ[m, 2*n - 1]
+ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b), (igtq(P_m,0)), (igtq(P_n,0)), (((gtq(P_m,((((2)*(P_n)))+((-1))))))) Int(((Xv)^(P_m))*(((P_a)+((O_b)*((Xv)^(P_n))))^(K_1)),Xv) = Int((polyquotient(((Xv)^(P_m)),((P_a)+(((O_b)*(((Xv)^(P_n)))))),Xv)+polyremainder(((Xv)^(P_m)),((P_a)+(((O_b)*(((Xv)^(P_n)))))),Xv)*((((P_a)+(((O_b)*(((Xv)^(P_n)))))))^(-1))),Xv)
 
 # Rule 45 (12 variants):
 #   Int[x_/Sqrt[a_ + b_.*x_^3], x_Symbol] := With[{r = Numer[Rt[b/a, 3]], s = Denom[Rt[b/a, 3]]}, -(1 - Sqrt[3])*s/r*Int[1/Sqrt[a + b*x^3], x] + 1/r*Int[((1 - Sqrt[3])*s + r*x)/Sqrt[a + b*x^3], x]] /; FreeQ[{a, b}, x] && PosQ[a]

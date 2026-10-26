@@ -71,7 +71,7 @@ integers and fractions as sorts below the real numbers without changing
 any rule of the library, and sorts of non-negative and positive numbers
 for which rules like $\sqrt{x^2}=x$ hold. As a case study, the rule-based
 integrator Rubi was translated into \texttt{rewrite}. A translator converts
-96\% of Rubi's rules automatically; for this, the language gained ordered rule lists
+97\% of Rubi's rules automatically; for this, the language gained ordered rule lists
 with a backtracking matcher for optional pattern parts, commutative
 operators and condition lists, symbolic helper functions and special
 functions. On \nproblems{} integration problems from four independent
@@ -276,6 +276,17 @@ written for \texttt{number} still calculates \texttt{m > 0} for a real
 \texttt{m}. The derivative and the translated Rubi rules are written this
 way and apply to real integrands and to integrands with \texttt{im}
 alike, while a real integrand keeps its real operators.
+
+\paragraph{Non-commuting quantities.} Above \texttt{number} the library
+declares the sort \texttt{algebra} of the elements of an associative
+algebra, whose product need not commute, and below it the sort
+\texttt{matrix}. A pattern matches the variants of a function on narrower
+sorts whenever its own variant is symbolic (has no numerical C function),
+so rules written for \texttt{algebra}, such as $(AB)^{-1}=B^{-1}A^{-1}$,
+apply to matrices and to numbers, while the integration rules, written
+for \texttt{number} with a commutative product, never see a matrix
+product. Matrix equations are solved by isolating the unknown from the
+left or from the right: $XA+C=B$ gives $X=(B-C)A^{-1}$.
 
 \paragraph{Sorts with a known sign.} A sort may have several wider sorts,
 and the conversion follows the shortest path in the resulting graph. The
@@ -597,7 +608,7 @@ from a file that the translator writes along with the rules.
 
 \subsection{Results}
 
-The translator converts 7183 of Rubi's 7492 rules (96\%; rules that Rubi
+The translator converts 7230 of Rubi's 7492 rules (97\%; rules that Rubi
 writes in two variants, with and without \texttt{ShowStep}, count twice),
 which become 7627 \texttt{rewrite} rules after the expansion of function
 variables. Rules that Rubi writes as small programs (\texttt{Module} with
@@ -673,10 +684,10 @@ integration problem collections in Rubi's test suite.}
 These collections come from textbooks and are the problems on which the
 translation was developed. A sample of every 20th problem of the other
 sections of the test suite (about 3700 problems, of 72\,000) shows where
-the translation is less complete: algebraic functions 85\%, trigonometric
-functions 78\%, hyperbolic functions 76\%, exponentials 73\%, inverse
-hyperbolic functions 58\%, logarithms 55\%, inverse trigonometric
-functions 54\% and special functions 42\% are solved, 75\% in all. The
+the translation is less complete: algebraic functions 88\%, trigonometric
+functions 80\%, hyperbolic functions 79\%, exponentials 73\%, inverse
+hyperbolic functions 69\%, logarithms 59\%, inverse trigonometric
+functions 56\% and special functions 46\% are solved, 79\% in all. The
 imaginary unit raised the trigonometric, hyperbolic and inverse
 trigonometric shares by 9 to 23 points, since many of Rubi's results
 contain it. The rest of the difference points to missing or inexact
@@ -803,9 +814,10 @@ solved with rules in the style of PRESS~\cite{bundy1981press}: the form of
 the equation selects isolation, polynomial methods, a change of the
 unknown, the attraction of logarithms or the removal of square roots, and
 every solution is checked in the original equation; linear systems use the
-fraction-free elimination. Natural next steps are nonlinear systems, a
-multivariate polynomial gcd for the cancellation of
-symbolic fractions, the general simplification for the sort
+fraction-free elimination, nonlinear ones substitution and resultants
+(Sylvester determinants). Natural next steps are a
+factorization of polynomials over the rationals, partial fractions with
+symbolic coefficients, the general simplification for the sort
 \texttt{number}, an associative-commutative matcher for sums and products
 of any length, and code generation that turns symbolically derived
 expressions into compiled numerical code.
@@ -815,7 +827,7 @@ expressions into compiled numerical code.
 \texttt{rewrite} shows that a small interpreter can host a complete
 computer algebra library when the mathematics is expressed as rewrite rules
 and rule sets can be combined and lifted between algebraic structures and
-number sorts. The automatic translation of 96\% of Rubi demonstrates that
+number sorts. The automatic translation of 97\% of Rubi demonstrates that
 established rule-based algorithms can be imported, and it clarifies which
 matching features and which implicit simplifications of the host system
 such an import requires.

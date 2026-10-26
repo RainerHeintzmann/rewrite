@@ -13,7 +13,7 @@ There are two rule sets:
   polynomials times them.
 - **`RubiIntegrate`** uses the rules in [rubi](rubi), which the script
   [tools/rubi2rewrite.py](../../tools/rubi2rewrite.py) translates
-  automatically from Rubi's rule files. About 96% of Rubi's
+  automatically from Rubi's rule files. About 97% of Rubi's
   rules are translated. Loading takes about half a second.
 
 ## Usage
@@ -141,6 +141,17 @@ have it, so a few steps are added:
   `positive`, no numerical value), as Mathematica writes `E^u`, so that
   rules for `F^u` apply to it and `ln(eE) = 1` stays exact. `IntOut` turns
   it back into `exp(u)`.
+- Products of sines and cosines of one angle are written as Mathematica
+  writes them (`trignorm`): `sin^2/cos = sin*tan`, `cos/sin = cot`,
+  `tan*cos = sin`, the same for `sinh`, `cosh`, `tanh`; not while Rubi's
+  cosine unification has shifted an angle by `pi/2`. Rubi's rules for
+  `x^m*sin^n*tan^p` then apply.
+- In the output, `exp(q*pi*im + w)` with a rational `q` becomes
+  `(cos(q pi) + im sin(q pi))*exp(w)`, as Mathematica evaluates
+  `E^(I Pi) = -1`.
+- `PosQ` and `NegQ` of a term with `im` collect it first
+  (`im*(-1*im)` is 1) and use the sign of the real part, or of the
+  imaginary part if the real part is 0, as Rubi does for complex numbers.
 - Mathematica's `I` is the constant `im` (as in Julia; `I` is the definite
   integral of inc/alg and `i` the complex number there). It has the sort
   `number` of inc/alg, above `real` and `complex`, and no numerical value;
@@ -353,9 +364,9 @@ about five minutes.
 
 A sample of every 20th problem of the whole suite (`--every 20`, about
 3700 problems, about half an hour) gives, by section: algebraic functions
-85%, trigonometric functions 78%, hyperbolic functions 76%, exponentials
-73%, inverse hyperbolic functions 58%, logarithms 55%, inverse
-trigonometric functions 54%, special functions 42%; 75% in all, 1.8%
+88%, trigonometric functions 80%, hyperbolic functions 79%, exponentials
+73%, inverse hyperbolic functions 69%, logarithms 59%, inverse
+trigonometric functions 56%, special functions 46%; 79% in all, 1.2%
 wrong. With the imaginary unit `im` the trigonometric (69% before),
 hyperbolic (53%) and inverse trigonometric (33%) sections gained most. The harness needs `mpmath` for the special functions
 (`pacman -S mingw-w64-ucrt-x86_64-python-mpmath` in MSYS2).
