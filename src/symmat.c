@@ -1035,6 +1035,16 @@ static Node * with_thread (sfn fn, Node * a[], int n, Symbol * f)
 	return r;
 }
 
+static int is_vector (Node * v)		/* a list without lists in it */
+{
+	int i, k;
+	if (! is_head(v, "list", -1)) return 0;
+	k = list_len(v);
+	for (i = 0; i < k; i++)
+		if (is_head(arg(deref(v), i), "list", -1)) return 0;
+	return k > 0;
+}
+
 static Node * s_transpose (Node * a[], int n, Symbol * f) { return with_thread(transpose_impl, a, n, f); }
 
 /* ---- the arithmetic of explicit vectors and matrices (inc/list) ----
@@ -1233,6 +1243,21 @@ static void show_slices (Node * t, int dims[], int d, int level, int idx[])
 		}
 }
 
+#define SHOW_MAXCOL 10		/* longer vectors are printed inline */
+
+/* a vector that is the whole printed term: a column, as Julia prints it,
+ * in the form of the input: [1,\n 2,\n 3] */
+static void show_column (Node * t)
+{
+	int k, n = list_len(t);
+	for (k = 0; k < n; k++)
+		{
+		char * s = entry_text(arg(deref(t), k));
+		printfOut("%s%s%s", k ? " " : "[", s, k < n - 1 ? ",\n" : "] ");
+		free(s);
+		}
+}
+
 static int show_list (Node * t, int prec)
 {
 	int dims[8], idx[8], d;
@@ -1245,13 +1270,39 @@ static int show_list (Node * t, int prec)
 		else show_slices(t, dims, d, 0, idx);
 		printfOut(" ");
 		}
+	else if (t == print_root && is_vector(t) && list_len(t) > 1 && list_len(t) <= SHOW_MAXCOL)
+		show_column(t);
 	else
 		show_inline(t);
 	return 1;
 }
 
+/* SHOW transpose ATT show_covec (inc/linalg): transpose([1,2,3]) of an
+ * explicit vector, a covector, as a row [1 2 3] when it is the whole
+ * printed term (entries with blanks in parentheses); otherwise, and for
+ * longer ones, the usual form transpose([1, 2, 3]) */
+static int show_covec (Node * t, int prec)
+{
+	Node * v;
+	int k, n;
+	t = deref(t);
+	if (t != print_root || term_nargs(t) != 1) return 0;
+	v = arg(t, 0);
+	if (! is_vector(v) || (n = list_len(v)) > SHOW_MAXCOL) return 0;
+	printfOut("[");
+	for (k = 0; k < n; k++)
+		{
+		char * s = entry_text(arg(deref(v), k));
+		printfOut(strchr(s, ' ') ? "%s(%s)" : "%s%s", k ? " " : "", s);
+		free(s);
+		}
+	printfOut("] ");
+	return 1;
+}
+
 static const struct { const char * name; show_function * fn; } pfn_tab[] = {
 	{ "show_list", show_list },
+	{ "show_covec", show_covec },
 	{ NULL, NULL } };
 
 show_function * give_pfn (const char * name)

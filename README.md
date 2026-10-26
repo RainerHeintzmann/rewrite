@@ -666,11 +666,14 @@ argument is no list:
 | `select(l,x,cond)` | the elements `x` of `l` for which `cond` is true |
 | `total(l)` | the sum of the elements |
 
-Lists are printed by their shape, as Julia prints arrays: inline as
-`[a, b, [c, d]]`, and a rectangular list of lists that is the whole printed
-term as a grid with aligned columns (numbers right-aligned), deeper ones in
-slices `[1, :, :] = ...`. This is a print function attached with
-`SHOW [ ATT show_list`; `SHOW [` prints the plain term again.
+Lists are printed by their shape, as Julia prints arrays. When it is the
+whole printed term, a vector of up to 10 entries is a column in the form
+of the input, `[1,` / ` 2,` / ` 3]` on three lines, a rectangular list of
+lists a grid with aligned columns (numbers right-aligned), deeper ones in
+slices `[1, :, :] = ...`; everything else is inline, `[a, b, [c, d]]`
+(in the examples below, results are written inline). This is a print
+function attached with `SHOW [ ATT show_list`; `SHOW [` prints the plain
+term again.
 
 `table` and `select` get their body and condition unevaluated (`HOLD`) and
 replace `x` first. `x` must be declared (`CONST kk : real`): an undeclared
@@ -692,7 +695,7 @@ C functions ([symmat.c](src/symmat.c)):
 
 | Function | Meaning |
 | --- | --- |
-| `transpose(m)`, `identity(n)` | rows as columns; the n x n unit matrix |
+| `transpose(m)`, `identity(n)` | rows as columns (of a vector: a covector, see below); the n x n unit matrix |
 | `dot(a,b)` | matrix product, matrix times vector, scalar product (like terms collected, sums not multiplied out) |
 | `det(m)` | determinant |
 | `linsolve(m,b)` | the solution `x` of `m.x = b`, `b` a vector or a matrix (several right-hand sides); unevaluated if `m` is singular |
@@ -718,6 +721,27 @@ det([[a,b],[g,n]])                                # a * n - b * g
 linsolve([[a,1,1],[1,a,1],[1,1,a]],[1,1,1])       # [1 / (a + 2 ), 1 / (a + 2 ), 1 / (a + 2 )]
 det([[2,1],[1,2]] - x*identity(2))                # x ^ 2 + 3 - 4 * x
 REWR sin([x,2*x]) : Listable                      # [sin (x ), sin (2 * x )]
+```
+
+**Covectors.** `transpose(v)` of a vector is a covector, a row vector of
+the sort `covector`, like Julia's `Transpose`: it stays a term, and the
+sorts choose the product. `transpose(u)*v` is a number (the inner
+product), `u*transpose(v)` a matrix (the outer product), `transpose(u)*m`
+a covector. Explicit lists are calculated; for symbolic vectors
+(`CONST u,v : vector`) the sort alone says that `transpose(u)*v` is a
+scalar that commutes with matrices. Sums and multiples of covectors are
+taken back to vectors, as `transpose` is linear. A covector that is the
+whole printed term is a row `[1 2 3]` (up to 10 entries).
+
+```text
+transpose([1,2,3]) * [4,5,6]             # 32
+[1,2] * transpose([3,4])                 # [ 3  4 ]
+                                         # [ 6  8 ]
+transpose([1,2]) * [[1,2],[3,4]]         # [7 10]
+CONST uu,vv : vector
+CONST MM : matrix
+REWR transpose(MM*uu) : MatrixRules      # transpose (uu )* transpose (MM )
+REWR MM*(transpose(uu)*vv) : MatrixRules # transpose (uu )* vv * MM
 ```
 
 **Symbolic matrices.** `CONST A,B : matrix` declares symbolic matrices,

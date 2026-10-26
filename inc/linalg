@@ -47,6 +47,37 @@ FUNC  sortleq   : algebra,algebra >> bool ATT SYMBOLIC sortleq # the sort of u i
 # numbers commute with matrices, vectors do not: not(sortleq(Xnu, nil)),
 # Xnu is no vector (nil is the empty vector)
 
+# ---------------- covectors (2026) ----------------
+# transpose(v) of a vector is a covector, a row vector (as Julia's
+# Transpose): it stays a term, and the sorts choose the products:
+# transpose(u)*v is a number (the inner product), u*transpose(v) a matrix
+# (the outer product), transpose(u)*m a covector. Explicit lists are
+# calculated with dot; symbolic vectors (CONST u : vector) stay. transpose
+# is linear, so sums and multiples of covectors are taken back to vectors.
+SORT covector
+SUBSORT covector,algebra
+VAR Va,Vb : vector
+ALG Covec
+OTHER transpose : vector >> covector                      # stays a term
+OTHER transpose : covector >> vector      ATT RULES Covec
+OTHER *         : covector,vector >> number   ATT RULES Covec
+OTHER *         : vector,covector >> matrix   ATT RULES Covec
+OTHER *         : covector,matrix >> covector ATT RULES Covec
+OTHER *         : number,covector >> covector ATT RULES Covec
+OTHER +         : covector,covector >> covector ATT RULES Covec
+OTHER -         : covector,covector >> covector ATT RULES Covec
+OTHER -         : covector >> covector    ATT RULES Covec
+SPEC    Covec : transpose(transpose(Va)) = Va
+ADDSPEC Covec : IF (listq(Va)), (listq(Vb)) transpose(Va)*Vb = dot(Va,Vb)
+ADDSPEC Covec : IF (listq(Va)), (listq(Vb)) Va*transpose(Vb) = dot(transpose([Va]),[Vb])
+ADDSPEC Covec : IF (listq(Va)), (listq(Ma)) transpose(Va)*Ma = transpose(Va*Ma)
+ADDSPEC Covec : IF (not(sortleq(Xnu, nil))) Xnu*transpose(Va) = transpose(Xnu*Va)
+ADDSPEC Covec : transpose(Va)+transpose(Vb) = transpose(Va+Vb)
+ADDSPEC Covec : transpose(Va)-transpose(Vb) = transpose(Va-Vb)
+ADDSPEC Covec : -transpose(Va) = transpose(-Va)
+# printed as a row [1 2 3] (up to 10 entries) when it is the whole output
+SHOW transpose ATT show_covec
+
 ALG MatrixRules
 # products associated to the left, so that A*B*inverse(B) cancels
 SPEC    MatrixRules : Ma*(Mb*Mc) = Ma*Mb*Mc
@@ -77,6 +108,7 @@ ADDSPEC MatrixRules : Ma*inverse(Mb)*Mb = Ma
 # transpose, inverse and determinant of products: the order reverses
 ADDSPEC MatrixRules : transpose(transpose(Ma)) = Ma
 ADDSPEC MatrixRules : transpose(Ma*Mb) = transpose(Mb)*transpose(Ma)
+ADDSPEC MatrixRules : transpose(Ma*Va) = transpose(Va)*transpose(Ma)
 ADDSPEC MatrixRules : transpose(Ma+Mb) = transpose(Ma)+transpose(Mb)
 ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) transpose(Xnu*Ma) = Xnu*transpose(Ma)
 ADDSPEC MatrixRules : transpose(Id) = Id

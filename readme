@@ -421,6 +421,9 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    Matrix mal Matrix oder Vektor und Potenzen als Matrixprodukt,
    z.B. [[1,2],[3,4]] * [5,6] = [17, 39]. Die numerischen Vektoren und
    Matrizen (inc/rvector, inc/rmatrix) laedt inc/all nicht mehr.
+ - Kovektoren (inc/linalg): transpose(v) eines Vektors hat die Sorte
+   covector (ein Zeilenvektor wie Transpose in Julia); die Sorten waehlen
+   das Produkt: transpose(u)*v ist eine Zahl, u*transpose(v) eine Matrix.
  - Matrixfunktionen (inc/linalg, symmat.c): det, linsolve, inverse mit
    Bareiss' bruchfreier Elimination auf duennen Polynomen, dot, transpose,
    identity; Funktionen von Listen elementweise (thread, Listable),
@@ -438,7 +441,8 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    Regeln MatrixRules (inc/linalg), auch zusammen mit expliziten,
    Matrixgleichungen (msolve).
  - SHOW f ATT name: eigene C-Ausgabefunktion fuer eine Funktion. Listen werden
-   damit nach ihrer Form ausgegeben (wie in Julia): als [a, b], eine Matrix
+   damit nach ihrer Form ausgegeben (wie in Julia): ein Vektor als ganzer
+   ausgegebener Term als Spalte, sonst als [a, b], eine Matrix
    als ganzer ausgegebener Term als Gitter mit ausgerichteten Spalten.
  - SUBSORT real,complex: komplexe Funktionen nehmen auch reelle Argumente; eine
    genau passende Variante hat Vorrang vor Umwandlungen, die wenigsten

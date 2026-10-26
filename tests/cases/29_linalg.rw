@@ -56,6 +56,24 @@ x*[1,2] - [x,x]
 [[a,b],[g,n]]^(-1)
 2*[[1,2],[3,4]] + [[1,0],[0,1]]
 AA^0
+# a vector transposed is a covector (a row): the sorts choose the inner
+# product (a number), the outer product (a matrix), row times matrix
+transpose([1,2,3])
+transpose([1,2,3]) * [4,5,6]
+[1,2,3] * transpose([4,5,6])
+[p,qq] * transpose([p,qq]) + [[1,0],[0,1]]
+transpose([1,2]) * [[1,2],[3,4]]
+2*transpose([1,2]) + transpose([3,4])
+transpose(transpose([1,2]))
+transpose(range(12))
+transpose([p+1,qq])
+# symbolic vectors: transpose(u)*v is a scalar and commutes with matrices
+CONST uu,vv : vector
+CONST MM : matrix
+transpose(uu)*vv
+uu*transpose(vv)
+REWR transpose(MM*uu) : MatrixRules
+REWR MM*(transpose(uu)*vv) : MatrixRules
 # ---- printing by the shape: grid at the top, inline inside a term,
 # slices for depth 3; SHOW [ without ATT prints the plain term again
 AA
