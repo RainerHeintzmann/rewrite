@@ -2,8 +2,8 @@
  *	symmat.c (2026)
  *
  *	Symbolic matrices on lists, included by symfn.c (it uses its static
- *	helpers). A matrix is a list of rows, list(list(a,b),list(c,d)), a
- *	vector a list (inc/list, inc/linalg):
+ *	helpers). A matrix is a list of rows, [[a,b],[c,d]], a vector a
+ *	list [a,b] (inc/list, inc/linalg):
  *
  *	    transpose(m), dot(a,b), identity(n), det(m), linsolve(m,b), inverse(m)
  *
@@ -920,8 +920,8 @@ static Node * inverse_impl (Node * a[], int n, Symbol * f)
 }
 
 /* ---- thread(u): arithmetic on lists element by element (Listable) ----
- * list(1,2) + list(a,b) = list(1+a, 2+b), x*list(a,b) = list(x*a, x*b),
- * sin(list(a,b)) = list(sin(a), sin(b)); nested lists (matrices) too.
+ * [1,2] + [a,b] = [1+a, 2+b], x*[a,b] = [x*a, x*b],
+ * sin([a,b]) = [sin(a), sin(b)]; nested lists (matrices) too.
  * Symbolic C functions (det, dot, length, ...) are not threaded. */
 
 static int has_list (Node * u)
@@ -936,7 +936,9 @@ static int has_list (Node * u)
 	return 0;
 }
 
-static Node * thread (Node * u)
+/* force: u is threaded although its head is a symbolic C function (the
+ * arithmetic of vectors and matrices, listop) */
+static Node * thread_f (Node * u, int force)
 {
 	Node * t[MAXDIM], * e[MAXDIM], * args, * r;
 	int k, n, len = -1, i;
@@ -944,8 +946,8 @@ static Node * thread (Node * u)
 	if (! u || u->type != Func || ! has_list(u)) return tcpy(u);
 	n = term_nargs(u);
 	if (n > MAXDIM) return tcpy(u);
-	for (k = 0; k < n; k++) t[k] = thread(arg(u, k));
-	if (! is_head(u, "list", -1) && ! builtin(TERM_HEAD(u)))
+	for (k = 0; k < n; k++) t[k] = thread_f(arg(u, k), 0);
+	if (! is_head(u, "list", -1) && (force || ! builtin(TERM_HEAD(u))))
 		for (k = 0; k < n; k++)
 			if (is_head(t[k], "list", -1))
 				{
@@ -953,7 +955,7 @@ static Node * thread (Node * u)
 				if (len >= 0 && l != len) { len = -2; break; }
 				len = l;
 				}
-	if (len > 0 && len <= MAXDIM)		/* f(.., list(a1..an), ..) = list(f(.., ai, ..)) */
+	if (len > 0 && len <= MAXDIM)		/* f(.., [a1..an], ..) = [f(.., ai, ..)] */
 		{
 		for (i = 0; i < len; i++)
 			{
@@ -970,9 +972,9 @@ static Node * thread (Node * u)
 				delete(args);
 				c = is_head(u, "*", 2) ? mk_mul(x0, x1) : mk_add(x0, x1);
 				}
-			else
-				c = mknod(Func, u->l, args);
-			e[i] = thread(c);
+			else		/* the variant for the sorts of the elements */
+				c = mknod(Func, (Node *) getsymbol((Symbol *) u->l, args), args);
+			e[i] = thread_f(c, force);
 			delete(c);
 			}
 		r = mk_list(e, len);
@@ -986,6 +988,11 @@ static Node * thread (Node * u)
 		}
 	for (k = 0; k < n; k++) delete(t[k]);
 	return r;
+}
+
+static Node * thread (Node * u)
+{
+	return thread_f(u, 0);
 }
 
 static Node * s_thread (Node * a[], int n, Symbol * f)
@@ -1029,16 +1036,107 @@ static Node * with_thread (sfn fn, Node * a[], int n, Symbol * f)
 }
 
 static Node * s_transpose (Node * a[], int n, Symbol * f) { return with_thread(transpose_impl, a, n, f); }
+
+/* ---- the arithmetic of explicit vectors and matrices (inc/list) ----
+ * [1,2] + [a,b] = [1+a, 2+b], x*[a,b] = [x*a, x*b]: element by element
+ * (listop); the product of matrices, and of a matrix and a vector, is the
+ * matrix product (matmul), its integer powers repeated products (matpow).
+ * Symbolic matrices (CONST A : matrix) stay as they are. */
+
+static Node * nice_elems (Node * t)	/* nice for each entry of a nested list (takes t) */
+{
+	Node * e[MAXDIM];
+	int i, n;
+	if (! is_head(t, "list", -1) || (n = list_len(t)) > MAXDIM) return nice(t);
+	for (i = 0; i < n; i++) e[i] = nice_elems(tcpy(arg(t, i)));
+	delete(t);
+	return mk_list(e, n);
+}
+
+static Node * s_listop (Node * a[], int n, Symbol * f)
+{
+	Node * args = NULL, * u, * r;
+	int k, any = 0;
+	for (k = 0; k < n; k++)
+		if (is_head(a[k], "list", -1)) any = 1;
+	if (! any) return NULL;
+	for (k = n - 1; k >= 0; k--)
+		args = args ? mknod(Terms, tcpy(a[k]), args) : tcpy(a[k]);
+	u = mknod(Func, (Node *) f, args);
+	r = thread_f(u, 1);
+	delete(u);
+	return nice_elems(r);
+}
+
+static Node * s_matmul (Node * a[], int n, Symbol * f)
+{
+	return with_thread(dot_impl, a, n, f);
+}
+
+static Node * s_matpow (Node * a[], int n, Symbol * f)	/* m^k, k an integer */
+{
+	Node * m, * r, * b[2];
+	double v;
+	int k, rows, cols;
+	if (n != 2 || ! mat_dims(a[0], & rows, & cols) || rows != cols
+	    || ! is_num(a[1], & v) || v != floor(v) || fabs(v) > 64) return NULL;
+	k = (int) v;
+	if (k == 0)
+		{
+		Node * c = mk_int(rows);
+		r = s_identity(& c, 1, f);
+		delete(c);
+		return r;
+		}
+	m = k > 0 ? tcpy(a[0]) : inverse_impl(a, 1, f);
+	if (! m) return NULL;
+	if (k < 0) k = -k;
+	r = tcpy(m);
+	while (--k > 0)
+		{
+		Node * p;
+		b[0] = r;
+		b[1] = m;
+		p = dot_impl(b, 2, f);
+		delete(r);
+		r = p;
+		if (! r) break;
+		}
+	delete(m);
+	return r;
+}
+
+/* scalarq(u): the sort of u is no vector or matrix (inc/list), for the
+ * rules that let numbers commute with matrices */
+static Node * s_scalarq (Node * a[], int n, Symbol * f)
+{
+	Node * s;
+	const char * sn;
+	if (n != 1) return NULL;
+	s = arg_sort(deref(a[0]));
+	sn = s ? name((Symbol *) s) : "";
+	return mk_bool(strcmp(sn, "vector") != 0 && strcmp(sn, "matrix") != 0, f);
+}
+
+/* list(a,b,..) = [a,b,..]: the old name of the list */
+static Node * s_tolist (Node * a[], int n, Symbol * f)
+{
+	Node * e[MAXLIST > 256 ? 256 : MAXLIST];
+	int i;
+	if (n < 1 || n > 256) return NULL;
+	for (i = 0; i < n; i++) e[i] = tcpy(a[i]);
+	return mk_list(e, n);
+}
 static Node * s_dot (Node * a[], int n, Symbol * f) { return with_thread(dot_impl, a, n, f); }
 static Node * s_det (Node * a[], int n, Symbol * f) { return with_thread(det_impl, a, n, f); }
 static Node * s_linsolve (Node * a[], int n, Symbol * f) { return with_thread(linsolve_impl, a, n, f); }
 static Node * s_inverse (Node * a[], int n, Symbol * f) { return with_thread(inverse_impl, a, n, f); }
 
-/* ---- printing of lists (SHOW list ATT show_list, inc/list) ----
+/* ---- printing of lists (SHOW [ ATT show_list, inc/list) ----
  * As Julia prints arrays by their shape: a rectangular list of lists of
  * depth 2 that is the whole printed term as a grid with aligned columns,
  * deeper ones as slices [i, :, :] = grid; everything else inline as
- * {a, b, {c, d}}. */
+ * [a, b, [c, d]]. */
 
 extern Node * print_root;	/* run.c */
 
@@ -1057,14 +1155,14 @@ static char * entry_text (Node * t)	/* the printed form of t, without trailing b
 static void show_inline (Node * t)
 {
 	int k, n = list_len(t);
-	printfOut("{");
+	printfOut("[");
 	for (k = 0; k < n; k++)
 		{
 		char * s = entry_text(arg(deref(t), k));
 		printfOut("%s%s", k ? ", " : "", s);
 		free(s);
 		}
-	printfOut("} ");
+	printfOut("] ");
 }
 
 /* the dimensions of a rectangular nested list: their number (depth), 0 if
@@ -1153,22 +1251,8 @@ static int show_list (Node * t, int prec)
 	return 1;
 }
 
-/* mat(list of rows): printed as its list (a grid when it is the whole term) */
-static int show_mat (Node * t, int prec)
-{
-	Node * l, * save = print_root;
-	t = deref(t);
-	if (term_nargs(t) != 1 || ! is_head(arg(t, 0), "list", -1)) return 0;
-	l = deref(arg(t, 0));
-	if (t == print_root) print_root = l;
-	show_list(l, prec);
-	print_root = save;
-	return 1;
-}
-
 static const struct { const char * name; show_function * fn; } pfn_tab[] = {
 	{ "show_list", show_list },
-	{ "show_mat", show_mat },
 	{ NULL, NULL } };
 
 show_function * give_pfn (const char * name)

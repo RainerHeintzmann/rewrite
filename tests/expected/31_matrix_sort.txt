@@ -13,6 +13,8 @@ a * n - b * g
 [ (3/2)  (-1/2) ] 
 [ 3  4 ]
 [ 6  9 ] 
+MA * [[1, 2], [3, 4]] 
+2 * MA * [x, y] 
 inverse (MA )* MB 
 (MB - MC )* inverse (MA )
 inverse (MA )* transpose (MB )

@@ -1,3 +1,7 @@
+# Needs inc/all, inc/rvector and inc/rmatrix (numerical vectors and matrices):
+#     INC "inc/all"
+#     INC "inc/rvector"
+#     INC "inc/rmatrix"
 DATA "LiNbO3/struct2"
 
 CONST Coord,Indices,a1,a2,a3,b1,b2,b3 : rvector

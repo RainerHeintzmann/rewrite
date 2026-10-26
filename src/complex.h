@@ -18,6 +18,7 @@ typedef struct {
 
 complex * cpy_complex (complex * x);
 void show_complex (complex * x);
+void show_number (complex * x);
 int cmp_complex (complex * x,complex * y);
 void del_complex (complex * x);
 

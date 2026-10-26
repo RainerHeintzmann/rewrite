@@ -1,47 +1,95 @@
 # inc/list (2026)
-# Lists as terms, like Mathematica's List: list(a,b,c), the empty list nil.
-# The elements may be any terms, also lists (list(list(1,2),list(3,4)) is a
-# matrix). Elements and results have the sort real, so that lists nest
-# freely. The functions are symbolic C functions (symfn.c) that work on
+# Lists in brackets, like Mathematica's List and Julia's arrays: [a,b,c] is
+# a list of the sort vector, a list of vectors [[1,2],[3,4]] a matrix (a
+# list of rows), [] does not exist: the empty list is nil. The elements
+# may be any terms. list(a,b,c) is the old name: it gives [a,b,c].
+# A vector is a number (inc/alg) whose arithmetic goes element by element:
+# [1,2] + [a,b] = [1+a, 2+b], x*[a,b] = [x*a, x*b]. A matrix is an element
+# of the algebra (not commutative): its product is the matrix product,
+# [[1,2],[3,4]] * [5,6] = [17, 39]; inc/linalg has det, inverse, ...
+# The functions are symbolic C functions (symfn.c, symmat.c) that work on
 # the structure; they stay unevaluated if an argument is no list.
 # Needs inc/all:
 #     INC "inc/all"
 #     INC "inc/list"
 
-FUNC  list    : real++ >> real                                  # list(a,b,c)
-CONST nil     : real                                            # the empty list
-FUNC  listq   : real >> bool        ATT SYMBOLIC listq          # u is a list
-FUNC  length  : real >> real        ATT SYMBOLIC length         # number of elements
-OTHER part    : real++ >> real      ATT SYMBOLIC part           # part(l,i,j,..): element i (from 1; -1 the last)
-FUNC  first   : real >> real        ATT SYMBOLIC first
-FUNC  last    : real >> real        ATT SYMBOLIC last
-FUNC  rest    : real >> real        ATT SYMBOLIC rest           # without the first element
-FUNC  most    : real >> real        ATT SYMBOLIC most           # without the last element
-FUNC  append  : real,real >> real   ATT SYMBOLIC append         # x at the end
-FUNC  prepend : real,real >> real   ATT SYMBOLIC prepend        # x at the front
-FUNC  join    : real++ >> real      ATT SYMBOLIC join           # the lists one after another
-FUNC  reverse : real >> real        ATT SYMBOLIC reverse
-FUNC  range   : real++ >> real      ATT SYMBOLIC range          # range(n), range(a,b), range(a,b,d)
-FUNC  total   : real >> real        ATT SYMBOLIC total          # sum of the elements
+SORT vector
+ATT vector show_number,cmp_complex,cpy_complex,del_complex
+SUBSORT vector,number ATT cpx2num
+SORT matrix
+ATT matrix show_number,cmp_complex,cpy_complex,del_complex
+SUBSORT matrix,algebra ATT cpx2num
+
+BRA   [ ]     : number++ >> vector                              # [a,b,c]
+OTHER [       : vector++ >> matrix                              # [[a,b],[c,d]]: the rows
+OTHER [       : bool++ >> vector                                # [x == 1, y == 2]
+OTHER [       : algebra++ >> algebra                            # lists of matrices
+SYMBOLIC "list" = "["
+CONST nil     : vector                                          # the empty list
+FUNC  list    : number++ >> vector  ATT SYMBOLIC tolist         # list(a,b,c) = [a,b,c]
+OTHER list    : vector++ >> matrix  ATT SYMBOLIC tolist
+OTHER list    : bool++ >> vector    ATT SYMBOLIC tolist
+OTHER list    : algebra++ >> algebra ATT SYMBOLIC tolist
+
+FUNC  listq   : number >> bool      ATT SYMBOLIC listq          # u is a list
+FUNC  length  : number >> real      ATT SYMBOLIC length         # number of elements
+FUNC  part    : number++ >> number  ATT SYMBOLIC part           # part(l,i,j,..): element i (from 1; -1 the last)
+FUNC  first   : number >> number    ATT SYMBOLIC first
+FUNC  last    : number >> number    ATT SYMBOLIC last
+FUNC  rest    : number >> number    ATT SYMBOLIC rest           # without the first element
+FUNC  most    : number >> number    ATT SYMBOLIC most           # without the last element
+FUNC  append  : number,number >> number ATT SYMBOLIC append     # x at the end
+FUNC  prepend : number,number >> number ATT SYMBOLIC prepend    # x at the front
+FUNC  join    : number++ >> number  ATT SYMBOLIC join           # the lists one after another
+FUNC  reverse : number >> number    ATT SYMBOLIC reverse
+FUNC  range   : number++ >> vector  ATT SYMBOLIC range          # range(n), range(a,b), range(a,b,d)
+FUNC  total   : number >> number    ATT SYMBOLIC total          # sum of the elements
 # with HOLD: the body and the condition are used with x replaced, unevaluated before
-FUNC  table   : real,real,real >> real ATT SYMBOLIC HOLD table  # table(body,x,l): body for each x in l (or 1..n)
-FUNC  select  : real,real,bool >> real ATT SYMBOLIC HOLD select # select(l,x,cond): the x in l with cond true
-# the same for the sort number (inc/alg), e.g. lists with im
-OTHER list    : number++ >> number
-OTHER listq   : number >> bool      ATT SYMBOLIC listq
-OTHER length  : number >> number    ATT SYMBOLIC length
-OTHER part    : number++ >> number  ATT SYMBOLIC part
-OTHER first   : number >> number    ATT SYMBOLIC first
-OTHER last    : number >> number    ATT SYMBOLIC last
-OTHER rest    : number >> number    ATT SYMBOLIC rest
-OTHER most    : number >> number    ATT SYMBOLIC most
-OTHER append  : number,number >> number ATT SYMBOLIC append
-OTHER prepend : number,number >> number ATT SYMBOLIC prepend
-OTHER join    : number++ >> number  ATT SYMBOLIC join
-OTHER reverse : number >> number    ATT SYMBOLIC reverse
-OTHER total   : number >> number    ATT SYMBOLIC total
+FUNC  table   : number,number,number >> number ATT SYMBOLIC HOLD table  # table(body,x,l): body for each x in l (or 1..n)
+FUNC  select  : number,number,bool >> number ATT SYMBOLIC HOLD select   # select(l,x,cond): the x in l with cond true
+# the same for matrices and other lists of the algebra
+OTHER listq   : algebra >> bool     ATT SYMBOLIC listq
+OTHER length  : algebra >> real     ATT SYMBOLIC length
+OTHER part    : algebra,number++ >> algebra ATT SYMBOLIC part
+OTHER first   : algebra >> algebra  ATT SYMBOLIC first
+OTHER last    : algebra >> algebra  ATT SYMBOLIC last
+OTHER rest    : algebra >> algebra  ATT SYMBOLIC rest
+OTHER most    : algebra >> algebra  ATT SYMBOLIC most
+OTHER append  : algebra,algebra >> algebra ATT SYMBOLIC append
+OTHER prepend : algebra,algebra >> algebra ATT SYMBOLIC prepend
+OTHER join    : algebra++ >> algebra ATT SYMBOLIC join
+OTHER reverse : algebra >> algebra  ATT SYMBOLIC reverse
+OTHER total   : algebra >> algebra  ATT SYMBOLIC total
+OTHER table   : algebra,number,number >> algebra ATT SYMBOLIC HOLD table
+OTHER select  : algebra,number,bool >> algebra ATT SYMBOLIC HOLD select
+
+# arithmetic element by element (listop) and the matrix product (matmul);
+# they stay as they are for symbolic matrices (CONST A : matrix)
+OTHER +       : vector,vector >> vector  ATT SYMBOLIC listop
+OTHER +       : vector,number >> vector  ATT SYMBOLIC listop
+OTHER +       : number,vector >> vector  ATT SYMBOLIC listop
+OTHER -       : vector,vector >> vector  ATT SYMBOLIC listop
+OTHER -       : vector,number >> vector  ATT SYMBOLIC listop
+OTHER -       : number,vector >> vector  ATT SYMBOLIC listop
+OTHER -       : vector >> vector         ATT SYMBOLIC listop
+OTHER *       : vector,vector >> vector  ATT SYMBOLIC listop
+OTHER *       : vector,number >> vector  ATT SYMBOLIC listop
+OTHER *       : number,vector >> vector  ATT SYMBOLIC listop
+OTHER /       : vector,vector >> vector  ATT SYMBOLIC listop
+OTHER /       : vector,number >> vector  ATT SYMBOLIC listop
+OTHER /       : number,vector >> vector  ATT SYMBOLIC listop
+OTHER ^       : vector,number >> vector  ATT SYMBOLIC listop
+OTHER +       : matrix,matrix >> matrix  ATT SYMBOLIC listop
+OTHER -       : matrix,matrix >> matrix  ATT SYMBOLIC listop
+OTHER -       : matrix >> matrix         ATT SYMBOLIC listop
+OTHER *       : matrix,matrix >> matrix  ATT SYMBOLIC matmul
+OTHER *       : matrix,vector >> vector  ATT SYMBOLIC matmul
+OTHER *       : vector,matrix >> vector  ATT SYMBOLIC matmul
+OTHER *       : number,matrix >> matrix  ATT SYMBOLIC listop
+OTHER *       : matrix,number >> matrix  ATT SYMBOLIC listop
+OTHER /       : matrix,number >> matrix  ATT SYMBOLIC listop
+OTHER ^       : matrix,number >> matrix  ATT SYMBOLIC matpow
 
 # printed by their shape (symmat.c): a matrix that is the whole printed
-# term as a grid, otherwise {a, b, ...}; SHOW list (without ATT) prints
-# list(a,b) again
-SHOW list ATT show_list
+# term as a grid, otherwise [a, b, ...]
+SHOW [ ATT show_list

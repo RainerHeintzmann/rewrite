@@ -8,6 +8,11 @@
 
 S	= src
 L	= -Wl,-Bstatic -lgmp -Wl,-Bdynamic -lm
+ifeq ($(OS),Windows_NT)
+# fully static on Windows: no MinGW DLLs (libwinpthread-1.dll) are needed, so
+# the program also starts outside the MSYS2 shell
+L	= -static -lgmp -lm
+endif
 O	= $(addprefix $(S)/, scan.o sym.o sync.o defs.o syn.o run.o stack.o \
 userfn.o forms.o node.o inout.o \
 real.o bool.o complex.o matrix.o vector.o \

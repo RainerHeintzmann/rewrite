@@ -55,7 +55,7 @@ sp_ops2 ([\-\+])
 					return String;}
 
 {sp_ops}*	{ return lookup(yytext); }	/* Id, etc */
-{sp_ops1}*	{ return lookup(yytext); }	/* Id, etc */
+{sp_ops1}	{ return lookup(yytext); }	/* 2026: one bracket per token: [[1,2],[3,4]] */
 {sp_ops2}*	{ return lookup(yytext); }	/* Id, etc */
 {numb}	   { double * value;
               Symbol * sp;

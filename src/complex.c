@@ -37,6 +37,15 @@ void show_complex (complex * x)
 	printfOut("(%g,%g) ",Re(x),Im(x));
 }
 
+/* 2026: a value of the sort number (or above): as a real one if it is real */
+void show_number (complex * x)
+{
+	if (Im(x) == 0.0)
+		printfOut("%g ",Re(x));
+	else
+		show_complex(x);
+}
+
 int cmp_complex (complex * x,complex * y)
 {
 #ifdef DEBUG

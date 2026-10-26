@@ -2,7 +2,7 @@
 # Equations solved with rules in the style of PRESS (Bundy and Welham 1981:
 # methods chosen by the form of the equation, here an ordered rule list):
 #
-#   REWR solve(x^2 - 3*x + 2 == 0, x) : Solve     # {1, 2}
+#   REWR solve(x^2 - 3*x + 2 == 0, x) : Solve     # [1, 2]
 #
 # solve(lhs == rhs, x) gives the list of the solutions (the empty list nil
 # if there is none); it stays unevaluated if no method applies. The methods
@@ -13,7 +13,7 @@
 #   new unknown    f a polynomial in g(x) (exp(x), x^(1/2), sin(x), ...):
 #                  solved for y = g(x), then g(x) = y isolated
 #   radicals       a + b*c^(1/2) = 0 squared: a^2 - b^2*c = 0
-# A system of linear equations, solve(list(eq1, eq2), list(x, y)), gives the
+# A system of linear equations, solve([eq1, eq2], [x, y]), gives the
 # list of the values of x and y (Bareiss' elimination, inc/linalg).
 # Trigonometric equations give the principal solutions (as Mathematica's
 # Solve without the integer constant). Squaring can add solutions; all
@@ -27,15 +27,14 @@
 #     INC "inc/solve"
 
 FUNC  solve     : bool,number >> number                  # solve(lhs == rhs, x)
-OTHER solve     : number,number >> number                # solve(list(eqs), list(unknowns)): linear systems
-OTHER list      : bool++ >> number                       # a list of equations
-SHOW list ATT show_list
+OTHER solve     : algebra,algebra >> algebra             # solve([eqs], [unknowns]): systems
 FUNC  sol       : number,number >> number                # the solutions of f = 0
 FUNC  iso       : number,number,number >> number         # the solutions of u = r, x only in u
 FUNC  isomap    : number,number,number >> number         # iso(g, r, x) for each r of a list
 FUNC  solker    : number,number >> number                # with a new unknown
 FUNC  ker       : number,number,number >> number         # ker(p, y, g): f = p(y), y = g(x)
 FUNC  union     : number,number >> number                # two solution lists
+OTHER union     : algebra,algebra >> algebra             # two lists of tuples (systems)
 FUNC  solcheck  : number,number,number >> number         # the solutions checked in f = 0
 CONST yker      : number                                 # the new unknown
 
@@ -51,43 +50,45 @@ FUNC  kernelq   : number,number >> bool    ATT SYMBOLIC kernelq
 FUNC  radicalq  : number,number >> bool    ATT SYMBOLIC radicalq
 FUNC  isoeach   : number,number,number >> number ATT SYMBOLIC isoeach
 FUNC  solfilter : number,number,number >> number ATT SYMBOLIC solfilter
-FUNC  linsys    : number,number >> number ATT SYMBOLIC linsys     # linear system: the values of the unknowns
-FUNC  linsysq   : number,number >> bool   ATT SYMBOLIC linsysq    # a solvable linear system
+FUNC  linsys    : algebra,algebra >> algebra ATT SYMBOLIC linsys     # linear system: the values of the unknowns
+FUNC  linsysq   : algebra,algebra >> bool ATT SYMBOLIC linsysq    # a solvable linear system
 # nonlinear systems: the steps (rules below) and their C functions
-FUNC  syssol    : number,number >> number                # syssol(list(f1,..), list(x,..)): list of tuples
-FUNC  systuple  : number >> number
-FUNC  sysback   : number,number,number,number,number >> number
-FUNC  sysext    : number,number,number,number,number >> number
-FUNC  sysy      : number,number,number,number >> number
-FUNC  syscheck  : number,number,number >> number
-FUNC  sysnorm   : number >> number          ATT SYMBOLIC sysnorm    # list(lhs == rhs, ..) -> list(lhs - rhs, ..)
-FUNC  sysstep   : number,number >> number   ATT SYMBOLIC sysstep    # substitution or resultant
-FUNC  sysstepq  : number,number >> bool     ATT SYMBOLIC sysstepq
-FUNC  systuplec : number >> number          ATT SYMBOLIC systuplec
-FUNC  sysbackc  : number,number,number,number,number >> number ATT SYMBOLIC sysbackc
-FUNC  sysextc   : number,number,number,number,number >> number ATT SYMBOLIC sysextc
-FUNC  sysyc     : number,number,number,number >> number ATT SYMBOLIC sysyc
-FUNC  syscheckc : number,number,number >> number ATT SYMBOLIC syscheckc
+FUNC  syssol    : algebra,algebra >> algebra                # syssol([f1,..], [x,..]): list of tuples
+FUNC  systuple  : algebra >> algebra
+FUNC  sysback   : algebra,algebra,algebra,algebra,algebra >> algebra
+FUNC  sysext    : algebra,algebra,algebra,algebra,algebra >> algebra
+FUNC  sysy      : algebra,algebra,algebra,algebra >> algebra
+FUNC  syscheck  : algebra,algebra,algebra >> algebra
+FUNC  sysnorm   : algebra >> algebra          ATT SYMBOLIC sysnorm    # [lhs == rhs, ..] -> [lhs - rhs, ..]
+FUNC  sysstep   : algebra,algebra >> algebra   ATT SYMBOLIC sysstep    # substitution or resultant
+FUNC  sysstepq  : algebra,algebra >> bool     ATT SYMBOLIC sysstepq
+FUNC  systuplec : algebra >> algebra          ATT SYMBOLIC systuplec
+FUNC  sysbackc  : algebra,algebra,algebra,algebra,algebra >> algebra ATT SYMBOLIC sysbackc
+FUNC  sysextc   : algebra,algebra,algebra,algebra,algebra >> algebra ATT SYMBOLIC sysextc
+FUNC  sysyc     : algebra,algebra,algebra,algebra >> algebra ATT SYMBOLIC sysyc
+FUNC  syscheckc : algebra,algebra,algebra >> algebra ATT SYMBOLIC syscheckc
 FUNC  resultant : number,number,number >> number ATT SYMBOLIC resultant  # resultant(f, g, y): y eliminated
 
 VAR Sf,Sg,Su,Sv,Sr,Sx,Sa,Sn,Sp,Sy,Sl,Sm : number
+VAR Tf,Tg,Tv,Ta,Tn,Ty,Tl,Tm : algebra                 # systems: lists of tuples are matrices
 
 COMM +,*
 ALG Solve
 # ---- the equation
 SPEC    Solve : solve(Su == Sv, Sx) = solcheck(sol(Su - Sv, Sx), Su - Sv, Sx)
-ADDSPEC Solve : IF (linsysq(Sl, Sm)) solve(Sl, Sm) = linsys(Sl, Sm)
+ADDSPEC Solve : IF (linsysq(Tl, Tm)) solve(Tl, Tm) = linsys(Tl, Tm)
 # a nonlinear system: substitution of an unknown that occurs linearly,
 # else (two polynomial equations) the resultant; the tuples are checked
-ADDSPEC Solve : IF (listq(Sl)), (listq(Sm)) solve(Sl, Sm) = syscheck(syssol(sysnorm(Sl), Sm), sysnorm(Sl), Sm)
-ADDSPEC Solve : IF (sysstepq(Sl, Sm)) syssol(Sl, Sm) = sysstep(Sl, Sm)
-ADDSPEC Solve : IF (listq(Sl)) systuple(Sl) = systuplec(Sl)
-ADDSPEC Solve : IF (listq(Sl)) sysback(Sl, Sm, Sv, Sn, Sa) = sysbackc(Sl, Sm, Sv, Sn, Sa)
-ADDSPEC Solve : IF (listq(Sl)) sysext(Sl, Sm, Sy, Sf, Sg) = sysextc(Sl, Sm, Sy, Sf, Sg)
-ADDSPEC Solve : IF (listq(Sm)) sysy(Sl, Sm, Sf, Sy) = sysyc(Sl, Sm, Sf, Sy)
-ADDSPEC Solve : IF (listq(Sl)) syscheck(Sl, Sf, Sm) = syscheckc(Sl, Sf, Sm)
+ADDSPEC Solve : IF (listq(Tl)), (listq(Tm)) solve(Tl, Tm) = syscheck(syssol(sysnorm(Tl), Tm), sysnorm(Tl), Tm)
+ADDSPEC Solve : IF (sysstepq(Tl, Tm)) syssol(Tl, Tm) = sysstep(Tl, Tm)
+ADDSPEC Solve : IF (listq(Tl)) systuple(Tl) = systuplec(Tl)
+ADDSPEC Solve : IF (listq(Tl)) sysback(Tl, Tm, Tv, Tn, Ta) = sysbackc(Tl, Tm, Tv, Tn, Ta)
+ADDSPEC Solve : IF (listq(Tl)) sysext(Tl, Tm, Ty, Tf, Tg) = sysextc(Tl, Tm, Ty, Tf, Tg)
+ADDSPEC Solve : IF (listq(Tm)) sysy(Tl, Tm, Tf, Ty) = sysyc(Tl, Tm, Tf, Ty)
+ADDSPEC Solve : IF (listq(Tl)) syscheck(Tl, Tf, Tm) = syscheckc(Tl, Tf, Tm)
 ADDSPEC Solve : IF (listq(Sl)) solcheck(Sl, Sf, Sx) = solfilter(Sl, Sf, Sx)
 ADDSPEC Solve : IF (listq(Sl)), (listq(Sm)) union(Sl, Sm) = join(Sl, Sm)
+ADDSPEC Solve : IF (listq(Tl)), (listq(Tm)) union(Tl, Tm) = join(Tl, Tm)
 ADDSPEC Solve : IF (listq(Sl)) isomap(Sg, Sl, Sx) = isoeach(Sg, Sl, Sx)
 # ---- the methods, in this order
 ADDSPEC Solve : IF (occurs(Sf, Sx) == 1) sol(Sf, Sx) = iso(Sf, 0, Sx)
@@ -99,7 +100,7 @@ ADDSPEC Solve : IF (kernelq(Sf, Sx)) sol(Sf, Sx) = solker(kernel(Sf, Sx), Sx)
 ADDSPEC Solve : solker(ker(Sp, Sy, Sg), Sx) = isomap(Sg, sol(Sp, Sy), Sx)
 ADDSPEC Solve : IF (radicalq(Sf, Sx)) sol(Sf, Sx) = sol(unradical(Sf, Sx), Sx)
 # ---- isolation: u = r with x only in u
-ADDSPEC Solve : iso(Sx, Sr, Sx) = list(normform(Sr))
+ADDSPEC Solve : iso(Sx, Sr, Sx) = [normform(Sr)]
 ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Su + Sa, Sr, Sx) = iso(Su, Sr - Sa, Sx)
 ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Su - Sa, Sr, Sx) = iso(Su, Sr + Sa, Sx)
 ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Sa - Su, Sr, Sx) = iso(Su, Sa - Sr, Sx)
@@ -115,17 +116,17 @@ ADDSPEC Solve : IF (freeq(Sa, Sx)) iso(Sa ^ Su, Sr, Sx) = iso(Su, ln(Sr) / ln(Sa
 ADDSPEC Solve : iso(sqrt(Su), Sr, Sx) = iso(Su, Sr ^ 2, Sx)
 ADDSPEC Solve : iso(exp(Su), Sr, Sx) = iso(Su, ln(Sr), Sx)
 ADDSPEC Solve : iso(ln(Su), Sr, Sx) = iso(Su, exp(Sr), Sx)
-ADDSPEC Solve : iso(sin(Su), Sr, Sx) = isomap(Su, list(arcsin(Sr), pi - arcsin(Sr)), Sx)
-ADDSPEC Solve : iso(cos(Su), Sr, Sx) = isomap(Su, list(arccos(Sr), - arccos(Sr)), Sx)
+ADDSPEC Solve : iso(sin(Su), Sr, Sx) = isomap(Su, [arcsin(Sr), pi - arcsin(Sr)], Sx)
+ADDSPEC Solve : iso(cos(Su), Sr, Sx) = isomap(Su, [arccos(Sr), - arccos(Sr)], Sx)
 ADDSPEC Solve : iso(tan(Su), Sr, Sx) = iso(Su, arctan(Sr), Sx)
 ADDSPEC Solve : iso(cot(Su), Sr, Sx) = iso(Su, arccot(Sr), Sx)
-ADDSPEC Solve : iso(sec(Su), Sr, Sx) = isomap(Su, list(arcsec(Sr), - arcsec(Sr)), Sx)
-ADDSPEC Solve : iso(csc(Su), Sr, Sx) = isomap(Su, list(arccsc(Sr), pi - arccsc(Sr)), Sx)
+ADDSPEC Solve : iso(sec(Su), Sr, Sx) = isomap(Su, [arcsec(Sr), - arcsec(Sr)], Sx)
+ADDSPEC Solve : iso(csc(Su), Sr, Sx) = isomap(Su, [arccsc(Sr), pi - arccsc(Sr)], Sx)
 ADDSPEC Solve : iso(sinh(Su), Sr, Sx) = iso(Su, arcsinh(Sr), Sx)
-ADDSPEC Solve : iso(cosh(Su), Sr, Sx) = isomap(Su, list(arccosh(Sr), - arccosh(Sr)), Sx)
+ADDSPEC Solve : iso(cosh(Su), Sr, Sx) = isomap(Su, [arccosh(Sr), - arccosh(Sr)], Sx)
 ADDSPEC Solve : iso(tanh(Su), Sr, Sx) = iso(Su, arctanh(Sr), Sx)
 ADDSPEC Solve : iso(coth(Su), Sr, Sx) = iso(Su, arccoth(Sr), Sx)
-ADDSPEC Solve : iso(sech(Su), Sr, Sx) = isomap(Su, list(arcsech(Sr), - arcsech(Sr)), Sx)
+ADDSPEC Solve : iso(sech(Su), Sr, Sx) = isomap(Su, [arcsech(Sr), - arcsech(Sr)], Sx)
 ADDSPEC Solve : iso(csch(Su), Sr, Sx) = iso(Su, arccsch(Sr), Sx)
 ADDSPEC Solve : iso(arcsin(Su), Sr, Sx) = iso(Su, sin(Sr), Sx)
 ADDSPEC Solve : iso(arccos(Su), Sr, Sx) = iso(Su, cos(Sr), Sx)

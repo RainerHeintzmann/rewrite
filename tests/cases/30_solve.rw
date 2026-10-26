@@ -36,11 +36,11 @@ REWR length(solve(x^3 + x + 1 == 0, x)) : Solve
 REWR length(solve(x^4 + x + 1 == 0, x)) : Solve
 REWR solve(x^3 + a*x == b, x) : Solve
 # ---- linear systems; nonlinear systems by substitution and resultants
-REWR solve(list(x + y == 3, x - y == 1), list(x, y)) : Solve
-REWR solve(list(a*x + b*y == 1, x - y == n), list(x, y)) : Solve
-REWR solve(list(x*y == 1, x == 2), list(x, y)) : Solve
-REWR solve(list(x^2 + y^2 == 5, x - y == 1), list(x, y)) : Solve
-REWR solve(list(x^2 + y^2 == 1, x^2 - y == 1), list(x, y)) : Solve
-REWR solve(list(x^2 + y^2 == 4, x*y == 1), list(x, y)) : Solve
-REWR solve(list(x + y + z == 6, x*y == 2, z == 3), list(x, y, z)) : Solve
-REWR solve(list(exp(x) == y, y - 2 == 0), list(x, y)) : Solve
+REWR solve([x + y == 3, x - y == 1], [x, y]) : Solve
+REWR solve([a*x + b*y == 1, x - y == n], [x, y]) : Solve
+REWR solve([x*y == 1, x == 2], [x, y]) : Solve
+REWR solve([x^2 + y^2 == 5, x - y == 1], [x, y]) : Solve
+REWR solve([x^2 + y^2 == 1, x^2 - y == 1], [x, y]) : Solve
+REWR solve([x^2 + y^2 == 4, x*y == 1], [x, y]) : Solve
+REWR solve([x + y + z == 6, x*y == 2, z == 3], [x, y, z]) : Solve
+REWR solve([exp(x) == y, y - 2 == 0], [x, y]) : Solve

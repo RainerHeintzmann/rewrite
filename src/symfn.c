@@ -5149,6 +5149,11 @@ static Node * s_linsolve (Node * a[], int n, Symbol * f);
 static Node * s_inverse (Node * a[], int n, Symbol * f);
 static Node * s_thread (Node * a[], int n, Symbol * f);
 static Node * s_threadq (Node * a[], int n, Symbol * f);
+static Node * s_listop (Node * a[], int n, Symbol * f);
+static Node * s_matmul (Node * a[], int n, Symbol * f);
+static Node * s_matpow (Node * a[], int n, Symbol * f);
+static Node * s_tolist (Node * a[], int n, Symbol * f);
+static Node * s_scalarq (Node * a[], int n, Symbol * f);
 static Node * s_occurs (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_eqnorm (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_polyroots (Node * a[], int n, Symbol * f);	/* symsolve.c */
@@ -5319,6 +5324,11 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "inverse", s_inverse },
 	{ "thread", s_thread },
 	{ "threadq", s_threadq },
+	{ "listop", s_listop },		/* vectors and matrices (inc/list) */
+	{ "matmul", s_matmul },
+	{ "matpow", s_matpow },
+	{ "tolist", s_tolist },
+	{ "scalarq", s_scalarq },
 	{ "occurs", s_occurs },
 	{ "eqnorm", s_eqnorm },
 	{ "polyroots", s_polyroots },
@@ -5394,6 +5404,11 @@ static int has_builtin (Node * t)	/* is a builtin call somewhere in t? */
  * lists (listmatch.c). Declared with HOLD: the pattern and the condition
  * arrive unevaluated (the condition refers to the pattern variables), u is
  * calculated here. */
+int term_has_builtin (Node * t)	/* exported has_builtin */
+{
+	return has_builtin(t);
+}
+
 static Node * s_matchq (Node * a[], int n, Symbol * f)
 {
 	Node * u;
@@ -5406,12 +5421,12 @@ static Node * s_matchq (Node * a[], int n, Symbol * f)
 }
 
 
-/* ---- lists (inc/list): list(a,b,c) and the empty list nil ----
- * A list is a term with the head "list", as Mathematica's List: its
- * elements and the results have the sort real, so that lists nest freely
- * (the sort of part(m,1) cannot be known before the list is there). The
- * functions work on the term structure and stay unevaluated if an argument
- * is no list. Roles "list" and "nil". */
+/* ---- lists (inc/list): [a,b,c] and the empty list nil ----
+ * A list is a term with the head of the role "list" (the bracket [ of
+ * inc/list), as Mathematica's List. Its sort follows the elements: vector
+ * for numbers, matrix for vectors (inc/list). The functions work on the
+ * term structure and stay unevaluated if an argument is no list. Roles
+ * "list" and "nil". */
 
 #define MAXLIST 4096
 

@@ -1,41 +1,45 @@
-# Lists (inc/list): list(a,b,c), the empty list nil, nested lists. The
-# functions are symbolic, so the results are shown with REWR (a plain
-# expression is calculated numerically).
+# Lists (inc/list): [a,b,c] (sort vector), the empty list nil, nested
+# lists (a list of vectors is a matrix); list(a,b) is the old name.
 INC "inc/all"
 INC "inc/exact"
 INC "inc/list"
-TERM L : real
-TERM MM : real
+TERM LL : vector
+TERM MM : matrix
 CONST yy,aa,kk : real
 x = yy
-L = list(3, aa, x^2)
-length(L)
-REWR part(L, 2) : All
-REWR part(L, -1) : All
-REWR first(L) : All
-REWR rest(L) : All
-REWR most(L) : All
-REWR append(L, 7) : All
-REWR prepend(L, 0) : All
-REWR join(L, list(1,2), nil) : All
-REWR reverse(L) : All
+LL = [3, aa, x^2]
+length(LL)
+REWR part(LL, 2) : All
+REWR part(LL, -1) : All
+REWR first(LL) : All
+REWR rest(LL) : All
+REWR most(LL) : All
+REWR append(LL, 7) : All
+REWR prepend(LL, 0) : All
+REWR join(LL, [1,2], nil) : All
+REWR reverse(LL) : All
 REWR range(5) : All
 REWR range(2, 10, 3) : All
 REWR range(1/2, 2, 1/2) : All
 # a list of lists: part with two indices
-MM = list(list(1,2), list(3,4))
+MM = [[1,2], [3,4]]
 REWR part(MM, 2, 1) : All
 REWR part(part(MM, 1), 2) : All
 # table and select (HOLD): the variable must be declared
-REWR table(aa^kk, kk, list(1,2,3)) : All
+REWR table(aa^kk, kk, [1,2,3]) : All
 REWR table(kk^2, kk, 4) : All
 REWR select(range(10), kk, kk > 6) : All
 total(range(100))
-REWR total(L) : All
-listq(L)
+REWR total(LL) : All
+listq(LL)
 listq(aa)
 length(nil)
-REWR rest(list(1)) : All
+REWR rest([1]) : All
 # no list or index out of range: unevaluated
-REWR part(L, 7) : All
+REWR part(LL, 7) : All
 REWR first(aa) : All
+# the old name
+REWR list(1, aa, [2]) : All
+length(list(1, 2))
+# a list is no value of a real constant: an error, aa is not changed
+aa = [1, 2]

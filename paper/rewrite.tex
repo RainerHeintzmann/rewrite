@@ -288,6 +288,16 @@ for \texttt{number} with a commutative product, never see a matrix
 product. Matrix equations are solved by isolating the unknown from the
 left or from the right: $XA+C=B$ gives $X=(B-C)A^{-1}$.
 
+Lists are written in brackets, which the list library declares like any
+other function (\texttt{BRA [ ]}) with variants for the sorts of the
+elements: a list of numbers has the sort \texttt{vector}, below
+\texttt{number}, and a list of vectors the sort \texttt{matrix}, so the
+choice of the variant by the argument sorts also decides whether a
+product is taken element by element or as a matrix product. Thus
+\texttt{[[1,2],[3,4]]*[5,6]} is the vector \texttt{[17, 39]}, explicit
+matrices mix with symbolic ones, and the solutions of a system of
+equations, a list of tuples, are printed as the rows of a matrix.
+
 \paragraph{Sorts with a known sign.} A sort may have several wider sorts,
 and the conversion follows the shortest path in the resulting graph. The
 library declares
@@ -805,11 +815,12 @@ rule sets~\cite{mathlib2020}. \texttt{rewrite} anticipated several of these
 ideas in a small and self-contained system.
 
 \paragraph{Outlook.} The same approach carries beyond integration. A
-library of symbolic matrices represents a matrix as a list of rows;
+library of matrices represents a matrix as a list of rows;
 determinants, linear systems and inverses use Bareiss' fraction-free
 elimination on sparse polynomials in the atoms of the entries, so that
-every division is exact, and arithmetic on lists works element by element,
-so that $\det(A-x I)$ is the characteristic polynomial. Equations are
+every division is exact, and the matrix functions thread their arguments
+element by element, so that $\det(A-x I)$ is the characteristic
+polynomial. Equations are
 solved with rules in the style of PRESS~\cite{bundy1981press}: the form of
 the equation selects isolation, polynomial methods, a change of the
 unknown, the attraction of logarithms or the removal of square roots, and

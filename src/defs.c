@@ -335,6 +335,8 @@ void other_fn (Node * np)
 				; /* No loop body */
 	variants(aux)=newsym;  /* Chaining of the functions */
 	orig_func(newsym)=sp;
+	bracket(newsym)=bracket(sp);	/* a variant of [ : printed with ] */
+	showfn(newsym)=showfn(sp);	/* SHOW */
 	if (att)
 		if (att->type==ATT)
 			{

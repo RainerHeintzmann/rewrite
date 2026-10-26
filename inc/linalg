@@ -1,7 +1,7 @@
 # inc/linalg (2026)
-# Symbolic matrices on lists (inc/list): a matrix is a list of rows,
-# list(list(a,b),list(c,d)), a vector a list. The functions are symbolic C
-# functions (symmat.c); they stay unevaluated if an argument does not fit.
+# Matrices: explicit ones are lists of rows (inc/list), [[a,b],[c,d]], a
+# vector is a list [a,b]. The functions are symbolic C functions
+# (symmat.c); they stay unevaluated if an argument does not fit.
 # det, linsolve and inverse use Bareiss' fraction-free elimination: the
 # entries may be any terms, the results are polynomials in them, divided
 # by the determinant at the end.
@@ -10,55 +10,40 @@
 #     INC "inc/list"
 #     INC "inc/linalg"
 
-FUNC  transpose : real >> real       ATT SYMBOLIC transpose      # rows become columns
-FUNC  dot       : real,real >> real  ATT SYMBOLIC dot            # matrix.matrix, matrix.vector, vector.vector
-FUNC  identity  : real >> real       ATT SYMBOLIC identity       # identity(n): the n x n unit matrix
-FUNC  det       : real >> real       ATT SYMBOLIC det            # determinant
-FUNC  linsolve  : real,real >> real  ATT SYMBOLIC linsolve       # x with m.x = b (b a vector or a matrix)
-FUNC  inverse   : real >> real       ATT SYMBOLIC inverse        # inverse matrix
-FUNC  thread    : real >> real       ATT SYMBOLIC thread         # arithmetic on lists element by element
-FUNC  threadq   : real >> bool       ATT SYMBOLIC threadq        # thread would change u
-# the same for the sort number (e.g. with im of inc/integration/base)
-OTHER transpose : number >> number   ATT SYMBOLIC transpose
-OTHER dot       : number,number >> number ATT SYMBOLIC dot
-OTHER det       : number >> number   ATT SYMBOLIC det
-OTHER linsolve  : number,number >> number ATT SYMBOLIC linsolve
-OTHER inverse   : number >> number   ATT SYMBOLIC inverse
-OTHER thread    : number >> number   ATT SYMBOLIC thread
-OTHER threadq   : number >> bool     ATT SYMBOLIC threadq
+FUNC  transpose : matrix >> matrix   ATT SYMBOLIC transpose      # rows become columns
+FUNC  dot       : number,number >> number ATT SYMBOLIC dot       # vector.vector
+OTHER dot       : matrix,matrix >> matrix ATT SYMBOLIC dot       # the matrix product
+OTHER dot       : matrix,vector >> vector ATT SYMBOLIC dot
+OTHER dot       : vector,matrix >> vector ATT SYMBOLIC dot
+FUNC  identity  : number >> matrix   ATT SYMBOLIC identity       # identity(n): the n x n unit matrix
+FUNC  det       : matrix >> number   ATT SYMBOLIC det            # determinant
+FUNC  linsolve  : matrix,vector >> vector ATT SYMBOLIC linsolve  # x with m.x = b
+OTHER linsolve  : matrix,matrix >> matrix ATT SYMBOLIC linsolve  # b a matrix
+FUNC  inverse   : matrix >> matrix   ATT SYMBOLIC inverse        # inverse matrix
+FUNC  thread    : number >> number   ATT SYMBOLIC thread         # arithmetic on lists element by element
+OTHER thread    : algebra >> algebra ATT SYMBOLIC thread
+FUNC  threadq   : number >> bool     ATT SYMBOLIC threadq        # thread would change u
+OTHER threadq   : algebra >> bool    ATT SYMBOLIC threadq
 
-# Arithmetic and functions of lists element by element, as Mathematica's
-# Listable functions: REWR list(1,2)*x + list(a,b) : Listable gives
-# list(x+a, 2*x+b). The matrix functions above do this with their
-# arguments themselves: det(m - x*identity(2)) is the characteristic
-# polynomial of m.
+# Functions of lists element by element, as Mathematica's Listable
+# functions: REWR sin([a,b]) : Listable gives [sin(a), sin(b)]. The
+# arithmetic of lists does this by itself (inc/list), and the matrix
+# functions above thread their arguments: det(m - x*identity(2)) is the
+# characteristic polynomial of m.
 ALG Listable
-SPEC Listable : IF (threadq(Xnu)) Xnu = thread(Xnu)
+SPEC    Listable : IF (threadq(Xnu)) Xnu = thread(Xnu)
+ADDSPEC Listable : IF (threadq(Xal)) Xal = thread(Xal)
 
-# ---------------- symbolic matrices: the sort matrix (2026) ----------------
-# A matrix below algebra (inc/alg): its product is not commutative, so the
-# rules for numbers (commutative *, the integration) do not apply to it, while
-# the rules for algebra do. CONST A,B : matrix are symbolic matrices; an
-# explicit one is mat(list(list(1,2),list(3,4))), computed with the list
-# functions above. REWR transpose(A*B) : MatrixRules gives
-# transpose(B)*transpose(A).
-SORT matrix
-ATT matrix show_complex,cmp_complex,cpy_complex,del_complex
-SUBSORT matrix,algebra ATT cpx2num
+# ---------------- symbolic matrices (2026) ----------------
+# The sort matrix (inc/list) is below algebra (inc/alg): its product is
+# not commutative, so the rules for numbers (commutative *, the
+# integration) do not apply to it, while the rules for algebra do.
+# CONST A,B : matrix are symbolic matrices, REWR transpose(A*B) :
+# MatrixRules gives transpose(B)*transpose(A). Explicit matrices are
+# calculated at once.
 VAR Ma,Mb,Mc,Mc2 : matrix
 CONST Id,Zm : matrix                       # the identity and the zero matrix
-FUNC  mat       : number >> matrix         # an explicit matrix: mat(list of rows)
-OTHER +         : matrix,matrix >> matrix
-OTHER -         : matrix,matrix >> matrix
-OTHER *         : matrix,matrix >> matrix
-OTHER *         : number,matrix >> matrix
-OTHER *         : matrix,number >> matrix
-OTHER -         : matrix >> matrix
-OTHER ^         : matrix,number >> matrix
-OTHER transpose : matrix >> matrix
-OTHER inverse   : matrix >> matrix
-OTHER det       : matrix >> number
-SHOW mat ATT show_mat
+FUNC  scalarq   : algebra >> bool    ATT SYMBOLIC scalarq    # no vector or matrix
 
 ALG MatrixRules
 # products associated to the left, so that A*B*inverse(B) cancels
@@ -66,10 +51,10 @@ SPEC    MatrixRules : Ma*(Mb*Mc) = Ma*Mb*Mc
 ADDSPEC MatrixRules : Ma*(Mb+Mc) = Ma*Mb+Ma*Mc
 ADDSPEC MatrixRules : (Ma+Mb)*Mc = Ma*Mc+Mb*Mc
 # numbers commute with matrices and go to the front
-ADDSPEC MatrixRules : Ma*Xnu = Xnu*Ma
-ADDSPEC MatrixRules : (Xnu*Ma)*Mb = Xnu*(Ma*Mb)
-ADDSPEC MatrixRules : Ma*(Xnu*Mb) = Xnu*(Ma*Mb)
-ADDSPEC MatrixRules : Xnu*(Ynu*Ma) = (Xnu*Ynu)*Ma
+ADDSPEC MatrixRules : IF (scalarq(Xnu)) Ma*Xnu = Xnu*Ma
+ADDSPEC MatrixRules : IF (scalarq(Xnu)) (Xnu*Ma)*Mb = Xnu*(Ma*Mb)
+ADDSPEC MatrixRules : IF (scalarq(Xnu)) Ma*(Xnu*Mb) = Xnu*(Ma*Mb)
+ADDSPEC MatrixRules : IF (scalarq(Xnu)), (scalarq(Ynu)) Xnu*(Ynu*Ma) = (Xnu*Ynu)*Ma
 # identity, zero, inverse
 ADDSPEC MatrixRules : Ma*Id = Ma
 ADDSPEC MatrixRules : Id*Ma = Ma
@@ -81,8 +66,8 @@ ADDSPEC MatrixRules : Ma-Ma = Zm
 ADDSPEC MatrixRules : Ma+Ma = 2*Ma
 ADDSPEC MatrixRules : (Ma+Mb)-Ma = Mb
 ADDSPEC MatrixRules : (Ma+Mb)-Mb = Ma
-ADDSPEC MatrixRules : Xnu*Ma+Ynu*Ma = (Xnu+Ynu)*Ma
-ADDSPEC MatrixRules : Ma+Xnu*Ma = (1+Xnu)*Ma
+ADDSPEC MatrixRules : IF (scalarq(Xnu)), (scalarq(Ynu)) Xnu*Ma+Ynu*Ma = (Xnu+Ynu)*Ma
+ADDSPEC MatrixRules : IF (scalarq(Xnu)) Ma+Xnu*Ma = (1+Xnu)*Ma
 ADDSPEC MatrixRules : Ma*inverse(Ma) = Id
 ADDSPEC MatrixRules : inverse(Ma)*Ma = Id
 ADDSPEC MatrixRules : Ma*Mb*inverse(Mb) = Ma
@@ -91,43 +76,33 @@ ADDSPEC MatrixRules : Ma*inverse(Mb)*Mb = Ma
 ADDSPEC MatrixRules : transpose(transpose(Ma)) = Ma
 ADDSPEC MatrixRules : transpose(Ma*Mb) = transpose(Mb)*transpose(Ma)
 ADDSPEC MatrixRules : transpose(Ma+Mb) = transpose(Ma)+transpose(Mb)
-ADDSPEC MatrixRules : transpose(Xnu*Ma) = Xnu*transpose(Ma)
+ADDSPEC MatrixRules : IF (scalarq(Xnu)) transpose(Xnu*Ma) = Xnu*transpose(Ma)
 ADDSPEC MatrixRules : transpose(Id) = Id
 ADDSPEC MatrixRules : inverse(inverse(Ma)) = Ma
 ADDSPEC MatrixRules : inverse(Ma*Mb) = inverse(Mb)*inverse(Ma)
-ADDSPEC MatrixRules : inverse(Xnu*Ma) = mi(Xnu)*inverse(Ma)
+ADDSPEC MatrixRules : IF (scalarq(Xnu)) inverse(Xnu*Ma) = mi(Xnu)*inverse(Ma)
 ADDSPEC MatrixRules : inverse(Id) = Id
 ADDSPEC MatrixRules : det(Ma*Mb) = det(Ma)*det(Mb)
 ADDSPEC MatrixRules : det(transpose(Ma)) = det(Ma)
 ADDSPEC MatrixRules : det(inverse(Ma)) = mi(det(Ma))
 ADDSPEC MatrixRules : det(Id) = 1
-# explicit matrices: calculated with the list functions
-ADDSPEC MatrixRules : mat(Xnu)*mat(Ynu) = mat(dot(Xnu,Ynu))
-ADDSPEC MatrixRules : mat(Xnu)+mat(Ynu) = mat(thread(Xnu+Ynu))
-ADDSPEC MatrixRules : mat(Xnu)-mat(Ynu) = mat(thread(Xnu-Ynu))
-ADDSPEC MatrixRules : Znu*mat(Xnu) = mat(thread(Znu*Xnu))
-ADDSPEC MatrixRules : transpose(mat(Xnu)) = mat(transpose(Xnu))
-ADDSPEC MatrixRules : inverse(mat(Xnu)) = mat(inverse(Xnu))
-ADDSPEC MatrixRules : det(mat(Xnu)) = det(Xnu)
-ADDSPEC MatrixRules : mat(Xnu)*Id = mat(Xnu)
-ADDSPEC MatrixRules : Id*mat(Xnu) = mat(Xnu)
 
 # ---- matrix equations: solve(A*X == B, X) gives X = inverse(A)*B; the
 # unknown is isolated from the left or from the right, as the product does
 # not commute (the matrices it is divided by must be invertible)
 OTHER ==        : matrix,matrix >> bool
-OTHER freeq     : algebra,algebra >> bool ATT SYMBOLIC freeq
+FUNC  mfreeq    : algebra,algebra >> bool ATT SYMBOLIC freeq  # freeq of inc/helpers
 FUNC  msolve    : bool,matrix >> matrix          # the solution of a matrix equation
 FUNC  isom      : matrix,matrix,matrix >> matrix # u = r with the unknown x only in u
 ALG MatrixSolve
 SPEC    MatrixSolve : msolve(Ma == Mb, Mc) = isom(Ma - Mb, Zm, Mc)
 ADDSPEC MatrixSolve : isom(Mc, Ma, Mc) = Ma
-ADDSPEC MatrixSolve : IF (freeq(Mb, Mc)) isom(Ma - Mb, Mc2, Mc) = isom(Ma, Mc2 + Mb, Mc)
-ADDSPEC MatrixSolve : IF (freeq(Mb, Mc)) isom(Ma + Mb, Mc2, Mc) = isom(Ma, Mc2 - Mb, Mc)
-ADDSPEC MatrixSolve : IF (freeq(Ma, Mc)) isom(Ma + Mb, Mc2, Mc) = isom(Mb, Mc2 - Ma, Mc)
-ADDSPEC MatrixSolve : IF (freeq(Ma, Mc)) isom(Ma * Mb, Mc2, Mc) = isom(Mb, inverse(Ma) * Mc2, Mc)
-ADDSPEC MatrixSolve : IF (freeq(Mb, Mc)) isom(Ma * Mb, Mc2, Mc) = isom(Ma, Mc2 * inverse(Mb), Mc)
-ADDSPEC MatrixSolve : isom(Xnu * Ma, Mc2, Mc) = isom(Ma, mi(Xnu) * Mc2, Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(Mb, Mc)) isom(Ma - Mb, Mc2, Mc) = isom(Ma, Mc2 + Mb, Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(Mb, Mc)) isom(Ma + Mb, Mc2, Mc) = isom(Ma, Mc2 - Mb, Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(Ma, Mc)) isom(Ma + Mb, Mc2, Mc) = isom(Mb, Mc2 - Ma, Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(Ma, Mc)) isom(Ma * Mb, Mc2, Mc) = isom(Mb, inverse(Ma) * Mc2, Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(Mb, Mc)) isom(Ma * Mb, Mc2, Mc) = isom(Ma, Mc2 * inverse(Mb), Mc)
+ADDSPEC MatrixSolve : IF (scalarq(Xnu)) isom(Xnu * Ma, Mc2, Mc) = isom(Ma, mi(Xnu) * Mc2, Mc)
 ADDSPEC MatrixSolve : isom(transpose(Ma), Mc2, Mc) = isom(Ma, transpose(Mc2), Mc)
 ADDSPEC MatrixSolve : isom(inverse(Ma), Mc2, Mc) = isom(Ma, inverse(Mc2), Mc)
 ADDSPEC MatrixSolve : isom(- Ma, Mc2, Mc) = isom(Ma, - Mc2, Mc)

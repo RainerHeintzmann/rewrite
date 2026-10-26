@@ -852,7 +852,7 @@ static Node * s_radicalq (Node * a[], int n, Symbol * f)
 	return mk_bool(find_sqrt(a[0], a[1]) != NULL, f);
 }
 
-/* isoeach(g, list(r1,..,rn), x) = union(iso(g,r1,x), union(iso(g,r2,x), ..)):
+/* isoeach(g, [r1,..,rn], x) = union(iso(g,r1,x), union(iso(g,r2,x), ..)):
  * the isolation for each solution of the new unknown */
 static Node * s_isoeach (Node * a[], int n, Symbol * f)
 {
@@ -871,7 +871,7 @@ static Node * s_isoeach (Node * a[], int n, Symbol * f)
 	return r;
 }
 
-/* ---- linsys: a system of linear equations, solve(list(eqs), list(vars)) ----
+/* ---- linsys: a system of linear equations, solve([eqs], [vars]) ----
  * The coefficients of the unknowns are collected into a matrix and the
  * system is solved with Bareiss' elimination (symmat.c). The values come
  * in the order of the unknowns; nonlinear systems stay unevaluated. */
@@ -946,7 +946,7 @@ static Node * s_linsysq (Node * a[], int n, Symbol * f)	/* a linear system linsy
 }
 
 /* ---- nonlinear systems ----
- * solve(list(eqs), list(vars)) for a nonlinear system (inc/solve):
+ * solve([eqs], [vars]) for a nonlinear system (inc/solve):
  *   syssol(F, V)     the solutions of the equations F = 0 (f = lhs - rhs) in V,
  *                    a list of tuples (lists in the order of V)
  *   sysstep(F, V)    the next step: one equation in one unknown; an unknown
@@ -1108,7 +1108,7 @@ static Node * s_sysstepq (Node * a[], int n, Symbol * f)
 	return mk_bool(r != NULL, f);
 }
 
-static Node * s_systuple (Node * a[], int n, Symbol * f)	/* list(r1, r2) -> list(list(r1), list(r2)) */
+static Node * s_systuple (Node * a[], int n, Symbol * f)	/* [r1, r2] -> [[r1], [r2]] */
 {
 	Node * e[64];
 	int k, len;
@@ -1165,7 +1165,7 @@ static Node * s_sysback (Node * a[], int n, Symbol * f)
 	return mk_list(e, len);
 }
 
-/* sysext(tuples of x, list(x), y, f1, f2): for each tuple the solutions y
+/* sysext(tuples of x, [x], y, f1, f2): for each tuple the solutions y
  * of f1 = 0 (the solver) that also make f2 zero: sysy terms joined by union */
 static Node * s_sysext (Node * a[], int n, Symbol * f)
 {
@@ -1201,7 +1201,7 @@ static int zero_value (Node * u)	/* 1: zero, 0: not zero, -1: unknown */
 	return -1;
 }
 
-/* sysy(tuple, list(y1, ..), f2, y): tuple ++ y_k for the y_k with f2 = 0 */
+/* sysy(tuple, [y1, ..], f2, y): tuple ++ y_k for the y_k with f2 = 0 */
 static Node * s_sysy (Node * a[], int n, Symbol * f)
 {
 	Node * e[64];
@@ -1249,7 +1249,7 @@ static Node * s_syscheck (Node * a[], int n, Symbol * f)
 	return mk_list(e, ne);
 }
 
-/* sysnorm(list(lhs1 == rhs1, ..)): list(lhs1 - rhs1, ..) */
+/* sysnorm([lhs1 == rhs1, ..]): [lhs1 - rhs1, ..] */
 static Node * s_sysnorm (Node * a[], int n, Symbol * f)
 {
 	Node * e[MAXDIM];

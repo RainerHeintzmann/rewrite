@@ -30,8 +30,9 @@ $ rewrite
 0.333333
 > sqrt(16), ln(e), sin(pi/2)
 4 1 1
-> [1,0,0] _x_ [0,1,0]
-[0,0,1]
+> INC "inc/list"
+> [[1,2],[3,4]] * [5,6]
+[17, 39]
 > a = 3
 > a + 1
 4
@@ -45,7 +46,8 @@ a + 1
 term with the rule list `All`, here computing the derivative of
 `sin(cos(x))`. Constants such as `a` either have a value or stand for
 themselves: `a = nothing` removes the value again, because the library
-constant `nothing` never has one.
+constant `nothing` never has one. `INC "inc/list"` adds lists and matrices in
+brackets, whose product is the matrix product.
 
 There are an interactive and a non-interactive way to run rewrite:
 
@@ -346,7 +348,7 @@ at run time. Two statements connect the sorts:
 
 | Command | Meaning |
 | --- | --- |
-| `SHOW f ATT name` | Prints the terms with the function `f` (all its variants) with the C print function `name` instead of the usual form; `SHOW f` alone switches back. [inc/list](inc/list) uses it for lists (`show_list`). |
+| `SHOW f ATT name` | Prints the terms with the function `f` (all its variants) with the C print function `name` instead of the usual form; `SHOW f` alone switches back. [inc/list](inc/list) uses it for lists (`SHOW [ ATT show_list`). |
 | `SUBSORT integer,rational ATT int2rat` | Every `integer` is also a `rational`; the C function converts a value. A sort may have several wider sorts. |
 | `INTNUM integer ATT read_int` | Numbers without point and exponent are of sort `integer`, made by the C function from the text. |
 
@@ -542,14 +544,14 @@ the files are in German.
 
 | File | Contents |
 | --- | --- |
-| [inc/list](inc/list) | Lists as terms, `list(a,b,c)` and `nil`, with `part`, `length`, `table`, `select`, ... (load it after `inc/all`). |
+| [inc/list](inc/list) | Lists `[a,b,c]` (sort `vector`) and `nil`, matrices `[[a,b],[c,d]]` (sort `matrix`), their arithmetic, `part`, `length`, `table`, `select`, ... (load it after `inc/all`). |
 | [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), linear systems (load it after `inc/list`). |
-| [inc/linalg](inc/linalg) | Symbolic matrices on lists: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread` (load it after `inc/list`). |
+| [inc/linalg](inc/linalg) | Matrices: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread`, symbolic matrices with `MatrixRules` and `MatrixSolve` (load it after `inc/list`). |
 | [inc/exact](inc/exact) | Exact numbers: sorts `integer` and `rational` (GMP), subsorts of `real`. |
 | [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
-| [inc/rvector](inc/rvector) | Real vectors `[1,2,3]`, scalar product, cross product `_x_`, `abs`, element access. |
-| [inc/rmatrix](inc/rmatrix) | Real matrices: `onemat`, `zeromat`, `chmat`, `trans`, products. Indices start at 0. |
+| [inc/rvector](inc/rvector) | Numerical real vectors `[1,2,3]`, scalar product, cross product `_x_`, `abs`, element access. Not loaded by `inc/all` any more: load it explicitly, and not together with [inc/list](inc/list), which uses `[ ]` for its lists. |
+| [inc/rmatrix](inc/rmatrix) | Numerical real matrices: `onemat`, `zeromat`, `chmat`, `trans`, products. Indices start at 0. Load it explicitly after `inc/rvector`. |
 | [inc/physik](inc/physik), [inc/theophys](inc/theophys), [inc/lagrange](inc/lagrange) | Physical units and formulas, Lagrange formalism. |
 | [inc/physnum](inc/physnum), [inc/mathnum](inc/mathnum) | Numerical values of physical and mathematical constants such as `c`, `e` and `pi`. |
 | [inc/eqnsolve](inc/eqnsolve) | Solving equations. |
@@ -562,7 +564,7 @@ Some examples:
 
 ```text
 (1+2*i)*(3-i)                     # prints (5,5)
-[1,2,3]*[4,5,6]                   # prints 32
+dot([1,2,3],[4,5,6])              # prints 32 (inc/list, inc/linalg)
 3!                                # prints 6
 REWR newton(1,x^2-2,D(x^2-2,x),x) : numerik,calc    # prints 1.41421
 REWR fmin(-1,1,(x-0.3)^2,x) : numerik,calc          # prints 0.3
@@ -618,19 +620,41 @@ derivative rule:
 `Gamma` is written with a capital G because `gamma` is a constant in
 [inc/physik](inc/physik). Outside their real domain the functions give NaN.
 
-### Lists
+### Lists, vectors and matrices
 
-[inc/list](inc/list) adds lists, as terms with the head `list`, like
-Mathematica's `List`: `list(a,b,c)`, the empty list `nil`, and lists of
-lists. Their elements and results have the sort `real`, so that lists nest
-freely; the sort system cannot know the sort of `part(m,1)` before the list
-is there. The functions are symbolic C functions, so their results are seen
-with `REWR` (a plain expression is calculated numerically), and they stay
-unevaluated if an argument is no list:
+[inc/list](inc/list) adds lists in brackets, like Mathematica's `List`
+and Julia's arrays: `[a,b,c]`, the empty list `nil`, and lists of lists.
+The bracket is declared in the library (`BRA [ ]`), and the sort of a list
+follows from its elements: a list of numbers is a `vector`, a list of
+vectors a `matrix` (a list of rows). `vector` is a subsort of `number`, so
+a vector can stand wherever a number can; `matrix` is a subsort of
+`algebra` (see above), so the rules for numbers with their commutative
+product never see a matrix product. `list(a,b,c)` is the old name and
+gives `[a,b,c]`.
+
+The arithmetic of explicit lists is done at once, also without `REWR`:
+element by element for vectors (`[1,2] + [a,b]`, `x*[1,2]`, `[1,2]^2`), for
+the sum of matrices and for a number times a matrix; the product of two
+matrices, of a matrix and a vector, and the integer powers of a matrix are
+the matrix products:
+
+```text
+INC "inc/all"
+INC "inc/list"
+[1,2]*x + [a,b]                     # [x + a, 2 * x + b]
+[[1,2],[3,4]] * [[0,1],[1,0]]       # [ 2  1 ]
+                                    # [ 4  3 ]
+[[1,2],[3,4]] * [x,y]               # [x + 2 * y, 3 * x + 4 * y]
+[[1,2],[3,4]]^2                     # [  7  10 ]
+                                    # [ 15  22 ]
+```
+
+The list functions are symbolic C functions; they stay unevaluated if an
+argument is no list:
 
 | Function | Meaning |
 | --- | --- |
-| `list(a,b,..)`, `nil` | a list, the empty list |
+| `[a,b,..]`, `nil`, `list(a,b,..)` | a list, the empty list, the old name of `[a,b,..]` |
 | `listq(u)`, `length(l)` | `u` is a list; the number of elements |
 | `part(l,i)`, `part(l,i,j)` | element `i` (from 1, `-1` is the last), element `j` of element `i` |
 | `first(l)`, `last(l)`, `rest(l)`, `most(l)` | first, last element; without the first, without the last |
@@ -641,36 +665,28 @@ unevaluated if an argument is no list:
 | `total(l)` | the sum of the elements |
 
 Lists are printed by their shape, as Julia prints arrays: inline as
-`{a, b, {c, d}}`, and a rectangular list of lists that is the whole printed
+`[a, b, [c, d]]`, and a rectangular list of lists that is the whole printed
 term as a grid with aligned columns (numbers right-aligned), deeper ones in
 slices `[1, :, :] = ...`. This is a print function attached with
-`SHOW list ATT show_list`; `SHOW list` prints `list(a,b)` again, in the form
-that can be read back.
-
-```text
-REWR identity(2) : All          # [ 1  0 ]
-                                # [ 0  1 ]
-REWR list(1,list(2,3)) : All    # {1, {2, 3}}
-```
+`SHOW [ ATT show_list`; `SHOW [` prints the plain term again.
 
 `table` and `select` get their body and condition unevaluated (`HOLD`) and
 replace `x` first. `x` must be declared (`CONST kk : real`): an undeclared
 name is a numerical variable with the value 0.
 
 ```text
-INC "inc/list"
 CONST aa,kk : real
-REWR table(aa^kk, kk, range(3)) : All           # {aa, aa ^ 2, aa ^ 3}
-REWR select(range(10), kk, kk > 6) : All        # {7, 8, 9, 10}
-REWR part(list(list(1,2),list(3,4)), 2, 1) : All   # 3
+REWR table(aa^kk, kk, range(3)) : All           # [aa, aa ^ 2, aa ^ 3]
+REWR select(range(10), kk, kk > 6) : All        # [7, 8, 9, 10]
+part([[1,2],[3,4]], 2, 1)                       # 3
+[1,[2,3]]                                       # [1, [2, 3]]
 ```
 
-### Symbolic matrices
+### Matrix functions and symbolic matrices
 
-[inc/linalg](inc/linalg) (load it after `inc/list`) works with matrices as
-lists of rows, `list(list(a,b),list(c,d))`, and vectors as lists. The
-entries may be any terms. The functions are symbolic C functions
-([symmat.c](src/symmat.c)):
+[inc/linalg](inc/linalg) (load it after `inc/list`) has the functions of
+linear algebra. The entries may be any terms. The functions are symbolic
+C functions ([symmat.c](src/symmat.c)):
 
 | Function | Meaning |
 | --- | --- |
@@ -678,8 +694,8 @@ entries may be any terms. The functions are symbolic C functions
 | `dot(a,b)` | matrix product, matrix times vector, scalar product (like terms collected, sums not multiplied out) |
 | `det(m)` | determinant |
 | `linsolve(m,b)` | the solution `x` of `m.x = b`, `b` a vector or a matrix (several right-hand sides); unevaluated if `m` is singular |
-| `inverse(m)` | the inverse matrix |
-| `thread(u)` | arithmetic and functions of lists element by element: `list(1,2)*x + list(a,b)` is `list(x+a, 2*x+b)` |
+| `inverse(m)` | the inverse matrix, also `m^(-1)` |
+| `thread(u)` | functions of lists element by element: `sin([a,b])` is `[sin(a), sin(b)]` |
 
 `det`, `linsolve` and `inverse` use Bareiss' fraction-free elimination:
 the entries become sparse polynomials in their atoms (every factor that is
@@ -696,18 +712,16 @@ Mathematica's `Listable` functions:
 INC "inc/list"
 INC "inc/linalg"
 CONST g : real
-REWR det(list(list(a,b),list(g,n))) : All                    # a * n - b * g
-REWR linsolve(list(list(a,1,1),list(1,a,1),list(1,1,a)),list(1,1,1)) : All
-                                                             # {1 / (2 + a ), 1 / (2 + a ), 1 / (2 + a )}
-REWR det(list(list(2,1),list(1,2)) - x*identity(2)) : All    # 3 + x ^ 2 - 4 * x
-REWR list(1,2)*x + list(a,b) : Listable                      # {x + a, 2 * x + b}
+det([[a,b],[g,n]])                                # a * n - b * g
+linsolve([[a,1,1],[1,a,1],[1,1,a]],[1,1,1])       # [1 / (a + 2 ), 1 / (a + 2 ), 1 / (a + 2 )]
+det([[2,1],[1,2]] - x*identity(2))                # x ^ 2 + 3 - 4 * x
+REWR sin([x,2*x]) : Listable                      # [sin (x ), sin (2 * x )]
 ```
 
 **Symbolic matrices.** `CONST A,B : matrix` declares symbolic matrices,
-whose product does not commute; `mat(list(list(1,2),list(3,4)))` is an
-explicit one. The rule set `MatrixRules` knows the laws of the algebra and
-of matrices, and `MatrixSolve` isolates an unknown matrix from the left or
-from the right:
+whose product does not commute; they mix with explicit ones. The rule set
+`MatrixRules` knows the laws of the algebra and of matrices, and
+`MatrixSolve` isolates an unknown matrix from the left or from the right:
 
 ```text
 CONST A,B,C,X : matrix
@@ -716,7 +730,8 @@ REWR inverse(A*B*C) : MatrixRules                      # inverse (C )* inverse (
 REWR A*(B+C) - A*B : MatrixRules                       # A * C
 REWR A*B - B*A : MatrixRules                           # stays: no commutation
 REWR msolve(X*A + C == B, X) : (MatrixSolve, MatrixRules)   # (B - C )* inverse (A )
-REWR det(mat(list(list(a,b),list(n,y)))) : MatrixRules      # a * y - b * n
+REWR det(A*[[a,b],[n,y]]) : MatrixRules                # det (A )* (a * y - b * n )
+REWR 2*A*[x,y] : MatrixRules                           # stays: a vector is no scalar
 ```
 
 (In a library loaded after inc/alg, `A`, `B`, `C` are variables already;
@@ -743,14 +758,15 @@ Complex roots use the imaginary unit `im`; trigonometric equations give
 the principal solutions, as Mathematica's `Solve` without the integer
 constant. Every solution is checked (numerically where possible), so the
 extra solutions of squaring and those that make the equation undefined are
-removed. A system of linear equations, `solve(list(eq1, eq2), list(x, y))`,
+removed. A system of linear equations, `solve([eq1, eq2], [x, y])`,
 gives the list of the values of the unknowns, solved with Bareiss'
 elimination of [inc/linalg](inc/linalg). A nonlinear system gives the list
 of the solution tuples: an unknown that occurs linearly is eliminated by
 substitution, and two polynomial equations by their resultant
 (`resultant(f, g, y)`, the determinant of the Sylvester matrix); every
-tuple is checked in all equations. `solve(list(x^2 + y^2 == 5, x - y == 1),
-list(x, y))` gives the tuples `{2, 1}` and `{-1, -2}`.
+tuple is checked in all equations. `solve([x^2 + y^2 == 5, x - y == 1],
+[x, y])` gives the tuples `[2, 1]` and `[-1, -2]`, printed as the rows of
+a matrix.
 The analysis is done by C helpers ([symsolve.c](src/symsolve.c)), the
 methods themselves are an ordered rule list.
 
@@ -759,14 +775,14 @@ INC "inc/all"
 INC "inc/integration/all"       # im
 INC "inc/list"
 INC "inc/solve"
-REWR solve(x^2 + 4*x + 7 == 0, x) : Solve               # {3 ^ (1/2) * im - 2, -2 - 3 ^ (1/2) * im}
-REWR solve(exp(2*x) - 3*exp(x) + 2 == 0, x) : Solve     # {0.693147, 0}
-REWR solve(sqrt(x+1) == x - 1, x) : Solve               # {3}
-REWR solve(list(x + y == 3, x - y == 1), list(x, y)) : Solve   # {2, 1}
+REWR solve(x^2 + 4*x + 7 == 0, x) : Solve               # [3 ^ (1/2) * im - 2, -2 - 3 ^ (1/2) * im]
+REWR solve(exp(2*x) - 3*exp(x) + 2 == 0, x) : Solve     # [0.693147, 0]
+REWR solve(sqrt(x+1) == x - 1, x) : Solve               # [3]
+REWR solve([x + y == 3, x - y == 1], [x, y]) : Solve   # [2, 1]
 ```
 
 With exact numbers, the results are exact: `exp(2*x+1) = 5` gives
-`{(1/2) * ln (5 )- (1/2)}`, `sin(x) = 1/2` gives `{(1/6) * pi, (5/6) * pi}`.
+`[(1/2) * ln (5 )- (1/2)]`, `sin(x) = 1/2` gives `[(1/6) * pi, (5/6) * pi]`.
 
 ### Symbolic helper functions
 
@@ -1002,11 +1018,12 @@ where the library [inc/](inc) and the tests are used from.
   polynomials in several variables (`polygcd`, `cancel`).
 - Equations ([inc/solve](inc/solve)): `solve(lhs == rhs, x)` with rules in
   the style of PRESS, linear systems.
-- Symbolic matrices on lists ([inc/linalg](inc/linalg)): `det`, `linsolve`,
-  `inverse`, `dot`, `transpose` with fraction-free elimination; arithmetic
-  on lists element by element.
-- Lists as terms ([inc/list](inc/list)): `list(a,b,c)`, `part`, `table`,
-  `select`, ...
+- Matrices ([inc/linalg](inc/linalg)): `det`, `linsolve`, `inverse`,
+  `dot`, `transpose` with fraction-free elimination.
+- Lists in brackets ([inc/list](inc/list)): `[a,b,c]` is a `vector`,
+  `[[a,b],[c,d]]` a `matrix`, with their arithmetic (element by element,
+  matrix products) and `part`, `table`, `select`, ... The numerical
+  vectors of inc/rvector are no longer loaded by inc/all.
 - `SUBSORT real,complex`: complex functions take real arguments; exact
   variants keep precedence over conversions, ties are reported.
 - The sort `number` above `real` and `complex` for symbolic expressions:

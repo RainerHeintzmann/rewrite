@@ -1,3 +1,7 @@
+# Needs inc/all, inc/rvector and inc/rmatrix (numerical vectors and matrices):
+#     INC "inc/all"
+#     INC "inc/rvector"
+#     INC "inc/rmatrix"
 CONST h,k,l,lambda,Egy,cnt,cmax,thick,mu : real
 CONST Egyf,muf : rvector
 Egyf=zerovec(1000)

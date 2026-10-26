@@ -46,7 +46,7 @@ SUBSORT real,complex ATT real2cpx
 # of number are complex numbers, but the variants on number below have no C
 # function: they only stand for the symbolic term.
 SORT number
-ATT number show_complex,cmp_complex,cpy_complex,del_complex
+ATT number show_number,cmp_complex,cpy_complex,del_complex
 SUBSORT real,number ATT real2cpx
 SUBSORT complex,number ATT cpx2num
 # variables of sort number: they match terms of every sort below number
@@ -57,7 +57,7 @@ VAR Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
 # a commutative product, like the integration) do not see the elements of
 # algebra that are no numbers.
 SORT algebra
-ATT algebra show_complex,cmp_complex,cpy_complex,del_complex
+ATT algebra show_number,cmp_complex,cpy_complex,del_complex
 SUBSORT number,algebra ATT cpx2num
 VAR Aal,Bal,Cal,Xal,Yal,Zal : algebra
 

@@ -1,5 +1,7 @@
 # Complex numbers, real vectors and real matrices (indices start at 0).
 INC "inc/all"
+INC "inc/rvector"
+INC "inc/rmatrix"
 (1+2*i)*(3-i)
 Cpx(1,2)
 [1,2,3]+[4,5,6]

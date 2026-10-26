@@ -4,8 +4,6 @@
 INC "inc/alg"
 # INC "inc/bool"
 INC "inc/pdiff"
-INC "inc/rvector"
-INC "inc/rmatrix"
 INC "inc/physik"
 INC "inc/theophys"
 INC "inc/lagrange"

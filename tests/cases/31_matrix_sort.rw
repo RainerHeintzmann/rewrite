@@ -1,6 +1,6 @@
-# The sorts algebra (inc/alg) and matrix (inc/linalg): symbolic matrices with a
+# The sorts algebra (inc/alg) and matrix (inc/list): symbolic matrices with a
 # product that does not commute, the rules MatrixRules, explicit matrices
-# mat(list(..)), and matrix equations (MatrixSolve).
+# [[..],[..]] mixed with symbolic ones, and matrix equations (MatrixSolve).
 INC "inc/all"
 INC "inc/integration/all"
 INC "inc/list"
@@ -15,10 +15,12 @@ REWR MA*MB*inverse(MB)*MC : MatrixRules
 REWR MA*(MB+MC) - MA*MB : MatrixRules
 REWR MA*MB - MB*MA : MatrixRules
 REWR transpose(2*MA*g*MB) : MatrixRules
-REWR mat(list(list(1,2),list(3,4))) * mat(list(list(0,1),list(1,0))) : MatrixRules
-REWR det(mat(list(list(a,b),list(g,n)))) : MatrixRules
-REWR inverse(mat(list(list(1,2),list(3,4)))) : MatrixRules
-REWR 2*mat(list(list(1,2),list(3,4))) + mat(list(list(1,0),list(0,1))) : MatrixRules
+REWR [[1,2],[3,4]] * [[0,1],[1,0]] : MatrixRules
+REWR det([[a,b],[g,n]]) : MatrixRules
+REWR inverse([[1,2],[3,4]]) : MatrixRules
+REWR 2*[[1,2],[3,4]] + [[1,0],[0,1]] : MatrixRules
+REWR MA*[[1,2],[3,4]]*Id : MatrixRules
+REWR 2*MA*[x,y] : MatrixRules
 REWR msolve(MA*MX == MB, MX) : (MatrixSolve, MatrixRules)
 REWR msolve(MX*MA + MC == MB, MX) : (MatrixSolve, MatrixRules)
 REWR msolve(transpose(MA*MX) == MB, MX) : (MatrixSolve, MatrixRules)

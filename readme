@@ -414,11 +414,17 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    Operatoren der Bibliothek ueber Rollen ("+", "cos", "pi", ...); eine
    Bibliothek mit anderen Namen ordnet sie zu: SYMBOLIC "cos" = "kos".
  - matchq(u, Muster, Bedingung): Rubis MatchQ mit dem Matcher der Regellisten.
- - Listen als Terme (inc/list): list(a,b,c), nil, part, length, table, select, ...
- - Symbolische Matrizen als Listen von Zeilen (inc/linalg, symmat.c): det,
-   linsolve, inverse mit Bareiss' bruchfreier Elimination auf duennen
-   Polynomen, dot, transpose, identity; Rechnen mit Listen elementweise
-   (thread, Listable), z.B. det(m - x*identity(2)).
+ - Listen in eckigen Klammern (inc/list): [a,b,c] hat die Sorte vector (unter
+   number), [[a,b],[c,d]] die Sorte matrix (unter algebra, eine Liste von
+   Zeilen); nil, part, length, table, select, ...; list(a,b,c) ist der alte
+   Name. Mit Listen wird sofort gerechnet: elementweise fuer Vektoren,
+   Matrix mal Matrix oder Vektor und Potenzen als Matrixprodukt,
+   z.B. [[1,2],[3,4]] * [5,6] = [17, 39]. Die numerischen Vektoren und
+   Matrizen (inc/rvector, inc/rmatrix) laedt inc/all nicht mehr.
+ - Matrixfunktionen (inc/linalg, symmat.c): det, linsolve, inverse mit
+   Bareiss' bruchfreier Elimination auf duennen Polynomen, dot, transpose,
+   identity; Funktionen von Listen elementweise (thread, Listable),
+   z.B. det(m - x*identity(2)).
  - Exakte Ergebnisse: Funktionen exakter Zahlen bleiben Terme (ln(2), pi/6),
    ausser ihr Wert ist exakt (cos(pi/3) = 1/2, arcsin(1/2) = pi/6);
    ggT von Polynomen in mehreren Variablen (polygcd, cancel).
@@ -428,10 +434,11 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    quadrieren), Loesungen werden geprueft; lineare Gleichungssysteme mit
    Bareiss-Elimination, nichtlineare durch Einsetzen und Resultanten.
  - Die Sorte algebra (nicht kommutatives Produkt) oberhalb von number und die
-   Sorte matrix darunter (inc/linalg): symbolische Matrizen mit den Regeln
-   MatrixRules, explizite Matrizen mat(list(..)), Matrixgleichungen (msolve).
+   Sorte matrix darunter: symbolische Matrizen (CONST A : matrix) mit den
+   Regeln MatrixRules (inc/linalg), auch zusammen mit expliziten,
+   Matrixgleichungen (msolve).
  - SHOW f ATT name: eigene C-Ausgabefunktion fuer eine Funktion. Listen werden
-   damit nach ihrer Form ausgegeben (wie in Julia): als {a, b}, eine Matrix
+   damit nach ihrer Form ausgegeben (wie in Julia): als [a, b], eine Matrix
    als ganzer ausgegebener Term als Gitter mit ausgerichteten Spalten.
  - SUBSORT real,complex: komplexe Funktionen nehmen auch reelle Argumente; eine
    genau passende Variante hat Vorrang vor Umwandlungen, die wenigsten

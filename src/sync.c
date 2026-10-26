@@ -18,6 +18,7 @@
 #include "inout.h"
 #include "defs.h"
 #include "nodes.h"
+#include "symfn.h"		/* 2026: term_has_builtin */
 
 #define BLOCK_OPEN '{'
 #define BLOCK_CLOSE  '}'
@@ -265,6 +266,12 @@ if (rslt=calculate (np ->r))
 	print(rslt);
 	delnum((Symbol *) rslt,TRUE); /* also value */
 	}
+else if (term_has_builtin(np -> r))	/* 2026: symbolic C functions, e.g. [1,2] + [3,4] */
+	{
+	rslt = tcalc(tcopy(np -> r));
+	print(rslt);
+	delete(rslt);
+	}
 else print(np -> r);
 
 /* printfOut("\t"); */ /* print tab */
@@ -306,6 +313,20 @@ while (((froass)->type != Const) && (froass->type != Func))
 	froass=froass->l;
 	}
 rslt = calculate(froass);
+
+/* 2026: a term of another sort, e.g. a list [2,3,4] for a real constant,
+   has no value of the sort of the constant: an error, the constant is
+   not changed (terms are stored in a TERM) */
+if (! rslt && get_type(froass) && rtypes(toass) && get_type(froass) != rtypes(toass)
+    && sort_dist(get_type(froass), rtypes(toass)) < 0)
+	{
+	ErrorMsg("");
+	printfErr("Wrong const-assignment : '%s' is of sort %s, the term is of sort %s;\n"
+	          "  a term is stored in a TERM, e.g. TERM t : %s\n",
+	          name(toass), name((Symbol *) rtypes(toass)), name((Symbol *) get_type(froass)),
+	          name((Symbol *) get_type(froass)));
+	return;
+	}
 
 /* 2026: without a value (e.g. a = nothing) the value is deleted, for every
    sort; otherwise the sort must fit (subsorts allowed) */

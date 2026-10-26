@@ -34,6 +34,7 @@ extern double prof_match_secs;
 extern long prof_match_calls;            /* term: Func node of a builtin */
 int term_equal (Node * a, Node * b);          /* structurally equal terms */
 Node * term_copy (Node * t);                  /* copy of a term */
+int term_has_builtin (Node * t);              /* a symbolic C function somewhere in t */
 int term_has_nan (Node * t);                  /* contains NaN, infinity, 1/0 or a failed polyquotient */
 Node * numeric_contagion (Node * t);          /* 2^(1/2)*0.7 as a real number, or NULL */
 Node * numeric_real (Node * t);               /* value with real numbers, or NULL */
