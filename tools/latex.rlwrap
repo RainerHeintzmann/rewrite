@@ -53,15 +53,18 @@ $filter -> run;
 
 my ($typed, $at, $shown);	# the typed text, the history index shown, its line
 
+# The first value returned is shown in rlwrap's echo area: always "",
+# never the key (rlwrap would print ESC[B, the cursor would move down).
 sub hotkey {
 	my ($key, $prefix, $postfix, $history, $histpos) = @_;
 	my $up = $key eq "\e[A" || $key eq "\eOA";
 	my $down = $key eq "\e[B" || $key eq "\eOB";
-	return @_ unless $up || $down;
+	my @same = ("", $prefix, $postfix, $history, $histpos);	# the line unchanged
+	return @_ unless $up || $down;		# another hotkey: for another filter
 	my @lines = split /\n/, $history;
 	my $line = $prefix . $postfix;
 	if (! defined $shown || $line ne $shown) {	# a new search
-		return @_ if $down;
+		return @same if $down;		# at the newest line already: nothing
 		($typed, $at, $shown) = ($line, scalar @lines, undef);
 	}
 	my $step = $up ? -1 : 1;
@@ -78,7 +81,7 @@ sub hotkey {
 		($typed, $at, $shown) = (undef, undef, undef);
 		return ("", $t, "", $history, $histpos);
 	}
-	return @_;			# no earlier line: unchanged
+	return @same;			# no earlier line: unchanged
 }
 
 # ---- colours (NO_COLOR: none). The output: errors red, warnings yellow,

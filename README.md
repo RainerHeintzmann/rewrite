@@ -61,9 +61,11 @@ There are an interactive and a non-interactive way to run rewrite:
 | `rewrite -h` | Shows these options. |
 | `rewrite --no-startup` | Interactive without the startup file. |
 
-An interactive session first runs the startup file `~/.rewrite/startup.rw`
-if it exists, as Julia's `startup.jl`; `~` is `HOME` (in the MSYS2 shell
-`C:\msys64\home\<user>`), otherwise `USERPROFILE` (`C:\Users\<user>`).
+An interactive session first runs the startup file `.rewrite/startup.rw`
+if it exists, as Julia's `startup.jl`. It is looked for in `HOME` (in the
+MSYS2 shell `C:\msys64\home\<user>`), then in the Windows profile folder
+(`C:\Users\<user>`), so one file there serves all terminals. A UTF-8 byte
+order mark (Notepad) at the start of a line is ignored.
 Scripts and pipes do not run it. A line `INC "inc/all"` in it loads the
 library in every session.
 

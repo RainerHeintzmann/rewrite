@@ -1160,12 +1160,13 @@ static const char * startup_file (void)
 {
 	/* HOME first, then the Windows home: in the MSYS2 shell HOME is
 	   C:\msys64\home\<user>, elsewhere only USERPROFILE C:\Users\<user> */
-	const char * homes[2];
+	const char * homes[3];
 	FILE * f;
 	int i;
 	homes[0] = getenv("HOME");
 	homes[1] = getenv("USERPROFILE");
-	for (i = 0; i < 2; i++)
+	homes[2] = windows_home();	/* the same, from Windows (console.c) */
+	for (i = 0; i < 3; i++)
 		{
 		if (! homes[i] || ! * homes[i]) continue;
 		snprintf(startup_path, sizeof startup_path, "%s/.rewrite/startup.rw", homes[i]);
