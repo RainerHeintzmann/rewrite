@@ -82,7 +82,8 @@ void on_interrupt (int sig)
 }
 
 /* 2026: step limit, so that a rule loop does not let REWR run forever */
-long max_rewrite_steps = 100000;
+long max_rewrite_steps = 100000;	/* 2026: MAXSTEPS, --max-steps */
+long max_term_depth = 1000;		/* 2026: MAXDEPTH, --max-depth (levels of the term) */
 static long rewrite_steps = 0;
 static int  rewrite_depth = 0;
 static BOOLEAN step_limit_hit = FALSE;
@@ -282,9 +283,12 @@ void rewrite_end (void)
 
 /* 2026: a rule that makes the term deeper on every step (f(c) = c*f(1),
    applied again inside) would overflow the C stack in the recursion here
-   long before the step limit: REWR stops at this depth. Real terms are a
-   few hundred levels deep at most. */
-#define MAX_TERM_DEPTH 20000
+   long before the step limit: REWR stops at the depth max_term_depth. The
+   recursion goes through the function node and the argument list, two
+   calls per level of the term. The default 1000 still fits a sum of 1000
+   summands (longer ones need more than the step limit anyway). Each step
+   searches the whole term again, so a runaway rule costs time quadratic in
+   this limit. */
 static int position_depth = 0;
 
 static BOOLEAN find_position_at (Node * * p_term, Node * rtree);
@@ -292,13 +296,14 @@ static BOOLEAN find_position_at (Node * * p_term, Node * rtree);
 BOOLEAN find_position (Node * * p_term, Node * rtree)
 {
 	BOOLEAN r;
-	if (position_depth >= MAX_TERM_DEPTH)
+	if (position_depth >= 2 * max_term_depth)
 		{
 		if (! step_limit_hit)
 			{
 			step_limit_hit = TRUE;
-			printfErr("REWR : the term became deeper than %d levels (a rule that keeps "
-			          "growing it?), the result is not complete\n", MAX_TERM_DEPTH);
+			printfErr("REWR : the term became deeper than about %ld levels (a rule that "
+			          "keeps growing it? MAXDEPTH sets the limit), the result is not complete\n",
+			          max_term_depth);
 			}
 		return FALSE;
 		}
@@ -392,8 +397,8 @@ static BOOLEAN find_position_at (Node * * p_term, Node * rtree)
 				if (++rewrite_steps > max_rewrite_steps && ! step_limit_hit)
 					{
 					step_limit_hit = TRUE;
-					printfErr("REWR : step limit (%ld rewrites) reached, the result is not complete\n",
-					          max_rewrite_steps);
+					printfErr("REWR : step limit (%ld rewrites, MAXSTEPS sets it) reached, "
+					          "the result is not complete\n", max_rewrite_steps);
 					}
 				return TRUE;
 			}

@@ -1,5 +1,6 @@
 ADDSPEC
 ALG
+ALIAS
 ATT
 All
 BRA
@@ -38,6 +39,8 @@ LB
 LIFT
 LOCAL
 Listable
+MAXDEPTH
+MAXSTEPS
 MatrixRules
 MatrixSolve
 NIN

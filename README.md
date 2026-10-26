@@ -60,6 +60,8 @@ There are an interactive and a non-interactive way to run rewrite:
 | `rewrite < file` | Reads the program from a pipe or file, without welcome message and prompts (for scripts and the tests). |
 | `rewrite -h` | Shows these options. |
 | `rewrite --no-startup` | Interactive without the startup file. |
+| `rewrite --max-steps n` | Sets the step limit of `REWR` (as `MAXSTEPS n`). |
+| `rewrite --max-depth n` | Sets the depth limit of `REWR` (as `MAXDEPTH n`). |
 
 An interactive session first runs the startup file `.rewrite/startup.rw`
 if it exists, as Julia's `startup.jl`. It is looked for in `HOME` (in the
@@ -216,8 +218,14 @@ REWRITE_PROFILE=1 ./rewrite.exe < problem.rw
   is `θ`, `\_1` is `₁`, `\hbar` is `ħ` (Julia's table of about 2500
   names, [src/latex.c](src/latex.c)). A name that ends in a letter must not
   be followed by a letter, so `\alphax` stays as it is. The output prints
-  the characters. For now Unicode operators such as `≤` or `×` are read as
-  letters, so they need blanks around them.
+  the characters.
+- Unicode operators are tokens of their own, also without blanks: `a≤b` is
+  `a ≤ b`, `3×4` is `3 × 4`. These are the signs `× ÷ · ± ¬`, the arrows
+  and the mathematical operators, except the ones used as names (`∂ ∇ ∞`,
+  sums and integrals). Their meaning comes from the library: `inc/alg`
+  declares `ALIAS "×" = "*"`, so `×` is read as `*`, and likewise
+  `≤ ≥ ≠ ⋅ · ÷ − ∧ ∨ ¬ √ π` (`√16` is `sqrt 16`). The output uses the
+  ASCII names. `\le`, `\times`, `\sqrt` ... give the characters.
 
 ### Defining data types and operators
 
@@ -397,8 +405,17 @@ A rule list of several thousand rules is fast, because a quick test of the
 function names skips most rules without running the matcher.
 
 **Step limit.** One `REWR` stops after 100000 rewriting steps with the
-message `REWR : step limit (100000 rewrites) reached`. Rules that loop
-therefore do not hang the interpreter.
+message `REWR : step limit (100000 rewrites, MAXSTEPS sets it) reached`.
+Rules that loop therefore do not hang the interpreter. `MAXSTEPS n` sets
+the limit, `MAXSTEPS` alone shows it.
+
+**Depth limit.** A rule that makes the term deeper on every step, such as
+`lin(c) = c*lin(1)` (it applies again to `lin(1)`), would overflow the
+stack of the interpreter long before the step limit. `REWR` therefore also
+stops when the term becomes deeper than 1000 levels. `MAXDEPTH n` sets this
+limit, `MAXDEPTH` alone shows it. A sum of 1000 summands is 1000 levels
+deep; a higher limit costs time when a rule runs away (quadratic in the
+limit), and a very high one can crash the interpreter.
 
 The trick behind `LIFT`: once the group rules for `+` and `-` are written,
 the ring rules for `*` and `/` can be derived from them:
@@ -618,7 +635,9 @@ This prints `10 20 30`.
 | `DATA Const` | Reads the next number from the data file into `Const`. Non-numeric text up to the end of the line is skipped. |
 | `SYS "command"` | Runs a shell command. |
 | `DEBUG n` | Sets the debug level of the interpreter. |
+| `ALIAS "name" = "symbol"` | The name is read as the symbol from now on, e.g. `ALIAS "×" = "*"`; mainly for Unicode operators. |
 | `SYMBOLIC "role" = "symbol"` | The symbolic C functions (helpers) use `symbol` where they need the function or constant `role` (`"cos"`, `"+"`, `"pi"`, ...), see [Symbolic helper functions](#symbolic-helper-functions). `SYMBOLIC` alone clears the mapping. |
+| `MAXSTEPS n`, `MAXDEPTH n` | The step and the depth limit of `REWR` (default 100000 and 1000); without `n` they are shown, see [Rule sets](#rule-sets-algebras-and-rewriting). |
 | `STEPS Alg "file"` | Shows each applied rule of the rule list of `Alg` (solution steps), labelled from `file` (lines `index<TAB>label<TAB>text`); `STEPS Alg ""` switches it off. |
 | `QUIT` | Ends the program. |
 

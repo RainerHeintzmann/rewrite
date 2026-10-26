@@ -13,3 +13,15 @@ SYM \theta : real
 [[\theta, 1], [22, \theta^2]]
 # a name followed by a letter is no name: \alphax stays
 PRT "\alphax and \alpha and \hbar\n"
+# Unicode operators are tokens of their own, also between numbers and
+# names; inc/alg gives them their meaning with ALIAS (2026)
+3×4, 12÷4−1, 2·5, 3\times 4
+2≤3, 3≥4, 2≠2, (1≤2)∧(2≤1), (1≤2)∨(2≤1), ¬(1≤2)
+√16, \sqrt(9), π
+REWR D(x^2−3×x,x) : All
+REWR (a≤b) : All
+SYM x² : real
+x² = 4
+x²×2
+ALIAS "⊕" = "+"
+2⊕3

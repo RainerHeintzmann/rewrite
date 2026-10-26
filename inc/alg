@@ -224,6 +224,22 @@ OTHER -     : complex >> complex                ATT c_ai
 OTHER -     : real >> real                      ATT ai
 
 FUNC mi     : ring >> ring                       # multiplicative inverse
+
+# 2026: Unicode operators (each a token of its own, also in a≤b) and names,
+# read as the ASCII ones; typed as \le, \times, \pi, ... + TAB in rewrite-rl
+ALIAS "≤" = "<="
+ALIAS "≥" = ">="
+ALIAS "≠" = "!="
+ALIAS "×" = "*"
+ALIAS "⋅" = "*"
+ALIAS "·" = "*"
+ALIAS "÷" = "/"
+ALIAS "−" = "-"
+ALIAS "∧" = "&&"
+ALIAS "∨" = "||"
+ALIAS "¬" = "not"
+ALIAS "√" = "sqrt"
+ALIAS "π" = "pi"
 OTHER mi    : field >> field                  
 OTHER mi    : cfield >> cfield               
 OTHER mi    : complex >> complex                ATT c_mi

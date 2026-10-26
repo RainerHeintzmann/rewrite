@@ -27,6 +27,7 @@ static const Reserved words [] = {	/* sorted */
 	{ ">>",     PFEIL },
 	{ "ADDSPEC",ADDSPEC },
 	{ "ALG",    ALG },
+	{ "ALIAS",  ALIAS },    /* ALIAS "×" = "*": another name of a symbol (2026) */
 	{ "ATT",    ATT },
 	{ "BRA",    BRA },
 	{ "COMM",   COMM },     /* commutative functions (2026) */
@@ -55,6 +56,8 @@ static const Reserved words [] = {	/* sorted */
 	{ "LB",     LB  },
 	{ "LIFT",   LIFT  },
 	{ "LOCAL",  LOCAL },
+	{ "MAXDEPTH", MAXDEPTH },   /* limits of REWR (2026) */
+	{ "MAXSTEPS", MAXSTEPS },
 	{ "NIN",    NIN },
 	{ "NUMPAT", NUMPAT },   /* pattern variables for numbers (2026, formerly NUM) */
 	{ "OPT",    OPT },      /* optional meta variables (2026) */
@@ -105,11 +108,42 @@ static int scmp _2a ((va, vb), const void * va, const void * vb)
 #undef	b
 }
 
+/* 2026: ALIAS "×" = "*": the name × is read as *. The libraries give the
+   Unicode operators (≤, ×, ...) their meaning this way, and printing keeps
+   the original name. */
+#define MAXALIAS 128
+static struct { char * from, * to; } aliases[MAXALIAS];
+static int naliases = 0;
+
+void alias_def (const char * from, const char * to)
+{
+	int i;
+	for (i = 0; i < naliases; i++)
+		if (strcmp(aliases[i].from, from) == 0) break;
+	if (i == naliases)
+		{
+		if (naliases == MAXALIAS) { printfErr("ALIAS : too many aliases\n"); return; }
+		aliases[naliases++].from = strdup(from);
+		}
+	else
+		free(aliases[i].to);
+	aliases[i].to = strdup(to);
+}
+
+static const char * unalias (const char * name)
+{
+	int i;
+	for (i = 0; i < naliases; i++)
+		if (strcmp(aliases[i].from, name) == 0) return aliases[i].to;
+	return name;
+}
+
 int lookup _1a ((name), const char * name)
 {	Reserved r, * rp;
 
 	Symbol s, ** pp;
 
+	name = unalias(name);
 	name(& r) = (char *)  name;
 	if (rp = (Reserved *) bsearch (& r, words, DIM(words), sizeof r, rcmp))
 		{

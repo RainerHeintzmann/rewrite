@@ -1,5 +1,6 @@
 ADDSPEC	keyword
 ALG	keyword
+ALIAS	keyword
 ATT	keyword
 BRA	keyword
 COMM	keyword
@@ -28,6 +29,8 @@ LA5	keyword
 LB	keyword
 LIFT	keyword
 LOCAL	keyword
+MAXDEPTH	keyword
+MAXSTEPS	keyword
 NIN	keyword
 NUMPAT	keyword
 OPT	keyword

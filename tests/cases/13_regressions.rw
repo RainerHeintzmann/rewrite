@@ -23,3 +23,19 @@ nb = abs(novec+vx)
 TERM tq : real
 REWR D(tq,x) : All
 tq
+# A rule that makes the term deeper on every step overflowed the C stack
+# (2026): REWR stops at the depth MAXDEPTH, MAXSTEPS limits the rewrites.
+MAXSTEPS
+MAXDEPTH
+MAXDEPTH 40
+FUNC lin : real >> real
+PAT Lc : real
+ALG Lin
+SPEC Lin : IF NIN(x, Lc) lin(Lc) = Lc*lin(1)
+REWR lin(5) : (Lin)
+MAXDEPTH 1000
+MAXSTEPS 10
+REWR lin(5) : (Lin)
+MAXSTEPS 100000
+MAXDEPTH 0
+"survived"

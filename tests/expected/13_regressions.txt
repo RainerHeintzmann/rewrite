@@ -5,3 +5,11 @@ survived
 >> REWR D(tq,x) : All
 Error in stdin : TERM tq has no term yet: assign one first, e.g. tq = REWR ... : All
 tq 
+REWR : the term became deeper than about 40 levels (a rule that keeps growing it? MAXDEPTH sets the limit), the result is not complete
+MAXSTEPS 100000
+MAXDEPTH 1000
+5 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * lin (1 )))))))))))))))))))))))))))))))))))))))
+REWR : step limit (10 rewrites, MAXSTEPS sets it) reached, the result is not complete
+5 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * (1 * lin (1 )))))))))))
+MAXDEPTH : expected a number from 1 to 10^9
+survived

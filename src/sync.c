@@ -386,6 +386,39 @@ void setdebug (Node * np)
 	setDebug((int) d);
 }
 
+/* 2026: ALIAS "from" = "to": the name from is read as to (sym.c) */
+void alias_fn (Node * np)
+{
+	alias_def(name((Symbol *) np->r->l), name((Symbol *) np->r->r));
+}
+
+/* 2026: MAXSTEPS n, MAXDEPTH n set a limit of REWR; without n they show it */
+static void set_limit (Node * np, long * limit, const char * what)
+{
+	double d;
+	if (! np->r)
+		{
+		printf("%s %ld\n", what, * limit);
+		return;
+		}
+	if (! num_to_double((Symbol *) np->r, & d) || d < 1 || d > 1e9)
+		{
+		printfErr("%s : expected a number from 1 to 10^9\n", what);
+		return;
+		}
+	* limit = (long) d;
+}
+
+void maxsteps_fn (Node * np)
+{
+	set_limit(np, & max_rewrite_steps, "MAXSTEPS");
+}
+
+void maxdepth_fn (Node * np)
+{
+	set_limit(np, & max_term_depth, "MAXDEPTH");
+}
+
 void numassign2 (Node * froass, Symbol * toass)   /* sets or deletes a number */
 {
 Node * rslt;
@@ -1145,13 +1178,16 @@ return 0;
 
 static void usage (void)
 {
-	printf("Usage: rewrite [-i] [--no-startup] [file ...]\n"
+	printf("Usage: rewrite [-i] [--no-startup] [--max-steps n] [--max-depth n] [file ...]\n"
 	       "  rewrite              read statements from the keyboard (or a pipe)\n"
 	       "  rewrite file ...     run the files, then exit\n"
 	       "  rewrite -i file ...  run the files, then continue interactively\n"
 	       "  rewrite < file       run a file without prompts (as in scripts)\n"
 	       "An interactive session first runs ~/.rewrite/startup.rw if it exists\n"
-	       "(~ is HOME, else USERPROFILE); --no-startup skips it.\n");
+	       "(~ is HOME, else USERPROFILE); --no-startup skips it.\n"
+	       "--max-steps n   REWR stops after n rewrites (default 100000), as MAXSTEPS n\n"
+	       "--max-depth n   REWR stops when the term is deeper than n levels (default\n"
+	       "                1000), as MAXDEPTH n\n");
 }
 
 /* 2026: the startup file of an interactive session, as Julia's startup.jl:
@@ -1196,12 +1232,28 @@ int main(int argc, char * argv []) /* no space between main and '(' ! */
 	const char * start = NULL;
 	inc_level=0;
 	console_utf8();		/* 2026: Unicode names, console.c */
-	for (i = 1; i < argc; i++)		/* 2026: options and files */
+	for (i = 1; i < argc; i++)		/* 2026: options and files; an option is removed */
 		{
+		long * limit = NULL;
 		if (! strcmp(argv[i], "-h") || ! strcmp(argv[i], "--help")) { usage(); return 0; }
 		else if (! strcmp(argv[i], "-i")) force = 1;
 		else if (! strcmp(argv[i], "--no-startup")) nostart = 1;
-		else files++;
+		else if (! strcmp(argv[i], "--max-steps")) limit = & max_rewrite_steps;
+		else if (! strcmp(argv[i], "--max-depth")) limit = & max_term_depth;
+		else { files++; continue; }
+		if (limit)
+			{
+			char * end = NULL;
+			long n = i + 1 < argc ? strtol(argv[i + 1], & end, 10) : 0;
+			if (n < 1 || * end)
+				{
+				fprintf(stderr, "rewrite : %s needs a number from 1 on\n", argv[i]);
+				return 1;
+				}
+			* limit = n;
+			argv[i++] = NULL;
+			}
+		argv[i] = NULL;
 		}
 	/* an interactive session (not a script, a pipe or the tests): Ctrl-C stops a
 	   computation instead of ending rewrite; the startup file first */
@@ -1212,7 +1264,7 @@ int main(int argc, char * argv []) /* no space between main and '(' ! */
 			include(start);
 		}
 	for (i = 1; i < argc; i++)
-		if (strcmp(argv[i], "-i") && strcmp(argv[i], "--no-startup"))
+		if (argv[i])
 			include(argv[i]);	/* like INC "file" */
 	if (files && ! force) return 0;
 	interactive = force || isatty(fileno(stdin));

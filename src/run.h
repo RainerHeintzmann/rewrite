@@ -53,6 +53,7 @@ void rewrite_end (void);
 void * rewrite_push (void);  /* 2026: nested REWR (ATT RULES): set the outer state aside */
 void rewrite_pop (void * p);
 extern long max_rewrite_steps;
+extern long max_term_depth;
 
 /* condition functions */
 

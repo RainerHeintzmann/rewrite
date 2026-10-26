@@ -40,6 +40,9 @@ extern void printstring (Node * np);
 extern void printnl (Node * np);
 
 extern void setdebug (Node * np);
+extern void maxsteps_fn (Node * np);
+extern void alias_fn (Node * np);
+extern void maxdepth_fn (Node * np);
 
 extern void numassign2 (Node * froass,Symbol * toass);
 

@@ -496,10 +496,67 @@ static int i;
 #endif
 
 
-#line 499 "<stdout>"
-#line 47 "src/scan.l"
+/* 2026: the length of the Unicode operator character at s (0 if none):
+   these are tokens of their own, like the brackets, so that a≤b is a, ≤, b.
+   Mathematical signs (× ÷ · ± ¬), arrows and the mathematical operators,
+   but not the names among them (∂ ∇ ∞, the sums and integrals). Their
+   meaning comes from the libraries (ALIAS "≤" = "<="). */
+static int unicode_op (const unsigned char * s)
+{
+	unsigned c;
+	if (s[0] == 0xC2 || s[0] == 0xC3)
+		{
+		c = ((s[0] & 0x1F) << 6) | (s[1] & 0x3F);
+		return (c == 0xAC || c == 0xB1 || c == 0xB7 || c == 0xD7 || c == 0xF7) ? 2 : 0;
+		}
+	if (s[0] != 0xE2 || (s[1] & 0xC0) != 0x80 || (s[2] & 0xC0) != 0x80) return 0;
+	c = ((s[0] & 0x0F) << 12) | ((s[1] & 0x3F) << 6) | (s[2] & 0x3F);
+	if (c >= 0x2190 && c <= 0x21FF) return 3;			/* arrows */
+	if (c >= 0x2200 && c <= 0x22FF)					/* mathematical operators */
+		return (c == 0x2202 || (c >= 0x2205 && c <= 0x2207) || (c >= 0x220F && c <= 0x2211)
+		        || c == 0x221E || (c >= 0x222B && c <= 0x2233)) ? 0 : 3;
+	if (c >= 0x2A00 && c <= 0x2AFF)					/* supplemental ones */
+		return (c >= 0x2A0B && c <= 0x2A1C) ? 0 : 3;
+	return 0;
+}
+
+/* the token of the number literal text */
+static int number_token (const char * text)
+{
+	double * value;
+	Symbol * sp;
+	if (strspn(text, "0123456789") == strlen(text)
+	    && (sp = int_literal(text)) != NULL)	/* 2026: integer number (INTNUM) */
+		{
+		yylval.y_sym = sp;
+		return lexval(sp);
+		}
+	if (! get_numbertype())	/* 2026: no sort for it yet */
+		{
+		printfErr("number %s : no sort for number literals (REALNUM sort, e.g. INC \"inc/all\")\n", text);
+		return (int) text[0];	/* a syntax error */
+		}
+	value = (double *) malloc(sizeof(double));
+	if (! value)
+		fatal("lex: no room for making real-number !\n");
+	sscanf(text, "%lf", value);
+	sp = mknum((void *) value, NULL);	/* std. number type */
+	yylval.y_sym = sp;
+	return lexval(sp);
+}
+
+static int is_number_text (const char * text)	/* 2026: 3 or 2.5 before an operator (3×4) */
+{
+	char * end;
+	if (! (* text >= '0' && * text <= '9') && * text != '.') return 0;
+	strtod(text, & end);
+	return * end == 0;
+}
+
+#line 556 "<stdout>"
+#line 104 "src/scan.l"
 	/* 2026: the bytes of UTF-8 characters are letters (names like alpha) */
-#line 502 "<stdout>"
+#line 559 "<stdout>"
 
 #define INITIAL 0
 
@@ -716,10 +773,10 @@ YY_DECL
 		}
 
 	{
-#line 52 "src/scan.l"
+#line 109 "src/scan.l"
 
 
-#line 722 "<stdout>"
+#line 779 "<stdout>"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -779,7 +836,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 54 "src/scan.l"
+#line 111 "src/scan.l"
 { int i;
 				  	for (i=1;yytext[i]!=0;i++)
 						;
@@ -789,79 +846,62 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 61 "src/scan.l"
+#line 118 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 62 "src/scan.l"
+#line 119 "src/scan.l"
 { return lookup(yytext); }	/* 2026: one bracket per token: [[1,2],[3,4]] */
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 63 "src/scan.l"
+#line 120 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 64 "src/scan.l"
-{ double * value;
-              Symbol * sp;
-				  if (strspn(yytext,"0123456789") == strlen(yytext)
-				      && (sp = int_literal(yytext)) != NULL)  /* 2026: integer number (INTNUM) */
-					{
-					yylval.y_sym = sp;
-					return lexval(sp);
-					}
-				  if (! get_numbertype())	/* 2026: no sort for it yet */
-					{
-					printfErr("number %s : no sort for number literals (REALNUM sort, e.g. INC \"inc/all\")\n", yytext);
-					return (int) yytext[0];	/* a syntax error */
-					}
-				  value = (double *) malloc(sizeof(double));
-				  if (! value)
-						fatal("lex: no room for making real-number !\n");
-
-              sscanf(yytext,"%lf",value); /* gets pointer to value */
-    			  sp=mknum((void *) value,NULL); /* std. number type */
-
-             yylval.y_sym = sp;
-	          return lexval(sp);
-	         }  
+#line 121 "src/scan.l"
+{ return number_token(yytext); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 87 "src/scan.l"
-{ return lookup(yytext); }	/* Id, etc */
+#line 122 "src/scan.l"
+{ int i, n = 0;		/* 2026: up to a Unicode operator, or that alone */
+			  for (i = 0; yytext[i] && ! (n = unicode_op((unsigned char *) yytext + i)); i++)
+				;
+			  if (n) yyless(i ? i : n);
+			  if (n && is_number_text(yytext)) return number_token(yytext);
+			  return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 7:
 *yy_cp = (yy_hold_char); /* undo effects of setting up yytext */
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 89 "src/scan.l"
+#line 129 "src/scan.l"
 ;			/* ignore #... */
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 90 "src/scan.l"
+#line 130 "src/scan.l"
 ;			/* ignore white space */
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
-#line 93 "src/scan.l"
+#line 133 "src/scan.l"
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 93 "src/scan.l"
+#line 133 "src/scan.l"
 return (int) yytext[0];	/* 'x' for yyparse() */
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 95 "src/scan.l"
+#line 135 "src/scan.l"
 ECHO;
 	YY_BREAK
-#line 864 "<stdout>"
+#line 904 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1866,7 +1906,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 95 "src/scan.l"
+#line 135 "src/scan.l"
 
 
 /*

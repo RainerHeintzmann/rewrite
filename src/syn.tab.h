@@ -112,39 +112,42 @@ extern int yydebug;
     SUBSORT = 313,                 /* SUBSORT  */
     INTNUM = 314,                  /* INTNUM  */
     STEPS = 315,                   /* STEPS  */
-    SYMBOLIC = 316,                /* SYMBOLIC  */
-    HOLD = 317,                    /* HOLD  */
-    RULES = 318,                   /* RULES  */
-    SHOW = 319,                    /* SHOW  */
-    REALNUM = 320,                 /* REALNUM  */
-    TYPEOF = 321,                  /* TYPEOF  */
-    HELP = 322,                    /* HELP  */
-    Id = 323,                      /* Id  */
-    String = 324,                  /* String  */
-    Sort = 325,                    /* Sort  */
-    Alg = 326,                     /* Alg  */
-    Term = 327,                    /* Term  */
-    La1 = 328,                     /* La1  */
-    La2 = 329,                     /* La2  */
-    La3 = 330,                     /* La3  */
-    La4 = 331,                     /* La4  */
-    La5 = 332,                     /* La5  */
-    Ru = 333,                      /* Ru  */
-    Ra = 334,                      /* Ra  */
-    Func = 335,                    /* Func  */
-    Const = 336,                   /* Const  */
-    Var = 337,                     /* Var  */
-    Bra = 338,                     /* Bra  */
-    Bra1 = 339,                    /* Bra1  */
-    Bra2 = 340,                    /* Bra2  */
-    Terms = 341,                   /* Terms  */
-    Form = 342,                    /* Form  */
-    Sorts = 343,                   /* Sorts  */
-    Functs = 344,                  /* Functs  */
-    Forms = 345,                   /* Forms  */
-    Algs = 346,                    /* Algs  */
-    Cond2 = 347,                   /* Cond2  */
-    Cond = 348                     /* Cond  */
+    MAXSTEPS = 316,                /* MAXSTEPS  */
+    MAXDEPTH = 317,                /* MAXDEPTH  */
+    SYMBOLIC = 318,                /* SYMBOLIC  */
+    HOLD = 319,                    /* HOLD  */
+    RULES = 320,                   /* RULES  */
+    SHOW = 321,                    /* SHOW  */
+    REALNUM = 322,                 /* REALNUM  */
+    TYPEOF = 323,                  /* TYPEOF  */
+    HELP = 324,                    /* HELP  */
+    ALIAS = 325,                   /* ALIAS  */
+    Id = 326,                      /* Id  */
+    String = 327,                  /* String  */
+    Sort = 328,                    /* Sort  */
+    Alg = 329,                     /* Alg  */
+    Term = 330,                    /* Term  */
+    La1 = 331,                     /* La1  */
+    La2 = 332,                     /* La2  */
+    La3 = 333,                     /* La3  */
+    La4 = 334,                     /* La4  */
+    La5 = 335,                     /* La5  */
+    Ru = 336,                      /* Ru  */
+    Ra = 337,                      /* Ra  */
+    Func = 338,                    /* Func  */
+    Const = 339,                   /* Const  */
+    Var = 340,                     /* Var  */
+    Bra = 341,                     /* Bra  */
+    Bra1 = 342,                    /* Bra1  */
+    Bra2 = 343,                    /* Bra2  */
+    Terms = 344,                   /* Terms  */
+    Form = 345,                    /* Form  */
+    Sorts = 346,                   /* Sorts  */
+    Functs = 347,                  /* Functs  */
+    Forms = 348,                   /* Forms  */
+    Algs = 349,                    /* Algs  */
+    Cond2 = 350,                   /* Cond2  */
+    Cond = 351                     /* Cond  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -161,7 +164,7 @@ union YYSTYPE
 	char 	* y_chr;
 	
 
-#line 165 "syn.tab.h"
+#line 168 "syn.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

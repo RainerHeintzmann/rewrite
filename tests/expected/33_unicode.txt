@@ -5,4 +5,10 @@ SYM α : real = 3
 SYM x₁ : real (no value)
 [ θ   1     ]
 [ 22  θ ^ 2 ] 
-\alphax and α and ħ\n
+\alphax and α and ħ\n12 2 10 12 
+true false false false true false 
+4 3 3.14159 
+2 * x - 3 
+a <= b 
+8 
+5 
