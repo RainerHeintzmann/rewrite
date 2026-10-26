@@ -470,6 +470,7 @@ char *yytext;
 #include "syn.h"		/* Number */
 #include "node.h"		/* mknum */
 #include "numsort.h"		/* int_literal (2026) */
+#include "inout.h"		/* printfErr (2026) */
 
 #ifdef	FLEX_SCANNER
 
@@ -494,8 +495,8 @@ static int i;
 #endif
 
 
-#line 497 "<stdout>"
 #line 498 "<stdout>"
+#line 499 "<stdout>"
 
 #define INITIAL 0
 
@@ -712,10 +713,10 @@ YY_DECL
 		}
 
 	{
-#line 48 "src/scan.l"
+#line 49 "src/scan.l"
 
 
-#line 718 "<stdout>"
+#line 719 "<stdout>"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -775,7 +776,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 50 "src/scan.l"
+#line 51 "src/scan.l"
 { int i;
 				  	for (i=1;yytext[i]!=0;i++)
 						;
@@ -785,22 +786,22 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 57 "src/scan.l"
+#line 58 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 58 "src/scan.l"
+#line 59 "src/scan.l"
 { return lookup(yytext); }	/* 2026: one bracket per token: [[1,2],[3,4]] */
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 59 "src/scan.l"
+#line 60 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 60 "src/scan.l"
+#line 61 "src/scan.l"
 { double * value;
               Symbol * sp;
 				  if (strspn(yytext,"0123456789") == strlen(yytext)
@@ -808,6 +809,11 @@ YY_RULE_SETUP
 					{
 					yylval.y_sym = sp;
 					return lexval(sp);
+					}
+				  if (! get_numbertype())	/* 2026: no sort for it yet */
+					{
+					printfErr("number %s : no sort for number literals (REALNUM sort, e.g. INC \"inc/all\")\n", yytext);
+					return (int) yytext[0];	/* a syntax error */
 					}
 				  value = (double *) malloc(sizeof(double));
 				  if (! value)
@@ -822,7 +828,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 78 "src/scan.l"
+#line 84 "src/scan.l"
 { return lookup(yytext); }	/* Id, etc */
 	YY_BREAK
 case 7:
@@ -830,29 +836,29 @@ case 7:
 (yy_c_buf_p) = yy_cp -= 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 80 "src/scan.l"
+#line 86 "src/scan.l"
 ;			/* ignore #... */
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 81 "src/scan.l"
+#line 87 "src/scan.l"
 ;			/* ignore white space */
 	YY_BREAK
 case 9:
 /* rule 9 can match eol */
-#line 84 "src/scan.l"
+#line 90 "src/scan.l"
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 84 "src/scan.l"
+#line 90 "src/scan.l"
 return (int) yytext[0];	/* 'x' for yyparse() */
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 86 "src/scan.l"
+#line 92 "src/scan.l"
 ECHO;
 	YY_BREAK
-#line 855 "<stdout>"
+#line 861 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1857,7 +1863,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 86 "src/scan.l"
+#line 92 "src/scan.l"
 
 
 /*

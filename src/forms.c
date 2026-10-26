@@ -105,47 +105,8 @@ BOOLEAN merge2(Node * form,Node * rtree)
 	if (rtree->type==OR_TYPE)
 		{
 		BOOLEAN tmp;
-		int depth1,depth2,saved_depth;
-		depth1 = 0;
-		depth2 = 0;
-		saved_depth=depthcount;
-		depthcount = 0;
 		if (in_repl != (Node *) NULL)
-			fatal("internal-error: merge2 did not expect ERSETZ before OR");
-
-		/* saved_p_tree = &(rtree->l);
-    matched_repl = FALSE;
-		if (merge2(form,rtree->l))
-			{
-			depthcount += saved_depth;
-			return TRUE;
-			}
-		depth1=depthcount; */
-
-		/* depthcount =0;
-		saved_p_tree = &(rtree->r);
-    matched_repl = FALSE;
-		if (merge2(form,rtree->r))
-			{
-			depthcount += saved_depth;
-			return TRUE;
-			}
-		depth2=depthcount;
-		
-		depthcount =0;
-    matched_repl = FALSE; */
-		/* if (depth1 >= depth2) */
-		/* 	{  */
-		/* 	saved_p_tree = &(rtree->l); */
-		/*	tmp = merge2(form,rtree->l);  /* count depth, take the better tree */
-	  /* 	} */
-		/* else */
-		/* 	{ */
-		/* 	saved_p_tree = &(rtree->r); */
-		/* 	tmp = merge2(form,rtree->r);  /* count depth, take the better tree */
-		/* 	} */
-
-		depthcount += saved_depth;
+			fatal("internal-error: merge2 did not expect a replacement before OR");
 		saved_p_tree = &(rtree->r); 
     matched_repl = FALSE;
 		tmp = merge2(form,rtree->r);  /* Better: count depth, take the better tree */
@@ -367,11 +328,6 @@ BOOLEAN match2 (Node * term,Node * rtree)
 				default:
 										RESTORE
 										return FALSE; /* Does happen in the tree ! */
-										/* printfErr("match2: Internal ERROR : term : ");
-										   print(term);
-										   printfErr("rtree : ");
-										   print(rtree);
-										   printfErr("(unexpected term-type) Nr.:%d !\n",term->type); */
 				}
 
 		if  (lexval((Symbol *) rtree) == Var) /* Replace variable */
@@ -407,14 +363,6 @@ BOOLEAN match2 (Node * term,Node * rtree)
   				|| ! hasval(tsym)            /* only replace numeric Const / Func */
 				|| symbolic_constant(tsym))	/* 2026: pi in exact mode: no number */
         {
-			/*	 Node * rslt1=calculate (term);
-					if (!rslt1 || rtypes((Symbol *) rslt1) != numbertype)
-					{
-					RESTORE
-					return FALSE;
-					}
-				 else
-					delete(rslt1); */
 
 					RESTORE
 					return FALSE;

@@ -22,27 +22,12 @@ static Symbol * symbolstack = NULL;
 static char * prtnumstring = "%g ";
 
 
-static Symbol stdsort={ /* Global standard real set */
-{SYM_TYPE,
-(Node *) NULL,
-(Node *) NULL
-},
-"StdSort",
-Sort,
-(Node *) std_cmp_real,
-(Node *) std_cpy_real,
-TRUE,
-(void *) std_show_real,
-(Symbol *) NULL,
-0,
-(Symbol *) std_del_real,
-(Symbol *) NULL,
-(Symbol *) NULL,
-(Symbol *) NULL,
-0
-};
-
-/* special numbers 0,1  , so that lifting always starts at the same symbol. */
+/* 2026: number literals. A number with a point or exponent (and every
+ * number without INTNUM) gets the sort set with REALNUM (numbertype, e.g.
+ * REALNUM real in inc/alg); its values are C doubles, as the scanner reads
+ * them. 0 and 1 of this sort are shared symbols: LIFT links the 0 and 1 of
+ * an algebra to them (inc/alg), so every 0 must be the same symbol, and
+ * it must outlive the LIFT statement. Their sort is set when they are used. */
 static double Zero = 0.0;
 static double One  = 1.0;
 
@@ -53,7 +38,7 @@ static Symbol Zero_Symbol={
 },
 "0",
 Const,
-(Node *) & stdsort,
+(Node *) NULL,	/* the REALNUM sort, set in mknum */
 (Node *) NULL,
 TRUE,
 (void *) & Zero,
@@ -73,7 +58,7 @@ static Symbol One_Symbol={
 },
 "1",
 Const,
-(Node *) & stdsort,
+(Node *) NULL,	/* the REALNUM sort, set in mknum */
 (Node *) NULL,
 TRUE,
 (void *) & One,
@@ -88,26 +73,6 @@ NULL,
 
 /* Functions for the standard handling of real numbers : */
 
-/* void std_show_cont (double * * x)
-{
-	int anz;
-	anz = (int) (* x++);
-	printfOut("[ ");
-	for (i=0;i< (anz-1);i++)
-		{print(x++);
-		printfOut(", ");
-		}
-	print(x);
-	printfOut("] ");
-}
-
-int std_cmp_cont (double * x,double * y)
-{
-	int anz1,anz2;
-	anz1 = (int) (* x++);
-	anz2 = (int) (* y++);
-	return (anz1 > anz2) ? 1 : ((anz1 == anz2) ? 0 : -1);
-} */	
 
 
 void std_show_real (double * x)
@@ -278,9 +243,8 @@ Symbol * mksym (int lexv,const char * name)  /* creates a symbol */
 /* frees a numeric value with the delete function of its number type */
 static void free_number_value (void * value)
 {
-	Symbol * srt = numbertype ? (Symbol *) numbertype : & stdsort;
-	if (del(srt))
-		((void (*) (void *)) del(srt)) (value);
+	if (del(numbertype))
+		((void (*) (void *)) del(numbertype)) (value);
 }
 
 /* mknum takes over the value 'value'. For 0 and 1 the shared
@@ -290,28 +254,22 @@ Symbol * mknum (void * value,Node * rtype)
 Symbol * sp;
 
   DEBG((4,"hier mknum\n"));
-	if (! rtype) 
-		{
+	if (! rtype)
 		rtype=numbertype;
-		}
-	if (! numbertype)
-		printfErr("You have to set the sort of number literals first (REALNUM sort) !\n"); 
+	if (! rtype)
+		fatal("mknum : a number without a sort (REALNUM sort missing)");
 
 	if (rtype == numbertype) /* is set via REALNUM sort */
 		{
 		if (* (double *) value == 0.0)
 			{
-			if (numbertype) rtypes(& Zero_Symbol) = numbertype;
-			else
-				rtypes(& Zero_Symbol) = ( Node *) & stdsort;
+			rtypes(& Zero_Symbol) = numbertype;
 			free_number_value(value); /* the shared symbol has its own value */
 			return & Zero_Symbol;
 			}
 		if (* (double *) value == 1.0)
 			{
-			if (numbertype) rtypes(& One_Symbol) = numbertype;
-			else
-				rtypes(& One_Symbol) = ( Node *) & stdsort;
+			rtypes(& One_Symbol) = numbertype;
 			free_number_value(value); /* the shared symbol has its own value */
 			return & One_Symbol;
 			}
@@ -319,13 +277,7 @@ Symbol * sp;
 
 	sp=mksym(Const,NULL); /* NULL, so that strsave is not used */
 	name(sp)   = numbername;
-
- 	rtypes(sp) = rtype;
-
-	if (! numbertype)
-		{
-		rtypes(sp) = (Node *) & stdsort;
-		}
+	rtypes(sp) = rtype;
 
 	hasval(sp) = TRUE;
 	value(sp) = value;

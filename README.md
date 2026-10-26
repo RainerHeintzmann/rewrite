@@ -159,7 +159,7 @@ x+y*2                                       # prints 4 + y * 2
 | Command | Meaning |
 | --- | --- |
 | `SORT name [,name ..]` | Defines a data type ("sort"), needed for functions, variables and constants. |
-| `REALNUM sortname` | Assigns the type for all numbers typed in. Numbers are stored as `double`. Example: `SORT real` then `REALNUM real`. |
+| `REALNUM sortname` | Assigns the type for all numbers typed in (with inc/exact, `INTNUM` takes the whole numbers). Numbers are stored as `double`. Example: `SORT real` then `REALNUM real`. Before it, a number is an error. |
 | `SYM name [,..] : sort` | Declares a symbol. It stands for itself and is printed by its name, or holds a numerical value of its sort (`x = 4`, `x = nothing` removes it), like a variable in the usual sense. |
 | `TERM name [,..] : sort` | Declares a term variable, which stores a whole expression (e.g. a list). |
 | `PAT name [,..] : sort` | Declares a pattern variable. It is a placeholder for any term in rewrite rules, for example `A+0=A`. |

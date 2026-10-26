@@ -12,6 +12,7 @@
 #include "syn.h"		/* Number */
 #include "node.h"		/* mknum */
 #include "numsort.h"		/* int_literal (2026) */
+#include "inout.h"		/* printfErr (2026) */
 
 #ifdef	FLEX_SCANNER
 
@@ -64,6 +65,11 @@ sp_ops2 ([\-\+])
 					{
 					yylval.y_sym = sp;
 					return lexval(sp);
+					}
+				  if (! get_numbertype())	/* 2026: no sort for it yet */
+					{
+					printfErr("number %s : no sort for number literals (REALNUM sort, e.g. INC \"inc/all\")\n", yytext);
+					return (int) yytext[0];	/* a syntax error */
 					}
 				  value = (double *) malloc(sizeof(double));
 				  if (! value)
