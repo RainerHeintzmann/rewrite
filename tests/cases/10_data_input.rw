@@ -1,7 +1,7 @@
 # DATA "file" opens a data file, DATA Const reads the next number from it.
 # Non-numeric text up to the end of the line is skipped (and echoed).
 INC "inc/all"
-CONST d1,d2,d3 : real
+SYM d1,d2,d3 : real
 DATA "tests/data/numbers.txt"
 DATA d1
 DATA d2

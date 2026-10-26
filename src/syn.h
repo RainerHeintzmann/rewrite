@@ -54,8 +54,8 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    CST = 258,                     /* CST  */
-    VAR = 259,                     /* VAR  */
+    SYM = 258,                     /* SYM  */
+    PAT = 259,                     /* PAT  */
     SORT = 260,                    /* SORT  */
     FUNC = 261,                    /* FUNC  */
     ALG = 262,                     /* ALG  */
@@ -66,7 +66,7 @@ extern int yydebug;
     GRAPH = 267,                   /* GRAPH  */
     PFEIL = 268,                   /* PFEIL  */
     TERM = 269,                    /* TERM  */
-    NUM = 270,                     /* NUM  */
+    NUMPAT = 270,                  /* NUMPAT  */
     ATT = 271,                     /* ATT  */
     IS = 272,                      /* IS  */
     EQ = 273,                      /* EQ  */
@@ -116,32 +116,34 @@ extern int yydebug;
     HOLD = 317,                    /* HOLD  */
     RULES = 318,                   /* RULES  */
     SHOW = 319,                    /* SHOW  */
-    Id = 320,                      /* Id  */
-    String = 321,                  /* String  */
-    Sort = 322,                    /* Sort  */
-    Alg = 323,                     /* Alg  */
-    Term = 324,                    /* Term  */
-    La1 = 325,                     /* La1  */
-    La2 = 326,                     /* La2  */
-    La3 = 327,                     /* La3  */
-    La4 = 328,                     /* La4  */
-    La5 = 329,                     /* La5  */
-    Ru = 330,                      /* Ru  */
-    Ra = 331,                      /* Ra  */
-    Func = 332,                    /* Func  */
-    Const = 333,                   /* Const  */
-    Var = 334,                     /* Var  */
-    Bra = 335,                     /* Bra  */
-    Bra1 = 336,                    /* Bra1  */
-    Bra2 = 337,                    /* Bra2  */
-    Terms = 338,                   /* Terms  */
-    Form = 339,                    /* Form  */
-    Sorts = 340,                   /* Sorts  */
-    Functs = 341,                  /* Functs  */
-    Forms = 342,                   /* Forms  */
-    Algs = 343,                    /* Algs  */
-    Cond2 = 344,                   /* Cond2  */
-    Cond = 345                     /* Cond  */
+    REALNUM = 320,                 /* REALNUM  */
+    TYPEOF = 321,                  /* TYPEOF  */
+    Id = 322,                      /* Id  */
+    String = 323,                  /* String  */
+    Sort = 324,                    /* Sort  */
+    Alg = 325,                     /* Alg  */
+    Term = 326,                    /* Term  */
+    La1 = 327,                     /* La1  */
+    La2 = 328,                     /* La2  */
+    La3 = 329,                     /* La3  */
+    La4 = 330,                     /* La4  */
+    La5 = 331,                     /* La5  */
+    Ru = 332,                      /* Ru  */
+    Ra = 333,                      /* Ra  */
+    Func = 334,                    /* Func  */
+    Const = 335,                   /* Const  */
+    Var = 336,                     /* Var  */
+    Bra = 337,                     /* Bra  */
+    Bra1 = 338,                    /* Bra1  */
+    Bra2 = 339,                    /* Bra2  */
+    Terms = 340,                   /* Terms  */
+    Form = 341,                    /* Form  */
+    Sorts = 342,                   /* Sorts  */
+    Functs = 343,                  /* Functs  */
+    Forms = 344,                   /* Forms  */
+    Algs = 345,                    /* Algs  */
+    Cond2 = 346,                   /* Cond2  */
+    Cond = 347                     /* Cond  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -158,7 +160,7 @@ union YYSTYPE
 	char 	* y_chr;
 	
 
-#line 162 "syn.tab.h"
+#line 164 "syn.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

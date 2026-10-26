@@ -32,11 +32,11 @@ SUBSORT rational,real ATT rat2real
 SUBSORT positive,nonneg ATT real2real
 SUBSORT nonneg,real ATT real2real
 
-VAR Anat,Bnat : natural
-VAR Az,Bz : integer
-VAR Aq,Bq : rational
-VAR An,Bn : nonneg
-VAR Ap,Bp : positive
+PAT Anat,Bnat : natural
+PAT Az,Bz : integer
+PAT Aq,Bq : rational
+PAT An,Bn : nonneg
+PAT Ap,Bp : positive
 
 # ---------------- integer ----------------
 OTHER +  : integer,integer >> integer   ATT int_plus

@@ -4,13 +4,13 @@
 INC "inc/all"
 INC "inc/integration/all"
 TERM TN : number
-CONST im2 : number
+SYM im2 : number
 FUNC never : real >> real
 ALG raw
 SPEC raw : never(X) = X
 # a rule for number matches a real term; its conditions are calculated with
 # the real variants (Uq > 2, 2*Uq)
-VAR Uq : number
+PAT Uq : number
 ALG Tn
 SPEC Tn : IF (Uq > 2), (integerq(2*Uq)) Int(Uq,Xv) = Uq*Xv
 TN = REWR Int(3,x) : Tn
@@ -51,4 +51,4 @@ TN
 TN = REWR Int(sech(x),x) : RubiIntegrate
 TN
 # a sort cannot be declared again as a constant
-CONST number : real
+SYM number : real

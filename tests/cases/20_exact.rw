@@ -26,18 +26,18 @@ sin(1/2)
 # ---- division by zero stays a term
 1/0
 # ---- assignment to a real constant and loops
-CONST z : real
+SYM z : real
 z = 3/4
 z
 z*4
-CONST sumk : real
+SYM sumk : real
 sumk = 0
-CONST kk : real
+SYM kk : real
 FOR kk = 1 TO 4 DO sumk = sumk + kk
 sumk
 # ---- rules for real apply to the exact sorts (LIFT)
 TERM T1 : real
-CONST yy : real
+SYM yy : real
 x = yy
 T1 = REWR x*1 + 0*x + (1/2)*x : All
 T1
@@ -45,8 +45,8 @@ T1 = REWR D(x^3/3,x) : All
 T1
 # ---- sorts with a known sign (nonneg, positive) and natural numbers
 2+3, 2-5, 2^10, 2^-1
-CONST tn : nonneg
-CONST tp : positive
+SYM tn : nonneg
+SYM tp : positive
 T1 = REWR sqrt(tn^2) + (tn^2)^(1/2) : All
 T1
 T1 = REWR sqrt(x^2) : All

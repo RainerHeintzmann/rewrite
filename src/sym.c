@@ -30,7 +30,6 @@ static const Reserved words [] = {	/* sorted */
 	{ "ATT",    ATT },
 	{ "BRA",    BRA },
 	{ "COMM",   COMM },     /* commutative functions (2026) */
-	{ "CONST",  CST },
 	{ "DATA",   DATA },  /* reading data files */
 	{ "DEBUG",  DBG },
 	{ "DEFAULT",DEFAULT },  /* value of missing operands (2026) */
@@ -56,14 +55,16 @@ static const Reserved words [] = {	/* sorted */
 	{ "LIFT",   LIFT  },
 	{ "LOCAL",  LOCAL },
 	{ "NIN",    NIN },
-	{ "NUM",    NUM },
+	{ "NUMPAT", NUMPAT },   /* pattern variables for numbers (2026, formerly NUM) */
 	{ "OPT",    OPT },      /* optional meta variables (2026) */
 	{ "OTHER",  OTHER },
 	{ "OUT",    OUT },
+	{ "PAT",    PAT },      /* pattern variables (2026, formerly VAR) */
 	{ "PRT",    PRT },
 	{ "PRTNUM", PRTNUM },
 	{ "QUIT",   QUIT },
 	{ "RA",		  RA  },  			/* right-associative */
+	{ "REALNUM",REALNUM },  /* sort of the other number literals (2026, formerly NUM sort) */
 	{ "RETURN", RETURN },
 	{ "REWR",   REWR },
 	{ "RIGHT",  RIGHT },    /* DEFAULT RIGHT (2026) */
@@ -75,11 +76,12 @@ static const Reserved words [] = {	/* sorted */
 	{ "STEP",   STEP },
 	{ "STEPS",  STEPS },    /* solution steps of a rule list (2026) */
 	{ "SUBSORT",SUBSORT },  /* subsort with conversion (2026) */
+	{ "SYM",    SYM },      /* symbols, with or without a value (2026, formerly CONST) */
 	{ "SYMBOLIC",SYMBOLIC },/* ATT SYMBOLIC: C function on terms (2026) */
 	{ "SYS",    SYS },
 	{ "TERM",   TERM },
 	{ "TO",     TO },
-	{ "VAR",    VAR },
+	{ "TYPEOF", TYPEOF },   /* TYPEOF term: its sort (2026) */
 	{ "WHILE",  WHILE }
 };
 

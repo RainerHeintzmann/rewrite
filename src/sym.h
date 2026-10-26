@@ -78,7 +78,7 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 #define orig_func(p_sym)	(((Symbol *) (p_sym)) -> orig_func) /* only for functions */
 #define defined_in_block(p_sym)	(((Symbol *) (p_sym)) -> def_in_blk) /* only for terms,constants,functions */
 /* 2026: a sort has numerical values if something makes them: ATT sort,
-   NUM, INTNUM, a SUBSORT conversion from a sort with values, or a function
+   REALNUM, INTNUM, a SUBSORT conversion from a sort with values, or a function
    with a numerical C function or a defining term of this result sort.
    Purely symbolic sorts (ring, the lists of inc/list) have none. */
 #define sort_valued(p_sym)	(((Symbol *) (p_sym)) -> valued)

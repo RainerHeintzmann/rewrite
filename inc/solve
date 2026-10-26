@@ -36,7 +36,7 @@ FUNC  ker       : number,number,number >> number         # ker(p, y, g): f = p(y
 FUNC  union     : number,number >> number                # two solution lists
 OTHER union     : algebra,algebra >> algebra             # two lists of tuples (systems)
 FUNC  solcheck  : number,number,number >> number         # the solutions checked in f = 0
-CONST yker      : number                                 # the new unknown
+SYM yker      : number                                 # the new unknown
 
 FUNC  occurs    : number,number >> real    ATT SYMBOLIC occurs     # occurrences of x in u (a number)
 FUNC  eqnorm    : number,number >> number  ATT SYMBOLIC eqnorm     # numerator over a common denominator
@@ -69,8 +69,8 @@ FUNC  sysyc     : algebra,algebra,algebra,algebra >> algebra ATT SYMBOLIC sysyc
 FUNC  syscheckc : algebra,algebra,algebra >> algebra ATT SYMBOLIC syscheckc
 FUNC  resultant : number,number,number >> number ATT SYMBOLIC resultant  # resultant(f, g, y): y eliminated
 
-VAR Sf,Sg,Su,Sv,Sr,Sx,Sa,Sn,Sp,Sy,Sl,Sm : number
-VAR Tf,Tg,Tv,Ta,Tn,Ty,Tl,Tm : algebra                 # systems: lists of tuples are matrices
+PAT Sf,Sg,Su,Sv,Sr,Sx,Sa,Sn,Sp,Sy,Sl,Sm : number
+PAT Tf,Tg,Tv,Ta,Tn,Ty,Tl,Tm : algebra                 # systems: lists of tuples are matrices
 
 COMM +,*
 ALG Solve

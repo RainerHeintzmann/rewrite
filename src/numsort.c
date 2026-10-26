@@ -129,7 +129,7 @@ int sort_dist (Node * from, Node * to)
 /* 2026: a term of a sort without values (not sort_valued, e.g. a list
    [1,2,3] of inc/list) as a value of the sort 'to', if a SUBSORT path
    leads there: the first conversion of the path gets the values of the
-   arguments of the term, as numbers of the standard sort (NUM), e.g.
+   arguments of the term, as numbers of the standard sort (REALNUM), e.g.
    SUBSORT vector,rvector ATT constr_vec. NULL if this is not possible. */
 void * term_convert (Node * term, Node * to)
 {

@@ -144,13 +144,13 @@ This complete program defines them from scratch:
 
 ```text
 SORT real                                   # a data type
-NUM real                                    # numbers like 1.5 have type real
+REALNUM real                                # numbers like 1.5 have type real
 FUNC + : real,real >> real LA2 ATT plus     # operators with priority and
 FUNC * : real,real >> real LA3 ATT mult      # the C function that computes them
 FUNC ^ : real,real >> real RA  ATT power
 1+2*3                                       # prints 7
 2^3^2                                       # prints 512
-CONST x,y : real
+SYM x,y : real
 x+y*2                                       # prints x + y * 2
 x=4
 x+y*2                                       # prints 4 + y * 2
@@ -159,11 +159,12 @@ x+y*2                                       # prints 4 + y * 2
 | Command | Meaning |
 | --- | --- |
 | `SORT name [,name ..]` | Defines a data type ("sort"), needed for functions, variables and constants. |
-| `NUM sortname` | Assigns the type for all numbers typed in. Numbers are stored as `double`. Example: `SORT real` then `NUM real`. |
-| `CONST name [,..] : sort` | Declares a constant. It can take any value, so it is a variable in the usual sense. Without a value it stays a symbol and is printed by its name. |
-| `VAR name [,..] : sort` | Declares a meta variable. It is a placeholder for any term in rewrite rules, for example `A+0=A`. |
-| `NUM name [,..] : sort` | Declares a meta variable that only matches numbers. |
-| `TERM name [,..] : sort` | Declares a term variable, which stores a whole expression. |
+| `REALNUM sortname` | Assigns the type for all numbers typed in. Numbers are stored as `double`. Example: `SORT real` then `REALNUM real`. |
+| `SYM name [,..] : sort` | Declares a symbol. It stands for itself and is printed by its name, or holds a numerical value of its sort (`x = 4`, `x = nothing` removes it), like a variable in the usual sense. |
+| `TERM name [,..] : sort` | Declares a term variable, which stores a whole expression (e.g. a list). |
+| `PAT name [,..] : sort` | Declares a pattern variable. It is a placeholder for any term in rewrite rules, for example `A+0=A`. |
+| `NUMPAT name [,..] : sort` | Declares a pattern variable that only matches numbers. |
+| `TYPEOF term`, `TYPEOF f` | Prints the sort of a term; for a name also its kind (`SYM`, `TERM`, `PAT`, `NUMPAT`) and its value or term; for a function all its variants with their argument and result sorts. |
 | `FUNC name : sorts >> sort [LA1..LA5\|RA\|RU] [ATT [SYMBOLIC [HOLD]] name \| ATT RULES alglist]` | Defines a function or operator, see below. |
 | `OTHER name : sorts >> sort [ATT name]` | Adds another meaning to an existing function name, for other argument types. Example: `OTHER + : vector,vector >> vector`. |
 | `BRA open close : sorts >> sort [ATT name]` | Defines a function written with brackets, like `<a,b>` for a scalar product. `a[b,c]` may be used for `[a,b,c]`, so vectors can be indexed with `v[1]`. |
@@ -193,7 +194,7 @@ A function can also be written in the rewrite language itself, with
 `ATT ( argument definitions ) block`:
 
 ```text
-FUNC fma3 : real,real,real >> real ATT (CONST aa,bb : real; TERM cc : real) { RETURN cc+aa*bb }
+FUNC fma3 : real,real,real >> real ATT (SYM aa,bb : real; TERM cc : real) { RETURN cc+aa*bb }
 fma3(2,3,4)          # prints 10
 fma3(2,3,y)          # y has no value: prints fma3 (2 ,3 ,y )
 ```
@@ -240,8 +241,8 @@ Rule sets in a list are separated by commas. Older versions used `;`. A
 list in parentheses, like `(Linear,Compl,diff)`, is applied repeatedly
 until nothing changes any more.
 
-Meta variables (`VAR`) in a rule match any term. Meta variables declared
-with `NUM` only match numbers. A rule can have conditions:
+Pattern variables (`PAT`) in a rule match any term. Pattern variables
+declared with `NUMPAT` only match numbers. A rule can have conditions:
 
 - `LB(term,term)`: "lower or between", an ordering of terms, used for
   example to sort sums.
@@ -256,11 +257,11 @@ Several conditions are separated by commas, and all of them must hold:
 the left side is replaced by the right side.
 
 ```text
-VAR A : real
+PAT A : real
 ALG simp
 SPEC simp : A*1=A
 ADDSPEC simp : A+0=A
-CONST u : real
+SYM u : real
 REWR (u*1)+0 : simp         # prints u
 ```
 
@@ -269,15 +270,15 @@ rule cover many forms of a term. They act on the rules defined after them:
 
 | Command | Meaning |
 | --- | --- |
-| `OPT A,B` | The meta variables `A`, `B` may be missing in a pattern. |
+| `OPT A,B` | The pattern variables `A`, `B` may be missing in a pattern. |
 | `DEFAULT + = 0` | A missing operand of `+` has the value 0. |
 | `DEFAULT RIGHT ^ = 1` | Only the right operand of `^` may be missing, with value 1. |
 | `COMM +,*` | Patterns with `+` and `*` also match with swapped operands. |
 | `OPT`, `DEFAULT`, `COMM` | Without arguments: clear the list again. |
 
 ```text
-VAR Xw : real
-NUM Ca,Cb,Cm : real
+PAT Xw : real
+NUMPAT Ca,Cb,Cm : real
 OPT Ca,Cb,Cm
 DEFAULT + = 0
 DEFAULT * = 1
@@ -350,8 +351,8 @@ at run time. Two statements connect the sorts:
 | --- | --- |
 | `SHOW f ATT name` | Prints the terms with the function `f` (all its variants) with the C print function `name` instead of the usual form; `SHOW f` alone switches back. [inc/list](inc/list) uses it for lists (`SHOW [ ATT show_list`). |
 | `SUBSORT integer,rational ATT int2rat` | Every `integer` is also a `rational`; the C function converts a value. A sort may have several wider sorts. |
-| `SUBSORT real,number` | Without `ATT`: the wider sort has no values of its own (`number`, `algebra`, `vector`, `matrix`); a value keeps its sort, and a `CONST` of such a sort holds no value. |
-| `SUBSORT vector,rvector ATT constr_vec` | From a sort without values into one with values: a term, such as the list `[1,2,3]`, becomes a value where one is expected (assigned to a `CONST`, or the argument of a numerical C function); the C function gets the values of its arguments. |
+| `SUBSORT real,number` | Without `ATT`: the wider sort has no values of its own (`number`, `algebra`, `vector`, `matrix`); a value keeps its sort, and a `SYM` of such a sort holds no value. |
+| `SUBSORT vector,rvector ATT constr_vec` | From a sort without values into one with values: a term, such as the list `[1,2,3]`, becomes a value where one is expected (assigned to a `SYM`, or the argument of a numerical C function); the C function gets the values of its arguments. |
 | `INTNUM integer ATT read_int` | Numbers without point and exponent are of sort `integer`, made by the C function from the text. |
 
 With `integer < rational < real`, a function declared for `real` also
@@ -463,13 +464,13 @@ natural < nonneg < real          positive < nonneg
 
 Numbers written without a point are `natural`; `2-5` is the `integer` -3.
 `nonneg` (values >= 0) and `positive` (> 0) are real numbers whose sign is
-known. A meta variable of such a sort only matches terms of that sort or
+known. A pattern variable of such a sort only matches terms of that sort or
 below it (a variable of sort `real` still matches any term). Rules that are
 wrong for negative numbers are written for these sorts:
 
 ```text
-CONST t : nonneg
-CONST p : positive
+SYM t : nonneg
+SYM p : positive
 REWR sqrt(t^2) : All       # prints t
 REWR sqrt(x^2) : All       # stays sqrt (x ^ 2 ) for a real x
 REWR ln(p*x) : All         # prints ln (p )+ ln (x )
@@ -516,7 +517,7 @@ a + 1               # prints a + 1
 | `{ ... }` | Block. Constants declared in a block are local to it. |
 
 ```text
-FOR n = 1 TO 3 DO { CONST s : real
+FOR n = 1 TO 3 DO { SYM s : real
                     s = n*10
                     PRT s }
 ```
@@ -552,7 +553,7 @@ the files are in German.
 | [inc/exact](inc/exact) | Exact numbers: sorts `integer` and `rational` (GMP), subsorts of `real`. |
 | [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
-| [inc/rvector](inc/rvector) | Numerical real vectors (C arrays): scalar product, cross product `_x_`, `abs`, element access. Not loaded by `inc/all` any more: load it after [inc/list](inc/list). A list becomes an rvector where one is expected: `CONST v : rvector`, `v = [1,2,3]`, `[1,0,0]*v`. |
+| [inc/rvector](inc/rvector) | Numerical real vectors (C arrays): scalar product, cross product `_x_`, `abs`, element access. Not loaded by `inc/all` any more: load it after [inc/list](inc/list). A list becomes an rvector where one is expected: `SYM v : rvector`, `v = [1,2,3]`, `[1,0,0]*v`. |
 | [inc/rmatrix](inc/rmatrix) | Numerical real matrices: `onemat`, `zeromat`, `chmat`, `trans`, products. Indices start at 0. Load it explicitly after `inc/rvector`. |
 | [inc/physik](inc/physik), [inc/theophys](inc/theophys), [inc/lagrange](inc/lagrange) | Physical units and formulas, Lagrange formalism. |
 | [inc/physnum](inc/physnum), [inc/mathnum](inc/mathnum) | Numerical values of physical and mathematical constants such as `c`, `e` and `pi`. |
@@ -676,11 +677,11 @@ function attached with `SHOW [ ATT show_list`; `SHOW [` prints the plain
 term again.
 
 `table` and `select` get their body and condition unevaluated (`HOLD`) and
-replace `x` first. `x` must be declared (`CONST kk : real`): an undeclared
+replace `x` first. `x` must be declared (`SYM kk : real`): an undeclared
 name is a numerical variable with the value 0.
 
 ```text
-CONST aa,kk : real
+SYM aa,kk : real
 REWR table(aa^kk, kk, range(3)) : All           # [aa, aa ^ 2, aa ^ 3]
 REWR select(range(10), kk, kk > 6) : All        # [7, 8, 9, 10]
 part([[1,2],[3,4]], 2, 1)                       # 3
@@ -716,7 +717,7 @@ Mathematica's `Listable` functions:
 ```text
 INC "inc/list"
 INC "inc/linalg"
-CONST g : real
+SYM g : real
 det([[a,b],[g,n]])                                # a * n - b * g
 linsolve([[a,1,1],[1,a,1],[1,1,a]],[1,1,1])       # [1 / (a + 2 ), 1 / (a + 2 ), 1 / (a + 2 )]
 det([[2,1],[1,2]] - x*identity(2))                # x ^ 2 + 3 - 4 * x
@@ -728,7 +729,7 @@ the sort `covector`, like Julia's `Transpose`: it stays a term, and the
 sorts choose the product. `transpose(u)*v` is a number (the inner
 product), `u*transpose(v)` a matrix (the outer product), `transpose(u)*m`
 a covector. Explicit lists are calculated; for symbolic vectors
-(`CONST u,v : vector`) the sort alone says that `transpose(u)*v` is a
+(`SYM u,v : vector`) the sort alone says that `transpose(u)*v` is a
 scalar that commutes with matrices. Sums and multiples of covectors are
 taken back to vectors, as `transpose` is linear. A covector that is the
 whole printed term is a row `[1 2 3]` (up to 10 entries).
@@ -738,19 +739,19 @@ transpose([1,2,3]) * [4,5,6]             # 32
 [1,2] * transpose([3,4])                 # [ 3  4 ]
                                          # [ 6  8 ]
 transpose([1,2]) * [[1,2],[3,4]]         # [7 10]
-CONST uu,vv : vector
-CONST MM : matrix
+SYM uu,vv : vector
+SYM MM : matrix
 REWR transpose(MM*uu) : MatrixRules      # transpose (uu )* transpose (MM )
 REWR MM*(transpose(uu)*vv) : MatrixRules # transpose (uu )* vv * MM
 ```
 
-**Symbolic matrices.** `CONST A,B : matrix` declares symbolic matrices,
+**Symbolic matrices.** `SYM A,B : matrix` declares symbolic matrices,
 whose product does not commute; they mix with explicit ones. The rule set
 `MatrixRules` knows the laws of the algebra and of matrices, and
 `MatrixSolve` isolates an unknown matrix from the left or from the right:
 
 ```text
-CONST A,B,C,X : matrix
+SYM A,B,C,X : matrix
 REWR transpose(A*B) : MatrixRules                      # transpose (B )* transpose (A )
 REWR inverse(A*B*C) : MatrixRules                      # inverse (C )* inverse (B )* inverse (A )
 REWR A*(B+C) - A*B : MatrixRules                       # A * C

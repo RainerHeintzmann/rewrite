@@ -38,11 +38,11 @@ ADDSPEC Listable : IF (threadq(Xal)) Xal = thread(Xal)
 # The sort matrix (inc/list) is below algebra (inc/alg): its product is
 # not commutative, so the rules for numbers (commutative *, the
 # integration) do not apply to it, while the rules for algebra do.
-# CONST A,B : matrix are symbolic matrices, REWR transpose(A*B) :
+# SYM A,B : matrix are symbolic matrices, REWR transpose(A*B) :
 # MatrixRules gives transpose(B)*transpose(A). Explicit matrices are
 # calculated at once.
-VAR Ma,Mb,Mc,Mc2 : matrix
-CONST Id,Zm : matrix                       # the identity and the zero matrix
+PAT Ma,Mb,Mc,Mc2 : matrix
+SYM Id,Zm : matrix                       # the identity and the zero matrix
 FUNC  sortleq   : algebra,algebra >> bool ATT SYMBOLIC sortleq # the sort of u is that of v or below
 # numbers commute with matrices, vectors do not: not(sortleq(Xnu, nil)),
 # Xnu is no vector (nil is the empty vector)
@@ -52,11 +52,11 @@ FUNC  sortleq   : algebra,algebra >> bool ATT SYMBOLIC sortleq # the sort of u i
 # Transpose): it stays a term, and the sorts choose the products:
 # transpose(u)*v is a number (the inner product), u*transpose(v) a matrix
 # (the outer product), transpose(u)*m a covector. Explicit lists are
-# calculated with dot; symbolic vectors (CONST u : vector) stay. transpose
+# calculated with dot; symbolic vectors (SYM u : vector) stay. transpose
 # is linear, so sums and multiples of covectors are taken back to vectors.
 SORT covector
 SUBSORT covector,algebra
-VAR Va,Vb : vector
+PAT Va,Vb : vector
 ALG Covec
 OTHER transpose : vector >> covector                      # stays a term
 OTHER transpose : covector >> vector      ATT RULES Covec

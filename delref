@@ -1,4 +1,4 @@
-CONST al,n0,memo,wi,dn,n,be,Ref : real
+SYM al,n0,memo,wi,dn,n,be,Ref : real
 TERM tmp : real
 
 # tmp = arccos((cos al)/(1.0/n))

@@ -89,7 +89,7 @@ Node ** term_argp  (Node * t, int i);   /* address of argument i, or NULL */
 #define LIFT_TO(np)        ((np)->r->l)
 #define LIFT_FROM(np)      ((np)->r->r)
 
-/* declarations (CONST, VAR, FUNC, ...):
+/* declarations (SYM, PAT, FUNC, ...):
  *	FUNC(declare, lexv-node(idlist, hasv-node(rtypes, atypes)))
  *	The node types themselves hold lexv and hasv. After a declaration at
  *	top level both are set to PARAM and rtypes/atypes to NULL. */

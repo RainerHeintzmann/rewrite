@@ -295,9 +295,9 @@ Symbol * sp;
 		rtype=numbertype;
 		}
 	if (! numbertype)
-		printfErr("You have to set numbertype first (NUM Sort) !\n"); 
+		printfErr("You have to set the sort of number literals first (REALNUM sort) !\n"); 
 
-	if (rtype == numbertype) /* is set via NUM Sort */
+	if (rtype == numbertype) /* is set via REALNUM sort */
 		{
 		if (* (double *) value == 0.0)
 			{

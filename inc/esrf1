@@ -1,7 +1,7 @@
 
 TERM kappa,etha,ld,dn,thetaB,ny,Xi  : real
 
-CONST dN,E,d,LD,alpha,dalpha,theta : real
+SYM dN,E,d,LD,alpha,dalpha,theta : real
 
 dn=h^2/(8*pi^2*ep0*me) * (dN/E^2)
 # dn=0.05

@@ -5,9 +5,9 @@
 #     INC "inc/rmatrix"
 DATA "LiNbO3/struct2"
 
-CONST Coord,Indices,a1,a2,a3,b1,b2,b3 : rvector
-CONST weight,c1,c2,c3,h,k,l,aa,ca,para,sin30,cos30 : real
-CONST StrucFa,FormNb,FormLi : complex
+SYM Coord,Indices,a1,a2,a3,b1,b2,b3 : rvector
+SYM weight,c1,c2,c3,h,k,l,aa,ca,para,sin30,cos30 : real
+SYM StrucFa,FormNb,FormLi : complex
 
 sin30 = sin (30*pi/180)
 cos30 = cos (30*pi/180)

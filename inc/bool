@@ -13,7 +13,7 @@ FUNC &&  : bool,bool >> bool LA1 ATT and
 FUNC ||  : bool,bool >> bool LA1 ATT or
 FUNC is_int : real >> bool       ATT is_int
 
-CONST true,false : bool
+SYM true,false : bool
 
 true  = (1==1)
 false = (1==0)

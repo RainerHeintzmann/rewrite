@@ -389,7 +389,7 @@ class Ctx:
     def __init__(self):
         self.pvars = {}          # Mathematica name -> rewrite name
         self.xname = None        # name of the integration variable
-        self.kvars = []          # NUM placeholders for negative numbers
+        self.kvars = []          # NUMPAT placeholders for negative numbers
         self.extra = []          # extra conditions (placeholders)
 
     def var(self, name, optional):
@@ -1421,11 +1421,11 @@ def main():
 
     with open(os.path.join(out_dir, 'declarations'), 'w', newline='\n') as f:
         f.write('# Declarations for the translated Rubi rules (rubi2rewrite.py)\n')
-        f.write('VAR %s : number\n' % ','.join(sorted(all_vars['P'])))
-        f.write('VAR %s : number\n' % ','.join(sorted(all_vars['O'])))
+        f.write('PAT %s : number\n' % ','.join(sorted(all_vars['P'])))
+        f.write('PAT %s : number\n' % ','.join(sorted(all_vars['O'])))
         f.write('OPT %s\n' % ','.join(sorted(all_vars['O'])))
         if all_vars['K']:
-            f.write('NUM %s : real\n' % ','.join(sorted(all_vars['K'], key=lambda k: int(k[2:]))))
+            f.write('NUMPAT %s : real\n' % ','.join(sorted(all_vars['K'], key=lambda k: int(k[2:]))))
     with open(os.path.join(out_dir, 'all'), 'w', newline='\n') as f:
         f.write(LOADER % '\n'.join('INC "inc/integration/rubi/%s"' % n for n in names))
     write_steps(out_dir)

@@ -5,21 +5,21 @@
 #     INC "inc/rmatrix"
 DATA "LiNbO3/struct"
 
-# CONST h,k,l : real
+# SYM h,k,l : real
 
 
-CONST Coord,Indices,a1,a2,a3,b1,b2,b3,p1,p2,p3,S,G,Cvec,Dvec : rvector
+SYM Coord,Indices,a1,a2,a3,b1,b2,b3,p1,p2,p3,S,G,Cvec,Dvec : rvector
 
-CONST c1,c2,c3,aa,ca,para,d,sin30,cos30,Vuc,A,C,D,MuDivRho,rho,Zges,MuDivRhoGes : real
-CONST DiffAtoms,ThisAtoms,SFA,SFB,SFC,Z,atom,SumA : real
-CONST ThetaB,sinThetaB,kappa,t05,mu,thick : real
+SYM c1,c2,c3,aa,ca,para,d,sin30,cos30,Vuc,A,C,D,MuDivRho,rho,Zges,MuDivRhoGes : real
+SYM DiffAtoms,ThisAtoms,SFA,SFB,SFC,Z,atom,SumA : real
+SYM ThetaB,sinThetaB,kappa,t05,mu,thick : real
 
-CONST Fg : complex # Structur Factor
-CONST fb : complex # Atomic Form Factor
-CONST Xg : complex # Complex Susceptibility
+SYM Fg : complex # Structur Factor
+SYM fb : complex # Atomic Form Factor
+SYM Xg : complex # Complex Susceptibility
 
-CONST indj,indk,num,value : real
-CONST d1jk,d2jk,d3jk : rmatrix
+SYM indj,indk,num,value : real
+SYM d1jk,d2jk,d3jk : rmatrix
 
 Cvec=zerovec(100)
 Dvec=Cvec

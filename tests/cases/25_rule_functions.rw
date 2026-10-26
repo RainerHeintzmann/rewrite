@@ -5,7 +5,7 @@
 INC "inc/all"
 INC "inc/helpers"
 TERM T : real
-CONST yy,nn : real
+SYM yy,nn : real
 x = yy
 # a partial derivative: D of inc/alg, with every term free of x constant
 ALG PdDef
@@ -21,7 +21,7 @@ T
 T = REWR deriv(x^3+nn*x,x) : All
 T
 # a rule function in the condition of a rule list (nested rewriting)
-VAR Uu,Xx : real
+PAT Uu,Xx : real
 OPT Uu
 DEFAULT * = 1
 COMM +,*

@@ -58,10 +58,10 @@ static Node * sym_att (Node * id, int hold);	/* below */
 	char 	* y_chr;
 	}
 
-%token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ INFO
+%token			SYM PAT SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUMPAT ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA COMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD RULES SHOW
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD RULES SHOW REALNUM TYPEOF
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -117,8 +117,8 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	PRECEDENCE att {	$$=mknod(FUN
 																				mknod(PARAM,mknod(FUNC,(Node *) att_fn,mknod(PARAM,(Node *) $2,$8)),NULL))));
 																	$$=mknod(FUNC,(Node *) sequence,fnlist);
 																	}
-			| VAR idlist ':' Sort			 {$$=DECLARE($2,Var,(Node *) $4,NULL,FALSE);}
-			| NUM Sort	 			  			 {$$=mknod(FUNC,(Node *) set_numbertype,(Node *) ($2)); /* sets numbertype for mknum */}
+			| PAT idlist ':' Sort			 {$$=DECLARE($2,Var,(Node *) $4,NULL,FALSE);}
+			| REALNUM Sort	 			  		 {$$=mknod(FUNC,(Node *) set_numbertype,(Node *) ($2)); /* sets numbertype for mknum */}
 			| SUBSORT Sort ',' Sort ATT Id	 {$$=mknod(FUNC,(Node *) subsort_def,   /* 2026: subsort */
 										      mknod(PARAM,(Node *) $2,mknod(PARAM,(Node *) $4,(Node *) give_ufn(name($6)))));}
 			| SUBSORT Sort ',' Sort		 {$$=mknod(FUNC,(Node *) subsort_def,   /* 2026: subsort of a sort without values */
@@ -129,9 +129,11 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	PRECEDENCE att {	$$=mknod(FUN
 										      mknod(PARAM,(Node *) $2,NULL));}
 			| INTNUM Sort ATT Id		 {$$=mknod(FUNC,(Node *) intnum_def,    /* 2026: sort of integers */
 										      mknod(PARAM,(Node *) $2,(Node *) give_ufn(name($4))));}
-			| NUM idlist ':' Sort			 { /* Variables for numeric numbers */
+			| NUMPAT idlist ':' Sort		 { /* pattern variables for numbers */
 									                $$=DECLARE($2,Var,(Node *) $4,NULL,TRUE);}
-			| CST idlist ':' Sort			 {$$=DECLARE($2,Const,(Node *) $4,NULL,FALSE);}
+			| SYM idlist ':' Sort			 {$$=DECLARE($2,Const,(Node *) $4,NULL,FALSE);}
+			| TYPEOF term			 {$$=mknod(FUNC,(Node *) typeof_fn,$2);}	/* 2026: the sort of a term */
+			| TYPEOF func			 {$$=mknod(FUNC,(Node *) typeof_func,(Node *) $2);}	/* 2026: the variants of a function */
 			| SPEC Alg ':' alglist	   {$$ = mknod(FUNC,(Node *) spec,mknod(PARAM,(Node *) $2,(Node *) $4));}
 			| SPEC Alg ':' formlist		 {$$ = mknod(FUNC,(Node *) spec_form,mknod(PARAM,(Node *) $2,$4));	}
 			| ADDSPEC Alg ':' formlist {$$ = mknod(FUNC,(Node *) a_spec_form,mknod(PARAM,(Node *) $2,$4));}

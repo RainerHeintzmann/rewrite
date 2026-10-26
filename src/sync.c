@@ -280,6 +280,84 @@ history_store(np->r);
 
 }
 
+/* 2026: TYPEOF term: the sort of the term, as the sort system chose it
+   when the term was built; for a name also its kind (SYM, TERM, PAT,
+   NUMPAT) and its value or term */
+static const char * sort_name (Node * s)
+{
+	return s ? name((Symbol *) s) : "?";
+}
+
+void typeof_fn (Node * np)
+{
+	Node * t = np->r;
+	Symbol * sp = NULL;
+	if (t->type == Const) sp = (Symbol *) t->l;
+	else if (t->type == SYM_TYPE) sp = (Symbol *) t;
+	if (sp && find_symbol(name(sp)) == sp)		/* a declared name, no number */
+		{
+		switch (lexval(sp))
+			{
+			case Const:
+				printfOut("SYM %s : %s", name(sp), sort_name(rtypes(sp)));
+				if (hasval(sp))
+					{
+					printfOut(" = ");
+					((void (*) (void *)) show(rtypes(sp))) (value(sp));
+					}
+				else
+					printfOut(" (no value)");
+				break;
+			case Term:
+				printfOut("TERM %s : %s", name(sp), sort_name(rtypes(sp)));
+				if (((Node *) sp)->l)
+					{
+					printfOut(" = ");
+					tprint(((Node *) sp)->l, 0);
+					}
+				else
+					printfOut(" (no term)");
+				break;
+			case Var:
+				printfOut("%s %s : %s", hasval(sp) ? "NUMPAT" : "PAT", name(sp), sort_name(rtypes(sp)));
+				break;
+			default:
+				printfOut("%s : %s", name(sp), sort_name(rtypes(sp)));
+			}
+		printfOut("\n");
+		return;
+		}
+	tprint(t, 0);
+	printfOut(": %s\n", sort_name(get_type(t)));
+}
+
+/* TYPEOF f: the variants of a function, its argument and result sorts */
+static void print_sorts (Node * a)
+{
+	int var = 0;
+	if (! a) { printfOut("()"); return; }
+	if (a->type == VARPAR) { var = 1; a = a->l; }
+	for ( ; a->r != NULL; a = a->r)
+		printfOut("%s,", sort_name(a->l));
+	printfOut("%s%s", sort_name(a), var ? "++" : "");
+}
+
+void typeof_func (Node * np)
+{
+	Symbol * f = (Symbol *) np->r, * v = f;
+	do	{
+		printfOut("%s : ", name(v));
+		print_sorts(atypes(v));
+		printfOut(" >> %s", sort_name(rtypes(v)));
+		if (exe_always(v)) printfOut("   (defined by a term)");
+		else if (builtin(v)) printfOut("   (symbolic C function or rules)");
+		else if (hasval(v)) printfOut("   (numerical C function)");
+		else printfOut("   (symbolic)");
+		printfOut("\n");
+		v = variants(v);
+		} while (v && v != f);
+}
+
 void printstring (Node * np)
 {char * cp;
 cp= name(((Symbol *) (np -> r)));
@@ -308,7 +386,7 @@ Node * rslt;
 while (((froass)->type != Const) && (froass->type != Func))
 	{
 	if (!(froass->l))	
-		{ErrorMsg("Wrong const-assignment : no Valid Term\n");
+		{ErrorMsg("Wrong assignment to a SYM : no Valid Term\n");
 		return;}
 	froass=froass->l;
 	}
@@ -319,15 +397,15 @@ rslt = calculate(froass);
 if (rtypes(toass) && ! sort_valued(rtypes(toass)) && (rslt || froass->type == Func))
 	{
 	ErrorMsg("");
-	printfErr("Wrong const-assignment : the sort %s of '%s' has no numerical values;\n"
-	          "  declare a value sort (e.g. CONST %s : real), or store a term in a TERM\n",
+	printfErr("Wrong assignment to a SYM : the sort %s of '%s' has no numerical values;\n"
+	          "  declare a value sort (e.g. SYM %s : real), or store a term in a TERM\n",
 	          name((Symbol *) rtypes(toass)), name(toass), name(toass));
 	if (rslt) delnum((Symbol *) rslt, TRUE);
 	return;
 	}
 
 /* 2026: a term of a sort without values, assigned to a constant of a wider
-   sort with values: converted (a list [1,2,3] for a CONST of sort rvector,
+   sort with values: converted (a list [1,2,3] for a SYM of sort rvector,
    SUBSORT vector,rvector ATT constr_vec) */
 if (! rslt && froass->type == Func && get_type(froass) && rtypes(toass)
     && get_type(froass) != rtypes(toass) && ! sort_valued(get_type(froass))
@@ -354,7 +432,7 @@ if (! rslt && froass->type == Func && get_type(froass)
 	{
 	const char * sn = name((Symbol *) get_type(froass));
 	ErrorMsg("");
-	printfErr("Wrong const-assignment : the term (sort %s) has no numerical value, '%s' (sort %s) is not changed;\n"
+	printfErr("Wrong assignment to a SYM : the term (sort %s) has no numerical value, '%s' (sort %s) is not changed;\n"
 	          "  a term is stored in a TERM, e.g. TERM t : %s\n",
 	          sn, name(toass), name((Symbol *) rtypes(toass)), sn);
 	return;
@@ -365,7 +443,7 @@ if (! rslt && froass->type == Func && get_type(froass)
 if (rslt && rtypes(toass) != rtypes((Symbol *) rslt)
     && sort_dist(rtypes((Symbol *) rslt), rtypes(toass)) < 0)
  	{
- 	ErrorMsg("Wrong const-assignment : different types\n");
+ 	ErrorMsg("Wrong assignment to a SYM : different types\n");
  	delete(rslt);
  	return;
  	}
@@ -466,7 +544,7 @@ if  (nsteps < 0)
 	}
 
 if (FOR_VAR(np) -> type != Const)
-	{ErrorMsg("Assigned Term should be a CONST - Value \n");
+	{ErrorMsg("Assigned Term should be a SYM with a value \n");
 	delnum((Symbol *) p_from,TRUE); /* also value */
 	delnum((Symbol *) p_to,TRUE); /* also value */
 	if (p_step) delnum((Symbol *) p_step,TRUE); /* also value */
@@ -742,7 +820,7 @@ BOOLEAN eq_rtypes(Node * a,Node * typ)
 		DEBG((4,"DB : eq_rtypes : a->type is 'Terms' \n"));
 		return FALSE;
 
-	case SYM_TYPE: /* VAR (replaced VARs are overwritten with Const or Func)*/
+	case SYM_TYPE: /* PAT (replaced PATs are overwritten with Const or Func)*/
 		DEBG((4,"DB : eq_rtypes Termsort : %s  required sort : %s \n",name((Symbol *) (rtypes((Symbol *)(a)))),name((Symbol *) (typ))));
 		if (typ!=rtypes((Symbol *) (a))) /* ! eq_sorts(typ,rtypes..) causes immediate reduction */
 			 return FALSE;

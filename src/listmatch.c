@@ -223,7 +223,7 @@ static BOOLEAN lm_solve (Goal * g)
 			{
 			if (t->type != Const && t->type != Func) return FALSE;
 			if (! var_sort_ok(rtypes(ps), t)) return FALSE;	/* subsorts (nonneg, ...) */
-			if (hasval(ps))			/* NUM: only numbers */
+			if (hasval(ps))			/* NUMPAT: only numbers */
 				if (t->type != Const || ! hasval(t->l) || lexval((Symbol *) t->l) != Const
 				    || symbolic_constant((Symbol *) t->l))	/* pi in exact mode: no number */
 					return FALSE;

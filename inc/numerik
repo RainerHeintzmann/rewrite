@@ -1,11 +1,11 @@
-CONST _step  : real
-CONST _steps : real
-CONST _myerg : real
-CONST _tmp1   : real
-CONST _tmp2   : real
-CONST _tmp3   : real
-CONST _best  : real
-CONST _bestx : real
+SYM _step  : real
+SYM _steps : real
+SYM _myerg : real
+SYM _tmp1   : real
+SYM _tmp2   : real
+SYM _tmp3   : real
+SYM _best  : real
+SYM _bestx : real
 
 TERM num : real
 

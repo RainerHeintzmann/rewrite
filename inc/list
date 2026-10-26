@@ -14,7 +14,7 @@
 #     INC "inc/list"
 
 # vector and matrix have no ATT: like number, they are purely symbolic
-# sorts without numerical values (a list is stored in a TERM, not in a CONST)
+# sorts without numerical values (a list is stored in a TERM, not in a SYM)
 SORT vector
 SUBSORT vector,number
 SORT matrix
@@ -25,7 +25,7 @@ OTHER [       : vector++ >> matrix                              # [[a,b],[c,d]]:
 OTHER [       : bool++ >> vector                                # [x == 1, y == 2]
 OTHER [       : algebra++ >> algebra                            # lists of matrices
 SYMBOLIC "list" = "["
-CONST nil     : vector                                          # the empty list
+SYM nil     : vector                                          # the empty list
 FUNC  list    : number++ >> vector  ATT SYMBOLIC tolist         # list(a,b,c) = [a,b,c]
 OTHER list    : vector++ >> matrix  ATT SYMBOLIC tolist
 OTHER list    : bool++ >> vector    ATT SYMBOLIC tolist
@@ -64,7 +64,7 @@ OTHER table   : algebra,number,number >> algebra ATT SYMBOLIC HOLD table
 OTHER select  : algebra,number,bool >> algebra ATT SYMBOLIC HOLD select
 
 # arithmetic element by element (listop) and the matrix product (matmul);
-# they stay as they are for symbolic matrices (CONST A : matrix)
+# they stay as they are for symbolic matrices (SYM A : matrix)
 OTHER +       : vector,vector >> vector  ATT SYMBOLIC listop
 OTHER +       : vector,number >> vector  ATT SYMBOLIC listop
 OTHER +       : number,vector >> vector  ATT SYMBOLIC listop

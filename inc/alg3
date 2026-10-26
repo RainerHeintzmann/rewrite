@@ -1,5 +1,5 @@
 SORT real
-NUM real
+REALNUM real
 
 SORT group
 SORT agroup
@@ -15,25 +15,25 @@ SORT complex
 complex IS vkoerper
 
 
-VAR A,B,C,X,Y,Z : real
-VAR Ag,Bg,Cg,Xg,Yg,Zg : group
-VAR Aag,Bag,Cag,Xag,Yag,Zag : agroup
-VAR Ar,Br,Cr,Xr,Yr,Zr : ring
-VAR Ak,Bk,Ck,Xk,Yk,Zk : koerper
-VAR Avk,Bvk,Cvk,Xvk,Yvk,Zvk : vkoerper
-NUM N,M : real
+PAT A,B,C,X,Y,Z : real
+PAT Ag,Bg,Cg,Xg,Yg,Zg : group
+PAT Aag,Bag,Cag,Xag,Yag,Zag : agroup
+PAT Ar,Br,Cr,Xr,Yr,Zr : ring
+PAT Ak,Bk,Ck,Xk,Yk,Zk : koerper
+PAT Avk,Bvk,Cvk,Xvk,Yvk,Zvk : vkoerper
+NUMPAT N,M : real
 
-CONST gn : group # Neutrales Element
+SYM gn : group # Neutrales Element
 
-CONST x,y,z,a,b,c,dummi,merk : real
-CONST _x : real # allg. Integrationsvariable
-CONST maxreal  : real
-CONST minreal  : real
+SYM x,y,z,a,b,c,dummi,merk : real
+SYM _x : real # allg. Integrationsvariable
+SYM maxreal  : real
+SYM minreal  : real
 maxreal=  1e38
 minreal= -1e38
 
 
-CONST i,e,pi : real  # sqrt(-1),e,pi
+SYM i,e,pi : real  # sqrt(-1),e,pi
 
 #  e  = 2.718281828459			siehe mathnum
 #  pi = 3.141592653589793

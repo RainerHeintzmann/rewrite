@@ -2,11 +2,11 @@
 # Inputs :
 #
 
-CONST pose : rvector # position of the electron
-CONST pe : rvector   # momentum of the electron
-CONST pos2,e12a,e12b,e12c : rvector  # position of observer, apparent relative unit vector
-CONST l12 : real                     # distance
-CONST t12a,t12b,t12c,dummy : real          # time at the observer
+SYM pose : rvector # position of the electron
+SYM pe : rvector   # momentum of the electron
+SYM pos2,e12a,e12b,e12c : rvector  # position of observer, apparent relative unit vector
+SYM l12 : real                     # distance
+SYM t12a,t12b,t12c,dummy : real          # time at the observer
 
 TERM E,B,F,d2dt2_e,Be : rvector # E=electric field,B = corresp. magnetic field,force,2nd deriv. (posrel), magnetic field for electron
 TERM t12 : real

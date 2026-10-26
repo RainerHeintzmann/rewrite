@@ -3,9 +3,9 @@
 # function inputs : F=force, dt=time step, m0 = rest mass or m mass
 # motion of a particle
 
-CONST dt,m0 : real
+SYM dt,m0 : real
 
-CONST pos,p,vel : rvector    # position of the particle, momentum, velocity
+SYM pos,p,vel : rvector    # position of the particle, momentum, velocity
 TERM m : real
 m= m0/(1-sqr(vel/c))^.5 # relativistic mass
 

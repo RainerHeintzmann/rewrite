@@ -50,7 +50,7 @@ static void mark_optional (Symbol * sp)
 	int i;
 	if (lexval(sp) != Var)
 		{
-		printfErr("error : OPT %s : only meta variables (VAR, NUM) can be optional !\n",name(sp));
+		printfErr("error : OPT %s : only pattern variables (PAT, NUMPAT) can be optional !\n",name(sp));
 		return;
 		}
 	for (i = 0; i < n_opt; i++)

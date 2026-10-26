@@ -8,7 +8,7 @@ INC "inc/linalg"
 FUNC never : real >> real
 ALG raw
 SPEC raw : never(X) = X
-CONST g,p,qq,r,ss,t,u,v,w : real
+SYM g,p,qq,r,ss,t,u,v,w : real
 TERM AA : matrix
 # ---- structure
 REWR transpose([[a,b,g],[1,2,3]]) : raw
@@ -68,8 +68,8 @@ transpose(transpose([1,2]))
 transpose(range(12))
 transpose([p+1,qq])
 # symbolic vectors: transpose(u)*v is a scalar and commutes with matrices
-CONST uu,vv : vector
-CONST MM : matrix
+SYM uu,vv : vector
+SYM MM : matrix
 transpose(uu)*vv
 uu*transpose(vv)
 REWR transpose(MM*uu) : MatrixRules

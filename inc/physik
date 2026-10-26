@@ -1,48 +1,48 @@
-CONST ep     : real
-CONST er     : real
-CONST alpha  : real
-CONST beta   : real
-CONST gamma  : real
-CONST delta  : real
-CONST phi    : real
-CONST ld,lmd,lamda : real
-CONST theta  : real
-CONST w      : real
-CONST F      : real
-CONST T      : real
-CONST t      : real
-CONST dt     : real
-CONST r      : real
-CONST v      : real
-CONST m      : real
-CONST m1,m2,m3     : real
-CONST x0,y0,x1,y1,x2,y2,x3,y3     : real
-CONST vx0,vy0,vx1,vy1,vx2,vy2,vx3,vy3    : real
-CONST ax0,ay0,ax1,ay1,ax2,ay2,ax3,ay3    : real
+SYM ep     : real
+SYM er     : real
+SYM alpha  : real
+SYM beta   : real
+SYM gamma  : real
+SYM delta  : real
+SYM phi    : real
+SYM ld,lmd,lamda : real
+SYM theta  : real
+SYM w      : real
+SYM F      : real
+SYM T      : real
+SYM t      : real
+SYM dt     : real
+SYM r      : real
+SYM v      : real
+SYM m      : real
+SYM m1,m2,m3     : real
+SYM x0,y0,x1,y1,x2,y2,x3,y3     : real
+SYM vx0,vy0,vx1,vy1,vx2,vy2,vx3,vy3    : real
+SYM ax0,ay0,ax1,ay1,ax2,ay2,ax3,ay3    : real
 
 # units:
 
-CONST  _E,_P,_T,_G,_M,_k,_h,_da,_d,_c,_m,_my,_mu,_n,_p,_f,_a,_Ang,_eV : real
+SYM  _E,_P,_T,_G,_M,_k,_h,_da,_d,_c,_m,_my,_mu,_n,_p,_f,_a,_Ang,_eV : real
 
 # special constants : (for numerical values : physnum)
 
-# CONST c      : real  # already defined    speed of light in vacuum
-CONST G      : real    # gravitational constant
-CONST e0     : real    # elementary charge
-CONST me     : real    # electron mass
-CONST mp     : real    # proton mass
-CONST g      : real    # gravitational acceleration
-CONST R      : real    # universal gas constant
-CONST Na     : real    # Avogadro constant
-CONST k,kb   : real    # Boltzmann constant
-CONST h      : real    # Planck constant
-CONST hq     : real    # Planck constant
-CONST ep0    : real    # electric constant
-CONST my0,mu0 : real    # magnetic constant
-CONST TK     : real    # 0 C = TK (273.15) K
-CONST bel    : real    # scattering length of the electron (e0*e0/(4*pi*ep0*me*c*c))
+# SYM c      : real  # already defined    speed of light in vacuum
+SYM G      : real    # gravitational constant
+SYM e0     : real    # elementary charge
+SYM me     : real    # electron mass
+SYM mp     : real    # proton mass
+SYM g      : real    # gravitational acceleration
+SYM R      : real    # universal gas constant
+SYM Na     : real    # Avogadro constant
+SYM k,kb   : real    # Boltzmann constant
+SYM h      : real    # Planck constant
+SYM hq     : real    # Planck constant
+SYM ep0    : real    # electric constant
+SYM my0,mu0 : real    # magnetic constant
+SYM TK     : real    # 0 C = TK (273.15) K
+SYM bel    : real    # scattering length of the electron (e0*e0/(4*pi*ep0*me*c*c))
 
-CONST u      : real    # atomic mass unit
+SYM u      : real    # atomic mass unit
 
 ADDSPEC diff : D(er,t) = D(phi,t) * ep
 ADDSPEC diff : D(ep,t) = - D(phi,t) * er

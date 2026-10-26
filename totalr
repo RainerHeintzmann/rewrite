@@ -1,8 +1,8 @@
-CONST alpha0,nr : real
+SYM alpha0,nr : real
 
-CONST alpha1,alphatot,alpharef,alphar,alphar1,nbr,nbr2,alphartot, alphartot1 : real
-CONST alr2,alr2tot,thettot,Reflein,eps,scale,width,LAMBDA,temp : real
-CONST pos,ergx,ergy,alout,aloutr,Refl,Intensity : rvector
+SYM alpha1,alphatot,alpharef,alphar,alphar1,nbr,nbr2,alphartot, alphartot1 : real
+SYM alr2,alr2tot,thettot,Reflein,eps,scale,width,LAMBDA,temp : real
+SYM pos,ergx,ergy,alout,aloutr,Refl,Intensity : rvector
 
 # lambda = 1.54 # CuKalpha
 

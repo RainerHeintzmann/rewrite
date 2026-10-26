@@ -1,7 +1,7 @@
 # inc/rvector: numerical real vectors (C arrays of doubles), for fast
 # numerics. The brackets are the lists of inc/list: a list of numbers is
 # converted into an rvector where one is expected (SUBSORT below), e.g.
-#     CONST v : rvector
+#     SYM v : rvector
 #     v = [1,2,3]
 #     [1,0,0]*v              # scalar product
 # Needs inc/all and inc/list:

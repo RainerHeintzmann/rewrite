@@ -2,7 +2,7 @@
 
 # definition of some constants
 
-CONST h,k,l,lambda,Egy : real
+SYM h,k,l,lambda,Egy : real
 
 h=0
 k=0

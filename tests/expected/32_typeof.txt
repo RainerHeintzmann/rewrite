@@ -1,0 +1,22 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+SYM kk : real (no value)
+SYM kk : real = 3 
+SYM a : real (no value)
+TERM vv : vector = [1, 2, 3] 
+PAT X : real
+NUMPAT N : real
+3 : natural
+1 / 2 : rational
+0.5 : real
+x + 1 : real
+[1, 2] * x : vector
+[[1, 2], [3, 4]] : matrix
+transpose ([1, 2] ): covector
+transpose ([1, 2] )* [3, 4] : number
+SYM pi : real = 3.14159 
+sin : real >> real   (numerical C function)
+sin : complex >> complex   (numerical C function)
+sin : number >> number   (symbolic)
+transpose : matrix >> matrix   (symbolic C function or rules)
+transpose : vector >> covector   (symbolic)
+transpose : covector >> vector   (symbolic C function or rules)

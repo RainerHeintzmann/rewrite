@@ -421,7 +421,7 @@ INC "inc/integration/all"
 INC "inc/integration/rubi/all"
 PRTNUM "%.15g "
 TERM FF : number
-CONST yy : real
+SYM yy : real
 x = yy
 '''
 
@@ -433,7 +433,7 @@ def run_batch(exe, items, timeout):
         params |= ps
     prog = [HEAD]
     if params:
-        prog.append('CONST %s : real\n' % ','.join(pname(p) for p in sorted(params)))
+        prog.append('SYM %s : real\n' % ','.join(pname(p) for p in sorted(params)))
     for key, integrand, _ in items:
         prog.append('PRT "@@BEGIN %s@@"\nFF = REWR Int(%s,x) : RubiIntegrate\nFF\n'
                     'PRT "@@END@@"\n' % (key, integrand))

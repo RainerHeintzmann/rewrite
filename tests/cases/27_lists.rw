@@ -5,7 +5,7 @@ INC "inc/exact"
 INC "inc/list"
 TERM LL : vector
 TERM MM : matrix
-CONST yy,aa,kk : real
+SYM yy,aa,kk : real
 x = yy
 LL = [3, aa, x^2]
 length(LL)

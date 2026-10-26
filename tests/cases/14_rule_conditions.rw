@@ -1,6 +1,6 @@
-# User-defined rule sets with conditions. NUM meta variables only match numbers.
+# User-defined rule sets with conditions. NUMPAT meta variables only match numbers.
 INC "inc/all"
-NUM NN : real
+NUMPAT NN : real
 FUNC half : real >> real
 ALG hv
 SPEC hv : IF (NN > 0) half(NN) = NN/2
@@ -10,7 +10,7 @@ REWR half(0.5) : hv
 REWR half(0) : hv
 REWR half(x) : hv
 # IN / NIN conditions
-VAR AA,BB : real
+PAT AA,BB : real
 FUNC dep : real,real >> real
 ALG dv
 SPEC dv : IF NIN(AA,BB) dep(AA,BB) = 0

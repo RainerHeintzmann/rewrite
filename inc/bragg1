@@ -1,7 +1,7 @@
 # calculation of the diffraction at the slit created by the sharp
 # Bragg condition
 
-CONST Phi0,Phi,Steps1,Steps2,PhiMax,l,DThetaB,sinThetaB,ld,k,t,SUM,a,step1,step2,I0 : real
+SYM Phi0,Phi,Steps1,Steps2,PhiMax,l,DThetaB,sinThetaB,ld,k,t,SUM,a,step1,step2,I0 : real
 l = 30             # distance to the source
 DThetaB = 10 * _my # 3 * _my
 ld = 1.09e-10
@@ -31,9 +31,9 @@ b = k/2/l
 
 step2 = DThetaB/(Steps2+0.1)
 
-FUNC Ages : real >> complex ATT (CONST Phi : real)  {
-CONST Phi0s : real
-CONST A1 : complex
+FUNC Ages : real >> complex ATT (SYM Phi : real)  {
+SYM Phi0s : real
+SYM A1 : complex
 
 A1=Cpx(0,0)
 
@@ -47,8 +47,8 @@ RETURN A1*step2
 
 step1 = (PhiMax-Phi0)/Steps1
 
-FUNC Idetektor : real >> real ATT (CONST Phi0 : real) {
-CONST SUM : real
+FUNC Idetektor : real >> real ATT (SYM Phi0 : real) {
+SYM SUM : real
 SUM=0
 
 FOR Phi=Phi0-DThetaB/2 TO Phi0+DThetaB/2 STEP step2 DO {

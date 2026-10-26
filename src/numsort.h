@@ -19,7 +19,7 @@
  *
  *	INTNUM makes numbers written without '.' and exponent (12, 0, 7) values
  *	of the given sort, created by the C function from the text. Without
- *	INTNUM all numbers are of the sort set with NUM (real).
+ *	INTNUM all numbers are of the sort set with REALNUM (real).
  */
 
 #include "run.h"
@@ -41,7 +41,7 @@ void * term_convert (Node * term, Node * to);	/* a list [1,2,3] as an rvector */
 Symbol * int_literal (const char * text);
 
 /* value of a number symbol as a double (via the subsort chain up to the
- * NUM sort); FALSE if it is no number of such a sort */
+ * REALNUM sort); FALSE if it is no number of such a sort */
 BOOLEAN num_to_double (Symbol * num, double * v);
 
 /* exact numbers made in C (integer if q == 1, else rational); NULL if

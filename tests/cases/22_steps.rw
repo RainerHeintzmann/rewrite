@@ -5,7 +5,7 @@ INC "inc/all"
 INC "inc/integration/all"
 INC "inc/integration/rubi/all"
 TERM FF : real
-CONST yy : real
+SYM yy : real
 x = yy
 STEPS RubiRules "inc/integration/rubi/steps"
 FF = REWR Int(x^2*sqrt(1-x^2),x) : RubiIntegrate

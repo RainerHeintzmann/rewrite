@@ -5,8 +5,8 @@ INC "inc/all"
 INC "inc/integration/all"
 INC "inc/list"
 INC "inc/linalg"
-CONST MA,MB,MC,MX : matrix
-CONST g : real
+SYM MA,MB,MC,MX : matrix
+SYM g : real
 # rules for numbers do not see matrix products: A*B - B*A stays
 REWR transpose(MA*MB) : MatrixRules
 REWR inverse(MA*MB*MC) : MatrixRules

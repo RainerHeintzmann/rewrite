@@ -3,8 +3,8 @@
 # condition refers to them. Declared ATT SYMBOLIC HOLD in inc/helpers.
 INC "inc/all"
 INC "inc/helpers"
-VAR Uu,Xx : real
-VAR Mc,Md,Mm : real
+PAT Uu,Xx : real
+PAT Mc,Md,Mm : real
 OPT Md,Mm
 DEFAULT + = 0
 DEFAULT * = 1
@@ -14,7 +14,7 @@ FUNC lin : real,real >> real
 ALG tm
 SPEC tm : IF (matchq(Uu, (Mc+Md*Xx)^Mm, freeq(Mc,Xx) && freeq(Md,Xx) && freeq(Mm,Xx))) lin(Uu,Xx) = 1
 ADDSPEC tm : lin(Uu,Xx) = 0
-CONST zz : real
+SYM zz : real
 # c required: (3+2x)^5 and zz+2x match, x^5 and x do not
 REWR lin((3+2*x)^5,x) : tm
 REWR lin(2*x+zz,x) : tm

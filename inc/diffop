@@ -2,15 +2,15 @@
 SORT doperator   # differential op.
 SORT vdoperator  # vector differential op.
 
-VAR DOP1 : doperator
-VAR DOP2 : doperator
-VAR DOP3 : doperator
-VAR VDOP1 : vdoperator
-VAR VDOP2 : vdoperator
-VAR VDOP3 : vdoperator
+PAT DOP1 : doperator
+PAT DOP2 : doperator
+PAT DOP3 : doperator
+PAT VDOP1 : vdoperator
+PAT VDOP2 : vdoperator
+PAT VDOP3 : vdoperator
 
-CONST \/ : vdoperator # Nabla
-CONST /\ : doperator # Laplace
+SYM \/ : vdoperator # Nabla
+SYM /\ : doperator # Laplace
 
 OTHER * : real,doperator    >> doperator # not commutative !
 OTHER * : real,vdoperator   >> vdoperator # not commutative !

@@ -1,5 +1,5 @@
 SORT real
-NUM real
+REALNUM real
 
 # DEBUG 5
 
@@ -18,7 +18,7 @@ FUNC &&  : bool,bool >> bool LA1 ATT and
 FUNC ||  : bool,bool >> bool LA1 ATT or
 FUNC is_int : real >> bool       ATT is_int
 
-CONST true,false : bool
+SYM true,false : bool
 
 true  = (1==1)
 false = (1==0)
@@ -33,31 +33,31 @@ SORT complex
 
 ATT complex show_complex,cmp_complex,cpy_complex,del_complex
 
-VAR A,B,C,X,Y,Z : real
-VAR As,Bs,Cs,Xs,Ys,Zs : sort
-VAR Ag,Bg,Cg,Xg,Yg,Zg : group
-VAR Aag,Bag,Cag,Xag,Yag,Zag : agroup
-VAR Ar,Br,Cr,Xr,Yr,Zr : ring
-VAR Ak,Bk,Ck,Xk,Yk,Zk : koerper
-VAR Avk,Bvk,Cvk,Xvk,Yvk,Zvk : vkoerper
-VAR Ac,Bc,Cc,Xc,Yc,Zc : complex
-NUM N,M : real
+PAT A,B,C,X,Y,Z : real
+PAT As,Bs,Cs,Xs,Ys,Zs : sort
+PAT Ag,Bg,Cg,Xg,Yg,Zg : group
+PAT Aag,Bag,Cag,Xag,Yag,Zag : agroup
+PAT Ar,Br,Cr,Xr,Yr,Zr : ring
+PAT Ak,Bk,Ck,Xk,Yk,Zk : koerper
+PAT Avk,Bvk,Cvk,Xvk,Yvk,Zvk : vkoerper
+PAT Ac,Bc,Cc,Xc,Yc,Zc : complex
+NUMPAT N,M : real
 
-CONST 0g      : group # Neutrales Element
-CONST 0ag     : agroup # Neutrales Element
-CONST 0r,1r   : ring
-CONST 0k,1k   : koerper
-CONST 0vk,1vk : vkoerper
-# CONST 0re,1re : real    0 und 1 sind nur einmal existent ! 
-CONST 0c,1c   : complex
+SYM 0g      : group # Neutrales Element
+SYM 0ag     : agroup # Neutrales Element
+SYM 0r,1r   : ring
+SYM 0k,1k   : koerper
+SYM 0vk,1vk : vkoerper
+# SYM 0re,1re : real    0 und 1 sind nur einmal existent ! 
+SYM 0c,1c   : complex
 
-CONST x,y,z,a,b,c,dummi,merk,n,j,l : real
-CONST _x : real # allg. Integrationsvariable
-CONST maxreal  : real
-CONST minreal  : real
+SYM x,y,z,a,b,c,dummi,merk,n,j,l : real
+SYM _x : real # allg. Integrationsvariable
+SYM maxreal  : real
+SYM minreal  : real
 
-CONST e,pi : real  # e,pi
-CONST i : complex  # sqrt(-1)
+SYM e,pi : real  # e,pi
+SYM i : complex  # sqrt(-1)
 
 #  e  = 2.718281828459			siehe mathnum
 #  pi = 3.141592653589793

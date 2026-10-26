@@ -1,20 +1,20 @@
 DATA "LiNbO3/struct"
 
-# CONST h,k,l : real
+# SYM h,k,l : real
 
 
-CONST Coord,Indices,a1,a2,a3,b1,b2,b3,p1,p2,p3,S,G : rvector
+SYM Coord,Indices,a1,a2,a3,b1,b2,b3,p1,p2,p3,S,G : rvector
 
-CONST c1,c2,c3,aa,ca,para,d,sin30,cos30,Vuc,Aw,C1,D1,MuDivRho,rho,Zges,MuDivRhoGes : real
-CONST DiffAtoms,ThisAtoms,SFA,SFB,SFC,Za,atom,SumA : real
-CONST ThetaB,sinThetaB,kappa,t05,mu,angx,angy,angz : real
+SYM c1,c2,c3,aa,ca,para,d,sin30,cos30,Vuc,Aw,C1,D1,MuDivRho,rho,Zges,MuDivRhoGes : real
+SYM DiffAtoms,ThisAtoms,SFA,SFB,SFC,Za,atom,SumA : real
+SYM ThetaB,sinThetaB,kappa,t05,mu,angx,angy,angz : real
 
-CONST Fg : complex # Structur Factor
-CONST fb : complex # Atomic Form Factor
-CONST Chig : complex # Complex Susceptibility
+SYM Fg : complex # Structur Factor
+SYM fb : complex # Atomic Form Factor
+SYM Chig : complex # Complex Susceptibility
 
-CONST indj,indk,number,value : real
-CONST d1jk,d2jk,d3jk : rmatrix
+SYM indj,indk,number,value : real
+SYM d1jk,d2jk,d3jk : rmatrix
 
 
 sin30 = sin (30*pi/180)

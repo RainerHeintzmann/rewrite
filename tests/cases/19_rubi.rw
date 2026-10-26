@@ -6,7 +6,7 @@ INC "inc/all"
 INC "inc/integration/all"
 INC "inc/integration/rubi/all"
 TERM FF,GG,HH : real
-CONST yy : real
+SYM yy : real
 x = yy
 FF = REWR Int(x^2,x) : RubiIntegrate
 FF

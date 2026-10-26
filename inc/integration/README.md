@@ -105,11 +105,11 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m), (neq(P_m,(-1)))
 | Rubi | rewrite |
 | --- | --- |
 | `x_Symbol` | `Xv` |
-| `a_` | `P_a`, a `VAR` |
-| `a_.` | `O_a`, a `VAR` declared with `OPT` |
+| `a_` | `P_a`, a `PAT` |
+| `a_.` | `O_a`, a `PAT` declared with `OPT` |
 | default of `a_.` in `+`, `*`, exponent | `DEFAULT + = 0`, `DEFAULT * = 1`, `DEFAULT RIGHT ^ = 1` |
 | order of factors and summands | `COMM +,*` |
-| negative number in a pattern, e.g. `-1` | a `NUM` variable `K_1` with the condition `(K_1 == (-1))` |
+| negative number in a pattern, e.g. `-1` | a `NUMPAT` variable `K_1` with the condition `(K_1 == (-1))` |
 | `FreeQ[{a,b},x]` | `NIN(Xv,O_a,O_b)` |
 | `c1 && c2` | `IF c1, c2` |
 | `With[{q = ...}, ...]`, `Module` with values only | `q` replaced by its value |

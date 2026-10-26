@@ -1,4 +1,4 @@
-CONST n,tt,tts,nx,nc,d,lambda,n2 : real
+SYM n,tt,tts,nx,nc,d,lambda,n2 : real
 
 d=0.79e-3
 lambda= 488e-09

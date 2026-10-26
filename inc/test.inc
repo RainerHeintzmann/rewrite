@@ -1,21 +1,21 @@
 SORT real
-NUM real
+REALNUM real
 
-VAR A : real
-VAR B : real
-VAR C : real
-VAR X : real
-VAR Y : real
-VAR Z : real
-NUM N : real
-NUM M : real
+PAT A : real
+PAT B : real
+PAT C : real
+PAT X : real
+PAT Y : real
+PAT Z : real
+NUMPAT N : real
+NUMPAT M : real
 
-CONST x : real
-CONST y : real
-CONST z : real
-CONST a : real
-CONST b : real
-CONST c : real
+SYM x : real
+SYM y : real
+SYM z : real
+SYM a : real
+SYM b : real
+SYM c : real
 
 FUNC +     : real,real >> real LA2		ATT  2
 FUNC *     : real,real >> real LA3		ATT  4

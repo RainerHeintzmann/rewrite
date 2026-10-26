@@ -1,8 +1,8 @@
-CONST alpha0,nr : real
+SYM alpha0,nr : real
 
-CONST alpha1,alphatot,alpharef,alphar,alphar1,nbr,nbr2,alphartot, alphartot1 : real
-CONST alr2,alr2tot,thettot,Refl,Reflein,alout,aloutr,eps,scale,width,LAMBDA : real
-CONST pos,ergx,ergy : rvector
+SYM alpha1,alphatot,alpharef,alphar,alphar1,nbr,nbr2,alphartot, alphartot1 : real
+SYM alr2,alr2tot,thettot,Refl,Reflein,alout,aloutr,eps,scale,width,LAMBDA : real
+SYM pos,ergx,ergy : rvector
 
 lambda = 0.993378 # /3 
 

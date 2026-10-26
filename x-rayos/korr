@@ -1,6 +1,6 @@
 # File for Correlating the datas
-CONST size,int,a,b,n,maxb,factorial : real
-CONST yval,xval : rvector
+SYM size,int,a,b,n,maxb,factorial : real
+SYM yval,xval : rvector
 
 size=380
 maxb=20

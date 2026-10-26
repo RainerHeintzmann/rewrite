@@ -12,7 +12,7 @@ arcsinh(1), arccosh(2), arctanh(0.5), arccoth(2)
 polylog(2,0.5), polylog(1,0.5), productlog(1)
 # ---- derivatives, checked against a difference quotient at x = 0.6
 TERM FF : real
-CONST yy,zz,hh : real
+SYM yy,zz,hh : real
 hh = 1e-6
 x = yy
 FF = REWR D(csc(x),x) : All
@@ -122,7 +122,7 @@ REWR rt(a,2) : raw
 REWR intpart(a+2.5) : raw
 REWR fracpart(a+2.5) : raw
 # a helper used in a rule condition
-VAR Uu,Xx : real
+PAT Uu,Xx : real
 FUNC qq : real,real >> real
 ALG tq
 SPEC tq : IF (polyq(Uu,Xx) && (expon(Uu,Xx) == 2)) qq(Uu,Xx) = coeff(Uu,Xx,2)

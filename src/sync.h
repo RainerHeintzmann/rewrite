@@ -29,6 +29,8 @@ extern void termassign (Node * np);
 extern void history_store (Node * np);
 
 extern void printterm (Node * np);
+extern void typeof_fn (Node * np);		/* 2026: TYPEOF term */
+extern void typeof_func (Node * np);	/* 2026: TYPEOF f */
 
 extern void printstring (Node * np);
 

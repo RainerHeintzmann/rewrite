@@ -393,7 +393,7 @@ BOOLEAN match2 (Node * term,Node * rtree)
 				}
 
 			/* Different sorts are assigned too, formerly: if (! eq_sorts(rtypes((Symbol *) rtree),rtypes(tsym))) return FALSE;*/
-			/* 2026: except for subsorts (VAR X : nonneg only matches nonneg) */
+			/* 2026: except for subsorts (PAT X : nonneg only matches nonneg) */
 			if (! var_sort_ok(rtypes((Symbol *) rtree), term))
 				{
 				RESTORE

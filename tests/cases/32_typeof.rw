@@ -1,0 +1,27 @@
+# TYPEOF: the sort of a term; for a name its kind (SYM, TERM, PAT, NUMPAT)
+# and value; for a function its variants.
+INC "inc/all"
+INC "inc/exact"
+INC "inc/list"
+INC "inc/linalg"
+SYM kk : real
+TYPEOF kk
+kk = 3
+TYPEOF kk
+TYPEOF a
+TERM vv : vector
+vv = [1,2,3]
+TYPEOF vv
+TYPEOF X
+TYPEOF N
+TYPEOF 3
+TYPEOF 1/2
+TYPEOF 0.5
+TYPEOF x + 1
+TYPEOF [1,2] * x
+TYPEOF [[1,2],[3,4]]
+TYPEOF transpose([1,2])
+TYPEOF transpose([1,2]) * [3,4]
+TYPEOF pi
+TYPEOF sin
+TYPEOF transpose

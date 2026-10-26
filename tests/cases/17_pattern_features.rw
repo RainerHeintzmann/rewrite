@@ -1,8 +1,8 @@
 # Optional pattern parts (OPT, DEFAULT), commutative operators (COMM) and
 # condition lists. One rule covers all forms of (a+b*x)^m.
 INC "inc/all"
-VAR Xx : real
-NUM Pa,Pb,Pm : real
+PAT Xx : real
+NUMPAT Pa,Pb,Pm : real
 OPT Pa,Pb,Pm
 DEFAULT + = 0
 DEFAULT * = 1
@@ -32,8 +32,8 @@ REWR lf(3+x,x) : tl2
 REWR lf(x+3,x) : tl2
 REWR lf(x,x) : tl2
 # condition lists: all conditions must hold
-NUM Pc : real
-VAR Pv : real
+NUMPAT Pc : real
+PAT Pv : real
 FUNC tst : real >> real
 ALG tc
 SPEC    tc : IF (Pc > 0), (Pc < 10) tst(Pc) = 1

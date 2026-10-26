@@ -12,10 +12,10 @@
 # Acta Crystallographica Section A (1994) 50, pp. 690-703
 #
 
-CONST g0,g1,P : complex
-CONST kp,Pa0,Pa1,betha1,LAMBDA,T,Ediff,rhoel,eprel,thick,densmod,dtn : real
-CONST U,E,Dholo : rvector # max displacement-vector, Electrical Fieldvector
-CONST Sjk : rmatrix # strain-Tensor
+SYM g0,g1,P : complex
+SYM kp,Pa0,Pa1,betha1,LAMBDA,T,Ediff,rhoel,eprel,thick,densmod,dtn : real
+SYM U,E,Dholo : rvector # max displacement-vector, Electrical Fieldvector
+SYM Sjk : rmatrix # strain-Tensor
 
 
 Pa0 = 1.0               # amplitude of displacive modulation

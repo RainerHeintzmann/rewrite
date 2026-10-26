@@ -12,7 +12,7 @@
 \geometry{margin=2.5cm}
 
 \lstdefinelanguage{rewrite}{
-  morekeywords={SORT,NUM,CONST,VAR,TERM,FUNC,OTHER,BRA,ATT,ALG,SPEC,ADDSPEC,
+  morekeywords={SORT,REALNUM,NUMPAT,SYM,PAT,TYPEOF,TERM,FUNC,OTHER,BRA,ATT,ALG,SPEC,ADDSPEC,
                 REWR,LIFT,TO,IF,ELSE,FOR,STEP,DO,WHILE,INC,PRT,PRTNUM,OUT,
                 DATA,RETURN,QUIT,NIN,IN,LB,LA1,LA2,LA3,LA4,LA5,RA,RU,
                 OPT,DEFAULT,RIGHT,COMM,SUBSORT,INTNUM},
@@ -126,13 +126,13 @@ expressions:
 
 \begin{lstlisting}
 SORT real                                 # a data type
-NUM real                                  # numbers typed in have sort real
+REALNUM real                              # numbers typed in have sort real
 FUNC + : real,real >> real LA2 ATT plus   # left-associative, priority 2
 FUNC * : real,real >> real LA3 ATT mult    # binds tighter than +
 FUNC ^ : real,real >> real RA  ATT power   # right-associative
 1+2*3                                     # prints 7
 2^3^2                                     # prints 512
-CONST x,y : real
+SYM x,y : real
 x+y*2                                     # prints x + y * 2
 \end{lstlisting}
 
@@ -160,16 +160,16 @@ a left side, a right side, an optional condition and an optional block of
 instructions that is executed before the replacement:
 
 \begin{lstlisting}
-VAR A : real
+PAT A : real
 ALG simp
 SPEC    simp : A*1 = A             # SPEC starts a new rule set
 ADDSPEC simp : A+0 = A             # ADDSPEC adds a rule
-CONST u : real
+SYM u : real
 REWR (u*1)+0 : simp                # prints u
 \end{lstlisting}
 
-\texttt{VAR} declares meta variables that match any term of their sort.
-\texttt{NUM} declares meta variables that only match numbers, which makes
+\texttt{PAT} declares pattern variables that match any term of their sort.
+\texttt{NUMPAT} declares pattern variables that only match numbers, which makes
 rules like ``evaluate if the argument is a number'' easy to write.
 Conditions test whether a term occurs in another one (\texttt{IN},
 \texttt{NIN}), compare terms in a total order (\texttt{LB}, used for
@@ -267,7 +267,7 @@ expressions, like \texttt{Number} in Julia. Its operator variants have no
 C function; a term is of sort \texttt{number} only when one of its parts
 is, for example the imaginary unit \texttt{im}, which has no numerical
 value and of which the symbolic helpers only know $\mathit{im}^2=-1$. A
-meta variable of sort \texttt{number} matches any term, and a function in
+pattern variable of sort \texttt{number} matches any term, and a function in
 a pattern whose variant is declared on such top sorts also matches its
 variants on narrower sorts, as a method for \texttt{Number} in Julia
 applies to \texttt{Float64}. The right-hand side and the conditions of a
@@ -313,11 +313,11 @@ Operator variants such as \texttt{nonneg*nonneg >> nonneg} and
 \texttt{sqrt : nonneg >> nonneg} propagate the sign through terms. Several
 simplification rules are valid only for non-negative or positive
 arguments: $\sqrt{t^2}=t$, $(t^a)^b=t^{ab}$, $\ln(pq)=\ln p+\ln q$. They
-are now written with meta variables of these sorts. A meta variable whose
+are now written with pattern variables of these sorts. A pattern variable whose
 sort is a subsort of another only matches terms of that sort or below it,
 whereas a variable of a sort without a wider sort still matches any term
 as in the original language. Thus \texttt{sqrt(t\^{}2)} simplifies to \texttt{t} for
-\texttt{CONST t : nonneg}, but \texttt{sqrt(x\^{}2)} stays as it is for a
+\texttt{SYM t : nonneg}, but \texttt{sqrt(x\^{}2)} stays as it is for a
 real \texttt{x}.
 
 One change in the interpreter made this work. When a rule written for
@@ -411,7 +411,7 @@ where \texttt{a\_.} matches a missing summand with default 0 and
 \texttt{b\_.} a missing factor with default 1. The pattern also matches
 $x\,b + a$, because Mathematica matches sums and products in any order, and
 the condition combines several tests. We added three corresponding
-features to the language: \texttt{OPT a,b} declares meta variables that may
+features to the language: \texttt{OPT a,b} declares pattern variables that may
 be missing, \texttt{DEFAULT + = 0}, \texttt{DEFAULT * = 1} and
 \texttt{DEFAULT RIGHT \^{} = 1} give the values of missing operands,
 \texttt{COMM +,*} declares commutative operators, and a rule can have a list
@@ -424,7 +424,7 @@ grows exponentially with the number of optional parameters and commutative
 products, however: the median Rubi rule would have about 1900 variants.
 Rules defined while one of these features is active are therefore kept in
 an ordered \emph{rule list}, as in Mathematica, and matched by a separate
-backtracking matcher. Bindings of meta variables are recorded on a trail,
+backtracking matcher. Bindings of pattern variables are recorded on a trail,
 so a failed alternative undoes exactly its own bindings. Swapped operands
 and missing optional operands are tried in turn, and the conditions are
 checked as part of the match, so a failing condition makes the matcher try
@@ -438,7 +438,7 @@ ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b), (neq(P_m,(-1)))
 \end{lstlisting}
 
 Here \texttt{P\_m} is a required and \texttt{O\_a}, \texttt{O\_b} are
-optional meta variables. One rule covers $(a+bx)^m$, $(bx+a)^m$, $(a+x)^m$,
+optional pattern variables. One rule covers $(a+bx)^m$, $(bx+a)^m$, $(a+x)^m$,
 $(bx)^m$ and $x^m$, with numeric or symbolic coefficients.
 
 \subsection{Automatic translation}
@@ -446,8 +446,8 @@ $(bx)^m$ and $x^m$, with numeric or symbolic coefficients.
 The translator (900 lines of Python) parses Rubi's rule files with a small
 Pratt parser into Mathematica's full form and writes one \texttt{rewrite}
 file per Rubi file, in Rubi's loading order and with the original of every
-rule as a comment. Pattern variables become meta variables, negative
-numbers in patterns become \texttt{NUM} variables with a condition, local
+rule as a comment. Mathematica's pattern variables become \texttt{PAT} variables, negative
+numbers in patterns become \texttt{NUMPAT} variables with a condition, local
 definitions (\texttt{With}, and \texttt{Module} with values only) are
 substituted, helper predicates that Rubi defines inside its rule files are
 inlined, and a predicate applied to a list, like \texttt{LinearQ[\{u,v\},x]},
@@ -783,7 +783,7 @@ $\arcsin$ meant editing one line of a text file, not the interpreter.
 \texttt{LIFT} allows algebraic structure to be expressed once and reused;
 with subsorts, it also turned out to be the right mechanism for a numeric
 tower, since exact fractions inherited all rules of the real numbers
-without any change to them. \texttt{NUM} variables together with conditions
+without any change to them. \texttt{NUMPAT} variables together with conditions
 give precise control over when a rule fires. The interleaving of rewriting
 and numerical evaluation makes it natural to derive formulas symbolically
 and evaluate them numerically in the same program, for example derivatives

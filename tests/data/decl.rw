@@ -1,4 +1,4 @@
 # declares and sets a constant; used by 11_include
-CONST s3 : real
+SYM s3 : real
 s3 = sin(30*_deg)
 PRT s3

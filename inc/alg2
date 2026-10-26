@@ -2,25 +2,25 @@ ALG Bool
 SORT bool
 SORT real
 
-VAR A : real
-VAR B : real
-VAR C : real
-VAR X : real
-VAR Y : real
-VAR Z : real
-NUM N : real
-NUM M : real
+PAT A : real
+PAT B : real
+PAT C : real
+PAT X : real
+PAT Y : real
+PAT Z : real
+NUMPAT N : real
+NUMPAT M : real
 
-CONST x : real
-CONST y : real
-CONST z : real
-CONST a : real
-CONST b : real
-CONST c : real
+SYM x : real
+SYM y : real
+SYM z : real
+SYM a : real
+SYM b : real
+SYM c : real
 
-CONST i : real  # sqrt(-1)
-CONST e : real
-CONST pi : real
+SYM i : real  # sqrt(-1)
+SYM e : real
+SYM pi : real
 
 #  e  = 2.718281828459			siehe mathnum
 #  pi = 3.141592653589793
@@ -37,8 +37,8 @@ TERM P6
 
 TERM DGL		# speichert DGL
 
-CONST true : bool
-CONST false : bool
+SYM true : bool
+SYM false : bool
 
 FUNC and   : real,real >> real LA1  # zum Verketten fuer Integralbed.
 FUNC inx   : real,real >> real LA4	                # Index-Funktion 	

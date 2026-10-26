@@ -61,7 +61,7 @@ INC "filename"  Unter 'filename' abgespeicherte Programme werden ausgefuehrt.
                 '\' fortgesetzt werden. (Einzige Ausnahme !)
                 INC darf auch innerhalb eines Blocks (z.B. in einer FOR-Schleife)
                 stehen. Das eingelesene File wird dann wie eine Eingabe auf
-                oberster Ebene behandelt: seine Definitionen (CONST, FUNC ..)
+                oberster Ebene behandelt: seine Definitionen (SYM, FUNC ..)
                 sind global und gelten auch nach dem Block weiter.
                 Bsp.: siehe LiNbO3/abso1
 
@@ -96,34 +96,44 @@ SORT name [,name ..]
 								Erzeugung eines Datentyps. Der Typ wird bei Funktionen,
                 Variablen und Konstanten gebraucht.
 
-NUM sortname    Standartmaessig wird mit dem Datentyp 'double' gerechnet
+REALNUM sortname
+                Standardmaessig wird mit dem Datentyp 'double' gerechnet.
                 Alle eingegebenen Zahlen (z.B.: 1.234) werden als 'double'
-                abgespeichert. Sie muessen aber einem selbstdefiniertem
+                abgespeichert. Sie muessen aber einem selbstdefinierten
                 Datentyp (mit 'SORT typname' erzeugt) zugeordnet werden.
                 Bsp.:
 											SORT real
-											NUM real    # ordnet Nummern den Typ real zu.
+											REALNUM real  # ordnet Nummern den Typ real zu.
 
-CONST name [,name ..] : sortname  
-								Deklaration einer Konstanten. Es wird eigentlich
-                eine Konstante erzeugt, die beliebige Werte annehmen kann.
-                (Also Variable). Im Gegensatz zu mit VAR erzeugten Metha-
-                Variablen kann sie aber nicht als Ersatz fuer ganze Terme
-                benutzt werden.
+SYM name [,name ..] : sortname
+								Deklaration eines Symbols. Es steht fuer sich selbst oder
+                hat einen numerischen Wert seiner Sorte (also eine Variable
+                im ueblichen Sinn; bis 2026 SYM). Im Gegensatz zu mit PAT
+                erzeugten Muster-Variablen kann es nicht als Ersatz fuer
+                ganze Terme benutzt werden.
 
-VAR name [,name ..] : sortname  
-								Erzeugung einer Metha-Variablen. Man kann diese Variable
-                als Platzhalter in Spezifikationen fuer Algebren verwenden.
+TERM name [,name ..] : sortname
+								Eine Term-Variable: speichert einen ganzen Ausdruck (z.B. eine
+                Liste).
+
+PAT name [,name ..] : sortname
+								Erzeugung einer Muster-Variablen (bis 2026 PAT). Man kann diese
+                Variable als Platzhalter in Spezifikationen fuer Algebren
+                verwenden.
                 Bsp.:
-											VAR A : real  SPEC xyz A+0=A
+											PAT A : real  SPEC xyz A+0=A
 
-NUM name [,name ..] : sortname  
-								Erzeugung einer Metha-Variablen. Man kann diese Variable
-                als Platzhalter nur fuer Numerische Werte in Spezifikationen 
-                fuer Algebren verwenden.
+NUMPAT name [,name ..] : sortname
+								Erzeugung einer Muster-Variablen (bis 2026 NUMPAT), die nur fuer
+                numerische Werte steht.
                 Bsp.:
-											NUM N : real 
+											NUMPAT N : real
 											SPEC xyz N+0=N
+
+TYPEOF term, TYPEOF f
+								Gibt die Sorte eines Terms aus; fuer einen Namen auch seine Art
+                (SYM, TERM, PAT, NUMPAT) und seinen Wert oder Term, fuer eine
+                Funktion alle Varianten mit ihren Sorten.
 
 FUNC name : sortname [,..] >> sortname [LA1..5|RU] [ATT name]
 																						 oder  [ATT ( Argdefs ) Block]
@@ -158,7 +168,7 @@ FUNC name : sortname [,..] >> sortname [LA1..5|RU] [ATT name]
 								Zuweisung eines Terms an eine Konstante erfolgt, oder ein Term
 								ausgegeben werden soll.
 							  z.B. FUNC test : real,real,real >> real ATT \
-							       (CONST a,b : real; TERM c : real) { RETURN c+a*b }
+							       (SYM a,b : real; TERM c : real) { RETURN c+a*b }
 
 RETURN Term     Setzt den Resultatwert (einen Term) der Funktion. Die Ausfuehrung
                 der Funktion wird NICHT!! beendet. Enthaelt der Term lokale
@@ -195,8 +205,8 @@ SPEC algname : algname [, algname ...]
 
 ADDSPEC algname : [IF ( Fkt )] was = zuwas [DO Block]
                Hinzufuegen einer Ersetzungsregel (Spezifikation) zur Algebra
-                'algname'. Es duerfen Metha-Variablen auf beiden Seiten
-               verwendet werden. Mit NUM definierte Metha-Variablen werden
+                'algname'. Es duerfen Muster-Variablen auf beiden Seiten
+               verwendet werden. Mit NUMPAT definierte Muster-Variablen werden
                nur bei Zahlen ersetzt.
 
 							 Fkt ist selbstdefiniert (siehe IF ) oder eine der Funktionen :
@@ -277,16 +287,16 @@ ATT sortname Name1 , Name2 , Name3 , Name4
 FOR Constname = N1 TO N2 [STEP N3] DO Block
 							For-Schleife.
 							Bsp.: FOR i = 20 TO 10 STEP -1 DO i
-              Im Block definierte Konstanten (CONST ..) sind lokal und werden
+              Im Block definierte Konstanten (SYM ..) sind lokal und werden
               bei jedem Schleifendurchlauf neu angelegt.
-              Bsp.: FOR n = 1 TO 3 DO { CONST s : real
+              Bsp.: FOR n = 1 TO 3 DO { SYM s : real
                       s = n*10
                       PRT s }
 
 IF ( Fkt ) Block [ ELSE Block ]
               IF-Bedingung. Fkt ist Funktion mit double Resultat, die
               TRUE/FALSE (1/0) zurueckgibt.
-              Bsp.: CONST inc_xxx : real
+              Bsp.: SYM inc_xxx : real
                     inc_xxx = 1
                     IF (inc_xxx > 0) INC "inc/xxx"
 
@@ -376,7 +386,7 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
  - Zuweisung von 0 oder 1 an eine Konstante fuehrte spaeter zum free() von
    statischem Speicher (Absturz z.B. bei fmin, newton).
  - Absturz beim Aufraeumen nach nicht berechenbaren Funktionsargumenten behoben.
- - Definitionen in Bloecken (z.B. CONST in einer FOR-Schleife) funktionieren
+ - Definitionen in Bloecken (z.B. SYM in einer FOR-Schleife) funktionieren
    jetzt auch beim zweiten Durchlauf.
  - INC innerhalb eines Blocks: Definitionen im eingelesenen File wurden doppelt
    ausgefuehrt und zerstoert (z.B. LiNbO3/abso1). Behoben.
@@ -437,7 +447,7 @@ Aenderungen 2026 (Portierung auf aktuelle Compiler, 64 Bit, Windows):
    quadrieren), Loesungen werden geprueft; lineare Gleichungssysteme mit
    Bareiss-Elimination, nichtlineare durch Einsetzen und Resultanten.
  - Die Sorte algebra (nicht kommutatives Produkt) oberhalb von number und die
-   Sorte matrix darunter: symbolische Matrizen (CONST A : matrix) mit den
+   Sorte matrix darunter: symbolische Matrizen (SYM A : matrix) mit den
    Regeln MatrixRules (inc/linalg), auch zusammen mit expliziten,
    Matrixgleichungen (msolve).
  - SHOW f ATT name: eigene C-Ausgabefunktion fuer eine Funktion. Listen werden
@@ -475,7 +485,7 @@ kostet.
 Es folgt eine Zusammenfassung der yacc-syntax:
 
 
-%token			CST VAR SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUM ATT IS EQ
+%token			SYM PAT SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUMPAT ATT IS EQ
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA KOMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
 %token	<y_sym>	Id String
@@ -508,10 +518,10 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	VORRANG att
 			| OTHER func ':' vsortlist PFEIL Sort att 
 			| ATT Sort Id ',' Id ',' Id ',' Id 
 			| BRA Id Id	':'  vsortlist PFEIL Sort	att 
-			| VAR idlist ':' Sort			 
-			| NUM Sort	 			  			 
-			| NUM idlist ':' Sort			 
-			| CST idlist ':' Sort			 
+			| PAT idlist ':' Sort			 
+			| REALNUM Sort	 			  			 
+			| NUMPAT idlist ':' Sort			 
+			| SYM idlist ':' Sort			 
 			| SPEC Alg ':' alglist	   
 			| SPEC Alg ':' formlist		 
 			| ADDSPEC Alg ':' formlist 

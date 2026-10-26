@@ -1,15 +1,15 @@
 SORT vector
-VAR  A_v : vector
-VAR  B_v : vector
-VAR  C_v : vector
-VAR  X_v : vector
-VAR  Y_v : vector
-VAR  Z_v : vector
+PAT  A_v : vector
+PAT  B_v : vector
+PAT  C_v : vector
+PAT  X_v : vector
+PAT  Y_v : vector
+PAT  Z_v : vector
 
-CONST 1_v : vector                   # ones vector
-CONST e1 : vector                    # 1st unit vector
-CONST e2 : vector                    # 2nd unit vector
-CONST e3 : vector                    # 3rd unit vector
+SYM 1_v : vector                   # ones vector
+SYM e1 : vector                    # 1st unit vector
+SYM e2 : vector                    # 2nd unit vector
+SYM e3 : vector                    # 3rd unit vector
 
 OTHER +  : vector,vector >> vector   # vector addition
 OTHER -  : vector,vector >> vector   # vector subtraction
@@ -27,15 +27,15 @@ FUNC grad : real >> vector           # cross product
 FUNC _x_   : vector,vector >> vector  LA4 # cross product (same precedence as ^,inx)
 
 SORT matrix
-VAR  A_m : matrix
-VAR  B_m : matrix
-VAR  C_m : matrix
-VAR  X_m : matrix
-VAR  Y_m : matrix
-VAR  Z_m : matrix
+PAT  A_m : matrix
+PAT  B_m : matrix
+PAT  C_m : matrix
+PAT  X_m : matrix
+PAT  Y_m : matrix
+PAT  Z_m : matrix
 
-CONST E : matrix                    # identity matrix
-CONST 0_m : matrix						# zero matrix
+SYM E : matrix                    # identity matrix
+SYM 0_m : matrix						# zero matrix
 
 OTHER + : matrix,matrix >> matrix   # matrix addition
 OTHER * : matrix,matrix >> matrix   # matrix multiplication

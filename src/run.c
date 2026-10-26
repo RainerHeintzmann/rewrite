@@ -884,7 +884,7 @@ void * realcalc(Node * term,int * perr)
 			if (term->l) 
 				return realcalc(term->l,perr);
 		
-		* perr = TRUE; /* e.g. VAR */
+		* perr = TRUE; /* e.g. PAT */
 		return NULL;
 		}
 

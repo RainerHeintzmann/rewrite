@@ -4,7 +4,7 @@
 INC "inc/all"
 INC "inc/helpers"
 TERM T : real
-CONST yy : real
+SYM yy : real
 x = yy
 FUNC kos : real >> real ATT r_cos
 # without roles kos is unknown to the helpers: no power reduction

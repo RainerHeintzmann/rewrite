@@ -1,5 +1,5 @@
 SORT real
-NUM real
+REALNUM real
 
 # DEBUG 5
 
@@ -18,7 +18,7 @@ FUNC &&  : bool,bool >> bool LA1 ATT and
 FUNC ||  : bool,bool >> bool LA1 ATT or
 FUNC is_int : real >> bool       ATT is_int
 
-CONST true,false : bool
+SYM true,false : bool
 
 true  = (1==1)
 false = (1==0)
@@ -50,7 +50,7 @@ SORT number
 SUBSORT real,number
 SUBSORT complex,number
 # variables of sort number: they match terms of every sort below number
-VAR Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
+PAT Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
 # 2026: algebra, the sort of the elements of an associative algebra above
 # number: its product need not be commutative (matrices, inc/linalg). Rules
 # written for algebra hold for numbers as well; the rules for number (with
@@ -58,34 +58,34 @@ VAR Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
 # algebra that are no numbers.
 SORT algebra
 SUBSORT number,algebra
-VAR Aal,Bal,Cal,Xal,Yal,Zal : algebra
+PAT Aal,Bal,Cal,Xal,Yal,Zal : algebra
 
-VAR A,B,C,X,Y,Z : real
-VAR As,Bs,Cs,Xs,Ys,Zs : sort
-VAR Ag,Bg,Cg,Xg,Yg,Zg : group
-VAR Aag,Bag,Cag,Xag,Yag,Zag : agroup
-VAR Ar,Br,Cr,Xr,Yr,Zr : ring
-VAR Af,Bf,Cf,Xf,Yf,Zf : field
-VAR Acf,Bcf,Ccf,Xcf,Ycf,Zcf : cfield
-VAR Ac,Bc,Cc,Xc,Yc,Zc : complex
-NUM N,M : real
+PAT A,B,C,X,Y,Z : real
+PAT As,Bs,Cs,Xs,Ys,Zs : sort
+PAT Ag,Bg,Cg,Xg,Yg,Zg : group
+PAT Aag,Bag,Cag,Xag,Yag,Zag : agroup
+PAT Ar,Br,Cr,Xr,Yr,Zr : ring
+PAT Af,Bf,Cf,Xf,Yf,Zf : field
+PAT Acf,Bcf,Ccf,Xcf,Ycf,Zcf : cfield
+PAT Ac,Bc,Cc,Xc,Yc,Zc : complex
+NUMPAT N,M : real
 
-CONST 0g      : group # neutral element
-CONST 0ag     : agroup # neutral element
-CONST 0r,1r   : ring
-CONST 0f,1f   : field
-CONST 0cf,1cf : cfield
-# CONST 0re,1re : real    0 and 1 exist only once !
-CONST 0c,1c   : complex
+SYM 0g      : group # neutral element
+SYM 0ag     : agroup # neutral element
+SYM 0r,1r   : ring
+SYM 0f,1f   : field
+SYM 0cf,1cf : cfield
+# SYM 0re,1re : real    0 and 1 exist only once !
+SYM 0c,1c   : complex
 
-CONST x,y,z,a,b,c,dummy,memo,n,j,l : real
-CONST _x : real # general integration variable
-CONST maxreal  : real
-CONST minreal  : real
+SYM x,y,z,a,b,c,dummy,memo,n,j,l : real
+SYM _x : real # general integration variable
+SYM maxreal  : real
+SYM minreal  : real
 
-CONST e,pi : real  # e,pi
-CONST nothing : real  # 2026: never has a value; a = nothing deletes the value of a
-CONST i : complex  # sqrt(-1)
+SYM e,pi : real  # e,pi
+SYM nothing : real  # 2026: never has a value; a = nothing deletes the value of a
+SYM i : complex  # sqrt(-1)
 
 #  e  = 2.718281828459			see mathnum
 #  pi = 3.141592653589793
