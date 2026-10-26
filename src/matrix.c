@@ -7,6 +7,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>	/* snprintf */
 #include <string.h>
 #include <math.h>
 #include "inout.h"
@@ -14,6 +15,8 @@
 #include "vector.h"
 #include "real.h"
 #include "matrix.h"
+
+int value_is_root (void * value);	/* vector.c */
 
 void show_mat (matrix * mp)
 {
@@ -25,17 +28,32 @@ double * dp; /* otherwise Lattice does not get it */
 
 dp=Matrix(mp);
 
-printfOut("\n");
+if (value_is_root(mp))	/* 2026: a grid, numbers right-aligned, as for inc/list */
+	{
+	char s[64];
+	int w = 0;
+	for(i=0;i<Rows(mp)*Cols(mp);i++)
+		{
+		int n = snprintf(s, sizeof s, "%g", dp[i]);
+		if (n > w) w = n;
+		}
+	for(i=0;i<Rows(mp);i++)
+		{
+		printfOut("%s[ ", i ? "\n" : "");
+		for(j=0;j<Cols(mp);j++)
+			printfOut("%*g%s", w, dp[i*Cols(mp)+j], j < Cols(mp)-1 ? "  " : " ]");
+		}
+	printfOut(" ");
+	return;
+	}
+printfOut("[");			/* inline: [[1, 2], [3, 4]] */
 for(i=0;i<Rows(mp);i++)
 	{
+	printfOut("%s[", i ? ", " : "");
 	for(j=0;j<Cols(mp);j++)
-		{
-		printfOut(" %g",* (dp++));
-		if (j < Cols(mp)-1) printfOut(",");
-		}
-	printfOut("\n");
+		printfOut("%g%s", dp[i*Cols(mp)+j], j < Cols(mp)-1 ? ", " : "]");
 	}
-/* printfOut(") "); */
+printfOut("] ");
 }
 
 int cmp_mat (matrix * x,matrix * y)

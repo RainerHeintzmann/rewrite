@@ -2,7 +2,6 @@
 # (inc/integration/base): rules written with variables of sort number apply
 # to real terms too, and a term of reals keeps its real variants.
 INC "inc/all"
-INC "inc/integration/all"
 TERM TN : number
 SYM im2 : number
 FUNC never : real >> real
@@ -28,7 +27,6 @@ REWR collect(TN) : raw
 TN = REWR deriv(sin(im*x),x) : All
 REWR collect(TN) : raw
 # integrals with im (Rubi)
-INC "inc/integration/rubi/all"
 TN = REWR Int(sin(im*x),x) : RubiIntegrate
 TN
 TN = REWR Int(im*x*sin(x),x) : RubiIntegrate

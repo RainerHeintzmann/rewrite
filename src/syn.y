@@ -19,6 +19,7 @@
 #include "userfn.h"
 #include "nodes.h"
 #include "expand.h"
+#include "help.h"	/* 2026: HELP */
 #include "symfn.h"
 #include "numsort.h"
 
@@ -61,7 +62,7 @@ static Node * sym_att (Node * id, int hold);	/* below */
 %token			SYM PAT SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUMPAT ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA COMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD RULES SHOW REALNUM TYPEOF
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS SYMBOLIC HOLD RULES SHOW REALNUM TYPEOF HELP
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -134,6 +135,7 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	PRECEDENCE att {	$$=mknod(FUN
 			| SYM idlist ':' Sort			 {$$=DECLARE($2,Const,(Node *) $4,NULL,FALSE);}
 			| TYPEOF term			 {$$=mknod(FUNC,(Node *) typeof_fn,$2);}	/* 2026: the sort of a term */
 			| TYPEOF func			 {$$=mknod(FUNC,(Node *) typeof_func,(Node *) $2);}	/* 2026: the variants of a function */
+			| HELP String String		 {$$=mknod(FUNC,(Node *) help_def,mknod(PARAM,(Node *) $2,(Node *) $3));}	/* 2026: help text */
 			| SPEC Alg ':' alglist	   {$$ = mknod(FUNC,(Node *) spec,mknod(PARAM,(Node *) $2,(Node *) $4));}
 			| SPEC Alg ':' formlist		 {$$ = mknod(FUNC,(Node *) spec_form,mknod(PARAM,(Node *) $2,$4));	}
 			| ADDSPEC Alg ':' formlist {$$ = mknod(FUNC,(Node *) a_spec_form,mknod(PARAM,(Node *) $2,$4));}

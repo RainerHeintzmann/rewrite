@@ -2,7 +2,6 @@
 # methods, attraction of logarithms, a new unknown, removal of square roots;
 # the solutions are checked; linear systems with Bareiss' elimination.
 INC "inc/all"
-INC "inc/integration/all"
 INC "inc/list"
 INC "inc/solve"
 # ---- polynomials

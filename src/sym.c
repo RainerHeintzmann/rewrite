@@ -39,6 +39,7 @@ static const Reserved words [] = {	/* sorted */
 	{ "FOR",    FOR },
 	{ "FUNC",   FUNC },
 	{ "GRAPH",  GRAPH },
+	{ "HELP",   HELP },     /* HELP "name" "text": help for ?name (2026) */
 	{ "HOLD",   HOLD },     /* ATT SYMBOLIC HOLD: arguments unevaluated (2026) */
 	{ "IF",     IF  },
 	{ "IN",     IN  },
@@ -126,6 +127,20 @@ int lookup _1a ((name), const char * name)
 	yylval.y_sym = * pp;
 
 	return lexval(* pp);
+}
+
+/* 2026: the symbol of a string "...", also if its text is a keyword
+   (HELP "REWR" "..."); lookup would return the keyword without a symbol */
+void lookup_string (const char * name)
+{
+	Symbol s, ** pp;
+
+	name(& s) = (char *) name;
+	if (! (pp = (Symbol **) tsearch(& s, & root, scmp)))
+		fatal("lookup: no room");
+	if ((* pp) == (& s))	/* not found */
+  		(* pp) = mksym(Id,name);
+	yylval.y_sym = * pp;
 }
 
 /* 2026: look up the symbol of a name without creating it (NULL if unknown) */

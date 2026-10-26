@@ -98,6 +98,7 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 #define CALLFUNCT(term)							(((void (*) (Node *)) term->l) (term))
 
 int lookup _1p (const char *);		/* returns the yylex() value */
+void lookup_string (const char * name);	/* 2026: the symbol of a string, also of a keyword text */
 Symbol * find_symbol (const char * name);  /* 2026: look up a symbol, NULL if unknown */
 void focus (Symbol * sp);
 void restore _1p (Node *);

@@ -1,0 +1,134 @@
+#!/usr/bin/env perl
+# rlwrap filter for rewrite (tools/rewrite-rl), as in Julia's REPL:
+#   \alpha TAB  ->  α          a complete LaTeX-like name becomes its character
+#   \al TAB     ->  the names that begin with \al (if only one: its character)
+# The names are those of src/latex.c, read from latex_symbols.tsv next to
+# this file (tools/gen_latex.py writes both). Everything stays UTF-8 bytes.
+
+use lib ($ENV{RLWRAP_FILTERDIR} or ".");
+use RlwrapFilter;
+use strict;
+
+my $dir = $0;
+$dir =~ s{[^/\\]*$}{};
+my %sym;			# \alpha -> α
+open(my $f, '<:raw', "${dir}latex_symbols.tsv") or die "latex.rlwrap: no ${dir}latex_symbols.tsv\n";
+while (<$f>) {
+	chomp;
+	my ($name, $char) = split /\t/, $_, 2;
+	$sym{$name} = $char;
+}
+close $f;
+my @names = sort keys %sym;
+
+# keywords and sort names for the colours (tools/gen_words.py writes them)
+my (@kw, @sorts);
+if (open(my $k, '<:raw', "${dir}rewrite_kinds.tsv")) {
+	while (<$k>) {
+		chomp;
+		my ($w, $t) = split /\t/;
+		push @{$t eq 'keyword' ? \@kw : \@sorts}, $w;
+	}
+	close $k;
+}
+my $kw_re   = join '|', map { quotemeta } sort { length $b <=> length $a } @kw;
+my $sort_re = join '|', map { quotemeta } sort { length $b <=> length $a } @sorts;
+my $colours = ! $ENV{NO_COLOR};
+my ($prompt_text, $last_input, $redraw) = ('> ', undef, 0);	# for redraw
+
+my $filter = new RlwrapFilter;
+$filter -> help_text("Usage: rlwrap -z latex.rlwrap <command>\n"
+                   . "completes \\alpha to the character, as in Julia");
+$filter -> completion_handler(\&complete);
+$filter -> input_handler(\&save_line);
+$filter -> output_handler(\&colour);
+$filter -> prompt_handler(\&prompt);
+$filter -> run;
+
+# ---- colours (NO_COLOR: none). The output: errors red, warnings yellow,
+# the repeated faulty line grey, keywords bold magenta, sort names cyan.
+# The prompt green. An entered line is written again in colour when the
+# answer (or the next prompt) arrives: readline itself shows it plain.
+
+sub paint_words {
+	my ($s) = @_;
+	$s =~ s/\b($kw_re)\b/\e[1;35m$1\e[0m/g if $kw_re;
+	$s =~ s/(?<![\w\\])($sort_re)\b/\e[36m$1\e[0m/g if $sort_re;
+	return $s;
+}
+
+sub colour {
+	my ($out) = @_;
+	return $out unless $colours;
+	my @parts = split /(\n)/, $out;
+	for (@parts) {
+		next if $_ eq "\n" or $_ eq '';
+		if    (/^Error in /) { $_ = "\e[31m$_\e[0m"; }
+		elsif (/^warning /)  { $_ = "\e[33m$_\e[0m"; }
+		elsif (/^>> /)       { $_ = "\e[90m$_\e[0m"; }
+		else                 { $_ = paint_words($_); }
+	}
+	return redraw() . join '', @parts;
+}
+
+sub green { return "\e[1;32m$_[0]\e[0m"; }
+
+sub prompt {
+	my ($p) = @_;
+	return $p unless $colours;
+	my $pre = redraw();
+	$prompt_text = $p;
+	# \001 \002: readline does not count the colour codes as characters
+	return $pre . "\001\e[1;32m\002" . $p . "\001\e[0m\002";
+}
+
+# the characters of a UTF-8 text without colour codes
+sub width {
+	my ($s) = @_;
+	$s =~ s/\e\[[0-9;]*[A-Za-z]//g;
+	return scalar(() = $s =~ /[\x00-\x7f\xc0-\xff]/g);
+}
+
+sub columns {
+	my $size = `stty size < /dev/tty 2>/dev/null`;
+	return ($size =~ /\d+\s+(\d+)/ && $1 > 0) ? $1 : 80;
+}
+
+# the entered line again, in colour: the cursor goes up over it (as many
+# rows as it took), clears them and writes prompt and line coloured
+sub redraw {
+	return '' unless $redraw && defined $last_input;
+	$redraw = 0;
+	my $n = width($prompt_text) + width($last_input);
+	my $rows = $n > 0 ? int(($n - 1) / columns()) + 1 : 1;
+	my ($code, $comment) = ($last_input, '');
+	($code, $comment) = ($1, "\e[90m$2\e[0m") if $last_input =~ /^([^"#]*(?:"[^"]*"[^"#]*)*)(#.*)$/;
+	return "\e[${rows}A\r\e[J" . green($prompt_text) . paint_words($code) . $comment . "\n";
+}
+
+# every entered line goes into the history file at once (REWRITE_HISTORY,
+# set by tools/rewrite-rl), not only when rlwrap ends normally: a closed
+# window loses nothing. At a normal end rlwrap writes the same history.
+sub save_line {
+	my ($input) = @_;
+	my $file = $ENV{REWRITE_HISTORY};
+	(my $line = $input) =~ s/[\r\n]+$//;
+	($last_input, $redraw) = ($line, 1);		# coloured again by redraw
+	if ($file && $line =~ /\S/ && open(my $h, '>>:raw', $file)) {
+		print $h "$line\n";
+		close $h;
+	}
+	return $input;
+}
+
+# the word to complete may have something before the backslash: x\_1 -> x₁
+sub complete {
+	my ($line, $prefix, @completions) = @_;
+	my $i = rindex($prefix, "\\");
+	return @completions if $i < 0;
+	my ($head, $name) = (substr($prefix, 0, $i), substr($prefix, $i));
+	return ($head . $sym{$name}) if exists $sym{$name};
+	my @fit = grep { substr($_, 0, length $name) eq $name } @names;
+	return ($head . $sym{$fit[0]}) if @fit == 1;	# only one name fits: its character
+	return map { $head . $_ } @fit;
+}

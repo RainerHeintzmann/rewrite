@@ -1,0 +1,17 @@
+# 02_differentiation.rw: derivatives with the rule set All
+INC "inc/all"
+
+REWR D(x^3 + 2*x, x) : All
+REWR D(sin(x)^2, x) : All
+REWR D(x^2*exp(-x), x) : All
+REWR D(ln(sin(x)), x) : All
+REWR D(arctan(2*x), x) : All
+
+"---- a second derivative"
+REWR D(D(x^4*cos(x), x), x) : All
+
+"---- D(f,x) does not assume that other symbols are constant (D(y,x) stays);"
+"---- deriv(f,x) does: a partial derivative"
+SYM kk : real
+REWR deriv(x^2*y + y^3, y) : All
+REWR deriv(kk*x^2 + sin(kk*x), x) : All

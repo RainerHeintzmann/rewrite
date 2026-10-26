@@ -3,9 +3,7 @@
 # Rubi 4.17.3 (Copyright (c) 2018 Rule-Based-Integration Organization,
 # MIT license, see inc/integration/LICENSE.Rubi).
 # Usage:
-#   INC "inc/all"
-#   INC "inc/integration/all"
-#   INC "inc/integration/rubi/all"
+#   INC "inc/all"          (loads these rules, 2026)
 #   REWR Int(x*exp(2*x),x) : RubiIntegrate
 
 INC "inc/integration/rubi/declarations"

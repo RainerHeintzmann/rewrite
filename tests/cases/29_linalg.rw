@@ -2,7 +2,6 @@
 # identity, det, linsolve, inverse with Bareiss' fraction-free elimination,
 # and arithmetic on lists element by element (thread, Listable).
 INC "inc/all"
-INC "inc/integration/all"
 INC "inc/list"
 INC "inc/linalg"
 FUNC never : real >> real

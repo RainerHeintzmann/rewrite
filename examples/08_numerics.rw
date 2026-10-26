@@ -1,0 +1,27 @@
+# 08_numerics.rw: numerical methods (inc/numerik) and numerical vectors
+INC "inc/all"
+
+"---- a definite integral, a zero by Newton's method, a minimum"
+REWR I(0, 1, x^2, x) : numerik,calc
+REWR newton(1, x^2 - 2, D(x^2 - 2, x), x) : numerik,calc
+REWR fmin(-1, 1, (x - 0.3)^2, x) : numerik,calc
+
+"---- printing with more digits"
+PRTNUM "%.12g "
+sqrt(2)
+PRTNUM "%g "
+
+"---- numerical vectors (C arrays) for fast arithmetic"
+INC "inc/list"
+INC "inc/rvector"
+SYM vv, ww : rvector
+vv = [1, 2, 3]
+ww = [0, 1, 0]
+vv + ww
+vv * ww
+vv _x_ ww
+abs(vv)
+
+"---- a loop"
+SYM n : real
+FOR n = 1 TO 5 DO n^2

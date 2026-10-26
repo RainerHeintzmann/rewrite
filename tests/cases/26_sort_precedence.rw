@@ -12,7 +12,6 @@ FUNC tst : complex >> real ATT c_real
 OTHER tst : real >> real ATT r_abs
 tst(-2.5)
 tst(-2.5+i)
-INC "inc/exact"
 # rational -> real (1 conversion) beats rational -> real -> complex (2)
 tst(-5/2)
 # exact numbers: natural is a subsort of integer and of nonneg; inc/exact

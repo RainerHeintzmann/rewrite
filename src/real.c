@@ -52,9 +52,11 @@ double * cpy_real(double * x)
 return mkreal(* x);
 }
 
-void show_real (double * x)
+void std_show_real (double * x);	/* node.c: with the PRTNUM format */
+
+void show_real (double * x)		/* 2026: also with the PRTNUM format */
 {
-	printfOut("%g ",* x);
+	std_show_real(x);
 }
 
 int cmp_real (double * x,double * y)

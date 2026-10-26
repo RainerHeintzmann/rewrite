@@ -1,0 +1,8 @@
+# readline settings of tools/rewrite-rl (INPUTRC), as in Julia's REPL:
+# the arrow keys browse the history lines that begin with what is typed
+# already (with nothing typed: all lines).
+$include /etc/inputrc
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+"\eOA": history-search-backward
+"\eOB": history-search-forward

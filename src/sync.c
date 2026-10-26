@@ -19,6 +19,7 @@
 #include "defs.h"
 #include "nodes.h"
 #include "symfn.h"		/* 2026: term_has_builtin */
+#include "help.h"		/* 2026: ?name */
 
 #define BLOCK_OPEN '{'
 #define BLOCK_CLOSE  '}'
@@ -344,7 +345,12 @@ static void print_sorts (Node * a)
 
 void typeof_func (Node * np)
 {
-	Symbol * f = (Symbol *) np->r, * v = f;
+	print_variants((Symbol *) np->r);
+}
+
+void print_variants (Symbol * f)	/* the variants of a function with their sorts */
+{
+	Symbol * v = f;
 	do	{
 		printfOut("%s : ", name(v));
 		print_sorts(atypes(v));
@@ -1078,7 +1084,7 @@ int read_input _1a ((fp), FILE * fp)
 			break;
 		}
 
-		if (bp > buf)
+		if (bp > buf && ! help_line(buf))	/* 2026: ?name prints the help (help.c) */
 			{
 			ActualLine=buf;
 			lexi_buf(buf);

@@ -19,12 +19,10 @@ There are two rule sets:
 ## Usage
 
 ```text
-INC "inc/all"
-INC "inc/integration/all"
+INC "inc/all"                  # loads Integrate and RubiIntegrate
 REWR Int(x^2*cos(x),x) : Integrate
 2 * cos (x )* x + x ^ 2 * sin (x )- 2 * sin (x )
 
-INC "inc/integration/rubi/all"
 REWR Int(1/(1+x^3),x) : RubiIntegrate
 (1/3) * ln (1 + x )+ 0.57735 * arctan (-0.57735 + 1.1547 * x )- (1/6) * ln (1 + x ^ 2 - x )
 REWR Int(sqrt(1-x^2),x) : RubiIntegrate

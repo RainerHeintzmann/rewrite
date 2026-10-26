@@ -13,6 +13,18 @@
 #include "fatal.h"
 #include "vector.h"
 #include "real.h"
+#include "sym.h"
+
+/* 2026: printed like the lists of inc/list. A value that is the whole
+   printed term (print_root, run.c) is a column (vector) or a grid (matrix),
+   otherwise inline. */
+extern Node * print_root;
+
+int value_is_root (void * value)
+{
+	Node * r = print_root;
+	return r && r->type == SYM_TYPE && hasval((Symbol *) r) && value((Symbol *) r) == value;
+}
 
 void show_vec (vector * vp)
 {
@@ -23,11 +35,17 @@ double * dp; /* otherwise Lattice does not get it */
 
 dp=Vector(vp);
 
+if (value_is_root(vp) && Dimension(vp) > 1 && Dimension(vp) <= 10)	/* [1,\n 2,\n 3] */
+	{
+	for(i=0;i<Dimension(vp);i++)
+		printfOut("%s%g%s", i ? " " : "[", dp[i], i < Dimension(vp)-1 ? ",\n" : "] ");
+	return;
+	}
 printfOut("[");
 for(i=0;i<Dimension(vp);i++)
 	{
 		printfOut("%g",* (dp++));
-		if (i<Dimension(vp)-1) printfOut(",");
+		if (i<Dimension(vp)-1) printfOut(", ");
 	}
 printfOut("] ");
 }

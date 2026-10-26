@@ -1,7 +1,6 @@
 # TYPEOF: the sort of a term; for a name its kind (SYM, TERM, PAT, NUMPAT)
 # and value; for a function its variants.
 INC "inc/all"
-INC "inc/exact"
 INC "inc/list"
 INC "inc/linalg"
 SYM kk : real

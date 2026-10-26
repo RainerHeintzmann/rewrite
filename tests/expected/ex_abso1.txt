@@ -54,7 +54,9 @@ Atomic Number : 10   Form Factor : (6.75756,0)
 #----------------------------------------
 # density rho : [kg/m^3]
 
-index : [0,0,6]   Structure Factor : (94.5235,-74.3594) 
+index : [0,
+ 0,
+ 6]   Structure Factor : (94.5235,-74.3594) 
 angle of G to axis X: 90 , Y: 90 , Za:0 
 lambda [_Ang]: 1.54967 ThetaB [deg]: 19.5941 
 t0.5 [m]: 1.43657e-06 
@@ -75,13 +77,21 @@ absorbtionlength [m]: 4.97555e-06
 # d3jk :
 # number of Coeff (because of field -> no d311,d322)
 # j k value
-E : [0,353370,0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
-S : [0,0,0.216403]  _Ang U : [0,0.00590526,0.0191218]  _Ang
+E : [0,
+ 353370,
+ 0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
+S : [0,
+ 0,
+ 0.216403]  _Ang U : [0,
+ 0.00590526,
+ 0.0191218]  _Ang
 g0 for 0 order : (0.999916,0) 
 Intensity :(0.999831,0) 
  g1 for 1st order : (-0.0129992,1.59195e-18) 
  Intensity :(0.00016898,-4.13883e-20) 
-Density Modulation (lattice-response) Sjk*Dholo : [0,7.42077e-06,2.40292e-05] 
+Density Modulation (lattice-response) Sjk*Dholo : [0,
+ 7.42077e-06,
+ 2.40292e-05] 
 Electr. Density Modulation : 3.25331e-08 
 angle for transmission : 0.00887895  deg
 Transmission normal to surface : 9.36001e-17 
@@ -140,7 +150,9 @@ Atomic Number : 10   Form Factor : (6.75756,0)
 #----------------------------------------
 # density rho : [kg/m^3]
 
-index : [0,0,6]   Structure Factor : (94.5235,-74.3594) 
+index : [0,
+ 0,
+ 6]   Structure Factor : (94.5235,-74.3594) 
 angle of G to axis X: 90 , Y: 90 , Za:0 
 lambda [_Ang]: 0.885526 ThetaB [deg]: 11.048 
 t0.5 [m]: 1.43657e-06 
@@ -161,13 +173,21 @@ absorbtionlength [m]: 1.38129e-05
 # d3jk :
 # number of Coeff (because of field -> no d311,d322)
 # j k value
-E : [0,353370,0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
-S : [0,0,0.216403]  _Ang U : [0,0.00590526,0.0191218]  _Ang
+E : [0,
+ 353370,
+ 0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
+S : [0,
+ 0,
+ 0.216403]  _Ang U : [0,
+ 0.00590526,
+ 0.0191218]  _Ang
 g0 for 0 order : (0.999916,0) 
 Intensity :(0.999831,0) 
  g1 for 1st order : (-0.0129992,1.59195e-18) 
  Intensity :(0.00016898,-4.13883e-20) 
-Density Modulation (lattice-response) Sjk*Dholo : [0,7.42077e-06,2.40292e-05] 
+Density Modulation (lattice-response) Sjk*Dholo : [0,
+ 7.42077e-06,
+ 2.40292e-05] 
 Electr. Density Modulation : 3.25331e-08 
 angle for transmission : 0.00507369  deg
 Transmission normal to surface : 0.000502033 
@@ -226,7 +246,9 @@ Atomic Number : 10   Form Factor : (6.75756,0)
 #----------------------------------------
 # density rho : [kg/m^3]
 
-index : [0,0,6]   Structure Factor : (94.5235,-74.3594) 
+index : [0,
+ 0,
+ 6]   Structure Factor : (94.5235,-74.3594) 
 angle of G to axis X: 90 , Y: 90 , Za:0 
 lambda [_Ang]: 0.619868 ThetaB [deg]: 7.70898 
 t0.5 [m]: 1.43657e-06 
@@ -247,13 +269,21 @@ absorbtionlength [m]: 2.71733e-05
 # d3jk :
 # number of Coeff (because of field -> no d311,d322)
 # j k value
-E : [0,353370,0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
-S : [0,0,0.216403]  _Ang U : [0,0.00590526,0.0191218]  _Ang
+E : [0,
+ 353370,
+ 0] V/m Ediff : 288625  C/N LAMBDA : 5e-07  m
+S : [0,
+ 0,
+ 0.216403]  _Ang U : [0,
+ 0.00590526,
+ 0.0191218]  _Ang
 g0 for 0 order : (0.999916,0) 
 Intensity :(0.999831,0) 
  g1 for 1st order : (-0.0129992,1.59195e-18) 
  Intensity :(0.00016898,-4.13883e-20) 
-Density Modulation (lattice-response) Sjk*Dholo : [0,7.42077e-06,2.40292e-05] 
+Density Modulation (lattice-response) Sjk*Dholo : [0,
+ 7.42077e-06,
+ 2.40292e-05] 
 Electr. Density Modulation : 3.25331e-08 
 angle for transmission : 0.00355158  deg
 Transmission normal to surface : 0.0669926 

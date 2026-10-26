@@ -2,8 +2,8 @@
 # condition lists. One rule covers all forms of (a+b*x)^m.
 INC "inc/all"
 PAT Xx : real
-NUMPAT Pa,Pb,Pm : real
-OPT Pa,Pb,Pm
+NUMPAT Qpa,Qpb,Qpm : real
+OPT Qpa,Qpb,Qpm
 DEFAULT + = 0
 DEFAULT * = 1
 DEFAULT RIGHT ^ = 1
@@ -11,7 +11,7 @@ COMM +,*
 FUNC lf : real,real >> real
 FUNC Res3 : real,real,real >> real
 ALG tl
-SPEC tl : lf((Pa+Pb*Xx)^Pm,Xx) = Res3(Pa,Pb,Pm)
+SPEC tl : lf((Qpa+Qpb*Xx)^Qpm,Xx) = Res3(Qpa,Qpb,Qpm)
 REWR lf((3+2*x)^5,x) : tl
 REWR lf((2*x+3)^5,x) : tl
 REWR lf((3+x*2)^5,x) : tl
@@ -27,17 +27,17 @@ OPT
 DEFAULT
 COMM
 ALG tl2
-SPEC tl2 : lf(Pa+Xx,Xx) = Res3(Pa,1,1)
+SPEC tl2 : lf(Qpa+Xx,Xx) = Res3(Qpa,1,1)
 REWR lf(3+x,x) : tl2
 REWR lf(x+3,x) : tl2
 REWR lf(x,x) : tl2
 # condition lists: all conditions must hold
-NUMPAT Pc : real
+NUMPAT Qpc : real
 PAT Pv : real
 FUNC tst : real >> real
 ALG tc
-SPEC    tc : IF (Pc > 0), (Pc < 10) tst(Pc) = 1
-ADDSPEC tc : IF NIN(x,Pc), (Pc >= 10) tst(Pc) = 2
+SPEC    tc : IF (Qpc > 0), (Qpc < 10) tst(Qpc) = 1
+ADDSPEC tc : IF NIN(x,Qpc), (Qpc >= 10) tst(Qpc) = 2
 REWR tst(5) : tc
 REWR tst(50) : tc
 REWR tst(0) : tc

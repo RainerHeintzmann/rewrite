@@ -1,0 +1,19 @@
+# The help: HELP "name" "text" (inc/help, the libraries) and ?name at the
+# start of a line; without a text the variants or the value are shown.
+INC "inc/all"
+INC "inc/list"
+?
+?REWR
+?Int
+?part
+?sin
+SYM kk : real
+kk = 3
+?kk
+?real
+?nosuchname
+HELP "mine" "my own help"
+HELP "mine" "a second line"
+?mine
+# a string with a keyword as its text (was not possible before)
+PRT "QUIT"

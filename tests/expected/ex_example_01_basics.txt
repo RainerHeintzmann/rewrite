@@ -1,0 +1,15 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+---- a plain expression is calculated
+1028 
+1 
+(1/2) 
+---- a symbol stands for itself until it gets a value
+2 * pi * r 
+12.5664 
+2 * pi * r 
+---- a TERM stores a whole expression
+2 * pi * r 
+---- the sort of a term
+SYM r : real (no value)
+1 / 2 : rational
+TERM area : real = pi * r ^ 2 

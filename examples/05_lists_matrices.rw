@@ -1,0 +1,33 @@
+# 05_lists_matrices.rw: lists, vectors and matrices
+INC "inc/all"
+INC "inc/list"
+INC "inc/linalg"
+
+"---- a list is a vector: arithmetic element by element"
+[1,2,3] + [10,20,30]
+x*[1,2] + [a,b]
+range(5)^2
+
+"---- a list of rows is a matrix: products are matrix products"
+[[1,2],[3,4]] * [[0,1],[1,0]]
+[[1,2],[3,4]] * [5,6]
+[[2,1],[1,2]]^3
+
+"---- with symbolic entries"
+SYM g : real
+det([[a,b],[g,n]])
+inverse([[a,b],[g,n]])
+linsolve([[2,1],[1,3]], [3,5])
+
+"---- the characteristic polynomial"
+det([[2,1],[1,2]] - x*identity(2))
+
+"---- covectors: transpose(v)*w is a number, v*transpose(w) a matrix"
+transpose([1,2,3]) * [4,5,6]
+[1,2] * transpose([3,4])
+
+"---- list functions (the variable of table must be declared)"
+part([[1,2],[3,4]], 2, 1)
+SYM kk : real
+REWR table(x^kk, kk, range(4)) : All
+REWR select(range(10), kk, kk > 6) : All

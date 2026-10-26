@@ -3,8 +3,6 @@
 # Each integral is printed, then checked numerically:
 # |D(result,x) - integrand| at x = 0.7 must be below 1e-7 (prints true).
 INC "inc/all"
-INC "inc/integration/all"
-INC "inc/integration/rubi/all"
 TERM FF,GG,HH : real
 SYM yy : real
 x = yy

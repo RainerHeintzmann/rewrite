@@ -784,7 +784,7 @@ YY_RULE_SETUP
 				  	for (i=1;yytext[i]!=0;i++)
 						;
 				  	yytext[i-1]=0;
-					lookup(& yytext[1]); /* so that memory is allocated */
+					lookup_string(& yytext[1]); /* so that memory is allocated (2026: also for keywords) */
 					return String;}
 	YY_BREAK
 case 2:

@@ -1,0 +1,41 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+---- a list is a vector: arithmetic element by element
+[11,
+ 22,
+ 33] 
+[x + a,
+ 2 * x + b] 
+[1,
+ 4,
+ 9,
+ 16,
+ 25] 
+---- a list of rows is a matrix: products are matrix products
+[ 2  1 ]
+[ 4  3 ] 
+[17,
+ 39] 
+[ 14  13 ]
+[ 13  14 ] 
+---- with symbolic entries
+a * n - b * g 
+[ n / (a * n - b * g )    - b / (a * n - b * g ) ]
+[ - g / (a * n - b * g )  a / (a * n - b * g )   ] 
+[(4/5),
+ (7/5)] 
+---- the characteristic polynomial
+x ^ 2 + 3 - 4 * x 
+---- covectors: transpose(v)*w is a number, v*transpose(w) a matrix
+32 
+[ 3  4 ]
+[ 6  8 ] 
+---- list functions (the variable of table must be declared)
+3 
+[x,
+ x ^ 2,
+ x ^ 3,
+ x ^ 4] 
+[7,
+ 8,
+ 9,
+ 10] 

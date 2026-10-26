@@ -93,3 +93,17 @@ OTHER ^       : matrix,number >> matrix  ATT SYMBOLIC matpow
 # printed by their shape (symmat.c): a matrix that is the whole printed
 # term as a grid, otherwise [a, b, ...]
 SHOW [ ATT show_list
+
+# help for ?name
+HELP "list" "[a,b,c]   a list (sort vector); [[1,2],[3,4]] a matrix (a list of rows)"
+HELP "list" "  arithmetic element by element, matrix * matrix or vector the matrix product"
+HELP "list" "  part, length, first, last, rest, most, append, prepend, join, reverse,"
+HELP "list" "  range, table, select, total;  list(a,b) is the old name of [a,b]"
+HELP "[" "[a,b,c]   a list, see ?list"
+HELP "part" "part(l,i)  element i of the list l (from 1, -1 the last);  part(l,i,j) of a matrix"
+HELP "range" "range(n), range(a,b), range(a,b,d)   the list [1..n], [a..b] in steps of 1 or d"
+HELP "table" "table(body,x,l)   body for each x in the list l (or 1..n);  x must be declared"
+HELP "select" "select(l,x,cond)  the elements x of l for which cond holds"
+HELP "total" "total(l)   the sum of the elements of l"
+HELP "length" "length(l)   the number of elements of l"
+HELP "nil" "nil   the empty list"

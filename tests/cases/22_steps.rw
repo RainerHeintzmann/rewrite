@@ -2,8 +2,6 @@
 # of Alg with its label (inc/integration/rubi/steps, written by
 # tools/rubi2rewrite.py: Rubi section, rule number, Mathematica rule).
 INC "inc/all"
-INC "inc/integration/all"
-INC "inc/integration/rubi/all"
 TERM FF : real
 SYM yy : real
 x = yy

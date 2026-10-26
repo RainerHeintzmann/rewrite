@@ -1,0 +1,23 @@
+# 03_integration.rw: indefinite integrals
+# Integrate is a small rule set, RubiIntegrate the translated Rubi rules.
+INC "inc/all"
+
+"---- with Integrate"
+REWR Int(x^2, x) : Integrate
+REWR Int(x*sin(x), x) : Integrate
+REWR Int(1/(2*x+3), x) : Integrate
+REWR Int(x*exp(2*x), x) : Integrate
+
+"---- with RubiIntegrate"
+REWR Int(1/(1+x^2), x) : RubiIntegrate
+REWR Int(sin(x)^2, x) : RubiIntegrate
+REWR Int(x/(1+x^4), x) : RubiIntegrate
+REWR Int(sqrt(x)/(1+x), x) : RubiIntegrate
+REWR Int(ln(x)^2, x) : RubiIntegrate
+
+"---- check: the derivative of the result is the integrand"
+"---- (cancel puts it over a common denominator and simplifies)"
+TERM Fx : number
+Fx = REWR Int(x^2*cos(x), x) : RubiIntegrate
+Fx
+REWR cancel(deriv(Fx, x)) : All

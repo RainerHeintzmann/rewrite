@@ -1,0 +1,5 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+cos (α * θ )* α 
+- exp (- x * α )/ α 
+x₁ + x₂ 
+SYM x₁ : real (no value)

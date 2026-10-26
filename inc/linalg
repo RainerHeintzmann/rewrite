@@ -140,3 +140,15 @@ ADDSPEC MatrixSolve : IF (not(sortleq(Xnu, nil))) isom(Xnu * Ma, Mc2, Mc) = isom
 ADDSPEC MatrixSolve : isom(transpose(Ma), Mc2, Mc) = isom(Ma, transpose(Mc2), Mc)
 ADDSPEC MatrixSolve : isom(inverse(Ma), Mc2, Mc) = isom(Ma, inverse(Mc2), Mc)
 ADDSPEC MatrixSolve : isom(- Ma, Mc2, Mc) = isom(Ma, - Mc2, Mc)
+
+# help for ?name
+HELP "det" "det(m)   the determinant of the matrix m (fraction-free elimination)"
+HELP "inverse" "inverse(m)   the inverse matrix; also m^(-1)"
+HELP "linsolve" "linsolve(m,b)   the solution x of m.x = b (b a vector or a matrix)"
+HELP "transpose" "transpose(m)   rows become columns; transpose(v) of a vector is a covector:"
+HELP "transpose" "  transpose(u)*v the inner product (a number), u*transpose(v) the outer product"
+HELP "dot" "dot(a,b)   the matrix product, matrix times vector, or the scalar product"
+HELP "identity" "identity(n)   the n x n unit matrix"
+HELP "thread" "thread(u)   functions of lists element by element: sin([a,b]) = [sin(a), sin(b)]"
+HELP "MatrixRules" "REWR t : MatrixRules   the rules for symbolic matrices (SYM A : matrix)"
+HELP "MatrixSolve" "REWR msolve(A*X == B, X) : (MatrixSolve, MatrixRules)   solves for the matrix X"

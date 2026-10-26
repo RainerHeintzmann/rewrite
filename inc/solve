@@ -19,10 +19,9 @@
 # Solve without the integer constant). Squaring can add solutions; all
 # solutions are checked (numerically where possible) and those that make
 # the equation undefined or false are removed.
-# Needs inc/all, inc/list and inc/helpers (for the imaginary unit im of
-# complex roots inc/integration/all):
+# Needs inc/all (with inc/helpers and the imaginary unit im of the complex
+# roots) and inc/list:
 #     INC "inc/all"
-#     INC "inc/integration/all"
 #     INC "inc/list"
 #     INC "inc/solve"
 
@@ -143,3 +142,9 @@ ADDSPEC Solve : iso(arccsch(Su), Sr, Sx) = iso(Su, csch(Sr), Sx)
 # x still more than once inside: the whole equation u - r = 0 again
 ADDSPEC Solve : IF (occurs(Su, Sx) > 1) iso(Su, Sr, Sx) = sol(Su - Sr, Sx)
 COMM
+
+# help for ?name
+HELP "solve" "solve(lhs == rhs, x)   the list of the solutions of the equation for x"
+HELP "solve" "solve([eq1, eq2], [x, y])   a system of equations: the list of the solutions"
+HELP "solve" "  with the rule set Solve:  REWR solve(x^2 - 3*x + 2 == 0, x) : Solve"
+HELP "Solve" "REWR solve(..) : Solve   solves equations (isolation, polynomials, new unknown, ..)"

@@ -1,0 +1,7 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+---- fib(15) by the rules
+610 
+---- rules with symbols: the logarithm laws
+ln (a )+ 3 * ln (b )
+---- conditions: a linear map lin takes out factors free of x (NIN)
+3 * lin (x ^ 2 )+ y * lin (sin (x ))+ lin (5 )

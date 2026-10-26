@@ -1,13 +1,24 @@
 #!/bin/sh
-# rewrite with line editing, a history (arrow keys) and completion of the
-# LaTeX-like names with TAB (\al TAB -> \alpha), via rlwrap.
+# rewrite with line editing, a history and TAB completion via rlwrap:
+#  - TAB completes keywords and library names (TYP TAB -> TYPEOF), and as in
+#    Julia's REPL the LaTeX-like names: \alpha TAB gives α, \al TAB lists them;
+#  - the arrow keys browse the earlier lines that begin with what is typed
+#    (tools/rewrite.inputrc); the history is kept in ~/.rewrite_history,
+#    every line is saved at once.
 # Start it from the project folder (the INC paths are relative to it):
 #     tools/rewrite-rl                 or with files:  tools/rewrite-rl my.rw
 # Needs rlwrap: in MSYS2  pacman -S rlwrap,  on Linux e.g.  apt install rlwrap
 # -b: the word separators without the backslash, so \alpha is one word;
+# -f: the words to complete (keywords, library names, \alpha ...), written
+#     by tools/gen_words.py; rlwrap completes only with such a list;
+# -z: the filter tools/latex.rlwrap replaces a complete \alpha by α and
+#     saves every line in the history file;
+#     it also colours the prompt, the entered lines and the output;
 # -i: rewrite stays interactive (under rlwrap its input is no terminal).
 dir=$(cd "$(dirname "$0")/.." && pwd)
 exe="$dir/rewrite.exe"
 [ -f "$exe" ] || exe="$dir/rewrite"
-exec rlwrap -b '(){}[],+-*/=&^%$#@";|' -f "$dir/tools/latex_words.txt" \
-     -H "$HOME/.rewrite_history" "$exe" -i "$@"
+export REWRITE_HISTORY="$HOME/.rewrite_history"
+export INPUTRC="$dir/tools/rewrite.inputrc"
+exec rlwrap -b '(){}[],+-*/=&^%$#@";|?' -f "$dir/tools/rewrite_words.txt" \
+     -z "$dir/tools/latex.rlwrap" -H "$REWRITE_HISTORY" "$exe" -i "$@"

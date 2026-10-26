@@ -1,0 +1,22 @@
+ Values for Li+ Nb5+ 3*(O2-) in ferroelectric phase (congruently grown)
+---- a definite integral, a zero by Newton's method, a minimum
+(1/3) 
+1.41421 
+0.3 
+---- printing with more digits
+1.41421356237 
+---- numerical vectors (C arrays) for fast arithmetic
+[1,
+ 3,
+ 3] 
+2 
+[-3,
+ 0,
+ 1] 
+3.74166 
+---- a loop
+1 
+4 
+9 
+16 
+25 

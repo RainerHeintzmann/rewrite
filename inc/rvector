@@ -66,3 +66,6 @@ FUNC _pow : rvector,real  >> rvector RA  ATT epow_vec  # elementwise
 FUNC _mul : rvector,rvector  >> rvector LA3  ATT emul_vec  # elementwise
 FUNC _div : rvector,rvector  >> rvector LA3  ATT ediv_vec  # elementwise
 
+# help for ?name
+HELP "rvector" "rvector   numerical vectors (C arrays): SYM v : rvector, v = [1,2,3], [1,0,0]*v"
+HELP "rmatrix" "rmatrix   numerical matrices (inc/rmatrix): zeromat, onemat, chmat, trans"

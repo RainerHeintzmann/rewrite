@@ -47,7 +47,9 @@ term with the rule list `All`, here computing the derivative of
 `sin(cos(x))`. Constants such as `a` either have a value or stand for
 themselves: `a = nothing` removes the value again, because the library
 constant `nothing` never has one. `INC "inc/list"` adds lists and matrices in
-brackets, whose product is the matrix product.
+brackets, whose product is the matrix product. `?REWR` (or `?` alone) shows
+help, and [examples/](examples/README.md) has small programs to start from,
+e.g. `rewrite examples/03_integration.rw`.
 
 There are an interactive and a non-interactive way to run rewrite:
 
@@ -96,10 +98,24 @@ After that, run `build_windows.bat` in the project folder, or `make` in the
 ### Terminal with line editing, history and `\alpha` completion
 
 rewrite reads plain lines. For line editing, a history across sessions
-(arrow keys) and TAB completion of the LaTeX-like names (`\al` TAB gives
-`\alpha`, which rewrite prints as `α`), start it through
+and TAB completion, start it through
 [rlwrap](https://github.com/hanslub42/rlwrap) with the script
-[tools/rewrite-rl](tools/rewrite-rl), from the project folder:
+[tools/rewrite-rl](tools/rewrite-rl), from the project folder. TAB
+completes the keywords and the names of the libraries (`TYP` TAB gives
+`TYPEOF`, `RubiInt` TAB `RubiIntegrate`), and the LaTeX-like names as in
+Julia: `\alpha` TAB gives `α`, `\al` TAB lists the names. As in Julia, the
+arrow keys browse the earlier lines that begin with what is typed already
+([tools/rewrite.inputrc](tools/rewrite.inputrc)); the history is kept in
+`~/.rewrite_history`, every line is saved at once. The session is
+coloured: the prompt green, errors red, warnings yellow, keywords magenta,
+sort names cyan and comments grey, also in the entered lines, which are
+written again in colour after Enter (`NO_COLOR=1` switches it off). The
+line being typed stays plain: readline cannot colour it. The word list
+`tools/rewrite_words.txt` is written by [tools/gen_words.py](tools/gen_words.py)
+(run it again after changing the libraries); the replacement of `\alpha`
+is the rlwrap filter [tools/latex.rlwrap](tools/latex.rlwrap) (Perl, comes
+with MSYS2 and most Linux systems), with the table `tools/latex_symbols.tsv`
+of [tools/gen_latex.py](tools/gen_latex.py):
 
 ```text
 tools/rewrite-rl                 # interactive
@@ -128,6 +144,14 @@ in `INC` are relative to the current folder, so start it in the project
 folder. Without rlwrap, rewrite runs in any terminal (also PowerShell and
 `cmd`); there `\alpha` is converted as well, only without completion.
 Unicode characters need a font that has them, as in Windows Terminal.
+
+A Desktop icon (a stylus drawing an integral, [tools/rewrite.ico](tools/rewrite.ico),
+drawn by [tools/make_icon.py](tools/make_icon.py)) that starts rewrite this
+way in the MSYS2 terminal is made once with
+
+```text
+powershell -ExecutionPolicy Bypass -File tools\make_shortcut.ps1
+```
 
 The old 32-bit Unix makefile is kept as `makefile.unix32.orig`, and the
 Amiga makefile as `makefile.amiga`.
@@ -166,6 +190,11 @@ REWRITE_PROFILE=1 ./rewrite.exe < problem.rw
   `-->` shows that a block is still open.
 - Several instructions in one line are separated by `;`.
 - Comments start with `#` and go to the end of the line.
+- A line that begins with `?` shows help, as in Julia: `?REWR`, `?Int`,
+  `?sin`; `?` alone lists the names with a help text. The texts come from
+  the library (`HELP "name" "text"`, in [inc/help](inc/help) and the
+  library files); without one, `?f` shows the variants of a function and
+  `?x` the kind and value of a name.
 - A text in double quotes is printed: `"Hello world"`. A comma-separated
   list prints several items: `"value of x: ",x`.
 - Writing a term prints it, evaluated as far as possible. The last printed
@@ -373,11 +402,11 @@ LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
 
 Each sort has its own representation in C. [inc/exact](inc/exact) adds two
 number sorts implemented with the GMP library ([exact.c](src/exact.c)):
-`integer` (any size) and `rational` (fractions). Load it after `inc/all`:
+`integer` (any size) and `rational` (fractions). `inc/all` loads it (with
+the integration); plain expressions are still calculated numerically:
 
 ```text
 INC "inc/all"
-INC "inc/exact"
 1/3 + 1/6           # prints (1/2)
 2^100               # prints 1267650600228229401496703205376
 (2/3)^-2            # prints (9/4)
@@ -622,21 +651,21 @@ REWR fmin(-1,1,(x-0.3)^2,x) : numerik,calc          # prints 0.3
 translation of a subset of the [Rubi](https://github.com/RuleBasedIntegration/Rubi)
 rules (MIT license). It covers powers of linear expressions, exponentials,
 sine and cosine, and polynomials times them, also with symbolic
-coefficients:
+coefficients. `INC "inc/all"` loads it, together with exact numbers
+(inc/exact: `1/3` stays a fraction, while plain expressions such as
+`sqrt(2)` are still calculated numerically):
 
 ```text
-INC "inc/integration/all"
 REWR Int(x^2*cos(x),x) : Integrate      # prints 2 * cos (x )* x + x ^ 2 * sin (x )- 2 * sin (x )
 REWR Int(1/(2*x+3),x) : Integrate      # prints (1/2) * ln (3 + 2 * x )
 REWR Int(sin(a*x+b),x) : Integrate     # prints - cos (a * x + b )/ a
 ```
 
-With [inc/integration/rubi](inc/integration/rubi), about 90% of
-all Rubi rules are available. They are translated automatically by
-[tools/rubi2rewrite.py](tools/rubi2rewrite.py):
+With [inc/integration/rubi](inc/integration/rubi), also loaded by
+`inc/all` (about 1 s), about 90% of all Rubi rules are available. They are
+translated automatically by [tools/rubi2rewrite.py](tools/rubi2rewrite.py):
 
 ```text
-INC "inc/integration/rubi/all"
 REWR Int(x/(1+x^4),x) : RubiIntegrate        # prints (1/2) * arctan (x ^ 2 )
 REWR Int(sqrt(x)/(1+x),x) : RubiIntegrate    # prints 2 * x ^ (1/2) - 2 * arctan (x ^ (1/2) )
 ```
@@ -712,7 +741,7 @@ argument is no list:
 
 Lists are printed by their shape, as Julia prints arrays. When it is the
 whole printed term, a vector of up to 10 entries is a column in the form
-of the input, `[1,` / ` 2,` / ` 3]` on three lines, a rectangular list of
+of the input (`[1,`, then `2,` and `3]` indented on the next lines), a rectangular list of
 lists a grid with aligned columns (numbers right-aligned), deeper ones in
 slices `[1, :, :] = ...`; everything else is inline, `[a, b, [c, d]]`
 (in the examples below, results are written inline). This is a print
@@ -842,7 +871,6 @@ methods themselves are an ordered rule list.
 
 ```text
 INC "inc/all"
-INC "inc/integration/all"       # im
 INC "inc/list"
 INC "inc/solve"
 REWR solve(x^2 + 4*x + 7 == 0, x) : Solve               # [3 ^ (1/2) * im - 2, -2 - 3 ^ (1/2) * im]

@@ -1,7 +1,6 @@
 # Exact numbers (inc/exact): sorts integer and rational with GMP, subsorts
 # integer < rational < real (SUBSORT), integer literals (INTNUM).
 INC "inc/all"
-INC "inc/exact"
 # ---- arithmetic stays exact
 1/3 + 1/6
 2/4

@@ -119,9 +119,10 @@ char * latex_convert (const char * line)
 }
 ''' % max(len(k.encode('utf-8')) for k in keys))
 print(len(keys), 'entries written to', out)
-# the names for rlwrap's completion (tools/rewrite-rl): \alpha, ...
-words = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'latex_words.txt')
-with open(words, 'w', encoding='utf-8', newline='\n') as f:
+# the names and characters for rlwrap's completion (tools/latex.rlwrap):
+# \alpha<TAB>α, one per line
+tsv_out = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'latex_symbols.tsv')
+with open(tsv_out, 'w', encoding='utf-8', newline='\n') as f:
     for k in sorted(d):
-        f.write('\\' + k + '\n')
-print(len(d), 'names written to', words)
+        f.write('\\' + k + '\t' + d[k] + '\n')
+print(len(d), 'names written to', tsv_out)

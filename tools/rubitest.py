@@ -417,8 +417,6 @@ def check(f_py, F_py, params):
 # ----------------------------------------------------------------------
 
 HEAD = '''INC "inc/all"
-INC "inc/integration/all"
-INC "inc/integration/rubi/all"
 PRTNUM "%.15g "
 TERM FF : number
 SYM yy : real
