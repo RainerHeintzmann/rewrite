@@ -181,11 +181,14 @@ static int num_value_exact (Node * t)
 static struct { char * role, * sym; } roles[MAXROLES];
 static int nroles = 0;
 
+static int role_generation = 1;		/* 2026: increased by every SYMBOLIC (role_of) */
+
 void role_fn (Node * np)	/* SYMBOLIC "role" = "symbol"; SYMBOLIC alone: clear */
 {
 	const char * r, * sy;
 	int i;
 	np = np->r;			/* the statement: FUNC(role_fn, PARAM(role, symbol)) */
+	role_generation++;		/* 2026: the cached roles are no longer valid */
 	if (! np)
 		{
 		for (i = 0; i < nroles; i++) { free(roles[i].role); free(roles[i].sym); }
@@ -218,7 +221,7 @@ static const char * role_symbol_name (const char * role)	/* the symbol playing a
 
 /* the role of a function symbol: its name, unless a role is mapped to it,
  * or its name is a role that another symbol plays ("" then) */
-static const char * role_of (Symbol * f)
+static const char * role_of_uncached (Symbol * f)
 {
 	const char * n = name(f);
 	int i;
@@ -228,6 +231,18 @@ static const char * role_of (Symbol * f)
 	for (i = 0; i < nroles; i++)
 		if (strcmp(roles[i].role, n) == 0) return "";
 	return n;
+}
+
+/* the role of f, kept in its symbol until the roles change (is_head asks
+   for it very often) */
+static const char * role_of (Symbol * f)
+{
+	if (f->role_gen != role_generation)
+		{
+		f->role = role_of_uncached(f);
+		f->role_gen = role_generation;
+		}
+	return f->role;
 }
 
 static Symbol * role_find (const char * role)	/* symbol of a role or NULL */
@@ -274,12 +289,15 @@ static Node * untrivial (Node * t)	/* 1*u, u*1, 0+u, u+0, u^1 -> u */
 		}
 }
 
-static int tequal (Node * a, Node * b)
+/* equal terms; strict: 0 + u is not u (else trivial factors, summands and
+   exponents are left out) */
+static int tequal_as (Node * a, Node * b, int strict)
 {
 	double va, vb;
 	Symbol * sa, * sb;
 	int i, n;
-	a = untrivial(a); b = untrivial(b);
+	if (strict) { a = deref(a); b = deref(b); }
+	else { a = untrivial(a); b = untrivial(b); }
 	if (a == b) return 1;
 	if (! a || ! b) return 0;
 	if (is_num(a, & va) && is_num(b, & vb))
@@ -291,8 +309,13 @@ static int tequal (Node * a, Node * b)
 	n = term_nargs(a);
 	if (n != term_nargs(b)) return 0;
 	for (i = 0; i < n; i++)
-		if (! tequal(arg(a, i), arg(b, i))) return 0;
+		if (! tequal_as(arg(a, i), arg(b, i), strict)) return 0;
 	return 1;
+}
+
+static int tequal (Node * a, Node * b)
+{
+	return tequal_as(a, b, 0);
 }
 
 int term_equal (Node * a, Node * b)	/* structural equality (exported) */
@@ -2998,7 +3021,7 @@ static Node * s_normform (Node * a[], int n, Symbol * f)
    IF (not(normalq(X))) X = normform(X) ends (the last step of All). After
    a rule the term is calculated again (tcalc), which may change normform's
    result a little ((-1/2)*c for - (1/2)*c): u is normal if it is that
-   calculated normal form. */
+   calculated normal form. Compared strictly: 0 + u is not normal. */
 static Node * s_normalq (Node * a[], int n, Symbol * f)
 {
 	Node * r;
@@ -3006,11 +3029,11 @@ static Node * s_normalq (Node * a[], int n, Symbol * f)
 	if (n != 1) return NULL;
 	if (nf_known(nf_hash(a[0], 0))) return mk_bool(1, f);
 	r = s_normform(a, 1, NULL);
-	same = r && term_equal(r, a[0]);
+	same = r && tequal_as(r, a[0], 1);
 	if (r && ! same)
 		{
 		r = tcalc(r);
-		same = r && term_equal(r, a[0]);
+		same = r && tequal_as(r, a[0], 1);
 		}
 	delete(r);
 	if (same) nf_hash(a[0], 1);		/* known as normal from now on */

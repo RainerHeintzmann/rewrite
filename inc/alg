@@ -553,6 +553,7 @@ ADDSPEC     diff : IF NIN(Znu,Anu,Bnu,Cnu) D(hyp2f1(Anu,Bnu,Cnu,Xnu),Znu) = D(Xn
 ADDSPEC     diff : IF NIN(Znu,Ynu) D(besselj(Ynu,Xnu),Znu) = D(Xnu,Znu)*(besselj(Ynu+(-1),Xnu)+(-(besselj(Ynu+1,Xnu))))*.5
 
 ADDSPEC     diff : D(Xnu*Ynu,Znu)=D(Xnu,Znu)*Ynu+D(Ynu,Znu)*Xnu   # general differentiation rules
+ADDSPEC     diff : D(Xnu/Ynu,Znu)=D(Xnu,Znu)/Ynu-Xnu*D(Ynu,Znu)/Ynu^2   # 2026 added: quotient rule
 ADDSPEC     diff : IF NIN (Z,X) D(_Fre(X),Z)=D(X,Z)*D(_Fre(X),X)  # chain rule
 
 ADDSPEC     diff : D(e^Xnu,Znu)  = D(Xnu,Znu)*e^Xnu

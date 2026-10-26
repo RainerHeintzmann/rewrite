@@ -39,6 +39,8 @@ static int find_pair (Node * from, Node * to)	/* index of from < to, or -1 */
 	return -1;
 }
 
+static void dcache_clear (void);	/* 2026: the sort_dist cache, below */
+
 void subsort_def (Node * np)		/* FUNC(subsort_def, PARAM(from, PARAM(to, conv))) */
 {
 	Node * p = np->r;
@@ -64,6 +66,7 @@ void subsort_def (Node * np)		/* FUNC(subsort_def, PARAM(from, PARAM(to, conv)))
 	sub[i].from = from;
 	sub[i].to = to;
 	sub[i].conv = conv;
+	dcache_clear();		/* the distances change */
 	if (conv && sort_valued(from)) sort_valued(to) = TRUE;	/* values are converted into to */
 }
 
@@ -121,9 +124,45 @@ static int shortest (Node * from, Node * to, int * via)
 	return -1;
 }
 
+/* 2026: sort_dist is asked for every argument of every variant when a
+   variant is chosen, and the search through the subsort graph was the most
+   expensive part of it: the distances are kept, until a SUBSORT changes the
+   graph. A sort gets an index in its symbol (sortno). */
+#define MAXSORTS 128
+static signed char dcache[MAXSORTS][MAXSORTS];	/* -2: not known yet */
+static Symbol * dsorts[MAXSORTS];
+static int ndsorts = 0;
+
+static void dcache_clear (void)
+{
+	int i;
+	for (i = 0; i < ndsorts; i++) dsorts[i]->sortno = 0;
+	ndsorts = 0;
+}
+
+static int sort_index (Symbol * s)		/* -1 if the cache is full */
+{
+	int i;
+	if (s->sortno > 0) return s->sortno - 1;
+	if (ndsorts == MAXSORTS) return -1;
+	i = ndsorts++;
+	dsorts[i] = s;
+	s->sortno = i + 1;
+	memset(dcache[i], -2, sizeof dcache[i]);
+	for (i = 0; i < ndsorts; i++) dcache[i][ndsorts - 1] = -2;
+	return ndsorts - 1;
+}
+
 int sort_dist (Node * from, Node * to)
 {
-	return shortest(from, to, NULL);
+	int i, j;
+	if (! from || ! to) return -1;
+	if (from == to) return 0;
+	i = sort_index((Symbol *) from);
+	j = sort_index((Symbol *) to);
+	if (i < 0 || j < 0) return shortest(from, to, NULL);
+	if (dcache[i][j] == -2) dcache[i][j] = (signed char) shortest(from, to, NULL);
+	return dcache[i][j];
 }
 
 /* 2026: a term of a sort without values (not sort_valued, e.g. a list

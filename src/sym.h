@@ -35,6 +35,9 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 	int		builtin;          /* 2026: symbolic C function (symfn.c), gets terms instead of numbers */
 	void *	showfn;           /* 2026: print function of a function (SHOW f ATT name), see tprint */
 	int		valued;           /* 2026: for a sort: values of it can arise (see sort_valued) */
+	int		sortno;           /* 2026: for a sort: its index in the sort_dist cache + 1 (numsort.c) */
+	const char * role;        /* 2026: the role of a function, valid if role_gen is current (symfn.c) */
+	int		role_gen;
 };
 
 #define NOFLAG		0

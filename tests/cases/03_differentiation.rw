@@ -20,6 +20,11 @@ REWR D(abs x,x) : All
 REWR D(exp(x^2),x) : All
 REWR D(sqrt(1+x^2),x) : All
 REWR D(arcsin(2*x),x) : All
+# 2026: the quotient rule; deriv treats y as a constant, D does not;
+# normalq is strict, so Final leaves no 0 + ... behind
+REWR deriv(x/y,x) : All
+REWR deriv(sin(x)/(x+y),x) : All
+REWR D(x/(1+x^2),x) : All
 # numerical check at x = 0.5: 1.1547 -1.1547 0.707107 0.786448 1
 TERM t1,t2,t3,t4,t5 : real
 t1 = REWR D(arcsin x,x) : All

@@ -280,7 +280,35 @@ void rewrite_end (void)
 	if (rewrite_depth == 0) hist_clear();
 }
 
-BOOLEAN find_position _2a ((p_term,rtree), Node * * p_term, Node * rtree)
+/* 2026: a rule that makes the term deeper on every step (f(c) = c*f(1),
+   applied again inside) would overflow the C stack in the recursion here
+   long before the step limit: REWR stops at this depth. Real terms are a
+   few hundred levels deep at most. */
+#define MAX_TERM_DEPTH 20000
+static int position_depth = 0;
+
+static BOOLEAN find_position_at (Node * * p_term, Node * rtree);
+
+BOOLEAN find_position (Node * * p_term, Node * rtree)
+{
+	BOOLEAN r;
+	if (position_depth >= MAX_TERM_DEPTH)
+		{
+		if (! step_limit_hit)
+			{
+			step_limit_hit = TRUE;
+			printfErr("REWR : the term became deeper than %d levels (a rule that keeps "
+			          "growing it?), the result is not complete\n", MAX_TERM_DEPTH);
+			}
+		return FALSE;
+		}
+	position_depth++;
+	r = find_position_at(p_term, rtree);
+	position_depth--;
+	return r;
+}
+
+static BOOLEAN find_position_at (Node * * p_term, Node * rtree)
 {
 	Node * lt, * rt,* repl ,* maintype;
 	BOOLEAN rewritten;
