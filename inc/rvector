@@ -1,5 +1,16 @@
+# inc/rvector: numerical real vectors (C arrays of doubles), for fast
+# numerics. The brackets are the lists of inc/list: a list of numbers is
+# converted into an rvector where one is expected (SUBSORT below), e.g.
+#     CONST v : rvector
+#     v = [1,2,3]
+#     [1,0,0]*v              # scalar product
+# Needs inc/all and inc/list:
+#     INC "inc/all"
+#     INC "inc/list"
+#     INC "inc/rvector"
 SORT rvector
 ATT rvector  show_vec,cmp_vec,cpy_vec,del_vec
+SUBSORT vector,rvector ATT constr_vec               # [1,2,3] as an rvector
 
 FUNC vecs  : rvector ++ >> real ATT vec_write          # display of many vectors
 
@@ -18,7 +29,7 @@ OTHER abs : rvector >> real ATT vec_abs                # magnitude
 FUNC _x_  : rvector,rvector >> rvector LA3 ATT vec_x_vec # square
 FUNC sqr  : rvector >> real ATT vec_sqr              # square
 FUNC elem : rvector,real >> real ATT elem_vec        # Vector,Pos
-FUNC part : rvector,real,real >> rvector ATT vec_part  # Part of the Vector From..To
+OTHER part : rvector,real,real >> rvector ATT vec_part # Part of the Vector From..To
 FUNC zerovec : real      >> rvector ATT zero_vec     # Dimension
 FUNC onevec : real,real >> rvector ATT one_vec     # Dimension,Pos
 FUNC gen : real,real,real  >> rvector ATT gen_vec    # from,to,steps
@@ -26,7 +37,6 @@ FUNC chvec : rvector,real,real >> rvector ATT ch_vec # vector,pos,value
 FUNC vecms : rvector >> real ATT vec_ms              # variance
 FUNC vecrms : rvector >> real ATT vec_rms            # standard deviation
 FUNC vecmiddle : rvector >> real ATT vec_middle      # mean
-BRA  [ ]  : real ++ >> rvector ATT constr_vec        # matrix,pos,value
 OTHER [ : rvector,real >> real ATT elem_vec          # Vector[Pos]
 
 # elementwise ::

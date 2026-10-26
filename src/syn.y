@@ -121,6 +121,8 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	PRECEDENCE att {	$$=mknod(FUN
 			| NUM Sort	 			  			 {$$=mknod(FUNC,(Node *) set_numbertype,(Node *) ($2)); /* sets numbertype for mknum */}
 			| SUBSORT Sort ',' Sort ATT Id	 {$$=mknod(FUNC,(Node *) subsort_def,   /* 2026: subsort */
 										      mknod(PARAM,(Node *) $2,mknod(PARAM,(Node *) $4,(Node *) give_ufn(name($6)))));}
+			| SUBSORT Sort ',' Sort		 {$$=mknod(FUNC,(Node *) subsort_def,   /* 2026: subsort of a sort without values */
+										      mknod(PARAM,(Node *) $2,mknod(PARAM,(Node *) $4,NULL)));}
 			| SHOW func ATT Id		 {$$=mknod(FUNC,(Node *) show_def,      /* 2026: print function */
 										      mknod(PARAM,(Node *) $2,(Node *) give_pfn(name($4))));}
 			| SHOW func			 {$$=mknod(FUNC,(Node *) show_def,      /* 2026: the usual printing again */

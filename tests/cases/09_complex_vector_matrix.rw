@@ -1,13 +1,24 @@
 # Complex numbers, real vectors and real matrices (indices start at 0).
+# The brackets are the lists of inc/list (symbolic, element by element);
+# a list becomes a numerical rvector where one is expected: assigned to a
+# CONST of sort rvector, or as the argument of an rvector function.
 INC "inc/all"
+INC "inc/list"
 INC "inc/rvector"
 INC "inc/rmatrix"
 (1+2*i)*(3-i)
 Cpx(1,2)
 [1,2,3]+[4,5,6]
 [1,2,3]*[4,5,6]
-[1,0,0] _x_ [0,1,0]
 abs([3,4,0])
+CONST v1,v2 : rvector
+v1 = [1,2,3]
+v2 = [4,5,6]
+v1+v2
+v1*v2
+abs([3,0,4]*1 + v1 - v1)
+[1,0,0]*v2
+[1,0,0] _x_ [0,1,0]
 eabs([-1.5,2,-3.25])
 zerovec(3)
 chvec(zerovec(3),1,7)

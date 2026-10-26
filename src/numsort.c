@@ -46,9 +46,9 @@ void subsort_def (Node * np)		/* FUNC(subsort_def, PARAM(from, PARAM(to, conv)))
 	u_function * conv = (u_function *) p->r->r;
 	int i = find_pair(from, to);
 	p->r->r = NULL;				/* not a node: must not be deleted */
-	if (! conv)
+	if (! conv && sort_valued(to))	/* 2026: without ATT: 'to' has no values */
 		{
-		ErrorMsg("SUBSORT needs a C conversion function (ATT name)\n");
+		ErrorMsg("SUBSORT into a sort with values needs a C conversion function (ATT name)\n");
 		return;
 		}
 	if (from == to || sort_dist(to, from) >= 0)
@@ -64,6 +64,7 @@ void subsort_def (Node * np)		/* FUNC(subsort_def, PARAM(from, PARAM(to, conv)))
 	sub[i].from = from;
 	sub[i].to = to;
 	sub[i].conv = conv;
+	if (conv && sort_valued(from)) sort_valued(to) = TRUE;	/* values are converted into to */
 }
 
 void intnum_def (Node * np)		/* FUNC(intnum_def, PARAM(sort, read function)) */
@@ -71,6 +72,7 @@ void intnum_def (Node * np)		/* FUNC(intnum_def, PARAM(sort, read function)) */
 	Node * p = np->r;
 	intsort = (Symbol *) p->l;
 	intread = (u_function *) p->r;
+	sort_valued(intsort) = TRUE;
 	p->r = NULL;				/* not a node: must not be deleted */
 	if (! intread)
 		{
@@ -124,6 +126,47 @@ int sort_dist (Node * from, Node * to)
 	return shortest(from, to, NULL);
 }
 
+/* 2026: a term of a sort without values (not sort_valued, e.g. a list
+   [1,2,3] of inc/list) as a value of the sort 'to', if a SUBSORT path
+   leads there: the first conversion of the path gets the values of the
+   arguments of the term, as numbers of the standard sort (NUM), e.g.
+   SUBSORT vector,rvector ATT constr_vec. NULL if this is not possible. */
+void * term_convert (Node * term, Node * to)
+{
+	void * args[MAXARGS], * v;
+	Node * a, * from, * nt = get_numbertype();
+	int via[MAXSUB + 2], n = 0, i, err = FALSE;
+	if (! term || term->type != Func || ! to || ! nt) return NULL;
+	from = rtypes(TERM_HEAD(term));
+	if (! from || sort_valued(from) || shortest(from, to, via) <= 0) return NULL;
+	for (a = TERM_ARGS(term); a && n < MAXARGS - 1; a = ARGS_NEXT(a))
+		{
+		Node * s;
+		v = realcalc(ARGS_ITEM(a), & err);
+		s = realcalc_sort();
+		if (err || ! v || ! s) { err = TRUE; break; }
+		if (s != nt)		/* an element as a standard number */
+			{
+			void * w = sort_dist(s, nt) > 0 ? sort_convert(v, s, nt) : NULL;
+			((void (*) (void *)) del(s)) (v);
+			if (! w) { err = TRUE; break; }
+			v = w;
+			}
+		args[n++] = v;
+		}
+	args[n] = NULL;
+	v = (err || a) ? NULL : (sub[via[0]].conv)(args);
+	for (i = 0; i < n; i++)
+		((void (*) (void *)) del(nt)) (args[i]);
+	if (v && via[1] >= 0)		/* the rest of the path */
+		{
+		void * w = sort_convert(v, sub[via[0]].to, to);
+		((void (*) (void *)) del(sub[via[0]].to)) (v);
+		v = w;
+		}
+	return v;
+}
+
 void * sort_convert (void * value, Node * from, Node * to)
 {
 	void * v = value, * arg[2];
@@ -135,10 +178,11 @@ void * sort_convert (void * value, Node * from, Node * to)
 		int i = via[j];
 		void * w;
 		arg[0] = v; arg[1] = NULL;
-		w = (sub[i].conv)(arg);
+		w = sub[i].conv ? (sub[i].conv)(arg) : NULL;	/* none: a sort without values */
 		if (v != value && del(sub[i].from))	/* intermediate value */
 			((void (*) (void *)) del(sub[i].from)) (v);
 		v = w;
+		if (! v) break;
 		}
 	return v;
 }

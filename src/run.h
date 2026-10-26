@@ -37,6 +37,8 @@ void tprint _2p(Node *,int);
 Node * mknod _3p (int,Node *,Node *);
 void set_numbertype(Node * np);
 Node * get_numbertype(void);
+Node * realcalc_sort (void);
+void * realcalc (Node * term, int * perr);
 void delete _1p (Node * );
 Node * tcopy _1p(Node *);
 Node * tcalc _1p(Node *);

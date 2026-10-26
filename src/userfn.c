@@ -123,12 +123,10 @@ t_funct (userfunction [])  = {
 	FN(r_abs),
 	FN(signum),
 	FN(show_complex),
-	FN(show_number),	/* 2026: sort number */
 	FN(cmp_complex),	
 	FN(cpy_complex),	
 	FN(del_complex),	
 	FN(real2cpx),		/* 2026: SUBSORT real,complex */
-	FN(cpx2num),		/* 2026: SUBSORT complex,number */
 	FN(cpx),					
 	FN(c_plus),			
 	FN(c_plus_r),		

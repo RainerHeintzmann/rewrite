@@ -314,17 +314,49 @@ while (((froass)->type != Const) && (froass->type != Func))
 	}
 rslt = calculate(froass);
 
-/* 2026: a term of another sort, e.g. a list [2,3,4] for a real constant,
-   has no value of the sort of the constant: an error, the constant is
-   not changed (terms are stored in a TERM) */
-if (! rslt && get_type(froass) && rtypes(toass) && get_type(froass) != rtypes(toass)
-    && sort_dist(get_type(froass), rtypes(toass)) < 0)
+/* 2026: a constant of a sort without values (number, vector, ...) never
+   has a value; a = nothing is allowed */
+if (rtypes(toass) && ! sort_valued(rtypes(toass)) && (rslt || froass->type == Func))
 	{
 	ErrorMsg("");
-	printfErr("Wrong const-assignment : '%s' is of sort %s, the term is of sort %s;\n"
+	printfErr("Wrong const-assignment : the sort %s of '%s' has no numerical values;\n"
+	          "  declare a value sort (e.g. CONST %s : real), or store a term in a TERM\n",
+	          name((Symbol *) rtypes(toass)), name(toass), name(toass));
+	if (rslt) delnum((Symbol *) rslt, TRUE);
+	return;
+	}
+
+/* 2026: a term of a sort without values, assigned to a constant of a wider
+   sort with values: converted (a list [1,2,3] for a CONST of sort rvector,
+   SUBSORT vector,rvector ATT constr_vec) */
+if (! rslt && froass->type == Func && get_type(froass) && rtypes(toass)
+    && get_type(froass) != rtypes(toass) && ! sort_valued(get_type(froass))
+    && sort_dist(get_type(froass), rtypes(toass)) > 0)
+	{
+	void * w = term_convert(froass, rtypes(toass));
+	if (w)
+		{
+		if (hasval(toass)) DELNUM(toass,value(toass));
+		value(toass) = w;
+		hasval(toass) = TRUE;
+		return;
+		}
+	}
+
+/* 2026: a term that can never have a value of the constant's sort is not
+   stored: a term of a sort that does not fit, or of a sort without
+   numerical values (sort_valued, e.g. the lists of inc/list). An error,
+   the constant is not changed (terms are stored in a TERM). Otherwise a
+   term without a value deletes the value (a = nothing;
+   the library assigns h/(2*pi) before pi has a value). */
+if (! rslt && froass->type == Func && get_type(froass)
+    && (sort_dist(get_type(froass), rtypes(toass)) < 0 || ! sort_valued(get_type(froass))))
+	{
+	const char * sn = name((Symbol *) get_type(froass));
+	ErrorMsg("");
+	printfErr("Wrong const-assignment : the term (sort %s) has no numerical value, '%s' (sort %s) is not changed;\n"
 	          "  a term is stored in a TERM, e.g. TERM t : %s\n",
-	          name(toass), name((Symbol *) rtypes(toass)), name((Symbol *) get_type(froass)),
-	          name((Symbol *) get_type(froass)));
+	          sn, name(toass), name((Symbol *) rtypes(toass)), sn);
 	return;
 	}
 
@@ -728,33 +760,43 @@ return TRUE;
 
 
 /* 2026: cost of a variant with extension of the sorts (SUBSORT):
-   sum of the steps integer -> rational -> real ...; -1 if it does not fit */
-static int arg_cost (Node * a, Node * typ)
+   sum of the steps integer -> rational -> real ... (see arg_cost); -1 if
+   it does not fit */
+/* twice the steps; a term of a sort without values that a numerical C
+   function would get converted into a value (a list [1,2] for an rvector,
+   term_convert) counts one more, so that an equally long widening that
+   keeps the term symbolic wins */
+static int arg_cost (Node * a, Node * typ, int numeric)
 {
+	Node * as;
+	int d;
 	if (a->type == Terms) return -1;
-	return sort_dist(arg_sort(a), typ);
+	as = arg_sort(a);
+	d = sort_dist(as, typ);
+	if (d <= 0) return d;
+	return 2 * d + (numeric && as && ! sort_valued(as) ? 1 : 0);
 }
 
 static int variant_cost (Symbol * sym, Node * termlist)
 {
 	Node * at1, * at2, * asym = atypes(sym);
-	int atype, cost = 0, c;
+	int atype, cost = 0, c, num = hasval(sym) && ! builtin(sym) && ! exe_always(sym);
 	if (! asym) return -1;
 	atype = asym->type;
 	if (atype == VARPAR) asym = asym->l;
 	for (at1=termlist,at2=asym;(at2->r!=NULL);at1=at1->r,at2=at2->r)
 		{
 		if ((at1->r==NULL) || (at1->type!=Terms)) return -1;
-		if ((c = arg_cost(at1->l,at2->l)) < 0) return -1;
+		if ((c = arg_cost(at1->l,at2->l,num)) < 0) return -1;
 		cost += c;
 		}
 	if (atype == VARPAR)
 		for ( ;(at1->r!=NULL) && (at1->type==Terms);at1=at1->r)
 			{
-			if ((c = arg_cost(at1->l,at2)) < 0) return -1;
+			if ((c = arg_cost(at1->l,at2,num)) < 0) return -1;
 			cost += c;
 			}
-	if ((c = arg_cost(at1,at2)) < 0) return -1;
+	if ((c = arg_cost(at1,at2,num)) < 0) return -1;
 	return cost + c;
 }
 

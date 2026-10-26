@@ -1,5 +1,6 @@
 # Regression tests for crashes fixed in 2026.
 INC "inc/all"
+INC "inc/list"
 INC "inc/rvector"
 INC "inc/rmatrix"
 # Assigning 0 or 1 and then assigning again freed static memory.

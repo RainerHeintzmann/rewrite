@@ -43,7 +43,9 @@ ADDSPEC Listable : IF (threadq(Xal)) Xal = thread(Xal)
 # calculated at once.
 VAR Ma,Mb,Mc,Mc2 : matrix
 CONST Id,Zm : matrix                       # the identity and the zero matrix
-FUNC  scalarq   : algebra >> bool    ATT SYMBOLIC scalarq    # no vector or matrix
+FUNC  sortleq   : algebra,algebra >> bool ATT SYMBOLIC sortleq # the sort of u is that of v or below
+# numbers commute with matrices, vectors do not: not(sortleq(Xnu, nil)),
+# Xnu is no vector (nil is the empty vector)
 
 ALG MatrixRules
 # products associated to the left, so that A*B*inverse(B) cancels
@@ -51,10 +53,10 @@ SPEC    MatrixRules : Ma*(Mb*Mc) = Ma*Mb*Mc
 ADDSPEC MatrixRules : Ma*(Mb+Mc) = Ma*Mb+Ma*Mc
 ADDSPEC MatrixRules : (Ma+Mb)*Mc = Ma*Mc+Mb*Mc
 # numbers commute with matrices and go to the front
-ADDSPEC MatrixRules : IF (scalarq(Xnu)) Ma*Xnu = Xnu*Ma
-ADDSPEC MatrixRules : IF (scalarq(Xnu)) (Xnu*Ma)*Mb = Xnu*(Ma*Mb)
-ADDSPEC MatrixRules : IF (scalarq(Xnu)) Ma*(Xnu*Mb) = Xnu*(Ma*Mb)
-ADDSPEC MatrixRules : IF (scalarq(Xnu)), (scalarq(Ynu)) Xnu*(Ynu*Ma) = (Xnu*Ynu)*Ma
+ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) Ma*Xnu = Xnu*Ma
+ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) (Xnu*Ma)*Mb = Xnu*(Ma*Mb)
+ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) Ma*(Xnu*Mb) = Xnu*(Ma*Mb)
+ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))), (not(sortleq(Ynu, nil))) Xnu*(Ynu*Ma) = (Xnu*Ynu)*Ma
 # identity, zero, inverse
 ADDSPEC MatrixRules : Ma*Id = Ma
 ADDSPEC MatrixRules : Id*Ma = Ma
@@ -66,8 +68,8 @@ ADDSPEC MatrixRules : Ma-Ma = Zm
 ADDSPEC MatrixRules : Ma+Ma = 2*Ma
 ADDSPEC MatrixRules : (Ma+Mb)-Ma = Mb
 ADDSPEC MatrixRules : (Ma+Mb)-Mb = Ma
-ADDSPEC MatrixRules : IF (scalarq(Xnu)), (scalarq(Ynu)) Xnu*Ma+Ynu*Ma = (Xnu+Ynu)*Ma
-ADDSPEC MatrixRules : IF (scalarq(Xnu)) Ma+Xnu*Ma = (1+Xnu)*Ma
+ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))), (not(sortleq(Ynu, nil))) Xnu*Ma+Ynu*Ma = (Xnu+Ynu)*Ma
+ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) Ma+Xnu*Ma = (1+Xnu)*Ma
 ADDSPEC MatrixRules : Ma*inverse(Ma) = Id
 ADDSPEC MatrixRules : inverse(Ma)*Ma = Id
 ADDSPEC MatrixRules : Ma*Mb*inverse(Mb) = Ma
@@ -76,11 +78,11 @@ ADDSPEC MatrixRules : Ma*inverse(Mb)*Mb = Ma
 ADDSPEC MatrixRules : transpose(transpose(Ma)) = Ma
 ADDSPEC MatrixRules : transpose(Ma*Mb) = transpose(Mb)*transpose(Ma)
 ADDSPEC MatrixRules : transpose(Ma+Mb) = transpose(Ma)+transpose(Mb)
-ADDSPEC MatrixRules : IF (scalarq(Xnu)) transpose(Xnu*Ma) = Xnu*transpose(Ma)
+ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) transpose(Xnu*Ma) = Xnu*transpose(Ma)
 ADDSPEC MatrixRules : transpose(Id) = Id
 ADDSPEC MatrixRules : inverse(inverse(Ma)) = Ma
 ADDSPEC MatrixRules : inverse(Ma*Mb) = inverse(Mb)*inverse(Ma)
-ADDSPEC MatrixRules : IF (scalarq(Xnu)) inverse(Xnu*Ma) = mi(Xnu)*inverse(Ma)
+ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) inverse(Xnu*Ma) = mi(Xnu)*inverse(Ma)
 ADDSPEC MatrixRules : inverse(Id) = Id
 ADDSPEC MatrixRules : det(Ma*Mb) = det(Ma)*det(Mb)
 ADDSPEC MatrixRules : det(transpose(Ma)) = det(Ma)
@@ -102,7 +104,7 @@ ADDSPEC MatrixSolve : IF (mfreeq(Mb, Mc)) isom(Ma + Mb, Mc2, Mc) = isom(Ma, Mc2 
 ADDSPEC MatrixSolve : IF (mfreeq(Ma, Mc)) isom(Ma + Mb, Mc2, Mc) = isom(Mb, Mc2 - Ma, Mc)
 ADDSPEC MatrixSolve : IF (mfreeq(Ma, Mc)) isom(Ma * Mb, Mc2, Mc) = isom(Mb, inverse(Ma) * Mc2, Mc)
 ADDSPEC MatrixSolve : IF (mfreeq(Mb, Mc)) isom(Ma * Mb, Mc2, Mc) = isom(Ma, Mc2 * inverse(Mb), Mc)
-ADDSPEC MatrixSolve : IF (scalarq(Xnu)) isom(Xnu * Ma, Mc2, Mc) = isom(Ma, mi(Xnu) * Mc2, Mc)
+ADDSPEC MatrixSolve : IF (not(sortleq(Xnu, nil))) isom(Xnu * Ma, Mc2, Mc) = isom(Ma, mi(Xnu) * Mc2, Mc)
 ADDSPEC MatrixSolve : isom(transpose(Ma), Mc2, Mc) = isom(Ma, transpose(Mc2), Mc)
 ADDSPEC MatrixSolve : isom(inverse(Ma), Mc2, Mc) = isom(Ma, inverse(Mc2), Mc)
 ADDSPEC MatrixSolve : isom(- Ma, Mc2, Mc) = isom(Ma, - Mc2, Mc)

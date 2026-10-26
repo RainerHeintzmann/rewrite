@@ -344,12 +344,14 @@ void other_fn (Node * np)
 			value(newsym)  = ATT_CFUNC(att);
 			builtin(newsym) = att->r ? (att->r->r ? 2 : 1) : 0;	/* symbolic C function, 2: HOLD */
 			if (att->r && att->r->l) rules_fn_register(newsym, att->r->l);	/* ATT RULES alglist */
+			if (! builtin(newsym) && rtypes(newsym)) sort_valued(rtypes(newsym)) = TRUE;
 			}
 		else /* PARAM */
 			{
 			value(newsym) = att;
 			exe_always(newsym) =TRUE;
 			hasval(newsym) = TRUE;
+			if (rtypes(newsym)) sort_valued(rtypes(newsym)) = TRUE;
 			}
 	OTHER_ATT(np)   = NULL;
 	OTHER_RTYPE(np) = NULL; /* do not delete atypes */
@@ -369,12 +371,14 @@ void att_fn (Node * np)
 			{value(sp)  = ATT_CFUNC(ufn);
 			hasval(sp) = TRUE;
 			builtin(sp) = ufn->r ? (ufn->r->r ? 2 : 1) : 0;	/* symbolic C function, 2: HOLD */
-			if (ufn->r && ufn->r->l) rules_fn_register(sp, ufn->r->l);}	/* ATT RULES alglist */
+			if (ufn->r && ufn->r->l) rules_fn_register(sp, ufn->r->l);	/* ATT RULES alglist */
+			if (! builtin(sp) && rtypes(sp)) sort_valued(rtypes(sp)) = TRUE;}
 		else /* PARAM */
 			{
 			value(sp) =ufn;
 			exe_always(sp) =TRUE;
-			hasval(sp) = TRUE;}
+			hasval(sp) = TRUE;
+			if (rtypes(sp)) sort_valued(rtypes(sp)) = TRUE;}
 	ATTF_ATT(np) = NULL;
 }
 
@@ -387,6 +391,7 @@ void att_sort (Node * np)
        * ufn4  = ATTS_DEL(np);
 DEBG((4,"def.c : att_sort \n"));
 hasval(sp) = TRUE;
+sort_valued(sp) = TRUE;
 show(sp) = (void *) ufn1 ; /* show function */
 cmp(sp)  = (Node *) ufn2;
 cpy(sp)  = (Node *) ufn3;

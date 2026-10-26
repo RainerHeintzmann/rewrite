@@ -29,5 +29,5 @@ first (aa )
 2 
 
 >> aa = [1, 2]
-Error in stdin : Wrong const-assignment : 'aa' is of sort real, the term is of sort vector;
+Error in stdin : Wrong const-assignment : the term (sort vector) has no numerical value, 'aa' (sort real) is not changed;
   a term is stored in a TERM, e.g. TERM t : vector

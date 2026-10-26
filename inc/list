@@ -13,12 +13,12 @@
 #     INC "inc/all"
 #     INC "inc/list"
 
+# vector and matrix have no ATT: like number, they are purely symbolic
+# sorts without numerical values (a list is stored in a TERM, not in a CONST)
 SORT vector
-ATT vector show_number,cmp_complex,cpy_complex,del_complex
-SUBSORT vector,number ATT cpx2num
+SUBSORT vector,number
 SORT matrix
-ATT matrix show_number,cmp_complex,cpy_complex,del_complex
-SUBSORT matrix,algebra ATT cpx2num
+SUBSORT matrix,algebra
 
 BRA   [ ]     : number++ >> vector                              # [a,b,c]
 OTHER [       : vector++ >> matrix                              # [[a,b],[c,d]]: the rows

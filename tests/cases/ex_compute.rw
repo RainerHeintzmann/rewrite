@@ -1,5 +1,6 @@
 # Example script LiNbO3/compute from the original project (regression test).
 INC "inc/all"
+INC "inc/list"
 INC "inc/rvector"
 INC "inc/rmatrix"
 INC "LiNbO3/compute"

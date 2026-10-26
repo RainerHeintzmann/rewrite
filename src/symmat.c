@@ -1106,16 +1106,15 @@ static Node * s_matpow (Node * a[], int n, Symbol * f)	/* m^k, k an integer */
 	return r;
 }
 
-/* scalarq(u): the sort of u is no vector or matrix (inc/list), for the
- * rules that let numbers commute with matrices */
-static Node * s_scalarq (Node * a[], int n, Symbol * f)
+/* sortleq(u, v): the sort of u is the sort of v or below it (SUBSORT),
+ * e.g. not(sortleq(x, nil)): x is no vector (inc/linalg) */
+static Node * s_sortleq (Node * a[], int n, Symbol * f)
 {
-	Node * s;
-	const char * sn;
-	if (n != 1) return NULL;
-	s = arg_sort(deref(a[0]));
-	sn = s ? name((Symbol *) s) : "";
-	return mk_bool(strcmp(sn, "vector") != 0 && strcmp(sn, "matrix") != 0, f);
+	Node * su, * sv;
+	if (n != 2) return NULL;
+	su = arg_sort(deref(a[0]));
+	sv = arg_sort(deref(a[1]));
+	return mk_bool(su && sv && sort_dist(su, sv) >= 0, f);
 }
 
 /* list(a,b,..) = [a,b,..]: the old name of the list */

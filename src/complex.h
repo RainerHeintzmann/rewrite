@@ -18,12 +18,10 @@ typedef struct {
 
 complex * cpy_complex (complex * x);
 void show_complex (complex * x);
-void show_number (complex * x);
 int cmp_complex (complex * x,complex * y);
 void del_complex (complex * x);
 
 complex * real2cpx (double * arg[]);   /* 2026: SUBSORT real,complex */
-complex * cpx2num (complex * arg[]);   /* 2026: SUBSORT complex,number */
 complex * cpx (double * arg[]);
 complex * c_plus (complex * arg[]);
 complex * c_plus_r (complex * arg[]);

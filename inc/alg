@@ -42,13 +42,13 @@ SUBSORT real,complex ATT real2cpx
 # to real and complex terms as well, and a function variant on number in a
 # pattern also matches its real and complex variants. Terms only become of
 # sort number when one of their parts is (like the imaginary unit im of
-# inc/integration/base); a term of reals keeps the real variants. The values
-# of number are complex numbers, but the variants on number below have no C
-# function: they only stand for the symbolic term.
+# inc/integration/base); a term of reals keeps the real variants. number has
+# no values of its own (no ATT): a numerical value keeps its sort real or
+# complex, and the variants on number below have no C function: they only
+# stand for the symbolic term.
 SORT number
-ATT number show_number,cmp_complex,cpy_complex,del_complex
-SUBSORT real,number ATT real2cpx
-SUBSORT complex,number ATT cpx2num
+SUBSORT real,number
+SUBSORT complex,number
 # variables of sort number: they match terms of every sort below number
 VAR Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
 # 2026: algebra, the sort of the elements of an associative algebra above
@@ -57,8 +57,7 @@ VAR Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
 # a commutative product, like the integration) do not see the elements of
 # algebra that are no numbers.
 SORT algebra
-ATT algebra show_number,cmp_complex,cpy_complex,del_complex
-SUBSORT number,algebra ATT cpx2num
+SUBSORT number,algebra
 VAR Aal,Bal,Cal,Xal,Yal,Zal : algebra
 
 VAR A,B,C,X,Y,Z : real

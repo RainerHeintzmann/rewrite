@@ -810,6 +810,7 @@ else
 void set_numbertype (Node * np)
 {	Node * nt=np->r;
 		numbertype = nt;
+		sort_valued(nt) = TRUE;		/* 2026: numbers are of this sort */
 }
 
 Node * get_numbertype (void)
@@ -839,6 +840,29 @@ static Node * param_sort (Symbol * f, int i)
 }
 
 static Symbol * lastsym = NULL;	/* symbol with the sort of the last value of realcalc */
+
+/* 2026: a fixed symbol with the sort s, for lastsym when a value keeps its
+   own sort after the term that produced it is deleted (one per sort, so
+   that nested calculations do not overwrite it) */
+static Symbol * sort_rep (Node * s)
+{
+	static struct { Node * sort; Symbol sym; } rep[64];
+	static int nrep = 0;
+	int i;
+	for (i = 0; i < nrep; i++)
+		if (rep[i].sort == s) return & rep[i].sym;
+	if (nrep == 64) fatal("run.c : too many sorts");
+	rep[nrep].sort = s;
+	rep[nrep].sym.node.type = SYM_TYPE;
+	rep[nrep].sym.name = "(value)";
+	rep[nrep].sym.rtypes = s;
+	return & rep[nrep++].sym;
+}
+
+Node * realcalc_sort (void)	/* 2026: the sort of the last value of realcalc */
+{
+	return lastsym ? rtypes(lastsym) : NULL;
+}
 
 void * realcalc(Node * term,int * perr)
 {
@@ -872,20 +896,24 @@ void * realcalc(Node * term,int * perr)
 			{
 			v = realcalc(res, perr);
 			/* 2026: the value has the sort of the result (e.g. rational); for
-			   the caller it must have the declared sort of the function */
-			if (! * perr && v && rtypes(lastsym) != rtypes(TERM_HEAD(term)))
+			   the caller it must have the declared sort of the function, if
+			   that sort has values (not number: the value keeps its sort) */
+			if (! * perr && v && rtypes(lastsym) != rtypes(TERM_HEAD(term))
+			    && sort_valued(rtypes(TERM_HEAD(term))))
 				{
 				Node * from = rtypes(lastsym), * to = rtypes(TERM_HEAD(term));
 				void * w = (sort_dist(from, to) > 0) ? sort_convert(v, from, to) : NULL;
 				((void (*) (void *)) del(from)) (v);
 				v = w;
 				if (! v) * perr = TRUE;
+				else lastsym = TERM_HEAD(term);	/* for DELNUM: sort of the result */
 				}
+			else if (! * perr && v)		/* the value keeps its sort; res is deleted */
+				lastsym = sort_rep(rtypes(lastsym));
 			delete(res);
 			}
 		else
 			* perr = TRUE;
-		lastsym = TERM_HEAD(term);	/* for DELNUM: sort of the result */
 		return * perr ? NULL : v;
 		}
 
@@ -954,12 +982,25 @@ void * realcalc(Node * term,int * perr)
 
 	for ( ; lterm; lterm = ARGS_NEXT(lterm))
 		{
-		Node * want;
-		vals[i]=realcalc(ARGS_ITEM(lterm),perr);/* Const or Funct */
-		syms[i]=lastsym;
+		Node * want = param_sort(TERM_HEAD(term), i), * at = ARGS_ITEM(lterm);
 		conv[i]=NULL;
+		/* 2026: a term of a sort without values (a list [1,0,0]) where a
+		   value of a wider sort is expected (an rvector): term_convert */
+		if (want && at->type == Func && rtypes(TERM_HEAD(at)) != want
+		    && ! sort_valued(rtypes(TERM_HEAD(at))) && sort_dist(rtypes(TERM_HEAD(at)), want) > 0)
+			{
+			vals[i] = term_convert(at, want);
+			syms[i] = TERM_HEAD(at);
+			if (vals[i]) conv[i] = want;
+			else * perr = TRUE;
+			i++;
+			if (* perr) break;
+			continue;
+			}
+		vals[i]=realcalc(at,perr);/* Const or Funct */
+		syms[i]=lastsym;
 		/* 2026: convert the value of a subsort into the declared sort */
-		if (! * perr && vals[i] && (want = param_sort(TERM_HEAD(term), i)) != NULL
+		if (! * perr && vals[i] && want != NULL
 		    && want != rtypes(syms[i]) && sort_dist(rtypes(syms[i]), want) > 0)
 			{
 			void * w = sort_convert(vals[i], rtypes(syms[i]), want);

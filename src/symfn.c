@@ -5153,7 +5153,7 @@ static Node * s_listop (Node * a[], int n, Symbol * f);
 static Node * s_matmul (Node * a[], int n, Symbol * f);
 static Node * s_matpow (Node * a[], int n, Symbol * f);
 static Node * s_tolist (Node * a[], int n, Symbol * f);
-static Node * s_scalarq (Node * a[], int n, Symbol * f);
+static Node * s_sortleq (Node * a[], int n, Symbol * f);
 static Node * s_occurs (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_eqnorm (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_polyroots (Node * a[], int n, Symbol * f);	/* symsolve.c */
@@ -5328,7 +5328,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "matmul", s_matmul },
 	{ "matpow", s_matpow },
 	{ "tolist", s_tolist },
-	{ "scalarq", s_scalarq },
+	{ "sortleq", s_sortleq },
 	{ "occurs", s_occurs },
 	{ "eqnorm", s_eqnorm },
 	{ "polyroots", s_polyroots },

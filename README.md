@@ -350,6 +350,8 @@ at run time. Two statements connect the sorts:
 | --- | --- |
 | `SHOW f ATT name` | Prints the terms with the function `f` (all its variants) with the C print function `name` instead of the usual form; `SHOW f` alone switches back. [inc/list](inc/list) uses it for lists (`SHOW [ ATT show_list`). |
 | `SUBSORT integer,rational ATT int2rat` | Every `integer` is also a `rational`; the C function converts a value. A sort may have several wider sorts. |
+| `SUBSORT real,number` | Without `ATT`: the wider sort has no values of its own (`number`, `algebra`, `vector`, `matrix`); a value keeps its sort, and a `CONST` of such a sort holds no value. |
+| `SUBSORT vector,rvector ATT constr_vec` | From a sort without values into one with values: a term, such as the list `[1,2,3]`, becomes a value where one is expected (assigned to a `CONST`, or the argument of a numerical C function); the C function gets the values of its arguments. |
 | `INTNUM integer ATT read_int` | Numbers without point and exponent are of sort `integer`, made by the C function from the text. |
 
 With `integer < rational < real`, a function declared for `real` also
@@ -550,7 +552,7 @@ the files are in German.
 | [inc/exact](inc/exact) | Exact numbers: sorts `integer` and `rational` (GMP), subsorts of `real`. |
 | [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, group, ring, field), operators, elementary functions, simplification rules and differentiation. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
-| [inc/rvector](inc/rvector) | Numerical real vectors `[1,2,3]`, scalar product, cross product `_x_`, `abs`, element access. Not loaded by `inc/all` any more: load it explicitly, and not together with [inc/list](inc/list), which uses `[ ]` for its lists. |
+| [inc/rvector](inc/rvector) | Numerical real vectors (C arrays): scalar product, cross product `_x_`, `abs`, element access. Not loaded by `inc/all` any more: load it after [inc/list](inc/list). A list becomes an rvector where one is expected: `CONST v : rvector`, `v = [1,2,3]`, `[1,0,0]*v`. |
 | [inc/rmatrix](inc/rmatrix) | Numerical real matrices: `onemat`, `zeromat`, `chmat`, `trans`, products. Indices start at 0. Load it explicitly after `inc/rvector`. |
 | [inc/physik](inc/physik), [inc/theophys](inc/theophys), [inc/lagrange](inc/lagrange) | Physical units and formulas, Lagrange formalism. |
 | [inc/physnum](inc/physnum), [inc/mathnum](inc/mathnum) | Numerical values of physical and mathematical constants such as `c`, `e` and `pi`. |

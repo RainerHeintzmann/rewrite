@@ -35,6 +35,7 @@ int sort_dist (Node * from, Node * to);
 /* value of sort 'from' converted to sort 'to' (new value; the caller frees
  * it with the delete function of 'to'); NULL if not possible */
 void * sort_convert (void * value, Node * from, Node * to);
+void * term_convert (Node * term, Node * to);	/* a list [1,2,3] as an rvector */
 
 /* number of the sort of an integer literal, or NULL (no INTNUM) */
 Symbol * int_literal (const char * text);

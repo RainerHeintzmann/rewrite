@@ -34,6 +34,7 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 	int		def_in_blk;       /* block level in which it was defined */
 	int		builtin;          /* 2026: symbolic C function (symfn.c), gets terms instead of numbers */
 	void *	showfn;           /* 2026: print function of a function (SHOW f ATT name), see tprint */
+	int		valued;           /* 2026: for a sort: values of it can arise (see sort_valued) */
 };
 
 #define NOFLAG		0
@@ -76,6 +77,11 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 #define IS_link(p_sym)	(((Symbol *) (p_sym)) -> IS_link) /* used by function,const,sort */
 #define orig_func(p_sym)	(((Symbol *) (p_sym)) -> orig_func) /* only for functions */
 #define defined_in_block(p_sym)	(((Symbol *) (p_sym)) -> def_in_blk) /* only for terms,constants,functions */
+/* 2026: a sort has numerical values if something makes them: ATT sort,
+   NUM, INTNUM, a SUBSORT conversion from a sort with values, or a function
+   with a numerical C function or a defining term of this result sort.
+   Purely symbolic sorts (ring, the lists of inc/list) have none. */
+#define sort_valued(p_sym)	(((Symbol *) (p_sym)) -> valued)
 #define showfn(p_sym)	(((Symbol *) (p_sym)) -> showfn) /* 2026: SHOW */
 #define builtin(p_sym)	(((Symbol *) (p_sym)) -> builtin) /* symbolic C function */
 
