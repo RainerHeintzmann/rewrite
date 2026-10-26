@@ -15,11 +15,16 @@
 #     saves every line in the history file;
 #     it also colours the prompt, the entered lines and the output;
 # -A, -pGreen: the prompt is coloured (also when rlwrap redraws it);
+# -a: readline from the start (arrow keys typed while the library loads);
 # -i: rewrite stays interactive (under rlwrap its input is no terminal).
 dir=$(cd "$(dirname "$0")/.." && pwd)
 exe="$dir/rewrite.exe"
 [ -f "$exe" ] || exe="$dir/rewrite"
 export REWRITE_HISTORY="$HOME/.rewrite_history"
 export INPUTRC="$dir/tools/rewrite.inputrc"
-exec rlwrap -A -pGreen -b '(){}[],+-*/=&^%$#@";|?' -f "$dir/tools/rewrite_words.txt" \
+# no Windows pseudo console for rewrite: it would ask the terminal for the
+# cursor position at the start, and the answer (ESC[1;1R) would end up in the
+# input line as "R"; rewrite reads and writes through rlwrap anyway
+export MSYS="${MSYS:+$MSYS }disable_pcon"
+exec rlwrap -a -A -pGreen -b '(){}[],+-*/=&^%$#@";|?' -f "$dir/tools/rewrite_words.txt" \
      -z "$dir/tools/latex.rlwrap" -H "$REWRITE_HISTORY" "$exe" -i "$@"
