@@ -656,6 +656,8 @@ The comments in the older files are in German.
 | [inc/integration/all](inc/integration/all) | Exact numbers ([inc/exact](inc/exact): `integer` and `rational`, GMP), the symbolic helpers ([inc/helpers](inc/helpers): `deriv`, `normform`, `cancel`, `expand`, ...), and integration with `Integrate`. |
 | [inc/integration/rubi/all](inc/integration/rubi/all) | The translated Rubi rules, `RubiIntegrate` (about 1 s to load). |
 | [inc/limits](inc/limits) | `heaviside`, `dirac`, `infinity`, limits `limit(u,x,infinity)` and definite integrals `Int(f,x,a,b)`. |
+| [inc/laplace](inc/laplace) | The Laplace transform `laplace(f,t,s)` and its inverse `invlaplace(F,s,t)`. |
+| [inc/fourier](inc/fourier) | The Fourier transform `fourier(f,t,w)` and its inverse `invfourier(F,w,t)`. |
 | [inc/list](inc/list) | Lists `[a,b,c]` (sort `vector`) and `nil`, matrices `[[a,b],[c,d]]` (sort `matrix`), their arithmetic, `part`, `length`, `table`, `select`, ... |
 | [inc/linalg](inc/linalg) | Matrices: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread`, covectors, symbolic matrices with `MatrixRules` and `MatrixSolve`. |
 | [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), systems. |
@@ -921,6 +923,88 @@ Int(dirac(t-3)*t^2, t, -infinity, infinity)   # prints 9
 - If a step fails (no antiderivative, an unknown limit), the integral stays
   as it is.
 
+### The Laplace transform
+
+[inc/laplace](inc/laplace) has `laplace(f, t, s)` and `invlaplace(F, s, t)`:
+
+```text
+SYM t, w : real
+SYM s, a : positive
+laplace(exp(-a*t)*sin(w*t), t, s)        # prints w / ((s + a )^ 2 + w ^ 2 )
+laplace(heaviside(t-2), t, s)            # prints exp (- 2 * s )/ s
+invlaplace(1/(s^2+3*s+2), s, t)          # prints exp (- t )- exp (- 2 * t )
+invlaplace(s/(s^2+2*s+5), s, t)          # prints cos (2 * t )* exp (- t )- (1/2) * exp (- t )* sin (2 * t )
+invlaplace(exp(-s)/(s+1), s, t)          # prints exp (1 - t )* heaviside (t - 1 )
+```
+
+- `laplace` uses linearity, a table (constants, powers of `t`, `exp`,
+  `sin`, `cos`, `sinh`, `cosh`, `heaviside`, `dirac`), the theorems (shift
+  by `exp(a*t)`, multiplication by `t` as `-D(F,s)`, delay by
+  `heaviside(t-c)`, derivatives) and finally the definite integral of
+  [inc/limits](inc/limits), which needs `s` declared positive. Results
+  are not always in the simplest form; `cancel(...)` brings a rational
+  function over a common denominator.
+- `invlaplace` uses linearity, the table backwards (also `1/s^(1/2)`), the
+  delay `exp(-c*s)`, a linear numerator over a quadratic without real roots
+  (damped oscillations), `(s^2+c)^-2` (resonance) and partial fractions of
+  rational functions with exact coefficients.
+- A part that is not known stays as `laplace(...)` or `invlaplace(...)`.
+
+**Differential equations.** `laplace(D(u(t),t),t,s)` is
+`s*laplace(u(t),t,s) - initial(u(t),t)`, and `initial(u(t),t)` is `u(0)`;
+for a derivative, `initial(D(u(t),t),t)` stays, so the initial values are
+given by rules. Then the transformed equation is solved for the transform
+`U`, and `invlaplace` gives the solution:
+
+```text
+FUNC u : real >> real                         # the unknown function
+SYM U : real                                  # its transform
+ALG Init
+SPEC    Init : u(0) = 1
+ADDSPEC Init : initial(D(u(t),t),t) = 0       # u'(0) = 0
+ADDSPEC Init : laplace(u(t),t,s) = U
+TERM E : real
+TERM R : vector
+E = REWR laplace(D(D(u(t),t),t) + u(t), t, s) : Init, All   # U * s ^ 2 + U - s
+R = REWR solve(E == 0, U) : Solve                           # [s / (s ^ 2 + 1 )]
+invlaplace(part(R,1), s, t)                                 # cos (t )
+```
+
+### The Fourier transform
+
+[inc/fourier](inc/fourier) has `fourier(f, t, w)` and `invfourier(F, w, t)`
+with the convention of physics and engineering (and of FFTW):
+
+```text
+F(w) = Int(f(t)*exp(-im*w*t), t, -infinity, infinity)
+f(t) = 1/(2 pi) Int(F(w)*exp(im*w*t), w, -infinity, infinity)
+```
+
+```text
+SYM t, w, b : real
+SYM a : positive
+fourier(cos(b*t), t, w)                  # prints pi * dirac (w - b )+ pi * dirac (b + w )
+fourier(exp(-a*abs(t)), t, w)            # prints 2 * a / (a ^ 2 + w ^ 2 )
+fourier(sin(a*t)/t, t, w)                # prints pi * heaviside (a + w )- pi * heaviside (w - a )
+fourier(exp(-a*t^2), t, w)               # prints pi ^ (1/2) * exp (- (1/4) * w ^ 2 / a )/ a ^ (1/2)
+REWR invfourier(2*a/(a^2+w^2), w, t) : All     # prints exp (- a * abs (t ))
+```
+
+- `fourier` combines a table with the integral: linearity first, then the
+  table (constants and `dirac`,
+  `exp(im*a*t)`, `cos`, `sin`, `heaviside`, `sgn`, `exp(-a*abs(t))`,
+  `1/(t^2+c)`, `1/(c+im*b*t)`, `sin(a*t)/t`), whose entries are
+  distributions or need contour integrals; then the theorems (modulation by
+  `exp(im*a*t)`, `cos`, `sin`; multiplication by `t` as `im*D(F,w)`;
+  derivatives as `im*w*F`); and for the rest the definite integral of
+  [inc/limits](inc/limits), which does Gaussians, one-sided exponentials
+  and rectangles.
+- `invfourier(F, w, t)` is `fourier(F, w, -t)/(2*pi)` (duality), so the
+  same table and the same integrals work backwards.
+- A part that is not known stays as `fourier(...)`. Results with `im` are
+  not always in the simplest form (`exp((1/4)*(3*im - im*w)^2)` for
+  `exp(-(w-3)^2/4)`).
+
 ### Equations
 
 [inc/solve](inc/solve) solves equations with rules in the style of PRESS
@@ -1160,7 +1244,17 @@ where the library [inc/](inc) and the tests are used from.
   `im` (formerly `i`, and a second symbolic `im` of the integration): a
   complex constant that stays a symbol in terms, like `pi`.
 - Limits at infinity, definite integrals, `heaviside` and `dirac`
-  ([inc/limits](inc/limits)).
+  ([inc/limits](inc/limits)); the Laplace transform and its inverse, also
+  for differential equations ([inc/laplace](inc/laplace)); the Fourier
+  transform and its inverse ([inc/fourier](inc/fourier)).
+- `REWR` calculates the term before the first rule set, as it does after
+  each rule set (a function defined by rules is computed before the rules
+  of the user apply). After the arguments of a function defined by rules
+  are calculated, its variant is chosen again for their sorts, also in the
+  conditions of rules.
+- In exact mode, the real numbers of rules loaded before inc/exact (the 1
+  of `mi X = 1/X`) become exact next to exact expressions such as `2*pi`,
+  so `t*mi(2*pi)` stays `t/(2*pi)` instead of `t*0.159155`.
 - Fixed: a number of a sort that is not below `real` (complex, bool) was
   shared instead of copied by the symbolic helpers, so freeing a copy freed
   the original as well (wrong results that changed from run to run); and

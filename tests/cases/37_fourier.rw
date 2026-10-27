@@ -1,0 +1,21 @@
+# inc/fourier (2026): F(w) = Int(f*exp(-im*w*t), t, -infinity, infinity)
+INC "inc/all"
+SYM t, w, b : real
+SYM a : positive
+fourier(5, t, w), fourier(dirac(t), t, w), fourier(dirac(2*t-1), t, w)
+fourier(exp(im*b*t), t, w)
+fourier(sin(2*t), t, w)
+fourier(heaviside(t), t, w), fourier(sgn(t), t, w)
+fourier(heaviside(1-t), t, w)
+fourier(1/(t^2+a^2), t, w)
+fourier(exp(-3*abs(t)), t, w)
+fourier(1/(a+im*t), t, w)
+fourier(t, t, w)
+fourier(D(exp(-t^2), t), t, w)
+fourier(exp(im*2*t)*exp(-abs(t)), t, w)
+fourier(t^2*exp(-t^2), t, w)
+fourier(ln(t^2+1), t, w)
+REWR invfourier(pi*(dirac(w-b)+dirac(w+b)), w, t) : All
+REWR invfourier(2*pi*dirac(w), w, t) : All
+REWR invfourier(exp(-2*im*w), w, t) : All
+REWR invfourier(fourier(sin(a*t)/t, t, w), w, t) : All

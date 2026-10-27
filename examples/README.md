@@ -23,6 +23,8 @@ it to see the input. `?name` explains a keyword or function.
 | [08_numerics.rw](08_numerics.rw) | numerical integral, Newton's method, minimum, `PRTNUM`, numerical vectors, a loop |
 | [09_unicode.rw](09_unicode.rw) | Unicode names, written directly or as `\alpha` |
 | [10_limits.rw](10_limits.rw) | limits at infinity, definite integrals, `heaviside` and `dirac` |
+| [11_laplace.rw](11_laplace.rw) | Laplace transforms and their inverses, differential equations with initial values |
+| [12_fourier.rw](12_fourier.rw) | Fourier transforms and their inverses: table, integral, theorems, duality |
 
 The tests run them as well (`tests/cases/ex_example_*.rw`), so they stay
 correct.

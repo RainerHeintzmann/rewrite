@@ -711,6 +711,7 @@ Node * to_rewr;
 if (term_missing(REWRASS_TERM(np))) return;
 to_rewr = tcopy(REWRASS_TERM(np)); /* no replacing inside terms (TERM t) ; tcopy skips the symbols 'TERM' */
 rewrite_begin();
+to_rewr = tcalc(to_rewr);	/* 2026: as after each rule set, also before the first (laplace(..) by its rules) */
 to_rewr = solve(to_rewr,REWRASS_ALGS(np));
 rewrite_end();
 termassign2(REWRASS_TARGET(np),to_rewr); /* stores a copy */
@@ -723,6 +724,7 @@ Node * to_rewr;
 if (term_missing(REWR_TERM(np))) return;
 to_rewr = tcopy(REWR_TERM(np)); /* no replacing inside terms (TERM t) ; tcopy skips the symbols 'TERM' */
 rewrite_begin();
+to_rewr = tcalc(to_rewr);	/* 2026: as after each rule set, also before the first (laplace(..) by its rules) */
 to_rewr = solve(to_rewr,REWR_ALGS(np));
 rewrite_end();
 print(to_rewr);

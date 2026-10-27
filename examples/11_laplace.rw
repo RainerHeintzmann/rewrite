@@ -1,0 +1,40 @@
+# 11_laplace.rw: the Laplace transform and its inverse (inc/laplace), and
+# linear differential equations with initial values
+INC "inc/all"
+SYM t, w : real
+SYM s : positive          # s > 0: the transform as an integral converges
+SYM a : positive
+
+"---- transforms"
+laplace(t^3, t, s)
+laplace(exp(-a*t)*sin(w*t), t, s)
+laplace(heaviside(t-2), t, s)
+cancel(laplace(t^2*sin(t), t, s))       # t*f gives -D(F,s), cancel tidies up
+laplace(erf(t), t, s)                    # not known: stays as it is
+
+"---- inverse transforms (partial fractions, damped oscillations, delays)"
+invlaplace(1/(s^2+3*s+2), s, t)
+invlaplace(s/(s^2+2*s+5), s, t)
+invlaplace(exp(-s)/(s+1), s, t)
+invlaplace(w/(s^2+w^2), s, t)
+
+"---- u'' + u = 0 with u(0) = 1, u'(0) = 0"
+FUNC u : real >> real     # the unknown function
+SYM U : real              # its transform
+ALG Init
+SPEC    Init : u(0) = 1
+ADDSPEC Init : initial(D(u(t),t),t) = 0     # u'(0)
+ADDSPEC Init : laplace(u(t),t,s) = U
+TERM E : real
+TERM R : vector
+E = REWR laplace(D(D(u(t),t),t) + u(t), t, s) : Init, All
+E
+R = REWR solve(E == 0, U) : Solve
+invlaplace(part(R,1), s, t)
+
+"---- u' + 2 u = exp(-t) with u(0) = 0"
+SPEC    Init : u(0) = 0
+ADDSPEC Init : laplace(u(t),t,s) = U
+E = REWR laplace(D(u(t),t) + 2*u(t) - exp(-t), t, s) : Init, All
+R = REWR solve(E == 0, U) : Solve
+invlaplace(part(R,1), s, t)

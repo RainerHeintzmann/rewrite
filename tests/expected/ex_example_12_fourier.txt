@@ -1,0 +1,16 @@
+---- pairs from the table
+exp (- 2 * im * w )
+pi * dirac (w - b )+ pi * dirac (b + w )
+2 * a / (a ^ 2 + w ^ 2 )
+pi * heaviside (a + w )- pi * heaviside (w - a )
+---- pairs from the integral (inc/limits)
+pi ^ (1/2) * exp (- (1/4) * w ^ 2 / a )/ a ^ (1/2) 
+- 1 / (- im * w - a )
+im * exp (- im * T * w )/ w - im * exp (im * T * w )/ w 
+---- the theorems
+- (1/2) * im * pi ^ (1/2) * w * exp (- (1/4) * w ^ 2 )
+(1/2) * pi ^ (1/2) * exp ((1/4) * (3 * im - im * w )^ 2 )+ (1/2) * pi ^ (1/2) * exp ((1/4) * (- 3 * im - im * w )^ 2 )
+---- the inverse, and back again
+exp (- a * abs (t ))
+exp (- a * t )* heaviside (t )
+exp (- t ^ 2 )

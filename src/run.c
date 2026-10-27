@@ -1231,10 +1231,14 @@ if (term->type == Func && builtin(term->l) == 2)	/* 2026: HOLD (matchq): argumen
 term->l = tcalc(term->l);
 term->r = tcalc(term->r);
 
-if ((term -> type) == Func && ! builtin(term->l))
+if ((term -> type) == Func)
 	{
-	exact_integers(term);	/* 2026: (1/2)*1.0 = 1/2, not 0.5 */
-	retype_node(term);	/* 2026: arguments can now be exact numbers (SUBSORT) */
+	if (! builtin(term->l))
+		exact_integers(term);	/* 2026: (1/2)*1.0 = 1/2, not 0.5 */
+	/* 2026: arguments can now be exact numbers (SUBSORT), or a computed
+	   argument has a narrower sort: also for a function defined by rules,
+	   whose variant decides which of its rules match */
+	retype_node(term);
 	}
 
 if ((term -> type) == Func && builtin(term->l))  /* symbolic C function (symfn.c) */

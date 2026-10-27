@@ -1,0 +1,32 @@
+# inc/laplace (2026): transforms, inverses, and round trips f -> F -> f
+INC "inc/all"
+SYM t, w : real
+SYM s, a : positive
+laplace(5, t, s), laplace(t, t, s), laplace(t^(1/2), t, s)
+laplace(cosh(2*t) - sinh(2*t), t, s)
+laplace(sin(2*t+1), t, s)
+laplace(dirac(t), t, s), laplace(dirac(t-a), t, s)
+laplace(heaviside(t-1)*exp(t), t, s)
+laplace(t*exp(-a*t)*cos(w*t), t, s)
+laplace(t*erf(t), t, s)
+REWR invlaplace(laplace(t^2*exp(-3*t), t, s), s, t) : All
+REWR invlaplace(laplace(exp(-t)*cos(2*t), t, s), s, t) : All
+REWR invlaplace(laplace(3 - 2*t + exp(4*t), t, s), s, t) : All
+REWR invlaplace(laplace(heaviside(t-2)*(t-2), t, s), s, t) : All
+invlaplace(1/(s^3*(s+1)), s, t)
+invlaplace(2/(s^2+1)^2, s, t)
+invlaplace(1/s^(1/2), s, t)
+invlaplace(s^2, s, t)
+"---- an underdamped oscillator: u'' + 2 u' + 5 u = 0, u(0) = 1, u'(0) = 0"
+FUNC u : real >> real
+SYM U : real
+ALG Init
+SPEC    Init : u(0) = 1
+ADDSPEC Init : initial(D(u(t),t),t) = 0
+ADDSPEC Init : laplace(u(t),t,s) = U
+TERM E : real
+TERM R : vector
+E = REWR laplace(D(D(u(t),t),t) + 2*D(u(t),t) + 5*u(t), t, s) : Init, All
+R = REWR solve(E == 0, U) : Solve
+R
+invlaplace(part(R,1), s, t)

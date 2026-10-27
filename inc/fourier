@@ -1,0 +1,117 @@
+# inc/fourier (2026): the Fourier transform and its inverse.
+# Loaded by inc/all (after inc/limits).
+#
+#   fourier(f, t, w)      F(w) = Int(f(t)*exp(-im*w*t), t, -infinity, infinity)
+#   invfourier(F, w, t)   f(t) = 1/(2 pi) Int(F(w)*exp(im*w*t), w, -infinity, infinity)
+#
+# The convention of physics and engineering (and of FFTW): the angular
+# frequency w, the factor 1/(2 pi) in the inverse. The variables are real,
+# im is the imaginary unit, a parameter that has to be positive is declared
+# positive (SYM a : positive).
+#
+# fourier uses, in this order: linearity, a table (constants and dirac give
+# deltas, exp(im*a*t), cos, sin, heaviside, sgn, exp(-a*abs(t)), 1/(t^2+c),
+# sin(a*t)/t), the theorems (modulation by exp(im*a*t), cos and sin,
+# multiplication by t, derivatives), and the integral (inc/limits) for the
+# rest, as for Gaussians and one-sided exponentials. invfourier uses the
+# duality invfourier(F,w,t) = fourier(F,w,-t)/(2 pi), so the same table
+# works backwards. A part that is not known stays as fourier(...).
+
+ALG FourierT
+ALG FourierBack
+ALG FourierTidy
+ALG InvFourierT
+FUNC  fourier    : real,real,real >> real         ATT RULES FourierT,FourierBack,FourierTidy,(DerivConst,Linear,diff),All
+OTHER fourier    : number,number,number >> number ATT RULES FourierT,FourierBack,FourierTidy,(DerivConst,Linear,diff),All
+FUNC  invfourier : real,real,real >> real         ATT RULES InvFourierT,FourierT,FourierBack,FourierTidy,(DerivConst,Linear,diff),All
+OTHER invfourier : number,number,number >> number ATT RULES InvFourierT,FourierT,FourierBack,FourierTidy,(DerivConst,Linear,diff),All
+FUNC  fourint    : real,real,real,real >> real         # internal: the integral, f, t, w
+OTHER fourint    : number,number,number,number >> number
+
+# the delta is even: dirac(-u) = dirac(u) (for a u of negative form)
+PAT _Du : number
+ADDSPEC Dirac : IF (negq(_Du)) dirac(_Du) = dirac(normform(-_Du))
+
+COMM +,*
+
+PAT _Vf,_Vg,_Vt,_Vw,_Vc,_Ve,_Vi : number
+
+# linearity
+SPEC    FourierT : IF (freeq(_Vf,_Vt)) fourier(_Vf,_Vt,_Vw) = 2*pi*_Vf*dirac(_Vw)
+ADDSPEC FourierT : fourier(_Vf+_Vg,_Vt,_Vw) = fourier(_Vf,_Vt,_Vw)+fourier(_Vg,_Vt,_Vw)
+ADDSPEC FourierT : fourier(_Vf-_Vg,_Vt,_Vw) = fourier(_Vf,_Vt,_Vw)-fourier(_Vg,_Vt,_Vw)
+ADDSPEC FourierT : fourier(-_Vf,_Vt,_Vw) = -fourier(_Vf,_Vt,_Vw)
+ADDSPEC FourierT : IF (freeq(_Vc,_Vt)) fourier(_Vc*_Vf,_Vt,_Vw) = _Vc*fourier(_Vf,_Vt,_Vw)
+ADDSPEC FourierT : IF (freeq(_Vc,_Vt)) fourier(_Vf/_Vc,_Vt,_Vw) = fourier(_Vf,_Vt,_Vw)/_Vc
+
+# the table; a linear argument k t + m
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)) \
+                   fourier(dirac(_Ve),_Vt,_Vw) = exp(im*_Vw*coeff(_Ve,_Vt,0)/coeff(_Ve,_Vt))/abs(coeff(_Ve,_Vt))
+# exp(im a t + m) with a real: a delta at w = a
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(normform(subst(coeff(_Ve,_Vt),im,0)),0)) \
+                   fourier(exp(_Ve),_Vt,_Vw) = 2*pi*exp(coeff(_Ve,_Vt,0))*dirac(_Vw-normform(-im*coeff(_Ve,_Vt)))
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(coeff(_Ve,_Vt,0),0)), (freeq(_Ve,im)) \
+                   fourier(cos(_Ve),_Vt,_Vw) = pi*(dirac(_Vw-coeff(_Ve,_Vt))+dirac(_Vw+coeff(_Ve,_Vt)))
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(coeff(_Ve,_Vt,0),0)), (freeq(_Ve,im)) \
+                   fourier(sin(_Ve),_Vt,_Vw) = im*pi*(dirac(_Vw+coeff(_Ve,_Vt))-dirac(_Vw-coeff(_Ve,_Vt)))
+# the step and the sign: heaviside(k t + m) = heaviside(t + m/k) for k > 0
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (knownpos(coeff(_Ve,_Vt))) \
+                   fourier(heaviside(_Ve),_Vt,_Vw) = pi*dirac(_Vw)-im*exp(im*_Vw*coeff(_Ve,_Vt,0)/coeff(_Ve,_Vt))/_Vw
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (knownneg(coeff(_Ve,_Vt))) \
+                   fourier(heaviside(_Ve),_Vt,_Vw) = fourier(1-heaviside(normform(-_Ve)),_Vt,_Vw)
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (knownpos(coeff(_Ve,_Vt))) \
+                   fourier(sgn(_Ve),_Vt,_Vw) = -2*im*exp(im*_Vw*coeff(_Ve,_Vt,0)/coeff(_Ve,_Vt))/_Vw
+# exp(-a |t|) and 1/(t^2 + c), a, c > 0
+ADDSPEC FourierT : IF (knownneg(_Vc)) fourier(exp(_Vc*abs(_Vt)),_Vt,_Vw) = -2*_Vc/(_Vc^2+_Vw^2)
+ADDSPEC FourierT : IF (knownpos(_Vc)) fourier(exp(-_Vc*abs(_Vt)),_Vt,_Vw) = 2*_Vc/(_Vc^2+_Vw^2)
+ADDSPEC FourierT : fourier(exp(-abs(_Vt)),_Vt,_Vw) = 2/(1+_Vw^2)
+ADDSPEC FourierT : IF (freeq(_Vc,_Vt)), (knownpos(_Vc)) \
+                   fourier(1/(_Vt^2+_Vc),_Vt,_Vw) = pi/sqrt(_Vc)*exp(-sqrt(_Vc)*abs(_Vw))
+ADDSPEC FourierT : IF (freeq(_Vc,_Vt)), (knownpos(_Vc)) \
+                   fourier((_Vt^2+_Vc)^-1,_Vt,_Vw) = pi/sqrt(_Vc)*exp(-sqrt(_Vc)*abs(_Vw))
+# 1/(c + im b t), b real: the dual of exp(-c t) heaviside(t), 1/(c + im w);
+# b > 0: 2 pi/b exp(c w/b) heaviside(-w), b < 0: -2 pi/b exp(c w/b) heaviside(w)
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(normform(subst(coeff(_Ve,_Vt),im,0)),0)), (knownneg(coeff(_Ve,_Vt,0))) \
+                   fourier(1/_Ve,_Vt,_Vw) = -fourier(1/normform(-_Ve),_Vt,_Vw)
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(normform(subst(coeff(_Ve,_Vt),im,0)),0)), (knownpos(coeff(_Ve,_Vt,0))), \
+                      (knownpos(normform(-im*coeff(_Ve,_Vt)))) \
+                   fourier(1/_Ve,_Vt,_Vw) = 2*pi/normform(-im*coeff(_Ve,_Vt)) \
+                       *exp(coeff(_Ve,_Vt,0)*_Vw/normform(-im*coeff(_Ve,_Vt)))*heaviside(normform(-_Vw))
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(normform(subst(coeff(_Ve,_Vt),im,0)),0)), (knownpos(coeff(_Ve,_Vt,0))), \
+                      (knownneg(normform(-im*coeff(_Ve,_Vt)))) \
+                   fourier(1/_Ve,_Vt,_Vw) = -2*pi/normform(-im*coeff(_Ve,_Vt)) \
+                       *exp(coeff(_Ve,_Vt,0)*_Vw/normform(-im*coeff(_Ve,_Vt)))*heaviside(_Vw)
+# sin(a t)/t: the rectangle of the width 2 a
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(coeff(_Ve,_Vt,0),0)), (knownpos(coeff(_Ve,_Vt))) \
+                   fourier(sin(_Ve)/_Vt,_Vt,_Vw) = pi*(heaviside(_Vw+coeff(_Ve,_Vt))-heaviside(_Vw-coeff(_Ve,_Vt)))
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(coeff(_Ve,_Vt,0),0)), (knownpos(coeff(_Ve,_Vt))) \
+                   fourier(sin(_Ve)*_Vt^-1,_Vt,_Vw) = pi*(heaviside(_Vw+coeff(_Ve,_Vt))-heaviside(_Vw-coeff(_Ve,_Vt)))
+
+# the theorems: modulation, multiplication by t, derivatives
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(normform(subst(coeff(_Ve,_Vt),im,0)),0)) \
+                   fourier(exp(_Ve)*_Vf,_Vt,_Vw) = exp(coeff(_Ve,_Vt,0)) \
+                       *subst(fourier(_Vf,_Vt,_Vw),_Vw,_Vw-normform(-im*coeff(_Ve,_Vt)))
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(coeff(_Ve,_Vt,0),0)), (freeq(_Ve,im)) \
+                   fourier(cos(_Ve)*_Vf,_Vt,_Vw) = (subst(fourier(_Vf,_Vt,_Vw),_Vw,_Vw-coeff(_Ve,_Vt)) \
+                       +subst(fourier(_Vf,_Vt,_Vw),_Vw,_Vw+coeff(_Ve,_Vt)))/2
+ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(coeff(_Ve,_Vt,0),0)), (freeq(_Ve,im)) \
+                   fourier(sin(_Ve)*_Vf,_Vt,_Vw) = (subst(fourier(_Vf,_Vt,_Vw),_Vw,_Vw-coeff(_Ve,_Vt)) \
+                       -subst(fourier(_Vf,_Vt,_Vw),_Vw,_Vw+coeff(_Ve,_Vt)))/(2*im)
+ADDSPEC FourierT : fourier(_Vt*_Vf,_Vt,_Vw) = im*D(fourier(_Vf,_Vt,_Vw),_Vw)
+ADDSPEC FourierT : fourier(_Vt,_Vt,_Vw) = 2*pi*im*D(dirac(_Vw),_Vw)
+ADDSPEC FourierT : fourier(D(_Vf,_Vt),_Vt,_Vw) = im*_Vw*fourier(_Vf,_Vt,_Vw)
+# the integral for the rest; fourint gives the transform back if it stays
+ADDSPEC FourierT : fourier(_Vf,_Vt,_Vw) = fourint(Int(_Vf*exp(-im*_Vw*_Vt),_Vt,-infinity,infinity),_Vf,_Vt,_Vw)
+ADDSPEC FourierT : IF (freeq(_Vi,_Vt)) fourint(_Vi,_Vf,_Vt,_Vw) = _Vi
+
+# the inverse by duality: the transform with the frequency -t
+PAT _Wf,_Ww,_Wt : number
+SPEC InvFourierT : invfourier(_Wf,_Ww,_Wt) = fourier(_Wf,_Ww,-_Wt)/(2*pi)
+
+COMM
+
+# an ordinary rule (in a rule list it would count as a cycle)
+SPEC FourierBack : fourint(_Vi,_Vf,_Vt,_Vw) = fourier(_Vf,_Vt,_Vw)
+PAT _Tu : number
+SPEC    FourierTidy : abs(-_Tu) = abs(_Tu)
+ADDSPEC FourierTidy : IF (negq(_Tu)) abs(_Tu) = abs(normform(-_Tu))

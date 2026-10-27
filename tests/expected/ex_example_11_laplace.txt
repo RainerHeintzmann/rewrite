@@ -1,0 +1,16 @@
+---- transforms
+6 / s ^ 4 
+w / ((s + a )^ 2 + w ^ 2 )
+exp (- 2 * s )/ s 
+(6 * s ^ 2 - 2 )/ (s ^ 6 + 3 * s ^ 4 + 3 * s ^ 2 + 1 )
+laplace (erf (t ),t ,s )
+---- inverse transforms (partial fractions, damped oscillations, delays)
+exp (- t )- exp (- 2 * t )
+cos (2 * t )* exp (- t )- (1/2) * exp (- t )* sin (2 * t )
+exp (1 - t )* heaviside (t - 1 )
+sin (t * w )
+---- u'' + u = 0 with u(0) = 1, u'(0) = 0
+U * s ^ 2 + U - s 
+cos (t )
+---- u' + 2 u = exp(-t) with u(0) = 0
+exp (- t )- exp (- 2 * t )

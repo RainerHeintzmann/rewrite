@@ -1,0 +1,26 @@
+# 12_fourier.rw: the Fourier transform and its inverse (inc/fourier)
+#   F(w) = Int(f(t)*exp(-im*w*t), t, -infinity, infinity)
+#   f(t) = 1/(2 pi) Int(F(w)*exp(im*w*t), w, -infinity, infinity)
+INC "inc/all"
+SYM t, w, b : real
+SYM a, T : positive       # a > 0, T > 0 are known
+
+"---- pairs from the table"
+fourier(dirac(t-2), t, w)               # a delay is a phase
+fourier(cos(b*t), t, w)                 # a cosine: two deltas
+fourier(exp(-a*abs(t)), t, w)           # a Lorentzian
+fourier(sin(a*t)/t, t, w)               # sinc: a rectangle
+
+"---- pairs from the integral (inc/limits)"
+fourier(exp(-a*t^2), t, w)              # a Gaussian stays a Gaussian
+fourier(heaviside(t)*exp(-a*t), t, w)   # a one-sided exponential
+fourier(heaviside(t+T)-heaviside(t-T), t, w)    # a rectangle: 2 sin(T w)/w
+
+"---- the theorems"
+fourier(t*exp(-t^2), t, w)              # multiplication by t: im*D(F,w)
+fourier(cos(3*t)*exp(-t^2), t, w)       # modulation shifts the spectrum
+
+"---- the inverse, and back again"
+REWR invfourier(2*a/(a^2+w^2), w, t) : All
+REWR invfourier(fourier(heaviside(t)*exp(-a*t), t, w), w, t) : All
+REWR invfourier(fourier(exp(-t^2), t, w), w, t) : All

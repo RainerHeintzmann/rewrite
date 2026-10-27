@@ -8,6 +8,8 @@
 #                  helpers (inc/helpers), integration with Integrate
 #   inc/integration/rubi/all  the translated Rubi rules (RubiIntegrate)
 #   inc/limits     heaviside, dirac, limit(u,x,infinity), definite Int(f,x,a,b)
+#   inc/laplace    laplace(f,t,s), invlaplace(F,s,t)
+#   inc/fourier    fourier(f,t,w), invfourier(F,w,t)
 #   inc/list       lists [a,b] (vector), matrices [[a,b],[c,d]] (matrix)
 #   inc/linalg     det, inverse, linsolve, transpose, covectors, symbolic matrices
 #   inc/solve      equations: solve(lhs == rhs, x) : Solve
@@ -24,6 +26,8 @@ INC "inc/mathnum"
 INC "inc/integration/all"
 INC "inc/integration/rubi/all"
 INC "inc/limits"
+INC "inc/laplace"
+INC "inc/fourier"
 INC "inc/list"
 INC "inc/linalg"
 INC "inc/solve"

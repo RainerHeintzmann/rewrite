@@ -92,6 +92,7 @@ static int is_num (Node * t, double * v)
 }
 
 static Node * real_copy (Node * t);
+static int exactish (Node * t);
 static Node * mk_neg (Node * a);
 
 /* numeric value, also of a calculable expression like 2*3-1, and of an
@@ -480,7 +481,8 @@ static Node * real_copy (Node * t)
 	return mknod(Terms, l, r);
 }
 
-/* real numbers with an integer value next to an exact number (or pi, im)
+/* real numbers with an integer value next to an exact number (or pi, im,
+ * or an exact expression such as 2*pi)
  * become exact integers: the 1 of a rule loaded before inc/exact is a real
  * number, and (1/2)*1.0 would be 0.5 instead of 1/2, 1.0*im the number
  * (0,1) instead of im. Changes the arguments of t. */
@@ -493,7 +495,7 @@ void exact_integers (Node * t)
 	if (! t || t->type != Func || ! exact_numbers()) return;
 	n = term_nargs(t);
 	for (k = 0; k < n; k++)
-		if (is_exact(arg(t, k)) || symbolic_constant(atom_sym(arg(t, k)))) exact = 1;
+		if (exactish(arg(t, k))) exact = 1;	/* 1/3, pi, 2*pi, im, ... */
 	if (! exact) return;
 	slot = & t->r;
 	for (k = 0; k < n; k++)
@@ -5272,6 +5274,7 @@ static Node * s_rules (Node * a[], int n, Symbol * f)
 	for (i = n - 1; i >= 0; i--)		/* the call f(a1,..,an) */
 		args = args ? mknod(Terms, tcpy(a[i]), args) : tcpy(a[i]);
 	t = mknod(Func, (Node *) f, args);
+	retype_node(t);		/* the variant for the computed arguments: it decides which rules match */
 	rulefn[k].active = 1;
 	{
 	void * outer = rewrite_push();	/* maybe in a condition of an outer rule */
