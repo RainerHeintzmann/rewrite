@@ -3,6 +3,7 @@
 # at x = 0.7 (and a = 2, b = 0.5 for symbolic coefficients) must be below
 # 1e-9 (prints true).
 INC "inc/all"
+SYM a, b : real
 TERM FF,GG,HH : real
 SYM yy : real
 x = yy

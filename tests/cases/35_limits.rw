@@ -1,0 +1,22 @@
+# inc/limits (2026): limits at infinity and definite integrals; a limit
+# that is infinite or unknown stays as it is.
+INC "inc/all"
+SYM tt, ww : real
+SYM aa : positive
+knownpos(2*aa), knownneg(-aa), knownpos(-aa)
+limit(exp(-aa*tt-im*ww*tt)/(aa+im*ww), tt, infinity)
+limit(tt^2*sin(ww*tt)*exp(-aa*tt), tt, infinity)
+limit(3 + tt*exp(-aa*tt), tt, infinity)
+limit(tt + exp(-aa*tt), tt, infinity)
+limit(tt - tt^2, tt, infinity)
+limit(arctan(tt), tt, -infinity)
+limit(tanh(2*tt), tt, infinity)
+limit(exp(tt^2), tt, infinity)
+limit(sin(tt), tt, infinity)
+Int(exp(-aa*tt)*exp(-im*ww*tt), tt, 0, infinity)
+Int(tt^2*exp(-tt), tt, 0, infinity)
+Int(exp(-tt^2), tt, 0, infinity)
+Int(heaviside(tt)*tt*exp(-aa*tt), tt, -infinity, infinity)
+Int(dirac(2*tt-1)*cos(pi*tt), tt, -infinity, infinity)
+Int(sin(tt), tt, 0, infinity)
+Int(ln(tt), tt, 1, 2)

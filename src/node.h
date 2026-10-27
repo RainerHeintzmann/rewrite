@@ -32,6 +32,7 @@ Symbol * mknum (void * value,Node * rtype);
 void delsym (Symbol * sp);
 
 void delnum (Symbol * number,int delvalue); /* Flag delvalue */
+int number_symbol (Symbol * s);	/* 2026: s is a number (of any sort), which delete frees */
 
 BOOLEAN symeq (Symbol * a,Symbol * b); /* Compares two symbols for equality */
 

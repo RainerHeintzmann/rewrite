@@ -5,7 +5,7 @@
 INC "inc/all"
 INC "inc/rvector"
 INC "inc/rmatrix"
-(1+2*i)*(3-i)
+(1+2*im)*(3-im)
 Cpx(1,2)
 [1,2,3]+[4,5,6]
 [1,2,3]*[4,5,6]

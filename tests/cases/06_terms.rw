@@ -1,5 +1,6 @@
 # TERM variables, the last-result term %, and terms used like functions.
 INC "inc/all"
+SYM a, b : real
 TERM tt,qq : real
 tt = a+b
 tt*2

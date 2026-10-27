@@ -26,7 +26,7 @@ SYM  _E,_P,_T,_G,_M,_k,_h,_da,_d,_c,_m,_my,_mu,_n,_p,_f,_a,_Ang,_eV : real
 
 # special constants : (for numerical values : physnum)
 
-# SYM c      : real  # already defined    speed of light in vacuum
+SYM c      : real    #                    speed of light in vacuum
 SYM G      : real    # gravitational constant
 SYM e0     : real    # elementary charge
 SYM me     : real    # electron mass

@@ -1,0 +1,17 @@
+true true false 
+0 
+0 
+3 
+limit (tt + exp (- aa * tt ),tt ,infinity )
+limit (tt - tt ^ 2 ,tt ,infinity )
+-1.5708 
+1 
+limit (exp (tt ^ 2 ),tt ,infinity )
+limit (sin (tt ),tt ,infinity )
+- 1 / (- aa - im * ww )
+2 
+0.886227 
+1 / aa ^ 2 
+0 
+Int (sin (tt ),tt ,0 ,infinity )
+Int (ln (tt ),tt ,1 ,2 )

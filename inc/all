@@ -7,6 +7,7 @@
 #   inc/integration/all       exact numbers (inc/exact), the symbolic
 #                  helpers (inc/helpers), integration with Integrate
 #   inc/integration/rubi/all  the translated Rubi rules (RubiIntegrate)
+#   inc/limits     heaviside, dirac, limit(u,x,infinity), definite Int(f,x,a,b)
 #   inc/list       lists [a,b] (vector), matrices [[a,b],[c,d]] (matrix)
 #   inc/linalg     det, inverse, linsolve, transpose, covectors, symbolic matrices
 #   inc/solve      equations: solve(lhs == rhs, x) : Solve
@@ -22,6 +23,7 @@ INC "inc/numerik"
 INC "inc/mathnum"
 INC "inc/integration/all"
 INC "inc/integration/rubi/all"
+INC "inc/limits"
 INC "inc/list"
 INC "inc/linalg"
 INC "inc/solve"

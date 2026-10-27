@@ -385,7 +385,11 @@ static BOOLEAN regroup (Node * p, Node * t, Goal * next)
 	return FALSE;
 }
 
-#define MAXCACHE 8
+/* Rule lists are matched while others are matched: a condition calls a
+ * function defined by rules (ATT RULES), whose list is matched in turn. An
+ * entry in use (busy) is therefore never replaced, and the loop over the
+ * candidates keeps its own copy of them (the array of candidates may grow). */
+#define MAXCACHE 32
 
 /* candidate rules for one combination of term head and first-argument head */
 typedef struct {
@@ -404,7 +408,9 @@ static struct {
 	Node ** items;			/* the rules of the list in order */
 	Cand * cand;
 	int ncand, capcand;
+	int busy;			/* match_rules loops over it */
 } cache[MAXCACHE];
+static int next_replace = 0;		/* the entry to replace next when all are used */
 
 static void cache_clear (int k)
 {
@@ -424,12 +430,20 @@ static int rule_info (Node * list)	/* cache entry of the list; uses cur_settings
 	for (k = 0; k < MAXCACHE; k++)
 		if (cache[k].list == list) break;
 	if (k < MAXCACHE && cache[k].gen == generation) return k;
-	if (k == MAXCACHE)		/* new entry (replace the first one if full) */
+	if (k == MAXCACHE)		/* new entry (replace one that is not busy if full) */
 		{
 		for (k = 0; k < MAXCACHE && cache[k].list; k++)
 			;
-		if (k == MAXCACHE) k = 0;
+		for (i = 0; k == MAXCACHE && i < MAXCACHE; i++)
+			{
+			int t = (next_replace + i) % MAXCACHE;
+			if (! cache[t].busy) k = t;
+			}
+		if (k == MAXCACHE) fatal("listmatch : rule lists nested too deeply");
+		next_replace = (k + 1) % MAXCACHE;
 		}
+	else if (cache[k].busy)
+		fatal("listmatch : rule list changed while it is matched");
 	cache_clear(k);
 	for (it = list->l; it; it = it->r) count++;
 	cache[k].list = list;
@@ -520,7 +534,8 @@ static Node * match_rules (Node * term, Node * list)
 {
 	Cand * c;
 	const char * th, * fh = NULL;
-	int k, j, start = lm_start;
+	int k, j, n, * idx, start = lm_start;
+	Node * found = NULL;
 	lm_start = 0;			/* nested calls (conditions) start at 0 */
 	cur_settings = list->r;
 	k = rule_info(list);
@@ -528,9 +543,12 @@ static Node * match_rules (Node * term, Node * list)
 	if (term && term->type == Func && term_nargs(term) >= 1)
 		fh = head_name(term_arg(term, 0));
 	c = candidates(k, th, fh);
-	for (j = 0; j < c->n; j++)
+	n = c->n;			/* c may move when nested calls add candidates */
+	idx = c->idx;
+	cache[k].busy++;
+	for (j = 0; j < n && ! found; j++)
 		{
-		int i = c->idx[j];
+		int i = idx[j];
 		Node * cp, * it;
 		if (i < start) continue;
 		it = cache[k].items[i];
@@ -544,11 +562,13 @@ static Node * match_rules (Node * term, Node * list)
 			DBFN(2,print(RES_RHS(cur_res)));
 			DEBG((2,"]\n"));
 			lm_last = i;
-			return cur_res;
+			found = cur_res;
 			}
-		restore_to(cp);
+		else
+			restore_to(cp);
 		}
-	return NULL;
+	cache[k].busy--;
+	return found;
 }
 
 /* ---------------- matchq ----------------

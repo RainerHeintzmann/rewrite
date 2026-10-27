@@ -1,5 +1,6 @@
 # Algebraic simplification rules of the standard library.
 INC "inc/all"
+SYM a, b : real
 REWR x+0 : All
 REWR 0*x + 1*y : All
 REWR a+a : All

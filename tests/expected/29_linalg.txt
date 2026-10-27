@@ -40,7 +40,7 @@ a * qq * v + a * r * w * y + a * ss * u * z + b * p * w * z + b * r * t + b * ss
 linsolve ([[1, 2], [2, 4]] ,[1, 1] )
 2 
 [a / (a ^ 2 - b ^ 2 ),
- b * im / (a ^ 2 - b ^ 2 )] 
+ im * b / (a ^ 2 - b ^ 2 )] 
 [ 1  0 ]
 [ 0  1 ] 
 x ^ 2 + 3 - 4 * x 

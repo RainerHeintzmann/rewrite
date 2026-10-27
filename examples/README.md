@@ -22,6 +22,7 @@ it to see the input. `?name` explains a keyword or function.
 | [07_own_rules.rw](07_own_rules.rw) | your own rule sets: Fibonacci numbers, the logarithm laws, rules with conditions |
 | [08_numerics.rw](08_numerics.rw) | numerical integral, Newton's method, minimum, `PRTNUM`, numerical vectors, a loop |
 | [09_unicode.rw](09_unicode.rw) | Unicode names, written directly or as `\alpha` |
+| [10_limits.rw](10_limits.rw) | limits at infinity, definite integrals, `heaviside` and `dirac` |
 
 The tests run them as well (`tests/cases/ex_example_*.rw`), so they stay
 correct.

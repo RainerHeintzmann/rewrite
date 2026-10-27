@@ -1,0 +1,17 @@
+---- limits for t -> infinity (only finite ones are evaluated)
+0 
+-1 
+0 
+limit (t * exp (a * t ),t ,infinity )
+---- definite integrals
+9 
+2 
+1 / a ^ 2 
+pi ^ (1/2) / a ^ (1/2) 
+a / (w ^ 2 + a ^ 2 )
+Int (1 / t ^ 2 ,t ,-1 ,1 )
+---- the Heaviside step and the Dirac delta
+1 0 
+exp (- a )/ a 
+9 
+2 * t * dirac (t ^ 2 - 1 )

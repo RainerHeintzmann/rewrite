@@ -9,17 +9,23 @@ Help on: ADDSPEC ALG ALIAS ATT All BRA COMM D DATA DEBUG DEFAULT EXE FOR FUNC
         MAXSTEPS MatrixRules MatrixSolve NIN NUMPAT OPT OTHER OUT PAT PRT
         PRTNUM QUIT RA REALNUM RETURN REWR RIGHT RU RULES RubiIntegrate SHOW
         SORT SPEC STEPS SUBSORT SYM SYMBOLIC SYS Solve TERM TYPEOF WHILE [ det
-        dot identity im inverse length linsolve list newton nil normform part
-        pi range select solve table thread total transpose
+        dirac dot heaviside identity im infinity inverse knownpos length limit
+        linsolve list newton nil normform part pi range select solve table
+        thread total transpose
 REWR term : alg [,alg ..]   rewrites term with the rule sets and prints the result
 t = REWR term : alg         stores the result in the TERM t
 rule sets: All (simplification), Integrate, RubiIntegrate, Solve (inc/solve), ...
 Int(f,x)   the indefinite integral of f by x:
   REWR Int(x^2,x) : Integrate          (a small rule set)
   REWR Int(1/(1+x^2),x) : RubiIntegrate  (the translated Rubi rules)
+Int(f,x,a,b)   the definite integral, also with a, b = infinity, -infinity:
+  Int(exp(-x^2),x,-infinity,infinity) gives pi^(1/2); for integrands that
+  are continuous on the real line (and heaviside, dirac), else it stays
 
 Int : real,real >> real   (symbolic)
 Int : number,number >> number   (symbolic)
+Int : real,real,real,real >> real   (symbolic C function or rules)
+Int : number,number,number,number >> number   (symbolic C function or rules)
 part(l,i)  element i of the list l (from 1, -1 the last);  part(l,i,j) of a matrix
 
 part : number++ >> number   (symbolic C function or rules)

@@ -1,0 +1,25 @@
+# 10_limits.rw: limits at infinity, definite integrals, the step and the
+# delta (inc/limits)
+INC "inc/all"
+SYM t, w : real
+SYM a : positive        # a > 0 is known: exp(-a*t) decays
+
+"---- limits for t -> infinity (only finite ones are evaluated)"
+limit(t^3*exp(-a*t), t, infinity)
+limit(erf(a*t), t, -infinity)
+limit((t+1)/(t^2+3), t, infinity)
+limit(t*exp(a*t), t, infinity)          # infinite: stays as it is
+
+"---- definite integrals"
+Int(t^2, t, 0, 3)
+Int(sin(t), t, 0, pi)
+Int(t*exp(-a*t), t, 0, infinity)
+Int(exp(-a*t^2), t, -infinity, infinity)     # the Gaussian
+Int(exp(-a*t)*cos(w*t), t, 0, infinity)
+Int(1/t^2, t, -1, 1)                    # 1/t^2 is not continuous at 0: stays
+
+"---- the Heaviside step and the Dirac delta"
+heaviside(2), heaviside(-1)
+Int(heaviside(t-1)*exp(-a*t), t, -infinity, infinity)
+Int(dirac(t-3)*t^2, t, -infinity, infinity)
+REWR D(heaviside(t^2-1), t) : All

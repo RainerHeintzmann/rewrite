@@ -1,5 +1,6 @@
 # Symbolic differentiation by rewriting in the algebra list 'All'.
 INC "inc/all"
+SYM a, b : real
 REWR D(sin cos x,x) : All
 REWR D(x^2,x) : All
 REWR D(x^2*sin x,x) : All

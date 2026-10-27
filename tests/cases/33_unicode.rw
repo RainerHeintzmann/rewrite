@@ -2,6 +2,7 @@
 # Julia (\alpha, \_1) are replaced on input; the output prints the
 # characters, and grids are aligned by characters, not bytes.
 INC "inc/all"
+SYM a, b : real
 SYM α, \beta, x\_1 : real
 α + 2*\beta
 REWR D(sin(\alpha^2), α) : All

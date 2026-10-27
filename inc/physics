@@ -12,6 +12,7 @@
 #   inc/physnum    the numerical values (SI units)
 
 INC "inc/physik"
+TERM DGL : real     # the equation of motion from inc/lagrange
 INC "inc/theophys"
 INC "inc/lagrange"
 INC "inc/physnum"

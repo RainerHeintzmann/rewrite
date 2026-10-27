@@ -1,6 +1,7 @@
 # Optional pattern parts (OPT, DEFAULT), commutative operators (COMM) and
 # condition lists. One rule covers all forms of (a+b*x)^m.
 INC "inc/all"
+SYM a, b : real
 PAT Xx : real
 NUMPAT Qpa,Qpb,Qpm : real
 OPT Qpa,Qpb,Qpm

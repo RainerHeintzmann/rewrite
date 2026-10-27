@@ -2,6 +2,7 @@
 #     INC "inc/all"
 #     INC "inc/rvector"
 #     INC "inc/rmatrix"
+SYM a : real
 DATA "LiNbO3/struct"
 
 # SYM h,k,l : real

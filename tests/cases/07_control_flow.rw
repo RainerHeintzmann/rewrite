@@ -1,5 +1,6 @@
 # IF/ELSE, WHILE, FOR and blocks.
 INC "inc/all"
+SYM n : real
 n = 5
 IF (n > 3) "big" ELSE "small"
 IF (n < 3) "big" ELSE "small"

@@ -1,6 +1,7 @@
 # Exercises the code paths that free memory (fixed leaks in 2026), so that
 # a freed tree that is still in use shows up as a wrong result or a crash.
 INC "inc/all"
+SYM a, b : real
 SYM kk : real
 FOR kk = 1 TO 3 DO REWR D(x^kk,x) : All
 TERM t3,t4 : real

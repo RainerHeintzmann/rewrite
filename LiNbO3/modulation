@@ -50,12 +50,12 @@ g1=Cpx(0,0)                          # initialize modulation fac. for first orde
 
 FOR kp = -1 TO 1 DO {                # calculate due to Lam's formula
 
-IF (kp == 1) P= -i*Pa1/2 * exp(-i*betha1) 
+IF (kp == 1) P= -im*Pa1/2 * exp(-im*betha1) 
 IF (kp == 0) P=Cpx(Pa0,0)
-IF (kp == -1) P= i*Pa1/2 * exp(i*betha1)
+IF (kp == -1) P= im*Pa1/2 * exp(im*betha1)
 
-g0 = g0+ P*bessel(kp,2*pi*(S*U))*exp(i*kp*pi)
-g1 = g1+ P*bessel(kp+1,2*pi*(S*U))*exp(i*(kp+1)*pi)
+g0 = g0+ P*bessel(kp,2*pi*(S*U))*exp(im*kp*pi)
+g1 = g1+ P*bessel(kp+1,2*pi*(S*U))*exp(im*(kp+1)*pi)
 }
 
 #-----------------------------------------------------------------------

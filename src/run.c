@@ -29,7 +29,6 @@
 
 #define EQUAL  0	/* important because of strcmp */
 
-extern char * numbername; /* to identify a number for delete */
 
 Node * numbertype = NULL;
 
@@ -709,7 +708,7 @@ void delete _1a ((p), Node * p)
 				}
 		  else
 				{
-				if (name((Symbol *) p) == numbername) /* -> is Number */
+				if (number_symbol((Symbol *) p))
 					delnum((Symbol *) p,TRUE); /* delete value too */
 				}
 		}
@@ -1054,17 +1053,21 @@ void * realcalc(Node * term,int * perr)
 			}
 		vals[i]=realcalc(at,perr);/* Const or Funct */
 		syms[i]=lastsym;
-		/* 2026: convert the value of a subsort into the declared sort */
-		if (! * perr && vals[i] && want != NULL
-		    && want != rtypes(syms[i]) && sort_dist(rtypes(syms[i]), want) > 0)
+		/* 2026: convert the value of a subsort into the declared sort; a
+		   value that cannot be converted (a complex number for a real
+		   argument, as im^2 built by a C helper) makes it not calculable */
+		if (! * perr && vals[i] && want != NULL && want != rtypes(syms[i]))
 			{
-			void * w = sort_convert(vals[i], rtypes(syms[i]), want);
+			void * w = sort_dist(rtypes(syms[i]), want) > 0
+			           ? sort_convert(vals[i], rtypes(syms[i]), want) : NULL;
 			if (w)
 				{
 				DELNUM(syms[i],vals[i]);
 				vals[i] = w;
 				conv[i] = want;
 				}
+			else if (sort_dist(rtypes(syms[i]), want) < 0)
+				* perr = TRUE;
 			}
 		i++;
 		if (i > MAXARGS-2) fatal("Fatal Error run.c : Too max Arguments for Function !");

@@ -305,6 +305,11 @@ void delsym (Symbol * sp)
 	return;
 }
 
+int number_symbol (Symbol * s)
+{
+	return s && name(s) == numbername;
+}
+
 void delnum (Symbol * number,BOOLEAN delvalue)
 {	
 	DEBG((4,"hier delnum Number :"));

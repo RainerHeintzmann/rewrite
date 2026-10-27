@@ -2,6 +2,7 @@
 #     INC "inc/all"
 #     INC "inc/rvector"
 #     INC "inc/rmatrix"
+SYM a : real
 DATA "LiNbO3/struct2"
 
 SYM Coord,Indices,a1,a2,a3,b1,b2,b3 : rvector
@@ -49,7 +50,7 @@ DATA c3
 Coord= [ c1,c2,c3 ]
 # Coord
 
-StrucFa = StrucFa + weight*FormNb*exp(-i*2*pi*(Indices*Coord))
+StrucFa = StrucFa + weight*FormNb*exp(-im*2*pi*(Indices*Coord))
 }
 
 FOR a=1 TO 12 DO  {  # read Li Atoms
@@ -60,7 +61,7 @@ DATA c3
 Coord= [ c1,c2,c3 ]
 # Coord
 
-StrucFa = StrucFa + weight*FormLi*exp(-i*2*pi*(Indices*Coord))
+StrucFa = StrucFa + weight*FormLi*exp(-im*2*pi*(Indices*Coord))
 }
 
 StrucFa

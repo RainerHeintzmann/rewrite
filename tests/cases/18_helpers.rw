@@ -1,6 +1,7 @@
 # Symbolic helper functions (inc/helpers, symfn.c) and the elementary
 # functions added in 2026 (inc/alg).
 INC "inc/all"
+SYM a, b : real
 FUNC never : real >> real
 ALG raw
 SPEC raw : never(X) = X

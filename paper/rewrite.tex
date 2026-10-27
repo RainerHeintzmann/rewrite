@@ -266,8 +266,9 @@ no coincidence. Conditions are still evaluated numerically.
 the library declares the sort \texttt{number} of symbolic scalar
 expressions, like \texttt{Number} in Julia. Its operator variants have no
 C function; a term is of sort \texttt{number} only when one of its parts
-is, for example the imaginary unit \texttt{im}, which has no numerical
-value and of which the symbolic helpers only know $\mathit{im}^2=-1$. A
+is. The imaginary unit \texttt{im} is a complex constant that, like
+$\pi$, stays a symbol in terms; the symbolic helpers know
+$\mathit{im}^2=-1$. A
 pattern variable of sort \texttt{number} matches any term, and a function in
 a pattern whose variant is declared on such top sorts also matches its
 variants on narrower sorts, as a method for \texttt{Number} in Julia
@@ -615,7 +616,7 @@ For hyperbolic
 functions, Rubi~4.17 has no basic rules; it writes $\sinh v=-i\sin(iv)$,
 $\cosh v=\cos(iv)$, \dots{} before its trigonometric rules, and
 Mathematica's evaluation turns $\sin(iw)$ back into $i\sinh w$. The same
-happens here with the imaginary unit \texttt{im} of sort \texttt{number}: a C helper rewrites the hyperbolic functions of
+happens here with the imaginary unit \texttt{im}: a C helper rewrites the hyperbolic functions of
 an integrand that is a function of trigonometric or hyperbolic functions of
 linear arguments, and the output step takes \texttt{im} out of the
 functions again, so that $\int x\sinh x\,dx$ gives $x\cosh x-\sinh x$.
@@ -847,7 +848,7 @@ for Newton's method.
 \paragraph{Limitations.} Commutative matching only swaps the two operands
 of one binary operator. Associativity is handled by normalization, so the
 integrand must be brought into a fixed form before the rules are tried.
-The imaginary unit is a symbol of the sort \texttt{number}, but the
+The imaginary unit stays a symbol in terms, but the
 general simplification of the library is still written for real numbers,
 and logarithms of negative arguments evaluate to NaN although their
 derivatives are correct. The sign of a term is only known through the

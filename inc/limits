@@ -1,0 +1,242 @@
+# inc/limits (2026): the Heaviside step and the Dirac delta, limits at
+# infinity and definite integrals. Loaded by inc/all (after the integration).
+#
+#   limit(u, x, infinity), limit(u, x, -infinity)
+#        only finite limits are evaluated; a limit that is not known (or does
+#        not exist) stays as it is, so infinity - infinity never becomes 0
+#   Int(f, x, a, b)
+#        the definite integral: the antiderivative of RubiIntegrate at the
+#        bounds (limits at infinity). Only for integrands that are continuous
+#        on the real line (polynomials, exp, sin, cos, erf, ... and their
+#        sums, products and quotients by constants), so that the
+#        antiderivative is continuous; heaviside and dirac are handled first.
+#        Otherwise, or if a step fails, the integral stays as it is.
+#
+# The symbols are real, im is the imaginary unit. A parameter declared with
+# the sort positive (SYM a : positive) counts as > 0.
+#
+# Each rule set has its own pattern variables: a helper called in a
+# condition (slowq(u,x)) matches with its own variables, so it must not
+# change those of the rule that calls it.
+
+SYM infinity : real
+ALIAS "∞" = "infinity"
+
+ALG Heaviside
+ALG Dirac
+FUNC  heaviside : real >> real   ATT RULES Heaviside   # 0 for x < 0, 1 for x > 0
+OTHER heaviside : number >> number ATT RULES Heaviside
+FUNC  dirac     : real >> real   ATT RULES Dirac       # the delta distribution
+OTHER dirac     : number >> number ATT RULES Dirac
+
+NUMPAT _hn : number
+PAT _hu,_hx : number
+SPEC    Heaviside : IF (_hn > 0) heaviside(_hn) = 1
+ADDSPEC Heaviside : IF (_hn < 0) heaviside(_hn) = 0
+SPEC    Dirac     : IF (_hn != 0) dirac(_hn) = 0
+ADDSPEC diff       : D(heaviside(_hu),_hx) = D(_hu,_hx)*dirac(_hu)
+ADDSPEC DerivConst : D(heaviside(_hu),_hx) = D(_hu,_hx)*dirac(_hu)
+
+# The rules below are rule lists (COMM): they are tried in order until one
+# matches with its conditions, and a pattern u*f(x) finds f(x) among all
+# factors of a product.
+COMM +,*
+
+# ---- signs: knownpos(u) is true if u > 0 is known, knownneg(u) if u < 0;
+# otherwise they stay unevaluated (and a condition with them does not hold)
+ALG KnownPos
+ALG KnownNeg
+FUNC  knownpos : real >> bool   ATT RULES KnownPos
+OTHER knownpos : number >> bool ATT RULES KnownPos
+FUNC  knownneg : real >> bool   ATT RULES KnownNeg
+OTHER knownneg : number >> bool ATT RULES KnownNeg
+PAT _ku,_kv : number
+PAT _kp : positive
+NUMPAT _kn : number
+
+SPEC    KnownPos : IF (_kn > 0) knownpos(_kn) = true
+ADDSPEC KnownPos : knownpos(_kp) = true
+ADDSPEC KnownPos : knownpos(pi) = true
+ADDSPEC KnownPos : knownpos(e) = true
+ADDSPEC KnownPos : knownpos(-_ku) = knownneg(_ku)
+ADDSPEC KnownPos : knownpos(_ku*_kv) = knownpos(_ku) && knownpos(_kv)
+ADDSPEC KnownPos : knownpos(_ku/_kv) = knownpos(_ku) && knownpos(_kv)
+ADDSPEC KnownPos : knownpos(_ku+_kv) = knownpos(_ku) && knownpos(_kv)
+ADDSPEC KnownPos : knownpos(_ku-_kv) = knownpos(_ku) && knownneg(_kv)
+ADDSPEC KnownPos : knownpos(_ku^_kv) = knownpos(_ku)
+ADDSPEC KnownPos : knownpos(mi(_ku)) = knownpos(_ku)
+ADDSPEC KnownPos : knownpos(sqrt(_ku)) = knownpos(_ku)
+ADDSPEC KnownPos : IF (freeq(_ku,im)) knownpos(exp(_ku)) = true
+ADDSPEC KnownPos : IF (_kn <= 0) knownpos(_kn) = false
+ADDSPEC KnownPos : knownpos(-_kp) = false
+
+SPEC    KnownNeg : IF (_kn < 0) knownneg(_kn) = true
+ADDSPEC KnownNeg : IF (_kn >= 0) knownneg(_kn) = false
+ADDSPEC KnownNeg : knownneg(_kp) = false
+ADDSPEC KnownNeg : knownneg(-_ku) = knownpos(_ku)
+ADDSPEC KnownNeg : knownneg(_ku*_kv) = knownneg(_ku) && knownpos(_kv)
+ADDSPEC KnownNeg : knownneg(_ku/_kv) = knownneg(_ku) && knownpos(_kv)
+ADDSPEC KnownNeg : knownneg(_ku+_kv) = knownneg(_ku) && knownneg(_kv)
+ADDSPEC KnownNeg : knownneg(_ku-_kv) = knownneg(_ku) && knownpos(_kv)
+
+# ---- polynomials in x: leadposq(u,x), leadnegq(u,x) are true if u is a
+# polynomial in x (degree >= 1) whose leading coefficient is known to be
+# > 0 (< 0); decayq(u,x) if the real part of that coefficient is < 0, so
+# that exp(u) -> 0 faster than any power of x
+ALG LeadPosQ
+ALG LeadNegQ
+ALG DecayQ
+FUNC  leadposq : real,real >> bool     ATT RULES LeadPosQ
+OTHER leadposq : number,number >> bool ATT RULES LeadPosQ
+FUNC  leadnegq : real,real >> bool     ATT RULES LeadNegQ
+OTHER leadnegq : number,number >> bool ATT RULES LeadNegQ
+FUNC  decayq   : real,real >> bool     ATT RULES DecayQ
+OTHER decayq   : number,number >> bool ATT RULES DecayQ
+PAT _pu,_px : number
+SPEC LeadPosQ : IF (polyq(_pu,_px)), (igeq(expon(_pu,_px),1)) \
+                leadposq(_pu,_px) = knownpos(normform(coeff(_pu,_px,expon(_pu,_px))))
+SPEC LeadNegQ : IF (polyq(_pu,_px)), (igeq(expon(_pu,_px),1)) \
+                leadnegq(_pu,_px) = knownneg(normform(coeff(_pu,_px,expon(_pu,_px))))
+SPEC DecayQ   : IF (polyq(_pu,_px)), (igeq(expon(_pu,_px),1)) \
+                decayq(_pu,_px) = knownneg(normform(subst(coeff(_pu,_px,expon(_pu,_px)),im,0)))
+
+# ---- slowq(u,x): u grows at most like a power of x (it may oscillate)
+ALG SlowQ
+FUNC  slowq : real,real >> bool     ATT RULES SlowQ
+OTHER slowq : number,number >> bool ATT RULES SlowQ
+PAT _su,_sv,_sx : number
+NUMPAT _sn : number
+SPEC    SlowQ : IF (freeq(_su,_sx)) slowq(_su,_sx) = true
+ADDSPEC SlowQ : IF (polyq(_su,_sx)) slowq(_su,_sx) = true
+ADDSPEC SlowQ : slowq(-_su,_sx) = slowq(_su,_sx)
+ADDSPEC SlowQ : slowq(_su*_sv,_sx) = slowq(_su,_sx) && slowq(_sv,_sx)
+ADDSPEC SlowQ : slowq(_su+_sv,_sx) = slowq(_su,_sx) && slowq(_sv,_sx)
+ADDSPEC SlowQ : slowq(_su-_sv,_sx) = slowq(_su,_sx) && slowq(_sv,_sx)
+ADDSPEC SlowQ : IF (freeq(_sv,_sx)) slowq(_su/_sv,_sx) = slowq(_su,_sx)
+ADDSPEC SlowQ : IF (_sn > 0) slowq(_su^_sn,_sx) = slowq(_su,_sx)
+ADDSPEC SlowQ : IF (polyq(_su,_sx)), (freeq(_su,im)) slowq(sin(_su),_sx) = true
+ADDSPEC SlowQ : IF (polyq(_su,_sx)), (freeq(_su,im)) slowq(cos(_su),_sx) = true
+ADDSPEC SlowQ : IF (polyq(_su,_sx)), (freeq(normform(subst(_su,im,0)),_sx)) slowq(exp(_su),_sx) = true
+ADDSPEC SlowQ : IF (freeq(_su,im)) slowq(erf(_su),_sx) = true
+ADDSPEC SlowQ : IF (freeq(_su,im)) slowq(arctan(_su),_sx) = true
+ADDSPEC SlowQ : IF (freeq(_su,im)) slowq(tanh(_su),_sx) = true
+ADDSPEC SlowQ : IF (freeq(_su,im)) slowq(heaviside(_su),_sx) = true
+
+# ---- limits for x -> infinity
+# A sum is split only if all its parts have a limit (limsum); LimitBack
+# turns a sum that failed into the original limit again.
+ALG LimitInf
+ALG LimitBack
+ALG LimitTidy
+FUNC  limit : real,real,real >> real         ATT RULES LimitInf,LimitBack,LimitTidy
+OTHER limit : number,number,number >> number ATT RULES LimitInf,LimitBack,LimitTidy
+FUNC  limsum : real,real,real,real >> real         # internal
+OTHER limsum : number,number,number,number >> number
+PAT _lu,_lv,_lw,_lx : number
+NUMPAT _ln : number
+
+SPEC    LimitInf : IF (freeq(_lu,_lx)) limit(_lu,_lx,infinity) = _lu
+ADDSPEC LimitInf : limit(_lu,_lx,-infinity) = limit(subst(_lu,_lx,-_lx),_lx,infinity)
+ADDSPEC LimitInf : limit(_lu+_lv,_lx,infinity) = limsum(limit(_lu,_lx,infinity)+limit(_lv,_lx,infinity),_lu+_lv,_lx,infinity)
+ADDSPEC LimitInf : limit(_lu-_lv,_lx,infinity) = limsum(limit(_lu,_lx,infinity)-limit(_lv,_lx,infinity),_lu-_lv,_lx,infinity)
+ADDSPEC LimitInf : IF (freeq(_lw,_lx)) limsum(_lw,_lu,_lx,infinity) = _lw
+ADDSPEC LimitInf : limit(-_lu,_lx,infinity) = -limit(_lu,_lx,infinity)
+ADDSPEC LimitInf : IF (freeq(_lv,_lx)) limit(_lv*_lu,_lx,infinity) = _lv*limit(_lu,_lx,infinity)
+ADDSPEC LimitInf : IF (freeq(_lv,_lx)) limit(_lu/_lv,_lx,infinity) = limit(_lu,_lx,infinity)/_lv
+# decaying exponentials, also times anything that grows at most like a power
+ADDSPEC LimitInf : IF (decayq(_lv,_lx)) limit(exp(_lv),_lx,infinity) = 0
+ADDSPEC LimitInf : IF (decayq(_lv,_lx)), (slowq(_lu,_lx)) limit(_lu*exp(_lv),_lx,infinity) = 0
+ADDSPEC LimitInf : IF (decayq(_lv,_lx)), (slowq(_lu,_lx)), (freeq(_lw,_lx)) limit(_lu*exp(_lv)/_lw,_lx,infinity) = 0
+# p(x)/q(x) -> 0 for polynomials with deg p < deg q
+ADDSPEC LimitInf : IF (polyq(_lu,_lx)), (polyq(_lv,_lx)), (iltq(expon(_lu,_lx),expon(_lv,_lx))) \
+                   limit(_lu/_lv,_lx,infinity) = 0
+ADDSPEC LimitInf : IF (polyq(_lu,_lx)), (igeq(expon(_lu,_lx),1)), (_ln < 0) limit(_lu^_ln,_lx,infinity) = 0
+ADDSPEC LimitInf : IF (polyq(_lu,_lx)), (igeq(expon(_lu,_lx),1)) limit(mi(_lu),_lx,infinity) = 0
+# bounded functions of a polynomial with a known sign of the leading coefficient
+ADDSPEC LimitInf : IF (leadposq(_lu,_lx)) limit(erf(_lu),_lx,infinity) = 1
+ADDSPEC LimitInf : IF (leadnegq(_lu,_lx)) limit(erf(_lu),_lx,infinity) = -1
+ADDSPEC LimitInf : IF (freeq(_lu,im)), (leadposq(_lu,_lx)) limit(arctan(_lu),_lx,infinity) = pi/2
+ADDSPEC LimitInf : IF (freeq(_lu,im)), (leadnegq(_lu,_lx)) limit(arctan(_lu),_lx,infinity) = -pi/2
+ADDSPEC LimitInf : IF (freeq(_lu,im)), (leadposq(_lu,_lx)) limit(tanh(_lu),_lx,infinity) = 1
+ADDSPEC LimitInf : IF (freeq(_lu,im)), (leadnegq(_lu,_lx)) limit(tanh(_lu),_lx,infinity) = -1
+ADDSPEC LimitInf : IF (freeq(_lu,im)), (leadposq(_lu,_lx)) limit(heaviside(_lu),_lx,infinity) = 1
+ADDSPEC LimitInf : IF (freeq(_lu,im)), (leadnegq(_lu,_lx)) limit(heaviside(_lu),_lx,infinity) = 0
+
+# ---- definite integrals
+# entireq(f,x): f is continuous on the real line (its antiderivative too)
+ALG EntireQ
+FUNC  entireq : real,real >> bool     ATT RULES EntireQ
+OTHER entireq : number,number >> bool ATT RULES EntireQ
+PAT _eu,_ev,_ex : number
+NUMPAT _en : number
+SPEC    EntireQ : IF (freeq(_eu,_ex)) entireq(_eu,_ex) = true
+ADDSPEC EntireQ : IF (polyq(_eu,_ex)) entireq(_eu,_ex) = true
+ADDSPEC EntireQ : entireq(-_eu,_ex) = entireq(_eu,_ex)
+ADDSPEC EntireQ : entireq(_eu*_ev,_ex) = entireq(_eu,_ex) && entireq(_ev,_ex)
+ADDSPEC EntireQ : entireq(_eu+_ev,_ex) = entireq(_eu,_ex) && entireq(_ev,_ex)
+ADDSPEC EntireQ : entireq(_eu-_ev,_ex) = entireq(_eu,_ex) && entireq(_ev,_ex)
+ADDSPEC EntireQ : IF (freeq(_ev,_ex)) entireq(_eu/_ev,_ex) = entireq(_eu,_ex)
+ADDSPEC EntireQ : IF (is_int(_en)), (_en > 0) entireq(_eu^_en,_ex) = entireq(_eu,_ex)
+ADDSPEC EntireQ : IF (freeq(_eu,_ex)), (knownpos(_eu)) entireq(_eu^_ev,_ex) = entireq(_ev,_ex)
+ADDSPEC EntireQ : entireq(exp(_eu),_ex) = entireq(_eu,_ex)
+ADDSPEC EntireQ : entireq(sin(_eu),_ex) = entireq(_eu,_ex)
+ADDSPEC EntireQ : entireq(cos(_eu),_ex) = entireq(_eu,_ex)
+ADDSPEC EntireQ : entireq(sinh(_eu),_ex) = entireq(_eu,_ex)
+ADDSPEC EntireQ : entireq(cosh(_eu),_ex) = entireq(_eu,_ex)
+ADDSPEC EntireQ : entireq(erf(_eu),_ex) = entireq(_eu,_ex)
+
+# atbound(G,x,b): the antiderivative G at x = b
+ALG AtBound
+FUNC  atbound : real,real,real >> real         ATT RULES AtBound
+OTHER atbound : number,number,number >> number ATT RULES AtBound
+PAT _bg,_bx,_bb : number
+SPEC    AtBound : atbound(_bg,_bx,infinity) = limit(_bg,_bx,infinity)
+ADDSPEC AtBound : atbound(_bg,_bx,-infinity) = limit(_bg,_bx,-infinity)
+ADDSPEC AtBound : IF NIN(infinity,_bb) atbound(_bg,_bx,_bb) = subst(_bg,_bx,_bb)
+
+# Int(f,x,a,b): DefIntA prepares (step, delta, entire integrand), then
+# RubiIntegrate finds the antiderivative, DefIntB takes it at the bounds;
+# DefIntBack gives back the integral if a step failed
+ALG DefIntA
+ALG DefIntB
+ALG DefIntBack
+OTHER Int : real,real,real,real >> real           ATT RULES DefIntA,RubiIntegrate,DefIntB,DefIntBack
+OTHER Int : number,number,number,number >> number ATT RULES DefIntA,RubiIntegrate,DefIntB,DefIntBack
+FUNC  defint  : real,real,real,real,real >> real         # internal
+OTHER defint  : number,number,number,number,number >> number
+FUNC  defdiff : real,real,real,real,real >> real         # internal
+OTHER defdiff : number,number,number,number,number >> number
+PAT _iu,_iw,_ix,_ia,_ib,_ig,_id : number
+
+# the step restricts the bounds, the delta picks the value
+SPEC    DefIntA : IF (linearq(_iw,_ix)), (knownpos(coeff(_iw,_ix))) \
+          Int(heaviside(_iw)*_iu,_ix,-infinity,_ib) = Int(_iu,_ix,-coeff(_iw,_ix,0)/coeff(_iw,_ix),_ib)
+ADDSPEC DefIntA : IF (linearq(_iw,_ix)), (knownpos(coeff(_iw,_ix))) \
+          Int(heaviside(_iw),_ix,-infinity,_ib) = Int(1,_ix,-coeff(_iw,_ix,0)/coeff(_iw,_ix),_ib)
+ADDSPEC DefIntA : Int(heaviside(_ix)*_iu,_ix,0,_ib) = Int(_iu,_ix,0,_ib)
+ADDSPEC DefIntA : IF (linearq(_iw,_ix)) \
+          Int(dirac(_iw)*_iu,_ix,-infinity,infinity) = subst(_iu,_ix,-coeff(_iw,_ix,0)/coeff(_iw,_ix))/abs(coeff(_iw,_ix))
+ADDSPEC DefIntA : IF (linearq(_iw,_ix)) \
+          Int(dirac(_iw),_ix,-infinity,infinity) = 1/abs(coeff(_iw,_ix))
+ADDSPEC DefIntA : IF (entireq(_iu,_ix)) Int(_iu,_ix,_ia,_ib) = defint(Int(_iu,_ix),_ix,_ia,_ib,_iu)
+
+SPEC    DefIntB : defint(_ig,_ix,_ia,_ib,_iu) = defdiff(atbound(_ig,_ix,_ib)-atbound(_ig,_ix,_ia),_ix,_ia,_ib,_iu)
+ADDSPEC DefIntB : IF (freeq(_id,_ix)) defdiff(_id,_ix,_ia,_ib,_iu) = normform(_id)
+
+COMM
+
+# The rules that give back the original limit or integral if a part failed
+# are ordinary rules: in a rule list, a result that was the term before
+# counts as a cycle and would be skipped.
+SPEC    LimitBack  : limsum(_lw,_lu,_lx,infinity) = limit(_lu,_lx,infinity)
+SPEC    DefIntBack : defdiff(_id,_ix,_ia,_ib,_iu) = Int(_iu,_ix,_ia,_ib)
+ADDSPEC DefIntBack : defint(_ig,_ix,_ia,_ib,_iu) = Int(_iu,_ix,_ia,_ib)
+# zeros from the decaying parts
+SPEC    LimitTidy  : 0/_lu = 0
+ADDSPEC LimitTidy  : 0*_lu = 0
+ADDSPEC LimitTidy  : _lu*0 = 0
+ADDSPEC LimitTidy  : _lu+0 = _lu
+ADDSPEC LimitTidy  : 0+_lu = _lu
+ADDSPEC LimitTidy  : _lu-0 = _lu
+ADDSPEC LimitTidy  : 0-_lu = -_lu
+ADDSPEC LimitTidy  : -0 = 0

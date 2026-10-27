@@ -21,7 +21,7 @@ void rules_fn_register (Symbol * f, Node * algs); /* ATT RULES alglist */
 s_function * rules_sfn (void);               /* the C function behind ATT RULES */
 void role_fn (Node * np);                    /* SYMBOLIC "role" = "symbol" */
 Node * call_builtin (Node * term);
-int symbolic_constant (Symbol * s);	/* 2026: pi in exact mode: no value in terms */
+int symbolic_constant (Symbol * s);	/* 2026: pi, im in exact mode: no value in terms */
 int exact_symbolic (Node * t);	/* 2026: exact mode: f(exact args), pi: no numeric value in a term */
 Node * special_value (Node * t);	/* 2026: its exact value (1/2, 3^(1/2)/2, pi/6) or NULL */
 typedef int show_function (Node * term, int prec);	/* 2026: SHOW: 1 if it printed the term */

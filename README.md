@@ -32,6 +32,7 @@ $ rewrite
 4 1 1
 > [[1,2],[3,4]] * [5,6]
 [17, 39]
+> SYM a : real
 > a = 3
 > a + 1
 4
@@ -43,9 +44,10 @@ a + 1
 
 `INC "inc/all"` loads the standard library. `REWR term : All` rewrites the
 term with the rule list `All`, here computing the derivative of
-`sin(cos(x))`. Constants such as `a` either have a value or stand for
-themselves: `a = nothing` removes the value again, because the library
-constant `nothing` never has one. Lists and matrices are written in
+`sin(cos(x))`. The library declares the variables `x`, `y`, `z`; other
+names are declared with `SYM`. A symbol such as `a` either has a value or
+stands for itself: `a = nothing` removes the value again, because the
+library constant `nothing` never has one. Lists and matrices are written in
 brackets; the product of matrices is the matrix product. `?REWR` (or `?` alone) shows
 help, and [examples/](examples/README.md) has small programs to start from,
 e.g. `rewrite examples/03_integration.rw`.
@@ -480,7 +482,7 @@ variant resolves it, as `/ : natural,natural` in [inc/exact](inc/exact):
 FUNC tst : complex >> real ATT c_real
 OTHER tst : real >> real ATT r_abs
 tst(-2.5)            # prints 2.5: the real variant fits exactly
-tst(-2.5+i)          # prints -2.5: the complex one
+tst(-2.5+im)         # prints -2.5: the complex one
 ```
 
 **The sort `number`.** [inc/alg](inc/alg) also declares the sort `number`
@@ -488,9 +490,8 @@ for symbolic scalar expressions, above `real` and `complex` (`SUBSORT
 real,number`, `SUBSORT complex,number`), like `Number` in Julia. The
 arithmetic and the elementary and special functions have variants on
 `number` without a C function; they only stand for the symbolic term.
-A term becomes of sort `number` only when one of its parts is, such as the
-imaginary unit `im` of [inc/integration/base](inc/integration/base); a term
-of reals keeps its real variants and is calculated as before. Rules written
+A term becomes of sort `number` only when one of its parts is; a term of
+reals keeps its real variants and is calculated as before. Rules written
 with variables of sort `number` apply to every term below it:
 
 - A variable whose sort has no wider sort (`number`) matches any term, and
@@ -654,6 +655,7 @@ The comments in the older files are in German.
 | [inc/mathnum](inc/mathnum) | The numerical values of `e` and `pi`, angle units `_deg`, `_rad`. |
 | [inc/integration/all](inc/integration/all) | Exact numbers ([inc/exact](inc/exact): `integer` and `rational`, GMP), the symbolic helpers ([inc/helpers](inc/helpers): `deriv`, `normform`, `cancel`, `expand`, ...), and integration with `Integrate`. |
 | [inc/integration/rubi/all](inc/integration/rubi/all) | The translated Rubi rules, `RubiIntegrate` (about 1 s to load). |
+| [inc/limits](inc/limits) | `heaviside`, `dirac`, `infinity`, limits `limit(u,x,infinity)` and definite integrals `Int(f,x,a,b)`. |
 | [inc/list](inc/list) | Lists `[a,b,c]` (sort `vector`) and `nil`, matrices `[[a,b],[c,d]]` (sort `matrix`), their arithmetic, `part`, `length`, `table`, `select`, ... |
 | [inc/linalg](inc/linalg) | Matrices: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread`, covectors, symbolic matrices with `MatrixRules` and `MatrixSolve`. |
 | [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), systems. |
@@ -673,7 +675,14 @@ The examples of the original project use their own files: [LiNbO3/comp](LiNbO3/c
 has the material constants of lithium niobate crystals.
 
 Note that `inc/all` defines some short names: `e` and `pi` (with their
-values), `i` (the imaginary unit of `complex`), `x`, `y`, `z`, `a`, `b`, `n`.
+values), the imaginary unit `im` (the complex number `Cpx(0,1)`) and the
+variables `x`, `y`, `z`. Other names, such as `a`, `b`, `n`, are declared
+where they are used (`SYM a, b : real`).
+
+**The imaginary unit `im`.** Like `pi`, `im` stays a symbol in terms (with
+the exact numbers of `inc/all`), as `I` in Mathematica: `2*im*x` stays as
+it is, and the symbolic helpers know `im^2 = -1`. A closed expression is
+calculated with complex numbers: `2+3*im` prints `(2,3)`.
 Some examples:
 
 ```text
@@ -872,6 +881,45 @@ REWR 2*A*[x,y] : MatrixRules                           # stays: a vector is no s
 
 (In a library loaded after inc/alg, `A`, `B`, `C` are variables already;
 the tests use `MA`, `MB`, ...)
+
+### Limits and definite integrals
+
+[inc/limits](inc/limits) adds the symbol `infinity` (also `∞`), the unit
+step `heaviside(x)` and the delta `dirac(x)`, limits at infinity and
+definite integrals:
+
+```text
+SYM t, w : real
+SYM a : positive                              # a > 0 is known
+limit(t^3*exp(-a*t), t, infinity)             # prints 0
+limit(erf(a*t), t, -infinity)                 # prints -1
+Int(exp(-a*t^2), t, -infinity, infinity)      # prints pi ^ (1/2) / a ^ (1/2)
+Int(exp(-a*t)*cos(w*t), t, 0, infinity)       # prints a / (w ^ 2 + a ^ 2 )
+Int(heaviside(t-1)*exp(-a*t), t, -infinity, infinity)   # prints exp (- a )/ a
+Int(dirac(t-3)*t^2, t, -infinity, infinity)   # prints 9
+```
+
+- `limit(u, x, infinity)` and `limit(u, x, -infinity)` evaluate a limit
+  only if it is finite and known: constants, sums of such parts, a
+  decaying exponential times anything that grows at most like a power
+  (also oscillating: `t^2*sin(w*t)*exp(-a*t)`), quotients of polynomials,
+  and `erf`, `arctan`, `tanh`, `heaviside` of a polynomial. Otherwise the
+  limit stays as it is, so `infinity - infinity` can never become 0.
+- The sign of a coefficient decides: `knownpos(u)` and `knownneg(u)` are
+  true for positive and negative numbers, symbols of the sort `positive`,
+  and products, quotients, sums and powers of them. A parameter that has
+  to be positive is declared with `SYM a : positive`. The symbols are real,
+  `im` is the imaginary unit.
+- `Int(f, x, a, b)` takes the antiderivative of `RubiIntegrate` at the
+  bounds. That is only correct if the antiderivative is continuous, so
+  the integrand must be continuous on the real line: polynomials, `exp`,
+  `sin`, `cos`, `sinh`, `cosh`, `erf` and their sums, products and
+  quotients by constants. `Int(1/t^2, t, -1, 1)` therefore stays as it is
+  (the antiderivative `-1/t` would give the wrong -2). A step
+  `heaviside(c*x+d)` with `c > 0` changes the lower bound, and a delta
+  `dirac(c*x+d)` picks the value of the rest of the integrand.
+- If a step fails (no antiderivative, an unknown limit), the integral stays
+  as it is.
 
 ### Equations
 
@@ -1106,6 +1154,18 @@ where the library [inc/](inc) and the tests are used from.
 
 ## Changes in 2026
 
+- `inc/all` declares only `x`, `y`, `z` as variables; `a`, `b`, `c`, `n`,
+  ... are declared where they are used. The internal names of the old
+  libraries were moved to the files that use them. The imaginary unit is
+  `im` (formerly `i`, and a second symbolic `im` of the integration): a
+  complex constant that stays a symbol in terms, like `pi`.
+- Limits at infinity, definite integrals, `heaviside` and `dirac`
+  ([inc/limits](inc/limits)).
+- Fixed: a number of a sort that is not below `real` (complex, bool) was
+  shared instead of copied by the symbolic helpers, so freeing a copy freed
+  the original as well (wrong results that changed from run to run); and
+  the cache of the rule lists could free an entry that was still in use
+  when more than eight rule lists were nested.
 - Ported to flex 2.6 and bison 3, and to 64-bit gcc on Linux and Windows.
 - Fixed a crash when a constant was assigned 0 or 1 and later reassigned.
 - Fixed a crash in the cleanup after arguments that cannot be calculated.

@@ -1,6 +1,7 @@
 # calculation of the diffraction at the slit created by the sharp
 # Bragg condition
 
+SYM b : real
 SYM Phi0,Phi,Steps1,Steps2,PhiMax,l,DThetaB,sinThetaB,ld,k,t,SUM,a,step1,step2,I0 : real
 l = 30             # distance to the source
 DThetaB = 10 * _my # 3 * _my

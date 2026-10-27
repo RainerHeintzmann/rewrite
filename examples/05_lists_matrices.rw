@@ -1,5 +1,6 @@
 # 05_lists_matrices.rw: lists, vectors and matrices
 INC "inc/all"
+SYM a, b, n : real
 
 "---- a list is a vector: arithmetic element by element"
 [1,2,3] + [10,20,30]

@@ -78,24 +78,21 @@ SYM 0cf,1cf : cfield
 # SYM 0re,1re : real    0 and 1 exist only once !
 SYM 0c,1c   : complex
 
-SYM x,y,z,a,b,c,dummy,memo,n,j,l : real
+# 2026: x, y, z are the usual variables; other names are declared where
+# they are used (formerly also a, b, c, n, j, l, ...)
+SYM x,y,z : real
 SYM _x : real # general integration variable
 SYM maxreal  : real
 SYM minreal  : real
 
 SYM e,pi : real  # e,pi
 SYM nothing : real  # 2026: never has a value; a = nothing deletes the value of a
-SYM i : complex  # sqrt(-1)
+SYM im : complex  # the imaginary unit sqrt(-1) (2026, formerly i); a symbol in terms
 
 #  e  = 2.718281828459			see mathnum
 #  pi = 3.141592653589793
 
 TERM _erg  : real
-TERM q,s : real
-
-TERM P0,P1,P2,P3,P4,P5,P6	: real			# parameter terms for include files
-
-TERM DGL : real	# stores ODE
 
 FUNC _F     : sort++  >> sort         # generic function
 FUNC _Fg    : group++ >> group        # generic function
@@ -469,11 +466,11 @@ SPEC    SumUnroll : IF (M>N) Sum(X,N,M,Y)=Sub(Y,X,M)+Sum(X,N,M- 1,Y)
 ADDSPEC SumUnroll :         Sum(X,N,N,Y)=Sub(Y,X,N)
 
 # ++++++++++++++++++ Complex numbers +++++++++++++++++++++++++++++++++++++
-i=Cpx(0,1)
+im=Cpx(0,1)
 ALG Compl
-SPEC  Compl : Cpx(X,Y) = X+i*Y
-ADDSPEC Compl : D(Xc,Y+i*Z) = i*D(Xc,Z)+D(Xc,Y)
-ADDSPEC Compl : D(Xc,i*Z+Y) = i*D(Xc,Z)+D(Xc,Y)
+SPEC  Compl : Cpx(X,Y) = X+im*Y
+ADDSPEC Compl : D(Xc,Y+im*Z) = im*D(Xc,Z)+D(Xc,Y)
+ADDSPEC Compl : D(Xc,im*Z+Y) = im*D(Xc,Z)+D(Xc,Y)
 
 # ++++++++++++++++++ ordering of terms, multiplicative ++++++++++++++++++++++++
 # caution : -2 * x
@@ -498,6 +495,7 @@ ADDSPEC     Addord : Y+N*X+M*X = Y+(N+M)*X
 ALG diff
 SPEC        diff : D(e,Xnu) = 0         # order matters (first check e, then replace X)
 ADDSPEC     diff : D(pi,Xnu)= 0
+ADDSPEC     diff : D(im,Xnu)= 0         # 2026
 ADDSPEC     diff : D(_x,Xnu)= 0
 ADDSPEC     diff : D(N,Xnu) = 0         # numbers are constant
 ADDSPEC     diff : D(Xnu,Xnu) = 1         # special constants

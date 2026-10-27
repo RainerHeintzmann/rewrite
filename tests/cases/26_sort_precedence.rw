@@ -5,13 +5,13 @@ INC "inc/all"
 # real < complex (inc/alg): complex functions also take real numbers
 Re(2.5)
 Im(3)
-1 + (i + 3)
+1 + (im + 3)
 # precedence: the variant for real fits exactly, the complex one is the
 # fallback for complex arguments
 FUNC tst : complex >> real ATT c_real
 OTHER tst : real >> real ATT r_abs
 tst(-2.5)
-tst(-2.5+i)
+tst(-2.5+im)
 # rational -> real (1 conversion) beats rational -> real -> complex (2)
 tst(-5/2)
 # exact numbers: natural is a subsort of integer and of nonneg; inc/exact

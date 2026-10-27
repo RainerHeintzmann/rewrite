@@ -4,7 +4,7 @@ Int (im2 ,x )
 -1 * x + im * x 
 -1 * y 
 2 * (im * x )
-cos (im * x )* im 
+im * cos (im * x )
 im * cosh (x )
 im * sin (x )- im * x * cos (x )
 (1/3) * x ^ 3 

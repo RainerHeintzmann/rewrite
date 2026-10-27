@@ -2,6 +2,7 @@
 # A rule set (ALG) is a list of rules left = right; PAT declares the pattern
 # variables, NUMPAT those that only match numbers.
 INC "inc/all"
+SYM a, b : real
 
 FUNC fib : real >> real
 NUMPAT Nf : real

@@ -67,16 +67,6 @@ static Node * deref (Node * t)		/* follow Term symbols to their term */
 	return t;
 }
 
-/* 2026: in exact mode (inc/exact) pi stays a symbol in terms, as Pi in
- * Mathematica; its value is still used for numerical calculations */
-int symbolic_constant (Symbol * s)
-{
-	static Symbol * pi = NULL;
-	static int looked = 0;
-	if (! looked || ! pi) { pi = find_symbol("pi"); looked = 1; }
-	return s && s == pi && exact_numbers();
-}
-
 static Symbol * num_sym (Node * t)	/* symbol of a real number, or NULL */
 {
 	Symbol * s;
@@ -248,6 +238,25 @@ static const char * role_of (Symbol * f)
 static Symbol * role_find (const char * role)	/* symbol of a role or NULL */
 {
 	return find_symbol(role_symbol_name(role));
+}
+
+/* 2026: in exact mode (inc/exact) the constants of the roles "pi" and "im"
+ * stay symbols in terms, as Pi and I in Mathematica; their values are still
+ * used for numerical calculations. Asked very often: the symbols are kept
+ * until the roles change (or while one is not declared yet). Compared by
+ * name: a pattern variable bound to pi carries a copy of its header. */
+int symbolic_constant (Symbol * s)
+{
+	static Symbol * pi = NULL, * im = NULL;
+	static int gen = 0;
+	if (! s || ! exact_numbers()) return 0;
+	if (gen != role_generation || ! pi || ! im)
+		{
+		pi = role_find("pi");
+		im = role_find("im");
+		gen = role_generation;
+		}
+	return (pi && name(s) == name(pi)) || (im && name(s) == name(im));
 }
 
 static int is_imag_unit (Node * t);
@@ -437,7 +446,10 @@ static Node * tcpy (Node * t)
 	Symbol * ns;
 	t = deref(t);
 	if (! t) return NULL;
-	if ((ns = num_sym(t)) != NULL)		/* number: clone it, keep its sort */
+	/* a number of any sort (also complex or bool): clone it, keep its sort;
+	   delete frees every number, so a copy must not share one */
+	ns = t->type == Const ? (Symbol *) t->l : t->type == SYM_TYPE ? (Symbol *) t : NULL;
+	if (number_symbol(ns))
 		return mknod(Const, (Node *) mknum(CPYNUM(ns, value(ns)), rtypes(ns)), NULL);
 	if (t->type == SYM_TYPE) return t;
 	if (t->type == Const) return mknod(Const, t->l, NULL);
@@ -468,9 +480,10 @@ static Node * real_copy (Node * t)
 	return mknod(Terms, l, r);
 }
 
-/* real numbers with an integer value next to an exact number become exact
- * integers: the 1 of a rule loaded before inc/exact is a real number, and
- * (1/2)*1.0 would be 0.5 instead of 1/2. Changes the arguments of t. */
+/* real numbers with an integer value next to an exact number (or pi, im)
+ * become exact integers: the 1 of a rule loaded before inc/exact is a real
+ * number, and (1/2)*1.0 would be 0.5 instead of 1/2, 1.0*im the number
+ * (0,1) instead of im. Changes the arguments of t. */
 void exact_integers (Node * t)
 {
 	Node ** slot;
@@ -480,7 +493,7 @@ void exact_integers (Node * t)
 	if (! t || t->type != Func || ! exact_numbers()) return;
 	n = term_nargs(t);
 	for (k = 0; k < n; k++)
-		if (is_exact(arg(t, k))) exact = 1;
+		if (is_exact(arg(t, k)) || symbolic_constant(atom_sym(arg(t, k)))) exact = 1;
 	if (! exact) return;
 	slot = & t->r;
 	for (k = 0; k < n; k++)
@@ -3051,19 +3064,12 @@ static Node * s_normalq (Node * a[], int n, Symbol * f)
  * is transcendental, so a hit is no accident. Conditions and a value
  * printed on its own are still calculated numerically. */
 
-static int is_pi (Node * t)
-{
-	Symbol * s = role_find("pi");
-	t = deref(t);
-	return s && t && atom_sym(t) == s;
-}
-
-static int exactish (Node * t)		/* exact numbers and pi, combined by numeric functions */
+static int exactish (Node * t)		/* exact numbers, pi and im, combined by numeric functions */
 {
 	int i, n;
 	t = deref(t);
 	if (! t) return 0;
-	if (is_exact(t) || is_pi(t)) return 1;
+	if (is_exact(t) || symbolic_constant(atom_sym(t))) return 1;
 	if (t->type != Func || builtin(TERM_HEAD(t)) || ! hasval(TERM_HEAD(t))) return 0;
 	n = term_nargs(t);
 	for (i = 0; i < n; i++)

@@ -2,6 +2,7 @@
 # identity, det, linsolve, inverse with Bareiss' fraction-free elimination,
 # and arithmetic on lists element by element (thread, Listable).
 INC "inc/all"
+SYM a, b, n : real
 FUNC never : real >> real
 ALG raw
 SPEC raw : never(X) = X

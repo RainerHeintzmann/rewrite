@@ -11,6 +11,7 @@
 
 # assign datafile for crytal data:
 
+SYM a, b : real
 DATA "LiNbO3/struct"
 
 # SYM h,k,l : real
@@ -147,9 +148,9 @@ FOR a=1 TO ThisAtoms DO {    # read position of atoms
 DATA c1; DATA c2; DATA c3
 Coord= [ c1,c2,c3 ]          # coord system is orthohexagonal
 
-Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p1))) # Calculate structure factor out of
-Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p2))) # form-factors. Add up for every
-Fg = Fg + fb*exp(-i*2*pi*(Indices*(Coord+p3))) # atom in unit cell.
+Fg = Fg + fb*exp(-im*2*pi*(Indices*(Coord+p1))) # Calculate structure factor out of
+Fg = Fg + fb*exp(-im*2*pi*(Indices*(Coord+p2))) # form-factors. Add up for every
+Fg = Fg + fb*exp(-im*2*pi*(Indices*(Coord+p3))) # atom in unit cell.
 }                             # end of for a
 
 }                             # end of for atom (counting the kinds of atoms)
