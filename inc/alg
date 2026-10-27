@@ -626,7 +626,7 @@ ADDSPEC     integr :                 I(_A,_B,_X,_X)      = .5*(_B^2+(-(_A^2)))
 # +++++++++++ Algebra for *, - standard +++++++++++++++++++++++++++++++++++++++
 ALG Combine1
 SPEC        Combine1 : mi _X *mi _Y = mi (_X*_Y)
-ADDSPEC     Combine1 : mi _X * _Y = _Y * mi _X
+# mi _X * _Y = _Y * mi _X: in inc/helpers (its condition needs matchq)
 ADDSPEC     Combine1 : mi mi _X  = _X
 ADDSPEC     Combine1 : (- _X) * _Y = -(_X*_Y)
 ADDSPEC     Combine1 : _X *(- _Y) = -(_X*_Y)

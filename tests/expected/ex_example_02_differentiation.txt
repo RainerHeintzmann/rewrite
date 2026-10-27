@@ -8,4 +8,4 @@ cos (x )/ sin (x )
 ---- D(f,x) does not assume that other symbols are constant (D(y,x) stays);
 ---- deriv(f,x) does: a partial derivative
 3 * y ^ 2 + x ^ 2 
-kk * cos (kk * x )+ 2 * kk * x 
+2 * kk * x + kk * cos (kk * x )

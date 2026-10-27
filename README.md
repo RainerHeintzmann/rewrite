@@ -1299,6 +1299,13 @@ where the library [inc/](inc) and the tests are used from.
   and `deriv(Tay(...))` is right (it was 0). A polynomial in one variable is
   printed in ascending powers, `1 - (1/2) * x ^ 2 + (1/24) * x ^ 4`
   (descending if that avoids a leading minus: `x - 1`).
+- Derivatives: `D` of a term without a variable (`5^(1/2)`, `constq`) is 0
+  at once, and `0*u`, `u+0` are removed during differentiation, also for
+  terms of the sort `number` (Rubi's results), which the rules of `Ring` do
+  not see. `REWR D(Int(1/(1+x^5),x),x) : All` took 100000 steps (80 s; the
+  intermediate term had 1800 summands), now 4200 steps (1 s). Fixed: the
+  rule `mi(a)*b = b*mi(a)` of `Combine1` swapped `mi(a)*mi(b)` back and
+  forth until the step limit.
 - `cancel` reduces roots of numbers (`(2^(1/2))^2 = 2`, also between
   `2^(1/2)` and `2^(-1/2)`), combines denominators equal up to a constant
   factor, normalizes its argument first (the raw result of `deriv`), and

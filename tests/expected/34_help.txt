@@ -42,7 +42,7 @@ SORT real : with values (computed in C)
   narrower sorts: rational, nonneg
   symbols (SYM): Xre, e, infinity, kk, maxreal, minreal, nothing, pi, x, y, z; 14 internal (_name)
   terms (TERM): num; 1 internal (_name)
-  pattern variables (PAT): 20 internal (_name)
+  pattern variables (PAT): 21 internal (_name)
   functions with this result: !, *, +, -, /, D, Dn, Dp, Dpn, Gamma, I, Im, ... (148); 2 internal (_name)
 no help on nosuchname (? alone lists the names)
 my own help

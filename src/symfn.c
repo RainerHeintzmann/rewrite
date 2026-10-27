@@ -1074,6 +1074,31 @@ static Node * s_freeq (Node * a[], int n, Symbol * f)
 	return mk_bool(! contains(a[0], a[1]), f);
 }
 
+/* u contains no variable: only numbers, symbols with a value, and the
+ * constants pi, im (5^(1/2), ((5/2) - (1/2)*5^(1/2))^(1/2)); D(u,x) = 0 */
+static int is_constant (Node * u)
+{
+	Symbol * s;
+	int i, n;
+	u = deref(u);
+	if (! u || num_sym(u)) return 1;
+	if (u->type == Func)
+		{
+		n = term_nargs(u);
+		for (i = 0; i < n; i++)
+			if (! is_constant(arg(u, i))) return 0;
+		return 1;
+		}
+	s = atom_sym(u);
+	return s && (hasval(s) || symbolic_constant(s));
+}
+
+static Node * s_constq (Node * a[], int n, Symbol * f)
+{
+	if (n != 1) return NULL;
+	return mk_bool(is_constant(a[0]), f);
+}
+
 static Node * s_integerq (Node * a[], int n, Symbol * f)
 {
 	int i; double v;
@@ -5412,6 +5437,7 @@ int rules_fn_users (Symbol * alg, Symbol * out[], int max)
 
 static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "freeq",           s_freeq },
+	{ "constq",          s_constq },
 	{ "integerq",        s_integerq },
 	{ "integersq",       s_integerq },
 	{ "rationalq",       s_rationalq },

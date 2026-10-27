@@ -7,6 +7,7 @@
 
 # ---- Predicates (result true/false, for conditions) ----
 FUNC freeq     : real,real >> bool        ATT SYMBOLIC freeq      # x does not occur in u
+FUNC constq    : real >> bool             ATT SYMBOLIC constq     # no variable in u (numbers, pi, 5^(1/2))
 FUNC integerq  : real >> bool             ATT SYMBOLIC integerq   # u is an integer
 FUNC integersq : real++ >> bool           ATT SYMBOLIC integersq  # all are integers
 FUNC rationalq : real++ >> bool           ATT SYMBOLIC rationalq  # all are numbers
@@ -122,6 +123,7 @@ FUNC falseq : real >> bool               ATT SYMBOLIC falseq       # Rubi: False
 # 2026: the variants for the sort number (inc/alg), e.g. for terms with the
 # imaginary unit im of inc/integration/base; the same C functions
 OTHER freeq             : number,number >> bool ATT SYMBOLIC freeq
+OTHER constq            : number >> bool ATT SYMBOLIC constq
 OTHER integerq          : number >> bool ATT SYMBOLIC integerq
 OTHER integersq         : number++ >> bool ATT SYMBOLIC integersq
 OTHER rationalq         : number++ >> bool ATT SYMBOLIC rationalq
@@ -216,6 +218,25 @@ OTHER functionofq       : number++ >> bool ATT SYMBOLIC functionofq
 OTHER substfor          : number++ >> number ATT SYMBOLIC substfor
 OTHER derivdivides      : number,number,number >> number ATT SYMBOLIC derivdivides
 OTHER falseq            : number >> bool ATT SYMBOLIC falseq
+
+# the derivative of a constant (no variable in it, as 5^(1/2)) is 0 at once,
+# and the zeros go at once: else the rules for products and powers copy the
+# summands 0*.. (in the derivative of Int(1/(1+x^5),x) 1800 of them), and
+# All only removed them at the end. The rules of Ring do not see these terms:
+# they are of the sort number (the variants of Rubi's results)
+NUMPAT _Dz : number
+ADDSPEC diff : IF (constq(_Xnu)) D(_Xnu,_Znu) = 0
+ADDSPEC diff : IF (_Dz == 0) _Dz * _Xnu = _Dz
+ADDSPEC diff : IF (_Dz == 0) _Xnu * _Dz = _Dz
+ADDSPEC diff : IF (_Dz == 0) _Dz + _Xnu = _Xnu
+ADDSPEC diff : IF (_Dz == 0) _Xnu + _Dz = _Xnu
+ADDSPEC diff : IF (_Dz == 0) - _Dz = _Dz
+
+# Combine1 of inc/alg: the inverses to the right, mi(a)*b = b*mi(a), but not
+# if b is an inverse too: mi(5)*mi(r) and mi(r)*mi(5) were swapped back and
+# forth until the step limit (the rule mi(a)*mi(b) = mi(a*b) combines them)
+PAT _Cm : real
+ADDSPEC Combine1 : IF (not(matchq(_Y, mi(_Cm)))) mi _X * _Y = _Y * mi _X
 
 # Taylor polynomial Tay(u,x,a,n), the rules Taylor (in All): the sum of
 # u^(k)(a)/k! (x-a)^k for k = 0..n, each derivative taken from the one
