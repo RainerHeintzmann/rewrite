@@ -5,7 +5,7 @@
 %token BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT
 %token   RETURN
 %token OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS MAXSTEPS MAXDEPTH SYMBOLIC
-%token   HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS
+%token   HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS AUTOSYM
 %token <y_sym> Id String
 %token <y_sym> Sort Alg Term
 %token <y_sym> La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -132,6 +132,7 @@ aninstruction :
         | Term EQ term
         | Term EQ REWR term ':' alglist
         | Const EQ term
+        | Id EQ term
         | EXE func Id
         | LIFT '(' termlist ')' TO '(' termlist ')'
         | DBG Const
@@ -139,6 +140,8 @@ aninstruction :
         | MAXSTEPS
         | MAXDEPTH Const
         | MAXDEPTH
+        | AUTOSYM Sort
+        | AUTOSYM
         | STEPS Alg String
         | SYMBOLIC String EQ String
         | SYMBOLIC
@@ -193,6 +196,8 @@ term : Term
         | Const
         | Const Bra1 termlist Bra2
         | Var
+        | Id
+        | Id '(' termlist ')'
         | '(' term ')'
         | term Ru
         | Func term

@@ -38,10 +38,37 @@ static void mp_free (MPoly * p)
 	p->n = p->cap = 0;
 }
 
+/* r^(1/q) for an exact number r > 0 and an integer q >= 2: an atom whose
+ * q-th power is the number r */
+static int radical_atom (Node * t, double * r, int * q)
+{
+	double e;
+	t = deref(t);
+	if (! is_head(t, "^", 2) || ! is_exact(arg(t, 0)) || ! is_num(arg(t, 0), r) || * r <= 0
+	    || ! num_value(arg(t, 1), & e) || ! num_value_exact(arg(t, 1)) || e <= 0 || e >= 1)
+		return 0;
+	* q = (int) floor(1 / e + 0.5);
+	return * q >= 2 && fabs(1.0 / * q - e) < 1e-12;
+}
+
+static void mono_radicals (Mono * m)	/* (2^(1/2))^3 = 2 * 2^(1/2) */
+{
+	int i, q, k;
+	double r;
+	for (i = 0; i < m->nf; i++)
+		if (m->f[i].e >= 2 && m->f[i].e == floor(m->f[i].e) && radical_atom(m->f[i].base, & r, & q))
+			{
+			k = (int) m->f[i].e / q;
+			m->c *= pow(r, k);
+			m->f[i].e -= k * q;
+			}
+}
+
 static void mono_sort (Mono * m)	/* bases in the order of tcmp, no x^0 */
 {
 	int i, j, k = 0;
 	mono_imag(m);			/* im^2 = -1 */
+	mono_radicals(m);		/* (2^(1/2))^2 = 2 */
 	for (i = 0; i < m->nf; i++)
 		if (m->f[i].e != 0) m->f[k++] = m->f[i];
 		else delete(m->f[i].base);
@@ -226,10 +253,17 @@ static MPoly mp_from (Node * t)
 		o.exact = m.exact;
 		for (k = 0; k < m.nf; k++)
 			{
-			double e = m.f[k].e;
-			if (e > 0 && e == floor(e))
+			double e = m.f[k].e, r, p, q;
+			if (m.f[k].exact && is_exact(m.f[k].base) && is_num(m.f[k].base, & r) && r > 0
+			    && rat_approx(e, & p, & q) && q <= 64)
+				{			/* 2^2 = 4, 2^(-1/2) = (1/2)*(2^(1/2)): one atom per root */
+				o.c *= pow(r, floor(e));
+				if (q >= 2)
+					mono_put(& o, mk_pow(tcpy(m.f[k].base), mk_num_ex(1 / q, 1)), (e - floor(e)) * q);
+				}
+			else if (e > 0 && e == floor(e))
 				mono_put(& o, tcpy(m.f[k].base), e);
-			else				/* a^(-1), 2^(1/2): an atom */
+			else				/* a^(-1), x^(1/2): an atom */
 				mono_put(& o, mk_pow(tcpy(m.f[k].base), mk_num_ex(e, m.f[k].exact)), 1);
 			}
 		free(m.f);			/* the bases belong to the summands */
@@ -246,6 +280,60 @@ static Node * mp_term (MPoly * p)
 	int i;
 	for (i = 0; i < p->n; i++) tl_add(& l, mono_build(& p->m[i]));
 	return tl_collect(& l);
+}
+
+/* the order of the monomials without their roots of numbers (radical_atom) */
+static int mono_core_cmp (Mono * a, Mono * b)
+{
+	Mono ca = { 1.0, NULL, 0, 0, 1 }, cb = ca;
+	double r;
+	int i, q, c;
+	ca.f = (Fac *) malloc((a->nf + 1) * sizeof(Fac));
+	cb.f = (Fac *) malloc((b->nf + 1) * sizeof(Fac));
+	if (! ca.f || ! cb.f) fatal("symmat : no room");
+	for (i = 0; i < a->nf; i++) if (! radical_atom(a->f[i].base, & r, & q)) ca.f[ca.nf++] = a->f[i];
+	for (i = 0; i < b->nf; i++) if (! radical_atom(b->f[i].base, & r, & q)) cb.f[cb.nf++] = b->f[i];
+	c = mono_cmp(& ca, & cb);
+	free(ca.f);			/* the bases belong to a and b */
+	free(cb.f);
+	return c;
+}
+
+/* b = k * b' with b' normalized: the leading coefficient of b' (the roots
+ * of numbers left out of the order) is 1, so that 2 + 2*2^(1/2)*x + 2*x^2 and
+ * 2^(1/2) + 2*x + 2^(1/2)*x^2 both give 1 + 2^(1/2)*x + x^2. b' (and *k), or
+ * NULL if the leading coefficient is no number times roots. */
+static Node * mp_canon (Node * b, Node ** k)
+{
+	MPoly p = mp_from(b), s = { NULL, 0, 0 };
+	Mono inv = { 1.0, NULL, 0, 0, 1 }, lead = inv;
+	double r;
+	int i, l = 0, q;
+	for (i = 1; i < p.n; i++)
+		if (mono_core_cmp(& p.m[i], & p.m[l]) > 0) l = i;
+	for (i = 0; i < p.n; i++)
+		if (i != l && mono_core_cmp(& p.m[i], & p.m[l]) == 0) break;
+	if (p.n < 2 || i < p.n || ! p.m[l].exact) { mp_free(& p); return NULL; }
+	inv.c = 1 / p.m[l].c;		/* 1/(c s^j) = s^(q-j)/(c r) */
+	lead.c = p.m[l].c;
+	for (i = 0; i < p.m[l].nf; i++)
+		if (radical_atom(p.m[l].f[i].base, & r, & q))
+			{
+			mono_put(& inv, tcpy(p.m[l].f[i].base), q - p.m[l].f[i].e);
+			inv.c /= r;
+			mono_put(& lead, tcpy(p.m[l].f[i].base), p.m[l].f[i].e);
+			}
+	for (i = 0; i < p.n; i++) mp_add_mono(& s, mono_mul(& p.m[i], & inv));
+	for (i = 1; i < s.n; i++)	/* a fixed order, so that equal ones are equal terms */
+		for (l = i; l > 0 && mono_cmp(& s.m[l-1], & s.m[l]) < 0; l--)
+			{ Mono h = s.m[l]; s.m[l] = s.m[l-1]; s.m[l-1] = h; }
+	* k = mono_build(& lead);
+	mono_free(& inv);
+	mono_free(& lead);
+	mp_free(& p);
+	b = mp_term(& s);
+	mp_free(& s);
+	return b;
 }
 
 static Node * nice (Node * t)		/* a result entry in normal form (takes t) */
@@ -755,8 +843,12 @@ static void mp_cancel (MPoly * nu, MPoly * de)
 	Node * v = mp_single_atom(nu, de);
 	double g = 0;
 	int s, i, exact = 1;
-	for (s = 0; s < 2; s++)
-		for (i = 0; i < ps[s]->n; i++) exact &= ps[s]->m[i].exact;
+	for (s = 0; s < 2; s++)		/* exact, or real numbers that are fractions (the 1.0 of a rule) */
+		for (i = 0; i < ps[s]->n; i++)
+			{
+			double p, q;
+			exact &= ps[s]->m[i].exact || rat_approx(ps[s]->m[i].c, & p, & q);
+			}
 	if (exact && nu->n > 0 && de->n > 0)	/* exact: the gcd in all atoms */
 		{
 		MPoly gp = mp_gcd(nu, de), q1, q2;

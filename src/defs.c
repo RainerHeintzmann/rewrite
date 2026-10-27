@@ -423,24 +423,51 @@ Node * alist = SPEC_LIST(np);
 SPEC_LIST(np) = NULL;
 }
 
+/* 2026: the number of rules of each rule set (TYPEOF alg): in the merged
+ * tree they cannot be counted */
+#define MAXALGCOUNT 512
+static struct { Symbol * alg; int n; } algcount[MAXALGCOUNT];
+static int nalgcount = 0;
+
+static int * alg_count_slot (Symbol * alg)
+{
+	int i;
+	for (i = 0; i < nalgcount; i++)
+		if (algcount[i].alg == alg) return & algcount[i].n;
+	if (nalgcount == MAXALGCOUNT) return NULL;
+	algcount[nalgcount].alg = alg;
+	algcount[nalgcount].n = 0;
+	return & algcount[nalgcount++].n;
+}
+
+int alg_rule_count (Symbol * alg)
+{
+	int * n = alg_count_slot(alg);
+	return n ? * n : -1;
+}
+
 void a_spec_form (Node * np)
 {
 Symbol * sp = (Symbol *) SPEC_ALG(np);
 Node * flist = SPEC_LIST(np);
 Node * ap,* form,* toform;
+int * count = alg_count_slot(sp);
 	for (ap=(flist);ap != NULL;ap=ap->r)
 		{
 		form=FORM_LHS(ap->l);
 		toform=FORM_RES(ap->l);
 		atypes(sp)=add_rule(form,toform,atypes(sp)); /* in formula tree or rule list (expand.c) */
+		if (count) (* count)++;
 		}
 SPEC_LIST(np) = NULL;
 }
 
 void spec_form (Node * np)
 {
+	int * count = alg_count_slot((Symbol *) SPEC_ALG(np));
 	delete(atypes((Symbol *) SPEC_ALG(np)));
 	atypes((Symbol *) SPEC_ALG(np))=NULL;
+	if (count) * count = 0;
 	a_spec_form(np);
 }
 

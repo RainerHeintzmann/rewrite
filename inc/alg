@@ -582,8 +582,7 @@ ADDSPEC     diff : D(_Xnu^_Ynu,_Znu)=D(_Xnu,_Znu)*_Ynu*_Xnu^(_Ynu+(-1))+D(_Ynu,_
 
 ADDSPEC     diff : D(I(_A,_B,_C,_x),_Z)=Sub(_C,_x,_B)*D(_B,_Z)-Sub(_C,_x,_A)*D(_A,_Z)+I(_A,_B,D(_C,_Z),_x) # Leibnitz
 
-ADDSPEC     diff : Tay(_X,_Y,_Z,0) = Sub(_X,_Y,_Z)
-ADDSPEC     diff : Tay(_X,_Y,_Z,_N) = Tay(_X,_Y,_Z,_N-1)+Sub(Dn(_X,_Y,_N),_Y,_Z)*mi(_N!)*(_Y+(-_Z))^_N 
+# Tay(u,x,a,n), the Taylor polynomial: the rules Taylor of inc/helpers (they use deriv)
 
 # ++++++++++++++++++++++++ Substitution ++++++++++++++++++++++++++
 ALG Subst

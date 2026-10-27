@@ -70,6 +70,22 @@ void subsort_def (Node * np)		/* FUNC(subsort_def, PARAM(from, PARAM(to, conv)))
 	if (conv && sort_valued(from)) sort_valued(to) = TRUE;	/* values are converted into to */
 }
 
+/* 2026: the sorts directly wider (wider = 1) or narrower (0) than s, by
+ * SUBSORT (TYPEOF sort); their number */
+int sort_neighbours (Node * s, int wider, Node * out[], int max)
+{
+	int i, n = 0;
+	for (i = 0; i < nsub && n < max; i++)
+		if ((wider ? sub[i].from : sub[i].to) == s)
+			out[n++] = wider ? sub[i].to : sub[i].from;
+	return n;
+}
+
+Node * int_literal_sort (void)		/* INTNUM: the sort of 3, or NULL */
+{
+	return (Node *) intsort;
+}
+
 void intnum_def (Node * np)		/* FUNC(intnum_def, PARAM(sort, read function)) */
 {
 	Node * p = np->r;

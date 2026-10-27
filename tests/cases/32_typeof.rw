@@ -23,3 +23,14 @@ TYPEOF transpose([1,2]) * [3,4]
 TYPEOF pi
 TYPEOF sin
 TYPEOF transpose
+# rule sets and sorts (2026)
+ALG tq
+PAT Xq : real
+SPEC tq : Xq + 0 = Xq
+ADDSPEC tq : Xq * 1 = Xq
+TYPEOF tq
+ALG tl
+SPEC tl : tq, (tq, diff)
+TYPEOF tl
+TYPEOF tq
+TYPEOF positive

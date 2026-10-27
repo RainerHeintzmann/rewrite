@@ -16,6 +16,7 @@ extern void att_sort (Node * np);
 extern void spec (Node * np);
 extern void a_spec_form (Node * np);
 extern void spec_form (Node * np);
+extern int alg_rule_count (Symbol * alg);	/* 2026: rules added by SPEC/ADDSPEC, -1: unknown */
 extern void block_begin(void);
 extern void do_block_begin(Node * np);
 extern void block_end(void);

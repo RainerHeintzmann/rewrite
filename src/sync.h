@@ -44,6 +44,10 @@ extern void setdebug (Node * np);
 extern void maxsteps_fn (Node * np);
 extern void alias_fn (Node * np);
 extern void maxdepth_fn (Node * np);
+extern void autosym_fn (Node * sort);        /* 2026: AUTOSYM sort (NULL: off) */
+extern Symbol * auto_symbol (Symbol * sp);    /* a new name declared by AUTOSYM, or NULL */
+extern void unknown_function (Symbol * sp);   /* f(..) of an undeclared f: an error */
+extern Symbol * declaresym (Symbol * sp, Node * rtps, Node * atps, int lexv, int hasv);
 
 extern void numassign2 (Node * froass,Symbol * toass);
 

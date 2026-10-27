@@ -62,7 +62,7 @@ static Node * sym_att (Node * id, int hold);	/* below */
 %token			SYM PAT SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUMPAT ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA COMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS MAXSTEPS MAXDEPTH SYMBOLIC HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS MAXSTEPS MAXDEPTH SYMBOLIC HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS AUTOSYM
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -135,6 +135,8 @@ definition	: FUNC namedId ':' vsortlist PFEIL Sort	PRECEDENCE att {	$$=mknod(FUN
 			| SYM idlist ':' Sort			 {$$=DECLARE($2,Const,(Node *) $4,NULL,FALSE);}
 			| TYPEOF term			 {$$=mknod(FUNC,(Node *) typeof_fn,$2);}	/* 2026: the sort of a term */
 			| TYPEOF func			 {$$=mknod(FUNC,(Node *) typeof_func,(Node *) $2);}	/* 2026: the variants of a function */
+			| TYPEOF Alg			 {typeof_alg($2); $$=NULL;}	/* 2026: a rule set */
+			| TYPEOF Sort			 {typeof_sort($2); $$=NULL;}	/* 2026: a sort */
 			| HELP String String		 {$$=mknod(FUNC,(Node *) help_def,mknod(PARAM,(Node *) $2,(Node *) $3));}	/* 2026: help text */
 			| SPEC Alg ':' alglist	   {$$ = mknod(FUNC,(Node *) spec,mknod(PARAM,(Node *) $2,(Node *) $4));}
 			| SPEC Alg ':' formlist		 {$$ = mknod(FUNC,(Node *) spec_form,mknod(PARAM,(Node *) $2,$4));	}
@@ -259,6 +261,9 @@ aninstruction	: /* Nothing */ 	{$$=NULL;}
 			| Term EQ term				{$$=mknod(FUNC,(Node *) termassign,mknod(PARAM,(Node *) ($1),$3));}
 			| Term EQ REWR term ':' alglist	{$$=mknod(FUNC,(Node *) rewrite_ass_fn,mknod(PARAM,(Node *) $1,mknod(PARAM,(Node *) $4,(Node *) $6)));}
 			| Const EQ term			{ $$=mknod(FUNC,(Node *) numassign,mknod(PARAM,(Node *) ($1),(Node *) ($3)));}
+			| Id EQ term			{ Symbol * s = auto_symbol($1);	/* 2026: AUTOSYM */
+							  if (! s) YYERROR;
+							  $$=mknod(FUNC,(Node *) numassign,mknod(PARAM,(Node *) s,(Node *) ($3)));}
 			| EXE func Id 			{$$ = NULL;
 																exe_always($2)=TRUE;
 																hasval($2) = TRUE;
@@ -270,6 +275,8 @@ aninstruction	: /* Nothing */ 	{$$=NULL;}
 			| MAXSTEPS			{$$=mknod(FUNC,(Node *) maxsteps_fn,NULL);}
 			| MAXDEPTH Const		{$$=mknod(FUNC,(Node *) maxdepth_fn,(Node *) ($2));}
 			| MAXDEPTH			{$$=mknod(FUNC,(Node *) maxdepth_fn,NULL);}
+			| AUTOSYM Sort			{autosym_fn((Node *) $2); $$=NULL;}	/* 2026: at once, for the next lines */
+			| AUTOSYM			{autosym_fn(NULL); $$=NULL;}
 			| STEPS Alg String		{$$=mknod(FUNC,(Node *) steps_fn,mknod(PARAM,(Node *) $2,(Node *) $3));} /* 2026 */
 			| SYMBOLIC String EQ String	{$$=mknod(FUNC,(Node *) role_fn,mknod(PARAM,(Node *) $2,(Node *) $4));} /* 2026: role */
 			| SYMBOLIC			{$$=mknod(FUNC,(Node *) role_fn,NULL);  /* delete roles */}
@@ -328,6 +335,10 @@ term		: Term							{	$$ = (Node *) $1; /* tcopy(); does not remember dependencie
 			| Const	Bra1 termlist Bra2 {np_aux=mknod(Terms,mknod(Const,(Node *) ($1),NULL),$3);
 														 $$ = mknod(Func,(Node *) getsymbol(($2),np_aux), np_aux);} 
 			| Var				      		{$$ = (Node *) $1;}
+			| Id				{ Symbol * s = auto_symbol($1);	/* 2026: AUTOSYM */
+							  if (! s) YYERROR;
+							  $$ = mknod(Const,(Node *) s,NULL);}
+			| Id '(' termlist ')'		{ unknown_function($1); YYERROR; }
 			| '(' term ')'		    {$$ = $2;}
 			| term Ru				      {$$ = mknod(Func,(Node *) getsymbol(($2),($1)), ($1) ); }
 			| Func term				    {$$ = mknod(Func,(Node *) getsymbol(($1),($2)), ($2) ); }

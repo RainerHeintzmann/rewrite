@@ -3,5 +3,9 @@ INC "inc/all"
 INC "does/not/exist"
 1 +
 undefinedfunc(3)
-x = qq
+# a new name: declared with a note (AUTOSYM real of inc/all), or an error
+qq + 1
+AUTOSYM
+x = qr
+AUTOSYM real
 "still running"

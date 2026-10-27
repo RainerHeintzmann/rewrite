@@ -29,6 +29,7 @@ static const Reserved words [] = {	/* sorted */
 	{ "ALG",    ALG },
 	{ "ALIAS",  ALIAS },    /* ALIAS "×" = "*": another name of a symbol (2026) */
 	{ "ATT",    ATT },
+	{ "AUTOSYM", AUTOSYM }, /* AUTOSYM real: new names are declared (2026) */
 	{ "BRA",    BRA },
 	{ "COMM",   COMM },     /* commutative functions (2026) */
 	{ "DATA",   DATA },  /* reading data files */
@@ -184,6 +185,20 @@ Symbol * find_symbol (const char * name)
 	name(& s) = (char *) name;
 	pp = (Symbol **) tfind(& s, (const void * const *) & root, scmp);
 	return pp ? * pp : (Symbol *) NULL;
+}
+
+/* 2026: fn for every name in the symbol table (TYPEOF of a sort or rule set) */
+static void (* walk_fn) (Symbol *);
+
+static void walk_visit (void ** node, VISIT which, int depth)
+{
+	if (which == postorder || which == leaf) walk_fn(* (Symbol **) node);
+}
+
+void for_all_symbols (void (* fn) (Symbol *))
+{
+	walk_fn = fn;
+	twalk(root, walk_visit);
 }
 
 void focus (Symbol * sp)

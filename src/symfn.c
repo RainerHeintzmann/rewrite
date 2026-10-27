@@ -57,6 +57,7 @@
 #include "exact.h"
 #include "apart.h"	/* partial fractions */
 #include "listmatch.h"	/* matchq */
+#include "help.h"	/* alglist_has */
 
 /* ================= basic term helpers ================= */
 
@@ -848,7 +849,11 @@ static void mono_flatten (Node * t, Mono * m)	/* t is a product */
 	t = deref(t);
 	int num;
 	num = num_value(t, & v);	/* 3^(1/2) is a factor, not the number 1.73205 */
-	if (num) { m->c *= v; if (! num_value_exact(t)) m->exact = 0; }
+	if (num)			/* the real 2 of a rule (mi(2*sqrt(u))) counts as exact */
+		{
+		m->c *= v;
+		if (! num_value_exact(t) && ! (v == floor(v) && fabs(v) < 1e15 && exact_numbers())) m->exact = 0;
+		}
 	else if (is_head(t, "*", 2)) { mono_flatten(arg(t, 0), m); mono_flatten(arg(t, 1), m); }
 	else if (is_head(t, "-", 1)) { m->c = -m->c; mono_flatten(arg(t, 0), m); }
 	else if (is_head(t, "^", 2) && num_value(arg(t, 1), & e))
@@ -2948,6 +2953,53 @@ static Node * nf_unsigned (Node * u, int * neg)
 	return den ? mk_f2("/", num, den) : num;
 }
 
+/* t = c * b^k with a number c and an integer k >= 0: *deg = k; the base b
+ * must be *base (set by the first summand with k > 0) */
+static int poly_summand (Node * t, Node ** base, double * deg)
+{
+	TList fl = {0};
+	Node * b = NULL;
+	double k = 0, e;
+	int i, ok = 1;
+	t = deref(t);
+	if (is_head(t, "-", 1)) return poly_summand(arg(t, 0), base, deg);
+	factors_to(t, & fl);
+	for (i = 0; i < fl.n && ok; i++)
+		{
+		Node * f = deref(fl.t[i]);
+		if (num_sym(f)) continue;
+		if (b) ok = 0;
+		else if (is_head(f, "^", 2) && is_num(arg(f, 1), & e) && e >= 1 && e == floor(e)) { b = arg(f, 0); k = e; }
+		else { b = f; k = 1; }
+		}
+	free(fl.t);
+	if (! ok || (b && * base && ! tequal(b, * base))) return 0;
+	if (b && ! * base) * base = b;
+	* deg = k;
+	return 1;
+}
+
+/* a polynomial in one base with numbers as coefficients: its summands in
+ * ascending powers (1 - x^2/2 + x^4/24); 0 for other sums */
+static int poly_order (TList * l)
+{
+	Node * base = NULL;
+	double deg[256];
+	int i, j;
+	if (l->n < 2 || l->n > 256) return 0;
+	for (i = 0; i < l->n; i++)
+		if (! poly_summand(l->t[i], & base, & deg[i])) return 0;
+	if (! base) return 0;
+	for (i = 1; i < l->n; i++)
+		for (j = i; j > 0 && deg[j-1] > deg[j]; j--)
+			{
+			Node * h = l->t[j]; double d = deg[j];
+			l->t[j] = l->t[j-1]; deg[j] = deg[j-1];
+			l->t[j-1] = h; deg[j-1] = d;
+			}
+	return 1;
+}
+
 static Node * nf_pretty (Node * u)
 {
 	double e, v;
@@ -2959,6 +3011,21 @@ static Node * nf_pretty (Node * u)
 		Node * r = NULL;
 		int i, neg;
 		summands_to(u, & l, 0);
+		if (poly_order(& l))	/* a polynomial: signs in place; descending if */
+			{		/* ascending would begin with "-" (x - 1, not -1 + x) */
+			int first, last, rev;
+			Node * s;
+			delete(nf_unsigned(l.t[0], & first));
+			delete(nf_unsigned(l.t[l.n - 1], & last));
+			rev = first && ! last;
+			for (i = 0; i < l.n; i++)
+				{
+				s = nf_unsigned(l.t[rev ? l.n - 1 - i : i], & neg);
+				r = ! r ? (neg ? mk_f1("-", s) : s) : mk_f2(neg ? "-" : "+", r, s);
+				}
+			tl_free(& l);
+			return r;
+			}
 		for (i = 0; i < l.n; i++)		/* positive summands first */
 			{
 			Node * s = nf_unsigned(l.t[i], & neg);
@@ -5279,6 +5346,7 @@ static Node * s_sysnorm (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static struct { Symbol * f; Node * algs; int active; } rulefn[MAXRULEFN];
 static int nrulefn = 0;
 
+
 void rules_fn_register (Symbol * f, Node * algs)
 {
 	int i;
@@ -5326,6 +5394,20 @@ static Node * s_rules (Node * a[], int n, Symbol * f)
 s_function * rules_sfn (void)
 {
 	return s_rules;
+}
+
+/* the functions defined with the rule set alg (ATT RULES ...), into out */
+int rules_fn_users (Symbol * alg, Symbol * out[], int max)
+{
+	int k, i, n = 0;
+	for (k = 0; k < nrulefn && n < max; k++)
+		if (alglist_has(rulefn[k].algs, alg))
+			{
+			for (i = 0; i < n && strcmp(name(out[i]), name(rulefn[k].f)); i++)
+				;
+			if (i == n) out[n++] = rulefn[k].f;	/* each name once (FUNC, OTHER) */
+			}
+	return n;
 }
 
 static struct { const char * name; s_function * fn; } symfunction[] = {

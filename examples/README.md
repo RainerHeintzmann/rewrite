@@ -27,6 +27,7 @@ it to see the input. `?name` explains a keyword or function.
 | [12_fourier.rw](12_fourier.rw) | Fourier transforms and their inverses: table, integral, theorems, duality |
 | [13_ode.rw](13_ode.rw) | ordinary differential equations: a solution checked, characteristic equation, integrating factor, separation of variables, an initial value problem (Laplace), Picard iteration, Runge-Kutta |
 | [14_pde.rw](14_pde.rw) | partial differential equations: wave, heat and Laplace equation, separation of variables, heat and transport equation with the Fourier transform |
+| [15_series.rw](15_series.rw) | Taylor polynomials around 0 and another point, of a product, the error, the derivative |
 
 The tests run them as well (`tests/cases/ex_example_*.rw`), so they stay
 correct.

@@ -21,6 +21,6 @@ y' + y/x = x^2
 1 / (1 + s ^ 2 )^ 2 
 (1/2) * sin (t )- (1/2) * t * cos (t )
 ---- Picard iteration for y' = y, y(0) = 1: y_(k+1) = 1 + Int(y_k, 0..x)
-1 + (1/2) * x ^ 2 + (1/24) * x ^ 4 + (1/6) * x ^ 3 + x 
+1 + x + (1/2) * x ^ 2 + (1/6) * x ^ 3 + (1/24) * x ^ 4 
 ---- numerically: Runge-Kutta (order 4) for y' = 1 + y^2, y(0) = 0, up to x = 1
 1.557406443 1.557407725 

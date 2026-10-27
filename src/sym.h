@@ -103,6 +103,7 @@ struct Symbol{            /* CAUTION: instances in node.c and sync.c */
 int lookup _1p (const char *);		/* returns the yylex() value */
 void lookup_string (const char * name);	/* 2026: the symbol of a string, also of a keyword text */
 Symbol * find_symbol (const char * name);
+void for_all_symbols (void (* fn) (Symbol *));	/* 2026: fn for every name */
 void alias_def (const char * from, const char * to);	/* 2026: ALIAS "from" = "to" */  /* 2026: look up a symbol, NULL if unknown */
 void focus (Symbol * sp);
 void restore _1p (Node *);

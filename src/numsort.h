@@ -26,6 +26,8 @@
 #include "sym.h"
 
 void subsort_def (Node * np);			/* SUBSORT statement */
+int sort_neighbours (Node * s, int wider, Node * out[], int max);	/* direct wider/narrower sorts */
+Node * int_literal_sort (void);			/* INTNUM: the sort of 3, or NULL */
 void intnum_def (Node * np);			/* INTNUM statement */
 
 /* steps from sort 'from' up to sort 'to' (0: same sort), -1 if 'to' is not

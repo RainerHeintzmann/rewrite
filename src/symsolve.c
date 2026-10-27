@@ -116,14 +116,83 @@ static Node * eqnorm_den (Node * f, Node * x, Node ** den_out)
 	return r;
 }
 
+/* the denominators b^-e of a product t as k^-e b'^-e (mp_canon), so that
+ * denominators equal up to a constant factor become equal (takes t) */
+static Node * canon_dens (Node * t)
+{
+	TList fl = {0};
+	Node * r = NULL, * u, * b, * k;
+	double e;
+	int j;
+	factors_to(t, & fl);
+	for (j = 0; j < fl.n; j++)
+		{
+		u = deref(fl.t[j]);
+		if (is_head(u, "^", 2) && num_value(arg(u, 1), & e) && e < 0 && e == floor(e)
+		    && ! num_sym(arg(u, 0)) && (b = mp_canon(arg(u, 0), & k)) != NULL)
+			u = mk_mul(mk_pow(k, mk_int(e)), mk_pow(b, mk_int(e)));
+		else
+			u = tcpy(u);
+		r = r ? mk_mul(r, u) : u;
+		}
+	free(fl.t);
+	delete(t);
+	return r ? r : mk_int(1);
+}
+
+/* the number of summands of the common denominator of the summands l,
+ * multiplied out (an upper bound) */
+static double den_size (TList * l)
+{
+	Node * den[64];
+	double size = 1, e;
+	int nd = 0, i, j, k;
+	for (i = 0; i < l->n; i++)
+		{
+		TList fl = {0};
+		factors_to(l->t[i], & fl);
+		for (j = 0; j < fl.n; j++)
+			{
+			Node * t = deref(fl.t[j]);
+			if (is_head(t, "^", 2) && num_value(arg(t, 1), & e) && e < 0 && ! num_sym(arg(t, 0)))
+				{
+				for (k = 0; k < nd && ! tequal(den[k], arg(t, 0)); k++)
+					;
+				if (k == nd && nd < 64)
+					{
+					TList sl = {0};
+					den[nd++] = arg(t, 0);
+					expand_to(arg(t, 0), & sl);
+					size *= pow(sl.n, -e);
+					tl_free(& sl);
+					}
+				}
+			}
+		free(fl.t);
+		}
+	return size;
+}
+
 /* ---- cancel(u): u as N/D over a common denominator, the polynomial gcd
- * of N and D cancelled (symmat.c: mp_gcd) ---- */
+ * of N and D cancelled (symmat.c: mp_gcd); unevaluated if the common
+ * denominator would be too large (nested roots, as in Int(1/(1+x^5),x)) ---- */
 static Node * s_cancel (Node * a[], int n, Symbol * f)
 {
-	Node * d, * nu = NULL;
+	Node * d, * nu = NULL, * u = NULL;
+	TList l = {0};
 	MPoly pn, pd;
+	int i;
 	if (n != 1) return NULL;
-	nu = eqnorm_den(a[0], NULL, & d);
+	u = s_normform(a, 1, NULL);		/* deriv leaves 0*u, 1*u, mi(u) */
+	expand_to(u, & l);
+	delete(u);
+	u = NULL;
+	for (i = 0; i < l.n; i++) l.t[i] = canon_dens(l.t[i]);
+	if (den_size(& l) > 20000) { tl_free(& l); return NULL; }
+	for (i = 0; i < l.n; i++) u = mk_add(u, tcpy(l.t[i]));
+	tl_free(& l);
+	nu = eqnorm_den(u ? u : a[0], NULL, & d);
+	delete(u);
 	pn = mp_from(nu);
 	pd = mp_from(d);
 	delete(nu);

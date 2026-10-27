@@ -19,3 +19,13 @@ sin : number >> number   (symbolic)
 transpose : matrix >> matrix   (symbolic C function or rules)
 transpose : vector >> covector   (symbolic)
 transpose : covector >> vector   (symbolic C function or rules)
+ALG tq : 2 rules, matched together (one tree of their left sides)
+ALG tl : a list of rule sets, applied one after the other, (..) repeated
+  until nothing changes: tq, (tq, diff)
+ALG tq : 2 rules, matched together (one tree of their left sides)
+  in the rule lists: tl
+SORT positive : with values (computed in C)
+  wider sorts (SUBSORT): nonneg
+  symbols (SYM): eE
+  pattern variables (PAT): 3 internal (_name)
+  functions with this result: *, +, /, ^, mi, sqrt

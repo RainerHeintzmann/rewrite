@@ -33,3 +33,7 @@ INC "inc/linalg"
 INC "inc/solve"
 INC "inc/simplify"
 INC "inc/help"
+
+# 2026: a new name in a term is declared as SYM name : real (with a note);
+# AUTOSYM alone switches this off
+AUTOSYM real

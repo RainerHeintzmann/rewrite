@@ -2,6 +2,7 @@ ADDSPEC	keyword
 ALG	keyword
 ALIAS	keyword
 ATT	keyword
+AUTOSYM	keyword
 BRA	keyword
 COMM	keyword
 DATA	keyword

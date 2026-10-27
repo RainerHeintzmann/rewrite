@@ -419,6 +419,38 @@ void maxdepth_fn (Node * np)
 	set_limit(np, & max_term_depth, "MAXDEPTH");
 }
 
+/* 2026: AUTOSYM sort: a new name in a term is declared as SYM name : sort,
+ * with a note (it may be a typo); AUTOSYM alone switches this off */
+static Node * auto_sort = NULL;
+
+void autosym_fn (Node * sort)		/* at parse time, for the lines after it */
+{
+	auto_sort = sort;
+}
+
+void unknown_function (Symbol * sp)	/* f(..) of an undeclared f: an error */
+{
+	char msg[200];
+	snprintf(msg, sizeof msg, "unknown function %s (declare it: FUNC %s : real >> real)", name(sp), name(sp));
+	yyerror(msg);
+}
+
+/* the new name sp as a constant of the AUTOSYM sort, or NULL (an error) */
+Symbol * auto_symbol (Symbol * sp)
+{
+	if (! auto_sort)
+		{
+		char msg[200];
+		snprintf(msg, sizeof msg, "unknown name %s (declare it: SYM %s : real, or AUTOSYM real)",
+		         name(sp), name(sp));
+		yyerror(msg);
+		return NULL;
+		}
+	sp = declaresym(sp, auto_sort, NULL, Const, FALSE);
+	printfErr("note : SYM %s : %s\n", name(sp), name((Symbol *) auto_sort));
+	return sp;
+}
+
 void numassign2 (Node * froass, Symbol * toass)   /* sets or deletes a number */
 {
 Node * rslt;

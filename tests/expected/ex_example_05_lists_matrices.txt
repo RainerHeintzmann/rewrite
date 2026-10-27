@@ -23,7 +23,7 @@ a * n - b * g
 [(4/5),
  (7/5)] 
 ---- the characteristic polynomial
-x ^ 2 + 3 - 4 * x 
+3 - 4 * x + x ^ 2 
 ---- covectors: transpose(v)*w is a number, v*transpose(w) a matrix
 32 
 [ 3  4 ]

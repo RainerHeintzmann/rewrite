@@ -19,6 +19,7 @@ typedef Node * s_function (Node * args[], int nargs, Symbol * f);
 s_function * give_sfn (const char * name);   /* NULL if unknown */
 void rules_fn_register (Symbol * f, Node * algs); /* ATT RULES alglist */
 s_function * rules_sfn (void);               /* the C function behind ATT RULES */
+int rules_fn_users (Symbol * alg, Symbol * out[], int max);	/* functions with alg in ATT RULES */
 void role_fn (Node * np);                    /* SYMBOLIC "role" = "symbol" */
 Node * call_builtin (Node * term);
 int symbolic_constant (Symbol * s);	/* 2026: pi, im in exact mode: no value in terms */

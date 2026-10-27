@@ -4,14 +4,15 @@ rewrite: term rewriting with rule sets, see README.md and examples/.
   REWR t : All   simplifies t;  REWR Int(x*sin(x),x) : RubiIntegrate
   QUIT           ends rewrite
 
-Help on: ADDSPEC ALG ALIAS ATT All BRA COMM D DATA DEBUG DEFAULT EXE FOR FUNC
-        HELP HOLD I IF IN INC INFO INTNUM Int Integrate LA1 LB LIFT MAXDEPTH
-        MAXSTEPS MatrixRules MatrixSolve NIN NUMPAT OPT OTHER OUT PAT PRT
-        PRTNUM QUIT RA REALNUM RETURN REWR RIGHT RU RULES RubiIntegrate SHOW
-        SORT SPEC STEPS SUBSORT SYM SYMBOLIC SYS Solve TERM TYPEOF WHILE [ det
-        dirac dot fourier heaviside identity im infinity initial inverse
-        invfourier invlaplace knownpos laplace length limit linsolve list
-        newton nil normform part pi range select solve table thread total
+Help on: ADDSPEC ALG ALIAS ATT AUTOSYM All BRA COMM D DATA DEBUG DEFAULT Dn EXE
+        FOR FUNC HELP HOLD I IF IN INC INFO INTNUM Int Integrate LA1 LB LIFT
+        MAXDEPTH MAXSTEPS MatrixRules MatrixSolve NIN NUMPAT OPT OTHER OUT PAT
+        PRT PRTNUM QUIT RA REALNUM RETURN REWR RIGHT RU RULES RubiIntegrate
+        SHOW SORT SPEC STEPS SUBSORT SYM SYMBOLIC SYS Solve Sub Sum TERM TYPEOF
+        Tay WHILE [ cancel coeff collect deriv det dirac dot expand expon
+        fourier freeq heaviside identity im infinity initial inverse invfourier
+        invlaplace knownpos laplace length limit linsolve list newton nil
+        normform part pi polyq range select solve subst table thread total
         transpose
 REWR term : alg [,alg ..]   rewrites term with the rule sets and prints the result
 t = REWR term : alg         stores the result in the TERM t
@@ -35,7 +36,14 @@ sin : real >> real   (numerical C function)
 sin : complex >> complex   (numerical C function)
 sin : number >> number   (symbolic)
 SYM kk : real = 3 
-real is a sort
+SORT real : with values (computed in C)
+  number literals like 1.5 have this sort (REALNUM)
+  wider sorts (SUBSORT): complex, number
+  narrower sorts: rational, nonneg
+  symbols (SYM): Xre, e, infinity, kk, maxreal, minreal, nothing, pi, x, y, z; 14 internal (_name)
+  terms (TERM): num; 1 internal (_name)
+  pattern variables (PAT): 20 internal (_name)
+  functions with this result: !, *, +, -, /, D, Dn, Dp, Dpn, Gamma, I, Im, ... (148); 2 internal (_name)
 no help on nosuchname (? alone lists the names)
 my own help
 a second line

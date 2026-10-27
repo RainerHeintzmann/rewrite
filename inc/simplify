@@ -16,4 +16,4 @@ ALG Expprod
 SPEC    Expprod : exp _Xnu * exp _Ynu = exp(normform(_Xnu+_Ynu))
 ADDSPEC Expprod : _Znu * exp _Xnu * exp _Ynu = _Znu * exp(normform(_Xnu+_Ynu))
 
-SPEC All : Std,Doit,(Linear,Compl,diff,GrRi),AGroup,integr,(Subst,GrRi),Std,Combine,NoMi,Final,Expprod,Final
+SPEC All : Std,Doit,(Linear,Compl,diff,Taylor,GrRi),AGroup,integr,(Subst,GrRi),Std,Combine,NoMi,Final,Expprod,Final

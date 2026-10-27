@@ -6,8 +6,10 @@ Error in stdin : Unable to open includefile "does/not/exist" (also not in the li
 Error in stdin : syntax error
 
 >> undefinedfunc(3)
-Error in stdin : syntax error
+Error in stdin : unknown function undefinedfunc (declare it: FUNC undefinedfunc : real >> real)
+note : SYM qq : real
+qq + 1 
 
->> x = qq
-Error in stdin : syntax error
+>> x = qr
+Error in stdin : unknown name qr (declare it: SYM qr : real, or AUTOSYM real)
 still running

@@ -216,3 +216,17 @@ OTHER functionofq       : number++ >> bool ATT SYMBOLIC functionofq
 OTHER substfor          : number++ >> number ATT SYMBOLIC substfor
 OTHER derivdivides      : number,number,number >> number ATT SYMBOLIC derivdivides
 OTHER falseq            : number >> bool ATT SYMBOLIC falseq
+
+# Taylor polynomial Tay(u,x,a,n), the rules Taylor (in All): the sum of
+# u^(k)(a)/k! (x-a)^k for k = 0..n, each derivative taken from the one
+# before and brought into normal form (Dn from scratch took minutes for
+# order 9 of cos(x)). Not in diff, so that deriv(Tay(..)) leaves Tay to All:
+# inside deriv, an inner deriv is not calculated.
+ALG Taylor
+FUNC  taysum : real,real,real,real,real >> real               # internal: u^(k), x, a, n, k
+NUMPAT _Gn,_Gk : real
+PAT _Gu,_Gx,_Ga : real
+SPEC    Taylor : Tay(_Gu,_Gx,_Ga,_Gn) = taysum(_Gu,_Gx,_Ga,_Gn,0)
+ADDSPEC Taylor : IF (_Gk > _Gn) taysum(_Gu,_Gx,_Ga,_Gn,_Gk) = 0
+ADDSPEC Taylor : IF (_Gk <= _Gn) taysum(_Gu,_Gx,_Ga,_Gn,_Gk) = subst(_Gu,_Gx,_Ga)*mi(_Gk!)*(_Gx-_Ga)^_Gk \
+                   + taysum(normform(deriv(_Gu,_Gx)),_Gx,_Ga,_Gn,_Gk+1)

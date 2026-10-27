@@ -270,6 +270,7 @@ x+y*2                                       # prints 4 + y * 2
 | `PAT name [,..] : sort` | Declares a pattern variable. It is a placeholder for any term in rewrite rules, for example `A+0=A`. |
 | `NUMPAT name [,..] : sort` | Declares a pattern variable that only matches numbers. |
 | `TYPEOF term`, `TYPEOF f` | Prints the sort of a term; for a name also its kind (`SYM`, `TERM`, `PAT`, `NUMPAT`) and its value or term; for a function all its variants with their argument and result sorts. |
+| `TYPEOF alg`, `TYPEOF sort` | For a rule set: how many rules and whether they form a tree or an ordered list, or the rule sets of a list (`TYPEOF All`); the lists it belongs to and the functions it defines (`ATT RULES`). For a sort: whether it has values, its wider and narrower sorts, and its symbols, terms, pattern variables and functions. `?name` shows the same after the help text. |
 | `FUNC name : sorts >> sort [LA1..LA5\|RA\|RU] [ATT [SYMBOLIC [HOLD]] name \| ATT RULES alglist]` | Defines a function or operator, see below. |
 | `OTHER name : sorts >> sort [ATT name]` | Adds another meaning to an existing function name, for other argument types. Example: `OTHER + : vector,vector >> vector`. |
 | `BRA open close : sorts >> sort [ATT name]` | Defines a function written with brackets, like `<a,b>` for a scalar product. `a[b,c]` may be used for `[a,b,c]`, so vectors can be indexed with `v[1]`. |
@@ -657,6 +658,7 @@ This prints `10 20 30`.
 | `ALIAS "name" = "symbol"` | The name is read as the symbol from now on, e.g. `ALIAS "×" = "*"`; mainly for Unicode operators. |
 | `SYMBOLIC "role" = "symbol"` | The symbolic C functions (helpers) use `symbol` where they need the function or constant `role` (`"cos"`, `"+"`, `"pi"`, ...), see [Symbolic helper functions](#symbolic-helper-functions). `SYMBOLIC` alone clears the mapping. |
 | `MAXSTEPS n`, `MAXDEPTH n` | The step and the depth limit of `REWR` (default 100000 and 1000); without `n` they are shown, see [Rule sets](#rule-sets-algebras-and-rewriting). |
+| `AUTOSYM sort` | A new name in a term is declared as `SYM name : sort`, with a note (it may be a typo); `inc/all` ends with `AUTOSYM real`. `AUTOSYM` alone switches this off: a new name is then an error. |
 | `STEPS Alg "file"` | Shows each applied rule of the rule list of `Alg` (solution steps), labelled from `file` (lines `index<TAB>label<TAB>text`); `STEPS Alg ""` switches it off. |
 | `QUIT` | Ends the program. |
 
@@ -817,8 +819,8 @@ function attached with `SHOW [ ATT show_list`; `SHOW [` prints the plain
 term again.
 
 `table` and `select` get their body and condition unevaluated (`HOLD`) and
-replace `x` first. `x` must be declared (`SYM kk : real`): an undeclared
-name is a numerical variable with the value 0.
+replace `x` first. `x` must be a symbol (`SYM kk : real`, or a new name
+with `AUTOSYM`), not a pattern variable.
 
 ```text
 SYM aa,kk : real
@@ -901,6 +903,23 @@ REWR 2*A*[x,y] : MatrixRules                           # stays: a vector is no s
 
 (In a library loaded after inc/alg, `A`, `B`, `C` are variables already;
 the tests use `MA`, `MB`, ...)
+
+### Taylor polynomials
+
+`Tay(u, x, a, n)` is the Taylor polynomial of `u` in `x` around `a` up to
+the order `n` (rules `Taylor` of [inc/helpers](inc/helpers), part of
+`All`): the sum of `u^(k)(a)/k! (x-a)^k`, each derivative taken from the
+one before. A polynomial in one variable is printed in ascending powers.
+
+```text
+REWR Tay(cos(x), x, 0, 8) : All        # 1 - (1/2) * x ^ 2 + (1/24) * x ^ 4 - ...
+REWR Tay(sqrt(1+x), x, 0, 3) : All     # 1 + (1/2) * x - (1/8) * x ^ 2 + (1/16) * x ^ 3
+REWR Tay(sin(x), x, pi/2, 4) : All     # 1 - (1/2) * (x - (1/2) * pi )^ 2 + ...
+```
+
+At a pole or a removable singularity (`x/(exp(x)-1)` at 0) the derivatives
+are not defined there, and the result contains a division by 0. More in
+[examples/15_series.rw](examples/15_series.rw).
 
 ### Limits and definite integrals
 
@@ -1138,7 +1157,7 @@ The helpers are:
 | `normpoly(u,x)` | every polynomial sum in `u` as `c0+c1*x+...` with collected coefficients |
 | `deriv(u,x)` | derivative, every term without `x` constant; defined by rules (`ATT RULES`, the rules `diff` of inc/alg); `D(f(x),x)` remains for unknown functions |
 | `collect(u)` | like summands combined, e.g. `2*a+b-a` gives `a+b` |
-| `cancel(u)` | `u` over a common denominator, `N/D`, with the greatest common divisor of `N` and `D` cancelled: `(x^2-y^2)/(x-y)` gives `x+y` (Mathematica's `Cancel` and `Together`) |
+| `cancel(u)` | `u` over a common denominator, `N/D`, with the greatest common divisor of `N` and `D` cancelled: `(x^2-y^2)/(x-y)` gives `x+y` (Mathematica's `Cancel` and `Together`); roots of numbers in the coefficients are reduced (`(2^(1/2))^2 = 2`) and denominators equal up to a constant factor are combined, so `cancel(deriv(Int(1/(1+x^4),x),x))` gives `1/(1+x^4)` |
 | `polygcd(a,b)` | greatest common divisor of two polynomials in several variables (primitive remainder sequence; exact coefficients) |
 | `replaceall(u,x,v)` | `u` with `x` replaced by `v` at once |
 | `expandtrigreduce(u,x)`, `expandtrigreduce(v,u,x)` | products and powers of `sin`, `cos`, `sinh`, `cosh` as sums of multiple angles, e.g. `sin(x)^3` gives `(3/4)*sin(x) - (1/4)*sin(3*x)`; times `v` |
@@ -1274,6 +1293,20 @@ where the library [inc/](inc) and the tests are used from.
   `exp(a)*exp(b)` to `exp(a+b)` and simplifies `exp(ln(x))`,
   `exp(-ln(x))`, `exp(n*ln(x))`; `fourier` knows the Gaussians
   `exp(-c*t^2+b*t+d)` from its table (fast, and with `im` cancelled).
+- Taylor polynomials `Tay(u,x,a,n)` take each derivative from the one
+  before (order 9 of `cos(x)` took minutes, now well under a second),
+  substitute with `subst` (`exp`, `tan`, `sqrt` were left as `Sub(...)`),
+  and `deriv(Tay(...))` is right (it was 0). A polynomial in one variable is
+  printed in ascending powers, `1 - (1/2) * x ^ 2 + (1/24) * x ^ 4`
+  (descending if that avoids a leading minus: `x - 1`).
+- `cancel` reduces roots of numbers (`(2^(1/2))^2 = 2`, also between
+  `2^(1/2)` and `2^(-1/2)`), combines denominators equal up to a constant
+  factor, normalizes its argument first (the raw result of `deriv`), and
+  gives up quickly (stays unevaluated) when the common denominator would be
+  huge, as with the nested roots of `Int(1/(1+x^5),x)`.
+- `AUTOSYM real` (set by `inc/all`): new names are declared as symbols,
+  with a note; an unknown function `f(..)` and, with `AUTOSYM` off, an
+  unknown name are reported as such instead of "syntax error".
 - All pattern variables of the library begin with `_` (`X`, `N`, `Xnu`,
   `Ag`, Rubi's `P_a`, ... are now `_X`, `_N`, `_Xnu`, `_Ag`, `_P_a`; `M`
   is `_K`, since `_M` is the unit prefix of inc/physik). A `TERM Y` of the
