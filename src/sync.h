@@ -33,6 +33,7 @@ extern void typeof_fn (Node * np);		/* 2026: TYPEOF term */
 extern void typeof_func (Node * np);	/* 2026: TYPEOF f */
 void console_utf8 (void);			/* 2026: console.c */
 const char * windows_home (void);	/* 2026: console.c */
+const char * program_dir (void);	/* 2026: console.c */
 void print_variants (Symbol * f);	/* 2026: TYPEOF f, ?f */
 
 extern void printstring (Node * np);

@@ -1,14 +1,9 @@
 #ifndef UNIX_H
 #define UNIX_H
 
-#define bcopy(s, d, n) memcpy((d), (s), (n))
-#define bzero(s, n)    memset((s), 0, (n))
-#define bcmp(a, b, n)  memcmp((a), (b), (n))
-
-#define index(s, c)    strchr((s), (c))
-#define rindex(s, c)   strrchr((s), (c))
-
-#include <stdlib.h>  /* mktemp, alloca: use the system declarations */
+/* 2026: the old BSD names (bcopy, index, ...) are no longer used; their
+   macros broke the declarations of <string.h> on Linux (glibc) */
+#include <stdlib.h>
 #include <string.h>
 
 #endif /* UNIX_H */

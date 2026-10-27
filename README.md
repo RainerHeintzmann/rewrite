@@ -78,8 +78,13 @@ interactive session. Whether the input is interactive is decided by the
 terminal: in the MSYS2 terminal (mintty), standard input is a pipe for
 Windows programs, so use `rewrite -i` there to get the prompts.
 
-Paths in `INC` and `DATA` are relative to the current directory, so start
-`rewrite` in the project folder when you use the standard library.
+A file in `INC` (such as `inc/all`) that is not found from the current
+folder is looked for in the library folders: those listed in the
+environment variable `REWRITE_PATH` (separated by `:`, on Windows by `;`),
+the folder of the installation (`make install`), and the folder of the
+program and `../share/rewrite` next to it. So rewrite works from any folder
+when it is installed or started from the project folder's `rewrite.exe`.
+`DATA` files are relative to the current folder.
 
 ## Building
 
@@ -92,7 +97,16 @@ numbers; it is linked statically).
 sudo apt install gcc flex bison make libgmp-dev    # Debian/Ubuntu
 make
 make test
+sudo make install            # /usr/local/bin/rewrite, /usr/local/share/rewrite
 ```
+
+`make install PREFIX=$HOME/.local` installs for one user (`bin/` must be
+in `PATH`); `make uninstall` removes it again, and `DESTDIR` stages the
+files for a package. `make bindist` makes a tarball of the program with its
+library (`rewrite-VERSION-linux-x86_64.tar.gz`) that runs wherever it is
+unpacked: GMP is linked statically, the program needs only the C library.
+`make dist` makes the source tarball of the last commit. `rewrite --version`
+shows the version.
 
 **Windows:** install [MSYS2](https://www.msys2.org), for example with
 `winget install MSYS2.MSYS2`. Then open the MSYS2 shell once and install
@@ -153,9 +167,8 @@ any terminal.
    ```
 
 With `alias rewrite='tools/rewrite-rl'` in `~/.bashrc` (in the MSYS2 home
-folder, `C:\msys64\home\<user>`), `rewrite` starts it this way; the paths
-in `INC` are relative to the current folder, so start it in the project
-folder. Without rlwrap, rewrite runs in any terminal (also PowerShell and
+folder, `C:\msys64\home\<user>`), `rewrite` starts it this way. After
+`make install` on Linux, `rewrite-rl` is in `PATH`. Without rlwrap, rewrite runs in any terminal (also PowerShell and
 `cmd`); there `\alpha` is converted as well, only without completion.
 Unicode characters need a font that has them, as in Windows Terminal.
 

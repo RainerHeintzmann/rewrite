@@ -5,8 +5,8 @@
 #  - the arrow keys browse the earlier lines that begin with what is typed
 #    (tools/rewrite.inputrc); the history is kept in ~/.rewrite_history,
 #    every line is saved at once.
-# Start it from the project folder (the INC paths are relative to it):
-#     tools/rewrite-rl                 or with files:  tools/rewrite-rl my.rw
+# In the project folder:  tools/rewrite-rl  (or with files: tools/rewrite-rl my.rw);
+# after make install:     rewrite-rl
 # Needs rlwrap: in MSYS2  pacman -S rlwrap,  on Linux e.g.  apt install rlwrap
 # -b: the word separators without the backslash, so \alpha is one word;
 # -f: the words to complete (keywords, library names, \alpha ...), written
@@ -17,14 +17,20 @@
 # -A, -pGreen: the prompt is coloured (also when rlwrap redraws it);
 # -a: readline from the start (arrow keys typed while the library loads);
 # -i: rewrite stays interactive (under rlwrap its input is no terminal).
-dir=$(cd "$(dirname "$0")/.." && pwd)
-exe="$dir/rewrite.exe"
-[ -f "$exe" ] || exe="$dir/rewrite"
+here=$(cd "$(dirname "$0")" && pwd)
+if [ -f "$here/../share/rewrite/tools/rewrite_words.txt" ]; then
+	exe="$here/rewrite"			# installed: bin/rewrite, share/rewrite/tools
+	tools="$here/../share/rewrite/tools"
+else
+	exe="$here/../rewrite.exe"		# the project folder: rewrite(.exe), tools/
+	[ -f "$exe" ] || exe="$here/../rewrite"
+	tools="$here"
+fi
 export REWRITE_HISTORY="$HOME/.rewrite_history"
-export INPUTRC="$dir/tools/rewrite.inputrc"
+export INPUTRC="$tools/rewrite.inputrc"
 # no Windows pseudo console for rewrite: it would ask the terminal for the
 # cursor position at the start, and the answer (ESC[1;1R) would end up in the
 # input line as "R"; rewrite reads and writes through rlwrap anyway
 export MSYS="${MSYS:+$MSYS }disable_pcon"
-exec rlwrap -a -A -pGreen -b '(){}[],+-*/=&^%$#@";|?' -f "$dir/tools/rewrite_words.txt" \
-     -z "$dir/tools/latex.rlwrap" -H "$REWRITE_HISTORY" "$exe" -i "$@"
+exec rlwrap -a -A -pGreen -b '(){}[],+-*/=&^%$#@";|?' -f "$tools/rewrite_words.txt" \
+     -z "$tools/latex.rlwrap" -H "$REWRITE_HISTORY" "$exe" -i "$@"

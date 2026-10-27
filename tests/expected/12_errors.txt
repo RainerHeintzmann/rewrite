@@ -1,6 +1,6 @@
 
 >> INC "does/not/exist"
-Error in stdin : Unabel to open includefile "does/not/exist" 
+Error in stdin : Unable to open includefile "does/not/exist" (also not in the library folders, see REWRITE_PATH)
 
 >> 1 +
 Error in stdin : syntax error

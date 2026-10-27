@@ -1178,6 +1178,10 @@ return 0;
 }
 
 
+#ifndef REWRITE_VERSION
+#define REWRITE_VERSION "2026"
+#endif
+
 static void usage (void)
 {
 	printf("Usage: rewrite [-i] [--no-startup] [--max-steps n] [--max-depth n] [file ...]\n"
@@ -1189,7 +1193,10 @@ static void usage (void)
 	       "(~ is HOME, else USERPROFILE); --no-startup skips it.\n"
 	       "--max-steps n   REWR stops after n rewrites (default 100000), as MAXSTEPS n\n"
 	       "--max-depth n   REWR stops when the term is deeper than n levels (default\n"
-	       "                1000), as MAXDEPTH n\n");
+	       "                1000), as MAXDEPTH n\n"
+	       "--version       the version of rewrite\n"
+	       "Library files (INC \"inc/all\") not found from the current folder are looked\n"
+	       "for in the folders of REWRITE_PATH, the installation and next to the program.\n");
 }
 
 /* 2026: the startup file of an interactive session, as Julia's startup.jl:
@@ -1223,8 +1230,8 @@ static void welcome (void)
 {
 	printf("rewrite - a language for symbolic and numerical mathematics\n"
 	       "(c) 1992-1996, 2026 Rainer Heintzmann, MIT license\n"
-	       "Load the standard library with   INC \"inc/all\"   (paths are relative to\n"
-	       "the current folder), then try   REWR D(sin(x)^2,x) : All\n"
+	       "Load the standard library with   INC \"inc/all\"\n"
+	       "then try   REWR D(sin(x)^2,x) : All\n"
 	       "End with QUIT or the end-of-file key (Ctrl-D, on Windows Ctrl-Z Enter).\n\n");
 }
 
@@ -1238,6 +1245,7 @@ int main(int argc, char * argv []) /* no space between main and '(' ! */
 		{
 		long * limit = NULL;
 		if (! strcmp(argv[i], "-h") || ! strcmp(argv[i], "--help")) { usage(); return 0; }
+		else if (! strcmp(argv[i], "--version")) { printf("rewrite %s\n", REWRITE_VERSION); return 0; }
 		else if (! strcmp(argv[i], "-i")) force = 1;
 		else if (! strcmp(argv[i], "--no-startup")) nostart = 1;
 		else if (! strcmp(argv[i], "--max-steps")) limit = & max_rewrite_steps;
@@ -1278,15 +1286,62 @@ int main(int argc, char * argv []) /* no space between main and '(' ! */
 	return 0;
 }
 
+/* 2026: a file that is not found from the current folder (a relative name
+   like "inc/all") is looked for in the library folders: those in
+   REWRITE_PATH (separated by ':', on Windows by ';'), the folder of the
+   installation (REWRITE_LIBDIR, set by make install), and the folder of
+   the program and its ../share/rewrite. path gets the name of the file. */
+#ifdef _WIN32
+#define PATH_SEP ';'
+#else
+#define PATH_SEP ':'
+#endif
+
+static FILE * open_in (const char * dir, size_t len, const char * name, char * path, size_t size)
+{
+	if (len == 0 || len + strlen(name) + 2 > size) return NULL;
+	snprintf(path, size, "%.*s/%s", (int) len, dir, name);
+	return fopen(path, "r");
+}
+
+static FILE * open_library_file (const char * name, char * path, size_t size)
+{
+	FILE * fp;
+	const char * dir, * end;
+	snprintf(path, size, "%s", name);
+	if ((fp = fopen(name, "r")) != NULL) return fp;
+	if (name[0] == '/' || name[0] == '\\' || (name[0] && name[1] == ':'))
+		return NULL;			/* an absolute name */
+	for (dir = getenv("REWRITE_PATH"); dir && * dir; dir = * end ? end + 1 : end)
+		{
+		end = strchr(dir, PATH_SEP);
+		if (! end) end = dir + strlen(dir);
+		if ((fp = open_in(dir, end - dir, name, path, size)) != NULL) return fp;
+		}
+#ifdef REWRITE_LIBDIR
+	if ((fp = open_in(REWRITE_LIBDIR, strlen(REWRITE_LIBDIR), name, path, size)) != NULL) return fp;
+#endif
+	if ((dir = program_dir()) != NULL)
+		{
+		char share[4096];
+		if ((fp = open_in(dir, strlen(dir), name, path, size)) != NULL) return fp;
+		snprintf(share, sizeof share, "%s/../share/rewrite", dir);
+		if ((fp = open_in(share, strlen(share), name, path, size)) != NULL) return fp;
+		}
+	snprintf(path, size, "%s", name);
+	return NULL;
+}
+
 void include _1a ((cp), const char * cp)
 {
 	FILE * fp;
 	const char * old;
+	char path[4096];
 
-	if (fp = fopen (cp,"r"))
+	if ((fp = open_library_file(cp, path, sizeof path)) != NULL)
 		{
 		old=IncFileName;
-		IncFileName=cp;
+		IncFileName=path;
 		int oldbase;
 		is_not_running();
 		inc_level++;
@@ -1301,7 +1356,7 @@ void include _1a ((cp), const char * cp)
 	else
 		{
 		ErrorMsg("");
-		printfErr("Unabel to open includefile \"%s\" \n",cp);
+		printfErr("Unable to open includefile \"%s\" (also not in the library folders, see REWRITE_PATH)\n",cp);
 		}
 }
 
