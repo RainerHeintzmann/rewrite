@@ -1163,6 +1163,11 @@ int read_input _1a ((fp), FILE * fp)
 			lexi_buf(buf);
 			yyparse();
 			}
+		if (fp == stdin)	/* 2026: a program reading through a pipe gets each answer at once */
+			{
+			fflush(stdout);
+			fflush(stderr);
+			}
 
 	} while (! feof(fp));
 	return 0;

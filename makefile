@@ -29,6 +29,12 @@ fatal.o strsave.o expand.o symfn.o listmatch.o numsort.o exact.o specfun.o apart
 
 T	= rewrite
 VERSION	= 2026.1
+EXE	=
+SYSTEM	= $(shell uname -s | tr A-Z a-z)
+ifeq ($(OS),Windows_NT)
+EXE	= .exe
+SYSTEM	= windows
+endif
 PREFIX	= /usr/local
 LIBDIR	= $(PREFIX)/share/rewrite
 
@@ -67,7 +73,7 @@ test: $(T)
 # the library files without the editor and FTP leftovers
 install: $(T)
 	install -d $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(LIBDIR)/tools
-	install -m 755 $(T) $(DESTDIR)$(PREFIX)/bin/rewrite
+	install -m 755 $(T)$(EXE) $(DESTDIR)$(PREFIX)/bin/rewrite$(EXE)
 	install -m 755 tools/rewrite-rl $(DESTDIR)$(PREFIX)/bin/rewrite-rl
 	cp -R inc examples $(DESTDIR)$(LIBDIR)/
 	find $(DESTDIR)$(LIBDIR) \( -name 'ws_ftp.log' -o -name '*.bak' -o -name '*~' \) -exec rm -f {} +
@@ -77,13 +83,13 @@ install: $(T)
 	install -m 644 README.md LICENSE $(DESTDIR)$(LIBDIR)/
 
 uninstall:
-	$(RM) $(DESTDIR)$(PREFIX)/bin/rewrite $(DESTDIR)$(PREFIX)/bin/rewrite-rl
+	$(RM) $(DESTDIR)$(PREFIX)/bin/rewrite$(EXE) $(DESTDIR)$(PREFIX)/bin/rewrite-rl
 	$(RM) -r $(DESTDIR)$(LIBDIR)
 
 dist:
 	git archive --prefix=rewrite-$(VERSION)/ -o rewrite-$(VERSION).tar.gz HEAD
 
-BINDIST	= rewrite-$(VERSION)-$(shell uname -s | tr A-Z a-z)-$(shell uname -m)
+BINDIST	= rewrite-$(VERSION)-$(SYSTEM)-$(shell uname -m)
 bindist: $(T)
 	$(RM) -r $(BINDIST)
 	$(MAKE) install DESTDIR=$(CURDIR)/$(BINDIST) PREFIX=
