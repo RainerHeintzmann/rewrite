@@ -438,6 +438,9 @@ ADDSPEC Real : IF (is_int((N- 1)/2)) (-X)^N= -(X^N)
 ADDSPEC Real : ln e  = 1
 ADDSPEC Real : IF (X > 0) ln (X*Y)=ln X + ln Y   # 2026: was ln(X+Y)=ln X * ln Y (wrong);
 ADDSPEC Real : IF (Y > 0) ln (X*Y)=ln X + ln Y   # only correct with a positive factor
+ADDSPEC Real : exp(ln X) = X                      # 2026 added: exp(-ln x) = 1/x
+ADDSPEC Real : exp(-ln X) = mi X
+ADDSPEC Real : exp(N*ln X) = X^N
 
 ADDSPEC Real : sin(-A) = -sin A
 ADDSPEC Real : cos(-A) =  cos A

@@ -481,28 +481,23 @@ static Node * real_copy (Node * t)
 	return mknod(Terms, l, r);
 }
 
-/* real numbers with an integer value next to an exact number (or pi, im,
- * or an exact expression such as 2*pi)
- * become exact integers: the 1 of a rule loaded before inc/exact is a real
- * number, and (1/2)*1.0 would be 0.5 instead of 1/2, 1.0*im the number
- * (0,1) instead of im. Changes the arguments of t. */
-void exact_integers (Node * t)
+static int real_integer (Node * t)		/* a real number with an integer value */
 {
-	Node ** slot;
-	int exact = 0, k, n;
+	Symbol * s = num_sym(t);
 	double v;
-	t = deref(t);
-	if (! t || t->type != Func || ! exact_numbers()) return;
-	n = term_nargs(t);
-	for (k = 0; k < n; k++)
-		if (exactish(arg(t, k))) exact = 1;	/* 1/3, pi, 2*pi, im, ... */
-	if (! exact) return;
-	slot = & t->r;
+	return t->type == Const && s && ! num_exact(s) && num_to_double(s, & v) && v == floor(v) && fabs(v) < 1e15;
+}
+
+static void exact_args (Node * t)	/* the real integers among the arguments of t as exact ones */
+{
+	Node ** slot = & t->r, ** cur;
+	Symbol * e;
+	double v;
+	int k, n = term_nargs(t);
 	for (k = 0; k < n; k++)
 		{
-		Node ** cur = (k < n - 1) ? & (* slot)->l : slot;
-		Symbol * s = num_sym(* cur), * e;
-		if ((* cur)->type == Const && s && ! num_exact(s) && num_to_double(s, & v) && v == floor(v) && fabs(v) < 1e15
+		cur = (k < n - 1) ? & (* slot)->l : slot;
+		if (real_integer(* cur) && num_to_double(num_sym(* cur), & v)
 		    && (e = make_exact((long long) v, 1)) != NULL)
 			{
 			delete(* cur);
@@ -510,6 +505,41 @@ void exact_integers (Node * t)
 			}
 		if (k < n - 1) slot = & (* slot)->r;
 		}
+}
+
+/* real numbers with an integer value next to an exact number (or pi, im,
+ * or an exact expression such as 2*pi)
+ * become exact integers: the 1 of a rule loaded before inc/exact is a real
+ * number, and (1/2)*1.0 would be 0.5 instead of 1/2, 1.0*im the number
+ * (0,1) instead of im. Changes the arguments of t. */
+void exact_integers (Node * t)
+{
+	int exact = 0, k, n;
+	t = deref(t);
+	if (! t || t->type != Func || ! exact_numbers()) return;
+	n = term_nargs(t);
+	for (k = 0; k < n; k++)
+		if (exactish(arg(t, k))) exact = 1;	/* 1/3, pi, 2*pi, im, ... */
+	if (exact) exact_args(t);
+}
+
+/* the same for a calculation of real integers only whose value r is no
+ * integer: the 2 of D(sqrt X) = D(X)*mi(2*sqrt X) gave 0.5, and (1/2)*pi
+ * then a number. The integers become exact, as if typed (mi(2) stays, 1/2
+ * in the end); true if t is changed, to be calculated again. */
+int exact_integer_args (Node * t, Node * r)
+{
+	double v;
+	int k, n;
+	t = deref(t);
+	if (! exact_numbers() || ! t || t->type != Func || ! r || num_exact((Symbol *) r)
+	    || ! num_to_double((Symbol *) r, & v) || v == floor(v))
+		return 0;
+	n = term_nargs(t);
+	for (k = 0; k < n; k++)
+		if (! real_integer(arg(t, k))) return 0;
+	exact_args(t);
+	return 1;
 }
 
 /* the value of t calculated with real numbers (2^(1/2) = 1.41421), or NULL

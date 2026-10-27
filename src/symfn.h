@@ -39,6 +39,7 @@ int term_has_nan (Node * t);                  /* contains NaN, infinity, 1/0 or 
 Node * numeric_contagion (Node * t);          /* 2^(1/2)*0.7 as a real number, or NULL */
 Node * numeric_real (Node * t);               /* value with real numbers, or NULL */
 void exact_integers (Node * t);               /* 1.0 next to an exact number as 1 */
+int exact_integer_args (Node * t, Node * r);  /* mi(2.0) = 0.5: the 2 as exact, calculate again */
 Node * exact_pow_pow (Node * t);              /* (2^(1/2))^2 = 2 */
 void term_simplify_trivial (Node ** p);       /* u^0, u^1, 1*u, 0*u, 0+u in place */
 

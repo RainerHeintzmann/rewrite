@@ -1006,17 +1006,19 @@ REWR invfourier(2*a/(a^2+w^2), w, t) : All     # prints exp (- a * abs (t ))
 - `fourier` combines a table with the integral: linearity first, then the
   table (constants and `dirac`,
   `exp(im*a*t)`, `cos`, `sin`, `heaviside`, `sgn`, `exp(-a*abs(t))`,
-  `1/(t^2+c)`, `1/(c+im*b*t)`, `sin(a*t)/t`), whose entries are
+  `1/(t^2+c)`, `1/(c+im*b*t)`, `sin(a*t)/t`, Gaussians
+  `exp(-c*t^2+b*t+d)` with `c > 0`), whose entries are
   distributions or need contour integrals; then the theorems (modulation by
   `exp(im*a*t)`, `cos`, `sin`; multiplication by `t` as `im*D(F,w)`;
   derivatives as `im*w*F`); and for the rest the definite integral of
-  [inc/limits](inc/limits), which does Gaussians, one-sided exponentials
-  and rectangles.
+  [inc/limits](inc/limits), which does one-sided exponentials and
+  rectangles.
 - `invfourier(F, w, t)` is `fourier(F, w, -t)/(2*pi)` (duality), so the
   same table and the same integrals work backwards.
-- A part that is not known stays as `fourier(...)`. Results with `im` are
-  not always in the simplest form (`exp((1/4)*(3*im - im*w)^2)` for
-  `exp(-(w-3)^2/4)`).
+- A part that is not known stays as `fourier(...)`.
+- With `fourier(D(u(x,t),x), x, w) = im*w*U`, a linear partial differential
+  equation in `x` becomes an ordinary one in `t`: the heat and the transport
+  equation in [examples/14_pde.rw](examples/14_pde.rw).
 
 ### Equations
 
@@ -1260,6 +1262,12 @@ where the library [inc/](inc) and the tests are used from.
   ([inc/limits](inc/limits)); the Laplace transform and its inverse, also
   for differential equations ([inc/laplace](inc/laplace)); the Fourier
   transform and its inverse ([inc/fourier](inc/fourier)).
+- Differential equations: examples for ordinary
+  ([examples/13_ode.rw](examples/13_ode.rw)) and partial ones
+  ([examples/14_pde.rw](examples/14_pde.rw)). For them: `All` combines
+  `exp(a)*exp(b)` to `exp(a+b)` and simplifies `exp(ln(x))`,
+  `exp(-ln(x))`, `exp(n*ln(x))`; `fourier` knows the Gaussians
+  `exp(-c*t^2+b*t+d)` from its table (fast, and with `im` cancelled).
 - `REWR` calculates the term before the first rule set, as it does after
   each rule set (a function defined by rules is computed before the rules
   of the user apply). After the arguments of a function defined by rules
@@ -1267,12 +1275,17 @@ where the library [inc/](inc) and the tests are used from.
   conditions of rules.
 - In exact mode, the real numbers of rules loaded before inc/exact (the 1
   of `mi X = 1/X`) become exact next to exact expressions such as `2*pi`,
-  so `t*mi(2*pi)` stays `t/(2*pi)` instead of `t*0.159155`.
+  so `t*mi(2*pi)` stays `t/(2*pi)` instead of `t*0.159155`. A
+  calculation of such integers alone that has no integer value (the
+  `mi(2)` of `D(sqrt(X),Z) = D(X,Z)*mi(2*sqrt(X))`) is done exactly, so
+  `D(sqrt(pi*t),t)` is `(1/2)*pi/sqrt(pi*t)`, not `1.5708/sqrt(pi*t)`.
 - Fixed: a number of a sort that is not below `real` (complex, bool) was
   shared instead of copied by the symbolic helpers, so freeing a copy freed
   the original as well (wrong results that changed from run to run); and
   the cache of the rule lists could free an entry that was still in use
-  when more than eight rule lists were nested.
+  when more than eight rule lists were nested; a calculation with an
+  argument that has no value could check a stale symbol (`Not a Symbol to
+  delete`).
 - Ported to flex 2.6 and bison 3, and to 64-bit gcc on Linux and Windows.
 - Fixed a crash when a constant was assigned 0 or 1 and later reassigned.
 - Fixed a crash in the cleanup after arguments that cannot be calculated.

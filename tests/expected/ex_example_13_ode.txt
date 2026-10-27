@@ -1,0 +1,26 @@
+---- a solution checked: u'' + 2 u' + 5 u = 0
+0 
+---- where it comes from: u = exp(lambda t) gives the characteristic equation
+[2 * im - 1,
+ -1 - 2 * im] 
+[0,
+ 1,
+ -1] 
+---- y' + p y = q: y = exp(-P) (Int(q exp(P)) + c1), where P = Int(p)
+y' + 2 y = x
+(1/2) * x + c1 * exp (- 2 * x )- (1/4) 
+0 
+y' + y/x = x^2
+(1/4) * x ^ 3 + c1 / x 
+---- separation of variables: y' = x y^2, so Int(1/y^2, y) = Int(x, x) + c1
+- 1 / y 
+(1/2) * x ^ 2 
+[1 / (- (1/2) * x ^ 2 - c1 )] 
+---- an initial value problem (see examples/11_laplace.rw):
+---- v'' + v = sin(t), v(0) = v'(0) = 0, driven at its resonance
+1 / (1 + s ^ 2 )^ 2 
+(1/2) * sin (t )- (1/2) * t * cos (t )
+---- Picard iteration for y' = y, y(0) = 1: y_(k+1) = 1 + Int(y_k, 0..x)
+1 + (1/2) * x ^ 2 + (1/24) * x ^ 4 + (1/6) * x ^ 3 + x 
+---- numerically: Runge-Kutta (order 4) for y' = 1 + y^2, y(0) = 0, up to x = 1
+1.557406443 1.557407725 

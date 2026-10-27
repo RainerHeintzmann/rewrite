@@ -1,0 +1,71 @@
+# 13_ode.rw: ordinary differential equations: a solution checked, the
+# characteristic equation, first-order equations (integrating factor,
+# separation of variables), an initial value problem with the Laplace
+# transform, Picard iteration and a Runge-Kutta loop
+INC "inc/all"
+SYM t : real
+SYM c1, c2 : real          # constants of integration
+SYM lambda : complex
+
+"---- a solution checked: u'' + 2 u' + 5 u = 0"
+TERM u : real
+u = exp(-t)*(c1*cos(2*t) + c2*sin(2*t))
+REWR deriv(deriv(u,t),t) + 2*deriv(u,t) + 5*u : All
+
+"---- where it comes from: u = exp(lambda t) gives the characteristic equation"
+REWR solve(lambda^2 + 2*lambda + 5 == 0, lambda) : Solve    # exp(-t) cos(2 t), exp(-t) sin(2 t)
+REWR solve(lambda^3 - lambda == 0, lambda) : Solve          # u''' = u': 1, exp(t), exp(-t)
+
+"---- y' + p y = q: y = exp(-P) (Int(q exp(P)) + c1), where P = Int(p)"
+TERM pint, ysol : real
+"y' + 2 y = x"
+pint = REWR Int(2, x) : RubiIntegrate
+ysol = REWR exp(-pint)*(Int(x*exp(pint), x) + c1) : RubiIntegrate, All
+ysol
+REWR deriv(ysol,x) + 2*ysol - x : All                             # the check
+"y' + y/x = x^2"
+pint = REWR Int(1/x, x) : RubiIntegrate
+ysol = REWR exp(-pint)*(Int(x^2*exp(pint), x) + c1) : RubiIntegrate, All
+ysol
+
+"---- separation of variables: y' = x y^2, so Int(1/y^2, y) = Int(x, x) + c1"
+REWR Int(1/y^2, y) : RubiIntegrate
+REWR Int(x, x) : RubiIntegrate
+REWR solve(-1/y == x^2/2 + c1, y) : Solve
+
+"---- an initial value problem (see examples/11_laplace.rw):"
+"---- v'' + v = sin(t), v(0) = v'(0) = 0, driven at its resonance"
+SYM s : positive
+FUNC v : real >> real     # the unknown function
+SYM V : real              # its transform
+ALG Init
+SPEC    Init : v(0) = 0
+ADDSPEC Init : initial(D(v(t),t),t) = 0
+ADDSPEC Init : laplace(v(t),t,s) = V
+TERM E, Vs : real
+TERM R : vector
+E = REWR laplace(D(D(v(t),t),t) + v(t) - sin(t), t, s) : Init, All
+R = REWR solve(E == 0, V) : Solve
+Vs = REWR part(R,1) : All
+Vs
+invlaplace(Vs, s, t)      # t cos(t) grows without bound
+
+"---- Picard iteration for y' = y, y(0) = 1: y_(k+1) = 1 + Int(y_k, 0..x)"
+SYM kk, tau : real
+TERM yk : real
+yk = 1
+FOR kk = 1 TO 4 DO yk = REWR 1 + Int(Sub(yk, x, tau), tau, 0, x) : All
+yk                        # the Taylor polynomial of exp(x)
+
+"---- numerically: Runge-Kutta (order 4) for y' = 1 + y^2, y(0) = 0, up to x = 1"
+SYM h, yn, k1, k2, k3, k4 : real
+h = 0.1
+yn = 0
+FOR kk = 1 TO 10 DO { k1 = 1 + yn^2
+                      k2 = 1 + (yn + h/2*k1)^2
+                      k3 = 1 + (yn + h/2*k2)^2
+                      k4 = 1 + (yn + h*k3)^2
+                      yn = yn + h/6*(k1 + 2*k2 + 2*k3 + k4) }
+PRTNUM "%.10g "
+yn, tan(1)                # the exact solution is tan(x)
+PRTNUM "%g "

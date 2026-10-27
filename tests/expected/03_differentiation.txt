@@ -9,7 +9,7 @@ x * D (b ,x )+ 3 * a * x ^ 2 + x ^ 3 * D (a ,x )+ b
 1 / (1 - x ^ 2 )^ 0.5 
 - 1 / (1 - x ^ 2 )^ 0.5 
 exp (x )
-0.5 / sqrt (x )
+1 / (2 * sqrt (x ))
 cosh (x )
 sinh (x )
 1 / cosh (x )^ 2 

@@ -10,4 +10,10 @@ OTHER normalq : number >> bool  ATT SYMBOLIC normalq
 ALG Final
 SPEC Final : IF (not(normalq(Xnu))) Xnu = normform(Xnu)
 
-SPEC All : Std,Doit,(Linear,Compl,diff,GrRi),AGroup,integr,(Subst,GrRi),Std,Combine,NoMi,Final
+# exp(a)*exp(b) = exp(a+b): after the normal form, which puts the factors
+# exp next to each other, then the normal form once more
+ALG Expprod
+SPEC    Expprod : exp Xnu * exp Ynu = exp(normform(Xnu+Ynu))
+ADDSPEC Expprod : Znu * exp Xnu * exp Ynu = Znu * exp(normform(Xnu+Ynu))
+
+SPEC All : Std,Doit,(Linear,Compl,diff,GrRi),AGroup,integr,(Subst,GrRi),Std,Combine,NoMi,Final,Expprod,Final

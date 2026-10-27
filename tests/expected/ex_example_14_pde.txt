@@ -1,0 +1,24 @@
+---- the wave equation u_tt = c^2 u_xx: any f(x - c t) + g(x + c t)
+0 
+---- the heat equation u_t = a u_xx: a decaying mode and the heat kernel
+0 
+0 
+---- the Laplace equation u_xx + u_yy = 0: harmonic functions
+0 
+0 
+4 / (x ^ 2 + y ^ 2 )- 4 * x ^ 2 / (x ^ 2 + y ^ 2 )^ 2 - 4 * y ^ 2 / (x ^ 2 + y ^ 2 )^ 2 
+0 
+---- separation of variables: u = XF(x) TF(t) in the heat equation
+D (TF (t ),t )/ (TF (t )* a )- D (D (XF (x ),x ),x )/ XF (x )
+a function of t minus a function of x: both are the same constant -k^2,
+XF'' = -k^2 XF and TF' = -a k^2 TF give the decaying mode above
+---- the heat equation on the line, with the Fourier transform in x
+- w ^ 2 * fourier (v (x ,t ),x ,w )
+U_t = -a w^2 U, so U = U0(w) exp(-a w^2 t); a point source, U0 = 1:
+(1/2) * exp (- (1/4) * x ^ 2 / (a * t ))/ (pi ^ (1/2) * a ^ (1/2) * t ^ (1/2) )
+a Gaussian u(x,0) = exp(-x^2) spreads:
+pi ^ (1/2) * exp (- (1/4) * w ^ 2 )
+(1/2) * exp (- x ^ 2 / (1 + 4 * a * t ))/ ((1/4) + a * t )^ (1/2) 
+---- the transport equation u_t + c u_x = 0: U = U0(w) exp(-im c w t),
+---- the profile moves to the right with the speed c
+exp (- (c * t - x )^ 2 )

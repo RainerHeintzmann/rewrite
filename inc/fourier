@@ -27,6 +27,8 @@ FUNC  invfourier : real,real,real >> real         ATT RULES InvFourierT,FourierT
 OTHER invfourier : number,number,number >> number ATT RULES InvFourierT,FourierT,FourierBack,FourierTidy,(DerivConst,Linear,diff),All
 FUNC  fourint    : real,real,real,real >> real         # internal: the integral, f, t, w
 OTHER fourint    : number,number,number,number >> number
+FUNC  gaussft    : real,real,real,real >> real         # internal: the Gaussian, c, b, d, w
+OTHER gaussft    : number,number,number,number >> number
 
 # the delta is even: dirac(-u) = dirac(u) (for a u of negative form)
 PAT _Du : number
@@ -34,7 +36,7 @@ ADDSPEC Dirac : IF (negq(_Du)) dirac(_Du) = dirac(normform(-_Du))
 
 COMM +,*
 
-PAT _Vf,_Vg,_Vt,_Vw,_Vc,_Ve,_Vi : number
+PAT _Vf,_Vg,_Vt,_Vw,_Vc,_Ve,_Vi,_Vb,_Vd : number
 
 # linearity
 SPEC    FourierT : IF (freeq(_Vf,_Vt)) fourier(_Vf,_Vt,_Vw) = 2*pi*_Vf*dirac(_Vw)
@@ -69,6 +71,11 @@ ADDSPEC FourierT : IF (freeq(_Vc,_Vt)), (knownpos(_Vc)) \
                    fourier(1/(_Vt^2+_Vc),_Vt,_Vw) = pi/sqrt(_Vc)*exp(-sqrt(_Vc)*abs(_Vw))
 ADDSPEC FourierT : IF (freeq(_Vc,_Vt)), (knownpos(_Vc)) \
                    fourier((_Vt^2+_Vc)^-1,_Vt,_Vw) = pi/sqrt(_Vc)*exp(-sqrt(_Vc)*abs(_Vw))
+# the Gaussian exp(-c t^2 + b t + d), c > 0:
+#   sqrt(pi/c) exp(d + (b - im w)^2/(4 c)), the square expanded (im^2 = -1)
+ADDSPEC FourierT : IF (polyq(_Ve,_Vt,2)), (knownpos(normform(-coeff(_Ve,_Vt,2)))) \
+                   fourier(exp(_Ve),_Vt,_Vw) = gaussft(normform(-coeff(_Ve,_Vt,2)),coeff(_Ve,_Vt,1),coeff(_Ve,_Vt,0),_Vw)
+ADDSPEC FourierT : gaussft(_Vc,_Vb,_Vd,_Vw) = pi^(1/2)*_Vc^(-1/2)*exp(_Vd+(_Vb^2-_Vw^2)/(4*_Vc)-im*_Vb*_Vw/(2*_Vc))
 # 1/(c + im b t), b real: the dual of exp(-c t) heaviside(t), 1/(c + im w);
 # b > 0: 2 pi/b exp(c w/b) heaviside(-w), b < 0: -2 pi/b exp(c w/b) heaviside(w)
 ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(normform(subst(coeff(_Ve,_Vt),im,0)),0)), (knownneg(coeff(_Ve,_Vt,0))) \

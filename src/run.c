@@ -1085,11 +1085,13 @@ void * realcalc(Node * term,int * perr)
 
 	for (j=0;j<i;j++)
 		{
+		if (! vals[j])	/* on error (perr) no value: syms[j] is not set, nothing to free */
+			continue;
 		if (((Node *) syms[j])->type != SYM_TYPE)
 			 fatal("run.c : Not a Symbol to delete !! j: %d, type: %d\n",j,((Node *) syms[j])->type);
-		if (vals[j] && conv[j])	/* converted value */
+		if (conv[j])	/* converted value */
 			((void (*) (void *)) del(conv[j])) (vals[j]);
-		else if (vals[j])  /* on error (perr) the value is NULL: nothing to free */
+		else
 			DELNUM(syms[j],vals[j]);
 		}
 	}
@@ -1275,6 +1277,12 @@ if  ((term -> type) == Func) /* the rest is mapped onto it */
 	calc_exact_only = 1;		/* 2^(1/2) stays exact in a term */
 	sp = (Symbol *) calculate(term);
 	calc_exact_only = save;
+	if (sp && exact_integer_args(term, (Node *) sp))	/* 2026: mi(2) of a rule: 1/2, not 0.5 */
+		{
+		delnum(sp, TRUE);
+		retype_node(term);
+		return tcalc(term);
+		}
 
 	if (sp == NULL)		/* 2026: 2^(1/2)*0.7: a real number makes it numeric */
 		sp = (Symbol *) numeric_contagion(term);
