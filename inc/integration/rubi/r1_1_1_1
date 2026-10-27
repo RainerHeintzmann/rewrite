@@ -8,20 +8,20 @@
 
 # Rule 1 (1 variants):
 #   Int[1/x_, x_Symbol] := Log[x]
-ADDSPEC RubiRules : IF (K_1 == (-1)) Int((Xv)^(K_1),Xv) = ln(Xv)
+ADDSPEC RubiRules : IF (_K_1 == (-1)) Int((_Xv)^(_K_1),_Xv) = ln(_Xv)
 
 # Rule 2 (2 variants):
 #   Int[x_^m_., x_Symbol] := x^(m + 1)/(m + 1) /; FreeQ[m, x] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_m), (neq(O_m,(-1))) Int((Xv)^(O_m),Xv) = ((((Xv)^(((O_m)+(1)))))*(((((O_m)+(1)))^((-1)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_m), (neq(_O_m,(-1))) Int((_Xv)^(_O_m),_Xv) = ((((_Xv)^(((_O_m)+(1)))))*(((((_O_m)+(1)))^((-1)))))
 
 # Rule 3 (6 variants):
 #   Int[1/(a_ + b_.*x_), x_Symbol] := Log[RemoveContent[a + b*x, x]]/b /; FreeQ[{a, b}, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,P_a,O_b) Int(((P_a)+((O_b)*(Xv)))^(K_1),Xv) = ((ln(removecontent(((P_a)+(((O_b)*(Xv)))),Xv)))*(((O_b)^((-1)))))
+ADDSPEC RubiRules : IF (_K_1 == (-1)), NIN(_Xv,_P_a,_O_b) Int(((_P_a)+((_O_b)*(_Xv)))^(_K_1),_Xv) = ((ln(removecontent(((_P_a)+(((_O_b)*(_Xv)))),_Xv)))*(((_O_b)^((-1)))))
 
 # Rule 4 (9 variants):
 #   Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /; FreeQ[{a, b, m}, x] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m), (neq(P_m,(-1))) Int(((O_a)+((O_b)*(Xv)))^(P_m),Xv) = ((((((O_a)+(((O_b)*(Xv)))))^(((P_m)+(1)))))*(((O_b)^((-1))))*(((((P_m)+(1)))^((-1)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_P_m), (neq(_P_m,(-1))) Int(((_O_a)+((_O_b)*(_Xv)))^(_P_m),_Xv) = ((((((_O_a)+(((_O_b)*(_Xv)))))^(((_P_m)+(1)))))*(((_O_b)^((-1))))*(((((_P_m)+(1)))^((-1)))))
 
 # Rule 5 (9 variants):
 #   Int[(a_. + b_.*u_)^m_, x_Symbol] := 1/Coefficient[u, x, 1]*Subst[Int[(a + b*x)^m, x], x, u] /; FreeQ[{a, b, m}, x] && LinearQ[u, x] && NeQ[u, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m), (linearq(P_u,Xv)), (neq(P_u,Xv)) Int(((O_a)+((O_b)*(P_u)))^(P_m),Xv) = ((((coeff(P_u,Xv,1))^((-1))))*(intsubst(((((O_a)+(((O_b)*(Xv)))))^(P_m)),Xv,P_u)))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_P_m), (linearq(_P_u,_Xv)), (neq(_P_u,_Xv)) Int(((_O_a)+((_O_b)*(_P_u)))^(_P_m),_Xv) = ((((coeff(_P_u,_Xv,1))^((-1))))*(intsubst(((((_O_a)+(((_O_b)*(_Xv)))))^(_P_m)),_Xv,_P_u)))

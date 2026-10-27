@@ -17,30 +17,30 @@ FUNC flzero : real,real,real      >> real # flmax(1,x^2,x)    find local zero
 FUNC newton : real,real,real,real >> real # newton(start,f,f',x) find local zero
 
 ALG num1
-SPEC    num1 : IF NIN(_x,B) I(X,Y,A,B)=I(X,Y,Sub(A,B,_x),_x)
-ADDSPEC num1 : IF NIN(_x,B) newton(X,A,C,B)=newton(X,Sub(A,B,_x),Sub(C,B,_x),_x)
-ADDSPEC num1 : IF NIN(_x,B) flzero(X,A,B)=newton(X,Sub(A,B,_x),D(Sub(A,B,_x),_x),_x)
-ADDSPEC num1 : IF NIN(_x,B) flext(X,A,B)=flzero(X,D(Sub(A,B,_x),_x),_x)
-ADDSPEC num1 : IF NIN(_x,B) fmin(X,Y,A,B)=fmin(X,Y,Sub(A,B,_x),_x)
-ADDSPEC num1 : IF NIN(_x,B) fmax(X,Y,A,B)=fmin(X,Y,- A,B)
+SPEC    num1 : IF NIN(_x,_B) I(_X,_Y,_A,_B)=I(_X,_Y,Sub(_A,_B,_x),_x)
+ADDSPEC num1 : IF NIN(_x,_B) newton(_X,_A,_C,_B)=newton(_X,Sub(_A,_B,_x),Sub(_C,_B,_x),_x)
+ADDSPEC num1 : IF NIN(_x,_B) flzero(_X,_A,_B)=newton(_X,Sub(_A,_B,_x),D(Sub(_A,_B,_x),_x),_x)
+ADDSPEC num1 : IF NIN(_x,_B) flext(_X,_A,_B)=flzero(_X,D(Sub(_A,_B,_x),_x),_x)
+ADDSPEC num1 : IF NIN(_x,_B) fmin(_X,_Y,_A,_B)=fmin(_X,_Y,Sub(_A,_B,_x),_x)
+ADDSPEC num1 : IF NIN(_x,_B) fmax(_X,_Y,_A,_B)=fmin(_X,_Y,- _A,_B)
 
 ALG calc
-SPEC    calc : I(N,M,A,_x)=_myerg DO { _myerg=0;_tmp1=0;_tmp2=0 # Simpson
-        FOR _n=N+_step/2 TO M-_step STEP _step DO { _x=_n;_tmp1=_tmp1+A	
+SPEC    calc : I(_N,_K,_A,_x)=_myerg DO { _myerg=0;_tmp1=0;_tmp2=0 # Simpson
+        FOR _n=_N+_step/2 TO _K-_step STEP _step DO { _x=_n;_tmp1=_tmp1+_A	
         _x=_n+_step/2
-				_tmp2=_tmp2+A }
-				_x=M-_step/2
-				_tmp1=_tmp1+A
-				_x=N;_myerg=A+4*_tmp1+2*_tmp2
-				_x=M;_myerg=(_myerg+A)*_step/2/3
+				_tmp2=_tmp2+_A }
+				_x=_K-_step/2
+				_tmp1=_tmp1+_A
+				_x=_N;_myerg=_A+4*_tmp1+2*_tmp2
+				_x=_K;_myerg=(_myerg+_A)*_step/2/3
 				_x=nothing }
 
-ADDSPEC calc : fmin(N,M,A,_x)=_myerg DO {_myerg=0;_bestx=nothing;_best=maxreal
-        FOR _x=N TO M STEP _step DO IF (_best>A) { _best=A;_bestx=_x }
+ADDSPEC calc : fmin(_N,_K,_A,_x)=_myerg DO {_myerg=0;_bestx=nothing;_best=maxreal
+        FOR _x=_N TO _K STEP _step DO IF (_best>_A) { _best=_A;_bestx=_x }
         _myerg=_bestx}
 
-ADDSPEC calc : newton(N,A,B,_x) = _myerg DO { _x=N
-        FOR _n=1 TO _steps DO { _x=_x-A/B }; _myerg=_x; _x=nothing }
+ADDSPEC calc : newton(_N,_A,_B,_x) = _myerg DO { _x=_N
+        FOR _n=1 TO _steps DO { _x=_x-_A/_B }; _myerg=_x; _x=nothing }
 
 ALG numerik
 SPEC numerik : (num1,Subst),All

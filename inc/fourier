@@ -36,7 +36,7 @@ ADDSPEC Dirac : IF (negq(_Du)) dirac(_Du) = dirac(normform(-_Du))
 
 COMM +,*
 
-PAT _Vf,_Vg,_Vt,_Vw,_Vc,_Ve,_Vi,_Vb,_Vd : number
+PAT _Vf,_Vg,_Vt,_Vw,_Vc,_Ve,_Vi,_Vh,_Vd : number
 
 # linearity
 SPEC    FourierT : IF (freeq(_Vf,_Vt)) fourier(_Vf,_Vt,_Vw) = 2*pi*_Vf*dirac(_Vw)
@@ -75,7 +75,7 @@ ADDSPEC FourierT : IF (freeq(_Vc,_Vt)), (knownpos(_Vc)) \
 #   sqrt(pi/c) exp(d + (b - im w)^2/(4 c)), the square expanded (im^2 = -1)
 ADDSPEC FourierT : IF (polyq(_Ve,_Vt,2)), (knownpos(normform(-coeff(_Ve,_Vt,2)))) \
                    fourier(exp(_Ve),_Vt,_Vw) = gaussft(normform(-coeff(_Ve,_Vt,2)),coeff(_Ve,_Vt,1),coeff(_Ve,_Vt,0),_Vw)
-ADDSPEC FourierT : gaussft(_Vc,_Vb,_Vd,_Vw) = pi^(1/2)*_Vc^(-1/2)*exp(_Vd+(_Vb^2-_Vw^2)/(4*_Vc)-im*_Vb*_Vw/(2*_Vc))
+ADDSPEC FourierT : gaussft(_Vc,_Vh,_Vd,_Vw) = pi^(1/2)*_Vc^(-1/2)*exp(_Vd+(_Vh^2-_Vw^2)/(4*_Vc)-im*_Vh*_Vw/(2*_Vc))
 # 1/(c + im b t), b real: the dual of exp(-c t) heaviside(t), 1/(c + im w);
 # b > 0: 2 pi/b exp(c w/b) heaviside(-w), b < 0: -2 pi/b exp(c w/b) heaviside(w)
 ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(normform(subst(coeff(_Ve,_Vt),im,0)),0)), (knownneg(coeff(_Ve,_Vt,0))) \

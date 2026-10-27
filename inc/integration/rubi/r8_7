@@ -8,20 +8,20 @@
 
 # Rule 1 (9 variants):
 #   Int[Zeta[2, a_. + b_.*x_], x_Symbol] := Int[PolyGamma[1, a + b*x], x] /; FreeQ[{a, b}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b) Int(zeta(2,(O_a)+((O_b)*(Xv))),Xv) = Int(polygamma(1,((O_a)+(((O_b)*(Xv))))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b) Int(zeta(2,(_O_a)+((_O_b)*(_Xv))),_Xv) = Int(polygamma(1,((_O_a)+(((_O_b)*(_Xv))))),_Xv)
 
 # Rule 2 (9 variants):
 #   Int[Zeta[s_, a_. + b_.*x_], x_Symbol] := -Zeta[s - 1, a + b*x]/(b*(s - 1)) /; FreeQ[{a, b, s}, x] && NeQ[s, 1] && NeQ[s, 2]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_s), (neq(P_s,1)), (neq(P_s,2)) Int(zeta(P_s,(O_a)+((O_b)*(Xv))),Xv) = (((-1))*(zeta(((P_s)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))*(((((P_s)+((-1))))^((-1)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_P_s), (neq(_P_s,1)), (neq(_P_s,2)) Int(zeta(_P_s,(_O_a)+((_O_b)*(_Xv))),_Xv) = (((-1))*(zeta(((_P_s)+((-1))),((_O_a)+(((_O_b)*(_Xv))))))*(((_O_b)^((-1))))*(((((_P_s)+((-1))))^((-1)))))
 
 # Rule 3 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*Zeta[2, a_. + b_.*x_], x_Symbol] := Int[(c + d*x)^m*PolyGamma[1, a + b*x], x] /; FreeQ[{a, b, c, d}, x] && RationalQ[m]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (rationalq(O_m)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(zeta(2,(O_a)+((O_b)*(Xv)))),Xv) = Int(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(polygamma(1,((O_a)+(((O_b)*(Xv))))))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d), (rationalq(_O_m)) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(zeta(2,(_O_a)+((_O_b)*(_Xv)))),_Xv) = Int(((((((_O_c)+(((_O_d)*(_Xv)))))^(_O_m)))*(polygamma(1,((_O_a)+(((_O_b)*(_Xv))))))),_Xv)
 
 # Rule 4 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*Zeta[s_, a_. + b_.*x_], x_Symbol] := -(c + d*x)^m*Zeta[s - 1, a + b*x]/(b*(s - 1)) + d*m/(b*(s - 1))*Int[(c + d*x)^(m - 1)*Zeta[s - 1, a + b*x], x] /; FreeQ[{a, b, c, d, s}, x] && NeQ[s, 1] && NeQ[s, 2] && GtQ[m, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_s), (neq(P_s,1)), (neq(P_s,2)), (((gtq(O_m,0)))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(zeta(P_s,(O_a)+((O_b)*(Xv)))),Xv) = (((((-1))*(((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(zeta(((P_s)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))*(((((P_s)+((-1))))^((-1))))))+(((O_d)*(O_m)*(((O_b)^((-1))))*(((((P_s)+((-1))))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(zeta(((P_s)+((-1))),((O_a)+(((O_b)*(Xv))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_P_s), (neq(_P_s,1)), (neq(_P_s,2)), (((gtq(_O_m,0)))) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(zeta(_P_s,(_O_a)+((_O_b)*(_Xv)))),_Xv) = (((((-1))*(((((_O_c)+(((_O_d)*(_Xv)))))^(_O_m)))*(zeta(((_P_s)+((-1))),((_O_a)+(((_O_b)*(_Xv))))))*(((_O_b)^((-1))))*(((((_P_s)+((-1))))^((-1))))))+(((_O_d)*(_O_m)*(((_O_b)^((-1))))*(((((_P_s)+((-1))))^((-1))))*(Int(((((((_O_c)+(((_O_d)*(_Xv)))))^(((_O_m)+((-1))))))*(zeta(((_P_s)+((-1))),((_O_a)+(((_O_b)*(_Xv))))))),_Xv)))))
 
 # Rule 5 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*Zeta[s_, a_. + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*Zeta[s, a + b*x]/(d*(m + 1)) + b*s/(d*(m + 1))*Int[(c + d*x)^(m + 1)*Zeta[s + 1, a + b*x], x] /; FreeQ[{a, b, c, d, s}, x] && NeQ[s, 1] && NeQ[s, 2] && LtQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_s), (neq(P_s,1)), (neq(P_s,2)), (((ltq(O_m,(-1))))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(zeta(P_s,(O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(zeta(P_s,((O_a)+(((O_b)*(Xv))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((O_b)*(P_s)*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(zeta(((P_s)+(1)),((O_a)+(((O_b)*(Xv))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_P_s), (neq(_P_s,1)), (neq(_P_s,2)), (((ltq(_O_m,(-1))))) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(zeta(_P_s,(_O_a)+((_O_b)*(_Xv)))),_Xv) = ((((((((_O_c)+(((_O_d)*(_Xv)))))^(((_O_m)+(1)))))*(zeta(_P_s,((_O_a)+(((_O_b)*(_Xv))))))*(((_O_d)^((-1))))*(((((_O_m)+(1)))^((-1))))))+(((_O_b)*(_P_s)*(((_O_d)^((-1))))*(((((_O_m)+(1)))^((-1))))*(Int(((((((_O_c)+(((_O_d)*(_Xv)))))^(((_O_m)+(1)))))*(zeta(((_P_s)+(1)),((_O_a)+(((_O_b)*(_Xv))))))),_Xv)))))

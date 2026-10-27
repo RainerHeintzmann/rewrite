@@ -5,24 +5,24 @@ FUNC Dpn   : real,real,real >> real           # n-th partial derivative
 
 ALG pdiff
 
-SPEC        pdiff : Dpn(X,Y,0) = X
-ADDSPEC     pdiff : Dpn(X,Y,N) = Dpn(Dp(X,Y),Y,N - 1)
+SPEC        pdiff : Dpn(_X,_Y,0) = _X
+ADDSPEC     pdiff : Dpn(_X,_Y,_N) = Dpn(Dp(_X,_Y),_Y,_N - 1)
 
-ADDSPEC     pdiff : Dp(X,X) = 1         		# special constants
-ADDSPEC     pdiff : IF NIN(X,Y) Dp(Y,X) = 0    # crucial difference !!!
+ADDSPEC     pdiff : Dp(_X,_X) = 1         		# special constants
+ADDSPEC     pdiff : IF NIN(_X,_Y) Dp(_Y,_X) = 0    # crucial difference !!!
 
-ADDSPEC     pdiff : Dp(-X,Y) = - Dp(X,Y)
-ADDSPEC     pdiff : Dp(mi X,Y) = - mi X^2*Dp(X,Y)
-ADDSPEC     pdiff : Dp(ln X,Z) = mi X * Dp(X,Z)
-ADDSPEC     pdiff : Dp(e^X,Z)  = e^X * Dp(X,Z)
-ADDSPEC     pdiff : Dp(sin X,Z)= cos X * Dp(X,Z)
-ADDSPEC     pdiff : Dp(cos X,Z)= - sin X * Dp(X,Z)
+ADDSPEC     pdiff : Dp(-_X,_Y) = - Dp(_X,_Y)
+ADDSPEC     pdiff : Dp(mi _X,_Y) = - mi _X^2*Dp(_X,_Y)
+ADDSPEC     pdiff : Dp(ln _X,_Z) = mi _X * Dp(_X,_Z)
+ADDSPEC     pdiff : Dp(e^_X,_Z)  = e^_X * Dp(_X,_Z)
+ADDSPEC     pdiff : Dp(sin _X,_Z)= cos _X * Dp(_X,_Z)
+ADDSPEC     pdiff : Dp(cos _X,_Z)= - sin _X * Dp(_X,_Z)
 
-ADDSPEC     pdiff : IF NIN(X,Y) Dp(D(X,Y),X) = 0      # variable is independent
+ADDSPEC     pdiff : IF NIN(_X,_Y) Dp(D(_X,_Y),_X) = 0      # variable is independent
 
-ADDSPEC     pdiff : Dp(N*X,Z)=N*Dp(X,Z)             # this is faster
-ADDSPEC     pdiff : Dp(X*Y,Z)=Dp(X,Z)*Y+Dp(Y,Z)*X   # general differentiation rules
-ADDSPEC     pdiff : Dp(X+Y,Z)=Dp(X,Z)+Dp(Y,Z)
-ADDSPEC     pdiff : Dp(X^N,X)=N*X^(N - 1)      	    # this is faster
-ADDSPEC     pdiff : Dp(X^Y,Z)=Dp(X,Z)*Y*X^(Y-1)+Dp(Y,Z)*ln X*X^Y
+ADDSPEC     pdiff : Dp(_N*_X,_Z)=_N*Dp(_X,_Z)             # this is faster
+ADDSPEC     pdiff : Dp(_X*_Y,_Z)=Dp(_X,_Z)*_Y+Dp(_Y,_Z)*_X   # general differentiation rules
+ADDSPEC     pdiff : Dp(_X+_Y,_Z)=Dp(_X,_Z)+Dp(_Y,_Z)
+ADDSPEC     pdiff : Dp(_X^_N,_X)=_N*_X^(_N - 1)      	    # this is faster
+ADDSPEC     pdiff : Dp(_X^_Y,_Z)=Dp(_X,_Z)*_Y*_X^(_Y-1)+Dp(_Y,_Z)*ln _X*_X^_Y
 

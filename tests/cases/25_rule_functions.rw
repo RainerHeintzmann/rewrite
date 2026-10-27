@@ -10,6 +10,7 @@ x = yy
 ALG PdDef
 ALG PdConst
 FUNC pd : real,real >> real ATT RULES PdDef,(PdConst,Linear,diff)
+PAT X,Y,Z : real
 SPEC PdDef : pd(X,Y) = D(X,Y)
 SPEC PdConst : IF NIN(Z,X) D(X,Z) = 0
 T = REWR pd(x^nn,x) : All

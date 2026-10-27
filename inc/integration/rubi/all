@@ -14,19 +14,19 @@ COMM +,*
 ALG RubiRules
 # first take constant factors out, as Mathematica does: otherwise normpoly
 # makes the factor (-1*x) from -1*(x*u), and rules for (c*x)^m match with c = -1
-ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_Pa) Int(_Pa*_Uv,_Xv) = _Pa*Int(_Uv,_Xv)
 # as Mathematica: 1/sin(u) = csc(u), and Rubi's FixInertTrigFunction for
 # products of two trig functions: sec(u)*sin(u)^2 = cos(u)^-1*sin(u)^2
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(trignorm(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(trignorm(_Uv,_Xv),_Xv)
 # write multiples of an angle (sin(2x) next to cos(x)) with sin, cos of the
 # angle, as Mathematica's TrigExpand
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(trigexpand(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(trigexpand(_Uv,_Xv),_Xv)
 # polynomials in the integrand in Mathematica's normal form c0+c1*x+...
 # (without a change the rule is skipped)
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(normpoly(_Uv,_Xv),_Xv)
 # split integrals of sums right here, before other rules transform the sum
 # (else cycles of multiplying out and factoring)
-ADDSPEC RubiRules : Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)
+ADDSPEC RubiRules : Int(_Uv+_Vv,_Xv) = Int(_Uv,_Xv)+Int(_Vv,_Xv)
 INC "inc/integration/rubi/r1_1_1_1"
 INC "inc/integration/rubi/r1_1_1_2"
 INC "inc/integration/rubi/r1_1_1_3"
@@ -231,19 +231,19 @@ INC "inc/integration/rubi/r9_1"
 INC "inc/integration/rubi/r9_3"
 # last: hyperbolic functions that no rule fits, written as e^u
 # (Rubi uses sin, cos with an imaginary argument for them)
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(hyp2exp(_Uv,_Xv),_Xv)
 
 # at the end: collect like summands of the result
 ALG RubiCollect
-ADDSPEC RubiCollect : Uv+Vv = collect(Uv+Vv)
-ADDSPEC RubiCollect : Uv*Vv = simp(Uv*Vv)       # x^2*e/x^2 = e
+ADDSPEC RubiCollect : _Uv+_Vv = collect(_Uv+_Vv)
+ADDSPEC RubiCollect : _Uv*_Vv = simp(_Uv*_Vv)       # x^2*e/x^2 = e
 # the result in its final form for output (normform, symfn.c): collected,
 # numbers distributed, positive summands first, A/B; in one pass, instead of
 # the general simplification All, which needs many steps for large results
 ALG RubiOut
 # im out of the functions first, as Mathematica evaluates sin(im*w) =
 # im*sinh(w) (the hyperbolic functions come back from hyp2trig)
-ADDSPEC RubiOut : Uv = normform(imagfn(Uv))
+ADDSPEC RubiOut : _Uv = normform(imagfn(_Uv))
 OPT
 DEFAULT
 COMM

@@ -4,6 +4,7 @@ INC "inc/all"
 SYM a, b : real
 FUNC never : real >> real
 ALG raw
+PAT X : real
 SPEC raw : never(X) = X
 # ---- elementary functions: values
 csc(1), sec(1), cot(1), arccot(2)

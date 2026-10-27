@@ -32,11 +32,11 @@ SUBSORT rational,real ATT rat2real
 SUBSORT positive,nonneg ATT real2real
 SUBSORT nonneg,real ATT real2real
 
-PAT Anat,Bnat : natural
-PAT Az,Bz : integer
-PAT Aq,Bq : rational
-PAT An,Bn : nonneg
-PAT Ap,Bp : positive
+PAT _Anat,_Bnat : natural
+PAT _Az,_Bz : integer
+PAT _Aq,_Bq : rational
+PAT _An,_Bn : nonneg
+PAT _Ap,_Bp : positive
 
 # ---------------- integer ----------------
 OTHER +  : integer,integer >> integer   ATT int_plus
@@ -105,28 +105,28 @@ OTHER sqrt : positive >> positive       ATT r_sqrt
 
 # ---------------- inherit rules ----------------
 # rational inherits the rules of real, integer those of rational
-LIFT (A+A,A-A,A*A,A/A,-A,mi(A),A^A) TO (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,mi(Aq),Aq^Az)
-LIFT (A^A) TO (Aq^Aq)                    # 2^(1/2) inherits the rules for powers
-LIFT (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,Aq^Az) TO (Az+Az,Az-Az,Az*Az,Az/Az,-Az,Az^Az)
-LIFT (Az+Az,Az*Az,Az^Az) TO (Anat+Anat,Anat*Anat,Anat^Anat)
-LIFT (Aq^Aq,Az^Az,Az/Az) TO (Anat^Aq,Anat^Az,Anat/Anat)   # the variants that resolve ties
-LIFT (A+A,A*A,A/A,mi(A),A^A,sqrt(A)) TO (An+An,An*An,An/An,mi(An),An^A,sqrt(An))
-LIFT (An+An,An*An,An/An,mi(An),An^A,sqrt(An)) TO (Ap+Ap,Ap*Ap,Ap/Ap,mi(Ap),Ap^A,sqrt(Ap))
-LIFT (Ap+Ap,Ap+Ap) TO (Ap+An,An+Ap)
+LIFT (_A+_A,_A-_A,_A*_A,_A/_A,-_A,mi(_A),_A^_A) TO (_Aq+_Aq,_Aq-_Aq,_Aq*_Aq,_Aq/_Aq,-_Aq,mi(_Aq),_Aq^_Az)
+LIFT (_A^_A) TO (_Aq^_Aq)                    # 2^(1/2) inherits the rules for powers
+LIFT (_Aq+_Aq,_Aq-_Aq,_Aq*_Aq,_Aq/_Aq,-_Aq,_Aq^_Az) TO (_Az+_Az,_Az-_Az,_Az*_Az,_Az/_Az,-_Az,_Az^_Az)
+LIFT (_Az+_Az,_Az*_Az,_Az^_Az) TO (_Anat+_Anat,_Anat*_Anat,_Anat^_Anat)
+LIFT (_Aq^_Aq,_Az^_Az,_Az/_Az) TO (_Anat^_Aq,_Anat^_Az,_Anat/_Anat)   # the variants that resolve ties
+LIFT (_A+_A,_A*_A,_A/_A,mi(_A),_A^_A,sqrt(_A)) TO (_An+_An,_An*_An,_An/_An,mi(_An),_An^_A,sqrt(_An))
+LIFT (_An+_An,_An*_An,_An/_An,mi(_An),_An^_A,sqrt(_An)) TO (_Ap+_Ap,_Ap*_Ap,_Ap/_Ap,mi(_Ap),_Ap^_A,sqrt(_Ap))
+LIFT (_Ap+_Ap,_Ap+_Ap) TO (_Ap+_An,_An+_Ap)
 
 # ---------------- rules that need a sign ----------------
 # For arbitrary real numbers they are wrong (sqrt((-2)^2) is not -2);
 # here they hold for terms of the sorts nonneg and positive.
-ADDSPEC Real : (An^Y)^Z = An^(Y*Z)
-ADDSPEC Real : (An*Bn)^Z = An^Z*Bn^Z
-ADDSPEC Real : sqrt(An^2) = An
-ADDSPEC Real : abs(An) = An
-ADDSPEC Real : ln(Ap*Y) = ln(Ap) + ln(Y)
-ADDSPEC Real : ln(Y*Ap) = ln(Y) + ln(Ap)
+ADDSPEC Real : (_An^_Y)^_Z = _An^(_Y*_Z)
+ADDSPEC Real : (_An*_Bn)^_Z = _An^_Z*_Bn^_Z
+ADDSPEC Real : sqrt(_An^2) = _An
+ADDSPEC Real : abs(_An) = _An
+ADDSPEC Real : ln(_Ap*_Y) = ln(_Ap) + ln(_Y)
+ADDSPEC Real : ln(_Y*_Ap) = ln(_Y) + ln(_Ap)
 
 # A term of sort rational without an exact value (2+3^(1/2)) contains no
 # variable (those are real): a constant
-ADDSPEC diff : D(Aq,X) = 0
+ADDSPEC diff : D(_Aq,_X) = 0
 
 # from here on, numbers without a point are natural numbers (natural); -3 is
 # -(3) and therefore integer

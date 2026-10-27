@@ -10,8 +10,8 @@ rules in Mathematica syntax, for example
 
 This script parses such rules and writes rewrite rules like
 
-    ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_m), (neq(P_m,(-1))) \
-        Int((O_a+O_b*Xv)^P_m,Xv) = ...
+    ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_P_m), (neq(_P_m,(-1))) \
+        Int((_O_a+_O_b*_Xv)^_P_m,_Xv) = ...
 
 Rules that use constructs or functions which rewrite does not have are not
 translated; the output file lists them with the reason.
@@ -394,9 +394,9 @@ class Ctx:
 
     def var(self, name, optional):
         if name == self.xname:
-            return 'Xv'
+            return '_Xv'
         if name not in self.pvars:
-            self.pvars[name] = ('O_' if optional else 'P_') + name
+            self.pvars[name] = ('_O_' if optional else '_P_') + name
         return self.pvars[name]
 
     def patvar(self, name, optional):
@@ -404,7 +404,7 @@ class Ctx:
         return self.var(name, optional)
 
     def knum(self, q):
-        k = 'K_%d' % (len(self.kvars) + 1)
+        k = '_K_%d' % (len(self.kvars) + 1)
         self.kvars.append(k)
         self.extra.append('(%s == %s)' % (k, fmt_rhs_num(q)))
         return k
@@ -412,7 +412,7 @@ class Ctx:
 
 class MatchCtx(Ctx):
     """the pattern of MatchQ[u, pattern /; cond] inside a condition: its
-    pattern variables are new ones (P_mq_a, O_mq_a), since the matcher
+    pattern variables are new ones (_P_mq_a, _O_mq_a), since the matcher
     binds them while the variables of the rule are bound; other symbols
     refer to the rule's variables"""
 
@@ -425,8 +425,8 @@ class MatchCtx(Ctx):
 
     def patvar(self, name, optional):
         if name == self.xname:
-            return 'Xv'
-        v = ('O_mq_' if optional else 'P_mq_') + name
+            return '_Xv'
+        v = ('_O_mq_' if optional else '_P_mq_') + name
         self.pvars[name] = v
         self.outer.pvars['#mq:' + v] = v     # declared with the rule's variables
         return v
@@ -456,7 +456,7 @@ def tr_lhs(e, ctx):
         name, optional, head = e[1], e[2], e[3]
         if head == 'Symbol':
             ctx.xname = name
-            return 'Xv'
+            return '_Xv'
         if head is not None:
             raise Untranslatable("typed pattern %s_%s" % (name, head))
         return ctx.patvar(name, optional)
@@ -493,7 +493,7 @@ def tr_rhs(e, ctx):
     if kind == 'sym':
         n = e[1]
         if n == ctx.xname:
-            return 'Xv'
+            return '_Xv'
         if n in ctx.pvars:
             return ctx.pvars[n]
         if n in CONSTANTS:
@@ -639,7 +639,7 @@ def tr_conditions(e, ctx):
         return out
     if e[0] == 'call' and e[1] == 'FreeQ' and e[2][1] == ('sym', ctx.xname):
         items = e[2][0][2] if e[2][0][0] == 'call' and e[2][0][1] == 'List' else [e[2][0]]
-        return ['NIN(Xv,%s)' % ','.join(tr_rhs(i, ctx) for i in items)]
+        return ['NIN(_Xv,%s)' % ','.join(tr_rhs(i, ctx) for i in items)]
     return [paren(tr_bool(e, ctx))]
 
 # ======================================================================
@@ -830,7 +830,7 @@ def default_guards(pattern, result, conds, ctx):
     out = []
     used = result + ' ' + ' '.join(conds)
     for v in sorted(set(ctx.pvars.values())):
-        if not v.startswith('O_') or re.search(r'\b%s\b' % v, used):
+        if not v.startswith('_O_') or re.search(r'\b%s\b' % v, used):
             continue
         r = re.escape('(%s)' % v)
         if re.search(r'\+' + r + '|' + r + r'\+', pattern):
@@ -852,9 +852,9 @@ def translate_parsed(lhs, rhs):
     ctx = Ctx()
     x = tr_lhs(lhs[2][1], ctx)         # first: sets the integration variable
     integrand = tr_lhs(lhs[2][0], ctx)
-    if x != 'Xv':
+    if x != '_Xv':
         raise Untranslatable("integration variable is not x_Symbol")
-    pattern = 'Int(%s,Xv)' % integrand
+    pattern = 'Int(%s,_Xv)' % integrand
     result = tr_rhs(rhs, ctx)
     conds = []
     for c in conds_ast:
@@ -1025,19 +1025,19 @@ def collect_matchq_defs(util_path):
 HAND_RULES = [
     # Rubi 2.3: integrand a function of F^(c x): substitute x -> F^(g x)
     ('Int[u_, x_Symbol] := With[{v = FunctionOfExponential[u, x]}',
-     'ADDSPEC RubiRules : Int(P_u,Xv) = substexp(P_u,Xv)'),
+     'ADDSPEC RubiRules : Int(_P_u,_Xv) = substexp(_P_u,_Xv)'),
     # Rubi 9.3: x -> (a+b*x)^(1/n) for fractional powers of a linear function
     ('Int[u_,x_Symbol] := With[{lst=SubstForFractionalPowerOfLinear[u,x]}, lst',
-     'ADDSPEC RubiRules : Int(P_u,Xv) = substfracpow(P_u,Xv)'),
+     'ADDSPEC RubiRules : Int(_P_u,_Xv) = substfracpow(_P_u,_Xv)'),
     # Rubi 9.3: Euler's substitutions for functions of x and Sqrt[a+b*x+c*x^2]
     ('Int[u_,x_Symbol] := With[{lst=FunctionOfSquareRootOfQuadratic[u,x]}, 2',
-     'ADDSPEC RubiRules : Int(P_u,Xv) = substsqrtquad(P_u,Xv)'),
+     'ADDSPEC RubiRules : Int(_P_u,_Xv) = substsqrtquad(_P_u,_Xv)'),
     # Rubi 1.1.3.1/2: x^m/(a+b*x^n) for odd n or n = 2 mod 4, partial
     # fractions with cos(k pi/n) (Module, CompoundExpression and Sum in Rubi)
     ('Int[1/(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[',
-     'ADDSPEC RubiRules : Int(P_u,Xv) = binomsum(P_u,Xv)'),
+     'ADDSPEC RubiRules : Int(_P_u,_Xv) = binomsum(_P_u,_Xv)'),
     ('Int[x_^m_./(a_ + b_.*x_^n_), x_Symbol] := Module[{r = Numerator[Rt[',
-     'ADDSPEC RubiRules : Int(P_u,Xv) = binomsum(P_u,Xv)'),
+     'ADDSPEC RubiRules : Int(_P_u,_Xv) = binomsum(_P_u,_Xv)'),
 ]
 
 
@@ -1051,7 +1051,7 @@ def translate_file(path, out_dir, all_vars, stats):
         hand = [r for key, r in HAND_RULES if text.startswith(key)]
         if hand:
             ok += 1
-            all_vars['P'].add('P_u')
+            all_vars['P'].add('_P_u')
             if hand[0] in used:         # several cases of one helper: once
                 lines.append('# Rule %d (by hand, as above):\n#   %s\n' % (i, text))
             else:
@@ -1072,8 +1072,8 @@ def translate_file(path, out_dir, all_vars, stats):
             continue
         ok += 1
         for k, (rule, nvar, ctx) in enumerate(results):
-            all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('P_'))
-            all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('O_'))
+            all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('_P_'))
+            all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('_O_'))
             all_vars['K'].update(ctx.kvars)
             stats['variants'].append((nvar, name, i))
             if k == 0:
@@ -1104,35 +1104,35 @@ COMM +,*
 ALG RubiRules
 # first take constant factors out, as Mathematica does: otherwise normpoly
 # makes the factor (-1*x) from -1*(x*u), and rules for (c*x)^m match with c = -1
-ADDSPEC RubiRules : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_Pa) Int(_Pa*_Uv,_Xv) = _Pa*Int(_Uv,_Xv)
 # as Mathematica: 1/sin(u) = csc(u), and Rubi's FixInertTrigFunction for
 # products of two trig functions: sec(u)*sin(u)^2 = cos(u)^-1*sin(u)^2
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(trignorm(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(trignorm(_Uv,_Xv),_Xv)
 # write multiples of an angle (sin(2x) next to cos(x)) with sin, cos of the
 # angle, as Mathematica's TrigExpand
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(trigexpand(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(trigexpand(_Uv,_Xv),_Xv)
 # polynomials in the integrand in Mathematica's normal form c0+c1*x+...
 # (without a change the rule is skipped)
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(normpoly(_Uv,_Xv),_Xv)
 # split integrals of sums right here, before other rules transform the sum
 # (else cycles of multiplying out and factoring)
-ADDSPEC RubiRules : Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)
+ADDSPEC RubiRules : Int(_Uv+_Vv,_Xv) = Int(_Uv,_Xv)+Int(_Vv,_Xv)
 %s
 # last: hyperbolic functions that no rule fits, written as e^u
 # (Rubi uses sin, cos with an imaginary argument for them)
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(hyp2exp(_Uv,_Xv),_Xv)
 
 # at the end: collect like summands of the result
 ALG RubiCollect
-ADDSPEC RubiCollect : Uv+Vv = collect(Uv+Vv)
-ADDSPEC RubiCollect : Uv*Vv = simp(Uv*Vv)       # x^2*e/x^2 = e
+ADDSPEC RubiCollect : _Uv+_Vv = collect(_Uv+_Vv)
+ADDSPEC RubiCollect : _Uv*_Vv = simp(_Uv*_Vv)       # x^2*e/x^2 = e
 # the result in its final form for output (normform, symfn.c): collected,
 # numbers distributed, positive summands first, A/B; in one pass, instead of
 # the general simplification All, which needs many steps for large results
 ALG RubiOut
 # im out of the functions first, as Mathematica evaluates sin(im*w) =
 # im*sinh(w) (the hyperbolic functions come back from hyp2trig)
-ADDSPEC RubiOut : Uv = normform(imagfn(Uv))
+ADDSPEC RubiOut : _Uv = normform(imagfn(_Uv))
 OPT
 DEFAULT
 COMM
@@ -1172,7 +1172,7 @@ DEACTIVATE_TEXT = """# r4_0_deactivate
 # result back (imagfn: sin(im*w) = im*sinh(w), ...). hyp2trig leaves u
 # unchanged when FunctionOfTrigOfLinearQ does not hold; then the rule is
 # skipped.
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2trig(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(hyp2trig(_Uv,_Xv),_Xv)
 """
 
 
@@ -1269,13 +1269,13 @@ def translate_fixinert(util_path, out_dir, all_vars, stats):
             continue
         ok += 1
         for k, (r, nvar, ctx) in enumerate(results):
-            all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('P_'))
-            all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('O_'))
+            all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('_P_'))
+            all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('_O_'))
             all_vars['K'].update(ctx.kvars)
             r = r.replace('ADDSPEC RubiRules : ', 'ADDSPEC FixInert : ').replace('Int(', 'fixinert(')
             lines.append(('# Definition %d:\n#   %s\n' % (i, st) if k == 0 else '') + r + '\n')
-    lines.append('# FixInertTrigFunction[u_,x_] := u\nADDSPEC FixInert : fixinert(P_u,Xv) = P_u\n')
-    all_vars['P'].add('P_u')
+    lines.append('# FixInertTrigFunction[u_,x_] := u\nADDSPEC FixInert : fixinert(_P_u,_Xv) = _P_u\n')
+    all_vars['P'].add('_P_u')
     stats['files'].append(('r4_0_fixinert', 'FixInertTrigFunction', ok, len(stmts) - 1))
     with open(os.path.join(out_dir, 'r4_0_fixinert'), 'w', encoding='utf-8', newline='\n') as f:
         f.write('\n'.join(lines))
@@ -1339,8 +1339,8 @@ def translate_unify(util_path, out_dir, all_vars, stats):
             continue
         ok += 1
         for k, (r, nvar, ctx) in enumerate(results):
-            all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('P_'))
-            all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('O_'))
+            all_vars['P'].update(v for v in ctx.pvars.values() if v.startswith('_P_'))
+            all_vars['O'].update(v for v in ctx.pvars.values() if v.startswith('_O_'))
             all_vars['K'].update(ctx.kvars)
             lines.append(('# Definition %d:\n#   %s\n' % (i, st) if k == 0 else '') + r + '\n')
     with open(os.path.join(out_dir, 'r4_0_unify'), 'w', encoding='utf-8', newline='\n') as f:

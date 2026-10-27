@@ -2,15 +2,15 @@
 FUNC polynom : real,real,real++ >> real  # masks in:1. degree:2. ,coeff.: 3.++
 
 ALG PolStd1a
-SPEC    PolStd1a : SLV*A=A*SLV^1
+SPEC    PolStd1a : SLV*_A=_A*SLV^1
 ADDSPEC PolStd1a :  SLV=  SLV^1
-ADDSPEC PolStd1a : A*SLV=A*SLV^1
-ADDSPEC PolStd1a : SLV^N*A=A*SLV^N
-ADDSPEC PolStd1a : B*SLV^N*A=(B*A)*SLV^N
-ADDSPEC PolStd1a : GT(M,N) A*SLV^N+B*SLV^M = B*SLV^M+A*SLV^N
-ADDSPEC PolStd1a : GT(M,N)   SLV^N+B*SLV^M = B*SLV^M+  SLV^N
-ADDSPEC PolStd1a : GT(M,N) A*SLV^N+  SLV^M =   SLV^M+A*SLV^N
-ADDSPEC PolStd1a : GT(M,N)   SLV^N+  SLV^M =   SLV^M+  SLV^N
+ADDSPEC PolStd1a : _A*SLV=_A*SLV^1
+ADDSPEC PolStd1a : SLV^_N*_A=_A*SLV^_N
+ADDSPEC PolStd1a : _B*SLV^_N*_A=(_B*_A)*SLV^_N
+ADDSPEC PolStd1a : GT(_K,_N) _A*SLV^_N+_B*SLV^_K = _B*SLV^_K+_A*SLV^_N
+ADDSPEC PolStd1a : GT(_K,_N)   SLV^_N+_B*SLV^_K = _B*SLV^_K+  SLV^_N
+ADDSPEC PolStd1a : GT(_K,_N) _A*SLV^_N+  SLV^_K =   SLV^_K+_A*SLV^_N
+ADDSPEC PolStd1a : GT(_K,_N)   SLV^_N+  SLV^_K =   SLV^_K+  SLV^_N
 
 ALG PolStd1
 SPEC PolStd1 : Std;PolStd1

@@ -14,11 +14,11 @@
 
 # Rule 3 (972 variants):
 #   Int[(d_. + e_.*x_)*Tanh[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := e*Log[Cosh[a + b*x + c*x^2]]/(2*c) + (2*c*d - b*e)/(2*c)*Int[Tanh[a + b*x + c*x^2], x] /; FreeQ[{a, b, c, d, e}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e) Int(((O_d)+((O_e)*(Xv)))*(tanh((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))),Xv) = ((((O_e)*(ln(cosh(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))))*((1/2))*(((O_c)^((-1))))))+(((((((2)*(O_c)*(O_d)))+((((-1))*(O_b)*(O_e)))))*((1/2))*(((O_c)^((-1))))*(Int(tanh(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_e) Int(((_O_d)+((_O_e)*(_Xv)))*(tanh((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2))))),_Xv) = ((((_O_e)*(ln(cosh(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2)))))))))*((1/2))*(((_O_c)^((-1))))))+(((((((2)*(_O_c)*(_O_d)))+((((-1))*(_O_b)*(_O_e)))))*((1/2))*(((_O_c)^((-1))))*(Int(tanh(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2))))))),_Xv)))))
 
 # Rule 4 (972 variants):
 #   Int[(d_. + e_.*x_)*Coth[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := e*Log[Sinh[a + b*x + c*x^2]]/(2*c) + (2*c*d - b*e)/(2*c)*Int[Coth[a + b*x + c*x^2], x] /; FreeQ[{a, b, c, d, e}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e) Int(((O_d)+((O_e)*(Xv)))*(coth((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))),Xv) = ((((O_e)*(ln(sinh(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))))*((1/2))*(((O_c)^((-1))))))+(((((((2)*(O_c)*(O_d)))+((((-1))*(O_b)*(O_e)))))*((1/2))*(((O_c)^((-1))))*(Int(coth(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_e) Int(((_O_d)+((_O_e)*(_Xv)))*(coth((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2))))),_Xv) = ((((_O_e)*(ln(sinh(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2)))))))))*((1/2))*(((_O_c)^((-1))))))+(((((((2)*(_O_c)*(_O_d)))+((((-1))*(_O_b)*(_O_e)))))*((1/2))*(((_O_c)^((-1))))*(Int(coth(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2))))))),_Xv)))))
 
 # Rule 5 not translated: function Integral
 #   Int[(d_. + e_.*x_)^m_.*Tanh[a_. + b_.*x_ + c_.*x_^2]^n_., x_Symbol] := Integral[(d + e*x)^m*Tanh[a + b*x + c*x^2]^n, x] /; FreeQ[{a, b, c, d, e, m, n}, x]

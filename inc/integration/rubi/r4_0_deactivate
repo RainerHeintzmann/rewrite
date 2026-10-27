@@ -9,4 +9,4 @@
 # result back (imagfn: sin(im*w) = im*sinh(w), ...). hyp2trig leaves u
 # unchanged when FunctionOfTrigOfLinearQ does not hold; then the rule is
 # skipped.
-ADDSPEC RubiRules : Int(Uv,Xv) = Int(hyp2trig(Uv,Xv),Xv)
+ADDSPEC RubiRules : Int(_Uv,_Xv) = Int(hyp2trig(_Uv,_Xv),_Xv)

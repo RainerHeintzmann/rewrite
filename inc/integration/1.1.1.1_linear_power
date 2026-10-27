@@ -8,13 +8,13 @@
 # Notation of the patterns: see inc/integration/base.
 
 # Int[1/x_, x_Symbol] := Log[x]
-ADDSPEC IntRubi : IF (Pm == -1) Int(Xv^Pm,Xv) = ln(Xv)
+ADDSPEC IntRubi : IF (_Pm == -1) Int(_Xv^_Pm,_Xv) = ln(_Xv)
 
 # Int[x_^m_., x_Symbol] := x^(m + 1)/(m + 1) /; FreeQ[m, x] && NeQ[m, -1]
-ADDSPEC IntRubi : IF NIN(Xv,Qm), (Qm != -1) Int(Xv^Qm,Xv) = Xv^(Qm+1)/(Qm+1)
+ADDSPEC IntRubi : IF NIN(_Xv,_Qm), (_Qm != -1) Int(_Xv^_Qm,_Xv) = _Xv^(_Qm+1)/(_Qm+1)
 
 # Int[1/(a_ + b_.*x_), x_Symbol] := Log[RemoveContent[a + b*x, x]]/b /; FreeQ[{a, b}, x]
-ADDSPEC IntRubi : IF NIN(Xv,Pa,Qb), (Pm == -1) Int((Pa+Qb*Xv)^Pm,Xv) = ln(Pa+Qb*Xv)/Qb
+ADDSPEC IntRubi : IF NIN(_Xv,_Pa,_Qb), (_Pm == -1) Int((_Pa+_Qb*_Xv)^_Pm,_Xv) = ln(_Pa+_Qb*_Xv)/_Qb
 
 # Int[(a_. + b_.*x_)^m_, x_Symbol] := (a + b*x)^(m + 1)/(b*(m + 1)) /; FreeQ[{a, b, m}, x] && NeQ[m, -1]
-ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb,Pm), (Pm != -1) Int((Qa+Qb*Xv)^Pm,Xv) = (Qa+Qb*Xv)^(Pm+1)/(Qb*(Pm+1))
+ADDSPEC IntRubi : IF NIN(_Xv,_Qa,_Qb,_Pm), (_Pm != -1) Int((_Qa+_Qb*_Xv)^_Pm,_Xv) = (_Qa+_Qb*_Xv)^(_Pm+1)/(_Qb*(_Pm+1))

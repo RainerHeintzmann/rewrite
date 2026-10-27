@@ -72,8 +72,8 @@ ALG DerivDef
 ALG DerivConst
 FUNC deriv     : real,real >> real        ATT RULES DerivDef,(DerivConst,Linear,diff)
 OTHER deriv    : number,number >> number  ATT RULES DerivDef,(DerivConst,Linear,diff)
-SPEC DerivDef : deriv(Xnu,Ynu) = D(Xnu,Ynu)
-SPEC DerivConst : IF NIN(Znu,Xnu) D(Xnu,Znu) = 0
+SPEC DerivDef : deriv(_Xnu,_Ynu) = D(_Xnu,_Ynu)
+SPEC DerivConst : IF NIN(_Znu,_Xnu) D(_Xnu,_Znu) = 0
 FUNC collect   : real >> real             ATT SYMBOLIC collect    # collect like summands
 FUNC cancel    : real >> real             ATT SYMBOLIC cancel     # N/D over a common denominator, gcd cancelled
 OTHER cancel   : number >> number         ATT SYMBOLIC cancel

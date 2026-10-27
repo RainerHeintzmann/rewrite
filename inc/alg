@@ -50,7 +50,7 @@ SORT number
 SUBSORT real,number
 SUBSORT complex,number
 # variables of sort number: they match terms of every sort below number
-PAT Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
+PAT _Anu,_Bnu,_Cnu,_Xnu,_Ynu,_Znu : number
 # 2026: algebra, the sort of the elements of an associative algebra above
 # number: its product need not be commutative (matrices, inc/linalg). Rules
 # written for algebra hold for numbers as well; the rules for number (with
@@ -58,17 +58,20 @@ PAT Anu,Bnu,Cnu,Xnu,Ynu,Znu : number
 # algebra that are no numbers.
 SORT algebra
 SUBSORT number,algebra
-PAT Aal,Bal,Cal,Xal,Yal,Zal : algebra
+PAT _Aal,_Bal,_Cal,_Xal,_Yal,_Zal : algebra
 
-PAT A,B,C,X,Y,Z : real
-PAT As,Bs,Cs,Xs,Ys,Zs : sort
-PAT Ag,Bg,Cg,Xg,Yg,Zg : group
-PAT Aag,Bag,Cag,Xag,Yag,Zag : agroup
-PAT Ar,Br,Cr,Xr,Yr,Zr : ring
-PAT Af,Bf,Cf,Xf,Yf,Zf : field
-PAT Acf,Bcf,Ccf,Xcf,Ycf,Zcf : cfield
-PAT Ac,Bc,Cc,Xc,Yc,Zc : complex
-NUMPAT N,M : real
+# 2026: the pattern variables of the library begin with _ (formerly X, Y,
+# N, ...), so that a TERM or SYM X of the user cannot change the rules;
+# declare your own for your rules: PAT X,Y : real
+PAT _A,_B,_C,_X,_Y,_Z : real
+PAT _As,_Bs,_Cs,_Xs,_Ys,_Zs : sort
+PAT _Ag,_Bg,_Cg,_Xg,_Yg,_Zg : group
+PAT _Aag,_Bag,_Cag,_Xag,_Yag,_Zag : agroup
+PAT _Ar,_Br,_Cr,_Xr,_Yr,_Zr : ring
+PAT _Af,_Bf,_Cf,_Xf,_Yf,_Zf : field
+PAT _Acf,_Bcf,_Ccf,_Xcf,_Ycf,_Zcf : cfield
+PAT _Ac,_Bc,_Cc,_Xc,_Yc,_Zc : complex
+NUMPAT _N,_K : real
 
 SYM 0g      : group # neutral element
 SYM 0ag     : agroup # neutral element
@@ -354,317 +357,317 @@ OTHER abs       : number >> number
 OTHER sgn       : number >> number
 OTHER D         : number,number >> number
 
-LIFT (_F(As)) TO (_Fg(Ag))
-LIFT (_Fg(Ag)) TO (_Fr(Ar))
-LIFT (_Fr(Ar)) TO (_Fre(A))
-LIFT (_Fre(A)) TO (_Fc(Ac))
-LIFT (_Fg(Ag,Ag),_Fg(Ag,Ag),_Fg(Ag)) TO (Ag+Ag,Ag-Ag,-Ag)
-LIFT (_Fre(A),_Fre(A),_Fre(A),_Fre(A),_Fre(A),_Fre(A)) TO (sin A,arcsin A,cos A,arccos A,tan A,arctan A)
-LIFT (_lFre(A,A),_lFre(A,A,A,A),_lFre(A,A,A,A),_lFre(A,A,A,A),_lFre(A,A,A),_lFre(A,A,A,A)) TO (D(A,A),I(A,A,A,A),Tay(A,A,A,A),Tay(Ac,Ac,Ac,A),Dn(A,A,A),Sum(A,A,A,A))
+LIFT (_F(_As)) TO (_Fg(_Ag))
+LIFT (_Fg(_Ag)) TO (_Fr(_Ar))
+LIFT (_Fr(_Ar)) TO (_Fre(_A))
+LIFT (_Fre(_A)) TO (_Fc(_Ac))
+LIFT (_Fg(_Ag,_Ag),_Fg(_Ag,_Ag),_Fg(_Ag)) TO (_Ag+_Ag,_Ag-_Ag,-_Ag)
+LIFT (_Fre(_A),_Fre(_A),_Fre(_A),_Fre(_A),_Fre(_A),_Fre(_A)) TO (sin _A,arcsin _A,cos _A,arccos _A,tan _A,arctan _A)
+LIFT (_lFre(_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A),_lFre(_A,_A,_A,_A)) TO (D(_A,_A),I(_A,_A,_A,_A),Tay(_A,_A,_A,_A),Tay(_Ac,_Ac,_Ac,_A),Dn(_A,_A,_A),Sum(_A,_A,_A,_A))
 
-LIFT (Ag+Ag,Ag-Ag,-Ag,0g) TO (Aag+Aag,Aag-Aag,-Aag,0ag)
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r) # crucial line !!
-LIFT (Ar+Ar,Ar-Ar,Ar*Ar,Ar/Ar,-Ar,mi(Ar),0r,1r) TO (Af+Af,Af-Af,Af*Af,Af/Af,-Af,mi(Af),0f,1f)
-LIFT (Af+Af,Af-Af,Af*Af,Af/Af,-Af,mi(Af),0f,1f) TO (Acf+Acf,Acf-Acf,Acf*Acf,Acf/Acf,-Acf,mi(Acf),0cf,1cf)
-LIFT (Acf+Acf,Acf-Acf,Acf*Acf,Acf/Acf,-Acf,mi(Acf),0cf,1cf) TO (A+A,A-A,A*A,A/A,-A,mi(A),0,1)
-LIFT (Acf+Acf,Acf+Acf,Acf+Acf,Acf-Acf,Acf-Acf,Acf-Acf,Acf*Acf,Acf*Acf,Acf*Acf,Acf/Acf,Acf/Acf,Acf/Acf,-Acf,mi(Acf),0cf,1cf) \
- TO (Ac+Ac,Ac+A,A+Ac,Ac-Ac,Ac-A,A-Ac,Ac*Ac,Ac*A,A*Ac,Ac/Ac,Ac/A,A/Ac,-Ac,mi(Ac),0c,1c)
+LIFT (_Ag+_Ag,_Ag-_Ag,-_Ag,0g) TO (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag)
+LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar+_Ar,_Ar-_Ar,-_Ar,0r)
+LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar*_Ar,_Ar/_Ar,mi(_Ar),1r) # crucial line !!
+LIFT (_Ar+_Ar,_Ar-_Ar,_Ar*_Ar,_Ar/_Ar,-_Ar,mi(_Ar),0r,1r) TO (_Af+_Af,_Af-_Af,_Af*_Af,_Af/_Af,-_Af,mi(_Af),0f,1f)
+LIFT (_Af+_Af,_Af-_Af,_Af*_Af,_Af/_Af,-_Af,mi(_Af),0f,1f) TO (_Acf+_Acf,_Acf-_Acf,_Acf*_Acf,_Acf/_Acf,-_Acf,mi(_Acf),0cf,1cf)
+LIFT (_Acf+_Acf,_Acf-_Acf,_Acf*_Acf,_Acf/_Acf,-_Acf,mi(_Acf),0cf,1cf) TO (_A+_A,_A-_A,_A*_A,_A/_A,-_A,mi(_A),0,1)
+LIFT (_Acf+_Acf,_Acf+_Acf,_Acf+_Acf,_Acf-_Acf,_Acf-_Acf,_Acf-_Acf,_Acf*_Acf,_Acf*_Acf,_Acf*_Acf,_Acf/_Acf,_Acf/_Acf,_Acf/_Acf,-_Acf,mi(_Acf),0cf,1cf) \
+ TO (_Ac+_Ac,_Ac+_A,_A+_Ac,_Ac-_Ac,_Ac-_A,_A-_Ac,_Ac*_Ac,_Ac*_A,_A*_Ac,_Ac/_Ac,_Ac/_A,_A/_Ac,-_Ac,mi(_Ac),0c,1c)
 
 maxreal=  1e38
 minreal= -1e38
 
 # +++++++++++++++++++++ General groups +++++++++++++++++++++++
 ALG Group
-SPEC    Group : 0g+Xg=Xg
-ADDSPEC Group : Xg+0g=Xg
-ADDSPEC Group : (- Xg)+Xg = 0g
-ADDSPEC Group : Xg+(-Xg)  = 0g
-ADDSPEC Group : - - Xg  = Xg
-ADDSPEC Group : - (Yg+Xg) = (-Xg)+ (-Yg)   # - additive, move inwards
-ADDSPEC Group : Xg+(Yg+Zg)=Xg+Yg+Zg        # associative law
-ADDSPEC Group : Xg-Yg=Xg+(-Yg)             # no -
+SPEC    Group : 0g+_Xg=_Xg
+ADDSPEC Group : _Xg+0g=_Xg
+ADDSPEC Group : (- _Xg)+_Xg = 0g
+ADDSPEC Group : _Xg+(-_Xg)  = 0g
+ADDSPEC Group : - - _Xg  = _Xg
+ADDSPEC Group : - (_Yg+_Xg) = (-_Xg)+ (-_Yg)   # - additive, move inwards
+ADDSPEC Group : _Xg+(_Yg+_Zg)=_Xg+_Yg+_Zg        # associative law
+ADDSPEC Group : _Xg-_Yg=_Xg+(-_Yg)             # no -
 
 # +++ Alphabetical sorting in Abelian groups ++++++++++++++
 
 ALG AGroup
-ADDSPEC AGroup : IF LB(Xag,Yag) Xag+Yag = Yag+Xag
-ADDSPEC AGroup : IF LB(Yag,Zag) Xag+Yag+Zag = Xag+Zag+Yag
+ADDSPEC AGroup : IF LB(_Xag,_Yag) _Xag+_Yag = _Yag+_Xag
+ADDSPEC AGroup : IF LB(_Yag,_Zag) _Xag+_Yag+_Zag = _Xag+_Zag+_Yag
 
 # +++++++++++++++++++++ General rings +++++++++++++++++++++++
 ALG Ring
-SPEC    Ring : 0r*Xr=0r                # zero element in the ring
-ADDSPEC Ring : Xr*0r=0r
-ADDSPEC Ring : (-Xr)*Yr = -(Xr*Yr)
-ADDSPEC Ring : Xr*(-Yr) = -(Xr*Yr)    # all - multiplicative, move to the front
-ADDSPEC Ring : mi -Xr = -mi Xr     # - outside mi
-ADDSPEC Ring : Xr*(Yr+Zr)=Xr*Yr+Xr*Zr 
-ADDSPEC Ring : (Xr+Yr)*Zr=Xr*Zr+Yr*Zr  # distributive law
+SPEC    Ring : 0r*_Xr=0r                # zero element in the ring
+ADDSPEC Ring : _Xr*0r=0r
+ADDSPEC Ring : (-_Xr)*_Yr = -(_Xr*_Yr)
+ADDSPEC Ring : _Xr*(-_Yr) = -(_Xr*_Yr)    # all - multiplicative, move to the front
+ADDSPEC Ring : mi -_Xr = -mi _Xr     # - outside mi
+ADDSPEC Ring : _Xr*(_Yr+_Zr)=_Xr*_Yr+_Xr*_Zr 
+ADDSPEC Ring : (_Xr+_Yr)*_Zr=_Xr*_Zr+_Yr*_Zr  # distributive law
 # automatic : ADDSPEC Ring : Xr/Yr=Xr*mi Yr          # no - and no /
 
 # +++++++++++++++++++++ Linearity ++++++++++++++++++++++++++++
 ALG Linear
-SPEC    Linear : _lFre(-A)= -_lFre(A)
-ADDSPEC Linear : _lFre(-A,B)= -_lFre(A,B)
-ADDSPEC Linear : _lFre(-A,B,C)= -_lFre(A,B,C)
-ADDSPEC Linear : _lFre(-A,B,C,X)= -_lFre(A,B,C,X)
-ADDSPEC Linear : _lFre(-A,B,C,X,Y)= -_lFre(A,B,C,X,Y)
-ADDSPEC Linear : _lFre(N*A)=N*_lFre(A)
-ADDSPEC Linear : _lFre(N*A,B)=N*_lFre(A,B)
-ADDSPEC Linear : _lFre(N*A,B,C)=N*_lFre(A,B,C)
-ADDSPEC Linear : _lFre(N*A,B,C,X)=N*_lFre(A,B,C,X)
-ADDSPEC Linear : _lFre(N*A,B,C,X,Y)=N*_lFre(A,B,C,X,Y)
-ADDSPEC Linear : _lFre(A+B)=_lFre(A)+_lFre(B)
-ADDSPEC Linear : _lFre(A+B,C)=_lFre(A,C)+_lFre(B,C)
-ADDSPEC Linear : _lFre(A+B,C,X)=_lFre(A,C,X)+_lFre(B,C,X)
-ADDSPEC Linear : _lFre(A+B,C,X,Y)=_lFre(A,C,X,Y)+_lFre(B,C,X,Y)
-ADDSPEC Linear : _lFre(A+B,C,X,Y,Z)=_lFre(A,C,X,Y,Z)+_lFre(B,C,X,Y,Z)
+SPEC    Linear : _lFre(-_A)= -_lFre(_A)
+ADDSPEC Linear : _lFre(-_A,_B)= -_lFre(_A,_B)
+ADDSPEC Linear : _lFre(-_A,_B,_C)= -_lFre(_A,_B,_C)
+ADDSPEC Linear : _lFre(-_A,_B,_C,_X)= -_lFre(_A,_B,_C,_X)
+ADDSPEC Linear : _lFre(-_A,_B,_C,_X,_Y)= -_lFre(_A,_B,_C,_X,_Y)
+ADDSPEC Linear : _lFre(_N*_A)=_N*_lFre(_A)
+ADDSPEC Linear : _lFre(_N*_A,_B)=_N*_lFre(_A,_B)
+ADDSPEC Linear : _lFre(_N*_A,_B,_C)=_N*_lFre(_A,_B,_C)
+ADDSPEC Linear : _lFre(_N*_A,_B,_C,_X)=_N*_lFre(_A,_B,_C,_X)
+ADDSPEC Linear : _lFre(_N*_A,_B,_C,_X,_Y)=_N*_lFre(_A,_B,_C,_X,_Y)
+ADDSPEC Linear : _lFre(_A+_B)=_lFre(_A)+_lFre(_B)
+ADDSPEC Linear : _lFre(_A+_B,_C)=_lFre(_A,_C)+_lFre(_B,_C)
+ADDSPEC Linear : _lFre(_A+_B,_C,_X)=_lFre(_A,_C,_X)+_lFre(_B,_C,_X)
+ADDSPEC Linear : _lFre(_A+_B,_C,_X,_Y)=_lFre(_A,_C,_X,_Y)+_lFre(_B,_C,_X,_Y)
+ADDSPEC Linear : _lFre(_A+_B,_C,_X,_Y,_Z)=_lFre(_A,_C,_X,_Y,_Z)+_lFre(_B,_C,_X,_Y,_Z)
 
 # +++++++++++++++++++++ Specifications of the algebras ++++++++++++++++++++++++
 ALG Real
-SPEC    Real : 1^X   = 1              # rules of ^ (exponentiation)
-ADDSPEC Real : 0^X   = 0
-ADDSPEC Real : IF (is_int(X)) (A*B)^X=A^X*B^X   # 2026: only for integer X or A > 0
-ADDSPEC Real : IF (A > 0) (A*B)^X=A^X*B^X       # (otherwise wrong for negative A, B)
-ADDSPEC Real : X^1   = X
-ADDSPEC Real : X^0   = 1
-ADDSPEC Real : X^(-Y)  = mi (X^Y)
-ADDSPEC Real : IF (is_int(Z)) (X^Y)^Z=X^(Y*Z)   # 2026: was X^Y^Z (= X^(Y^Z), wrong);
-ADDSPEC Real : IF (X > 0) (X^Y)^Z=X^(Y*Z)       # (x^2)^0.5 is not x
-ADDSPEC Real : X^(Y+Z)=X^Y*X^Z
-ADDSPEC Real : IF (is_int(N/2)) (-X)^N=X^N
-ADDSPEC Real : IF (is_int((N- 1)/2)) (-X)^N= -(X^N)
+SPEC    Real : 1^_X   = 1              # rules of ^ (exponentiation)
+ADDSPEC Real : 0^_X   = 0
+ADDSPEC Real : IF (is_int(_X)) (_A*_B)^_X=_A^_X*_B^_X   # 2026: only for integer X or A > 0
+ADDSPEC Real : IF (_A > 0) (_A*_B)^_X=_A^_X*_B^_X       # (otherwise wrong for negative A, B)
+ADDSPEC Real : _X^1   = _X
+ADDSPEC Real : _X^0   = 1
+ADDSPEC Real : _X^(-_Y)  = mi (_X^_Y)
+ADDSPEC Real : IF (is_int(_Z)) (_X^_Y)^_Z=_X^(_Y*_Z)   # 2026: was X^Y^Z (= X^(Y^Z), wrong);
+ADDSPEC Real : IF (_X > 0) (_X^_Y)^_Z=_X^(_Y*_Z)       # (x^2)^0.5 is not x
+ADDSPEC Real : _X^(_Y+_Z)=_X^_Y*_X^_Z
+ADDSPEC Real : IF (is_int(_N/2)) (-_X)^_N=_X^_N
+ADDSPEC Real : IF (is_int((_N- 1)/2)) (-_X)^_N= -(_X^_N)
 
 ADDSPEC Real : ln e  = 1
-ADDSPEC Real : IF (X > 0) ln (X*Y)=ln X + ln Y   # 2026: was ln(X+Y)=ln X * ln Y (wrong);
-ADDSPEC Real : IF (Y > 0) ln (X*Y)=ln X + ln Y   # only correct with a positive factor
-ADDSPEC Real : exp(ln X) = X                      # 2026 added: exp(-ln x) = 1/x
-ADDSPEC Real : exp(-ln X) = mi X
-ADDSPEC Real : exp(N*ln X) = X^N
+ADDSPEC Real : IF (_X > 0) ln (_X*_Y)=ln _X + ln _Y   # 2026: was ln(X+Y)=ln X * ln Y (wrong);
+ADDSPEC Real : IF (_Y > 0) ln (_X*_Y)=ln _X + ln _Y   # only correct with a positive factor
+ADDSPEC Real : exp(ln _X) = _X                      # 2026 added: exp(-ln x) = 1/x
+ADDSPEC Real : exp(-ln _X) = mi _X
+ADDSPEC Real : exp(_N*ln _X) = _X^_N
 
-ADDSPEC Real : sin(-A) = -sin A
-ADDSPEC Real : cos(-A) =  cos A
+ADDSPEC Real : sin(-_A) = -sin _A
+ADDSPEC Real : cos(-_A) =  cos _A
 
 ADDSPEC Real : sin(pi) = 0
 ADDSPEC Real : cos(pi) = -1
-ADDSPEC Real : IF (is_int(N)) sin(N*pi) = 0
-ADDSPEC Real : IF (is_int((N-.5)/2)) sin(N*pi) =  1
-ADDSPEC Real : IF (is_int((N+.5)/2)) sin(N*pi) = -1
-ADDSPEC Real : IF (is_int(N-.5)) cos(N*pi) = 0
-ADDSPEC Real : IF (is_int(N/2))  cos(N*pi) = 1
-ADDSPEC Real : IF (is_int((N+1)/2)) cos(N*pi) = -1
+ADDSPEC Real : IF (is_int(_N)) sin(_N*pi) = 0
+ADDSPEC Real : IF (is_int((_N-.5)/2)) sin(_N*pi) =  1
+ADDSPEC Real : IF (is_int((_N+.5)/2)) sin(_N*pi) = -1
+ADDSPEC Real : IF (is_int(_N-.5)) cos(_N*pi) = 0
+ADDSPEC Real : IF (is_int(_N/2))  cos(_N*pi) = 1
+ADDSPEC Real : IF (is_int((_N+1)/2)) cos(_N*pi) = -1
 
 # ++++++++++++++++++ Sums  +++++++++++++++++++++++++++++++++++++
 ALG SumClosed
-SPEC    SumClosed : IF NIN(X,Y) Sum(X,A,B,Y)=(B-A+1)*Y
-ADDSPEC SumClosed : IF NIN(X,Y) Sum(X,A,B,Y*Z)=Y*Sum(X,A,B,Z)
-ADDSPEC SumClosed : IF NIN(X,Y) Sum(X,A,B,Z*Y)=Y*Sum(X,A,B,Z)
-ADDSPEC SumClosed : Sum(X,A,B,Y+Z)=Sum(X,A,B,Y)+Sum(X,A,B,Z)
-ADDSPEC SumClosed : Sum(X,A,B,-Y)= -Sum(X,A,B,Y)
+SPEC    SumClosed : IF NIN(_X,_Y) Sum(_X,_A,_B,_Y)=(_B-_A+1)*_Y
+ADDSPEC SumClosed : IF NIN(_X,_Y) Sum(_X,_A,_B,_Y*_Z)=_Y*Sum(_X,_A,_B,_Z)
+ADDSPEC SumClosed : IF NIN(_X,_Y) Sum(_X,_A,_B,_Z*_Y)=_Y*Sum(_X,_A,_B,_Z)
+ADDSPEC SumClosed : Sum(_X,_A,_B,_Y+_Z)=Sum(_X,_A,_B,_Y)+Sum(_X,_A,_B,_Z)
+ADDSPEC SumClosed : Sum(_X,_A,_B,-_Y)= -Sum(_X,_A,_B,_Y)
 
-ADDSPEC SumClosed : Sum(X,A,B,X)=.5*B^2+.5*B+.5*A*A+ -(.5*A)
+ADDSPEC SumClosed : Sum(_X,_A,_B,_X)=.5*_B^2+.5*_B+.5*_A*_A+ -(.5*_A)
 
 ALG SumUnroll
-SPEC    SumUnroll : IF (M>N) Sum(X,N,M,Y)=Sub(Y,X,M)+Sum(X,N,M- 1,Y)
-ADDSPEC SumUnroll :         Sum(X,N,N,Y)=Sub(Y,X,N)
+SPEC    SumUnroll : IF (_K>_N) Sum(_X,_N,_K,_Y)=Sub(_Y,_X,_K)+Sum(_X,_N,_K- 1,_Y)
+ADDSPEC SumUnroll :         Sum(_X,_N,_N,_Y)=Sub(_Y,_X,_N)
 
 # ++++++++++++++++++ Complex numbers +++++++++++++++++++++++++++++++++++++
 im=Cpx(0,1)
 ALG Compl
-SPEC  Compl : Cpx(X,Y) = X+im*Y
-ADDSPEC Compl : D(Xc,Y+im*Z) = im*D(Xc,Z)+D(Xc,Y)
-ADDSPEC Compl : D(Xc,im*Z+Y) = im*D(Xc,Z)+D(Xc,Y)
+SPEC  Compl : Cpx(_X,_Y) = _X+im*_Y
+ADDSPEC Compl : D(_Xc,_Y+im*_Z) = im*D(_Xc,_Z)+D(_Xc,_Y)
+ADDSPEC Compl : D(_Xc,im*_Z+_Y) = im*D(_Xc,_Z)+D(_Xc,_Y)
 
 # ++++++++++++++++++ ordering of terms, multiplicative ++++++++++++++++++++++++
 # caution : -2 * x
 ALG Mulord
-SPEC        Mulord : X*X = X^2
-ADDSPEC     Mulord : X^N*X = X^(N+1)
-ADDSPEC     Mulord : X^N*X^M = X^(N+M)
-ADDSPEC     Mulord : Y*X*X = Y*X^2
-ADDSPEC     Mulord : Y*X^N*X = Y*X^(N+1)
-ADDSPEC     Mulord : Y*X^N*X^M = Y*X^(N+M)
+SPEC        Mulord : _X*_X = _X^2
+ADDSPEC     Mulord : _X^_N*_X = _X^(_N+1)
+ADDSPEC     Mulord : _X^_N*_X^_K = _X^(_N+_K)
+ADDSPEC     Mulord : _Y*_X*_X = _Y*_X^2
+ADDSPEC     Mulord : _Y*_X^_N*_X = _Y*_X^(_N+1)
+ADDSPEC     Mulord : _Y*_X^_N*_X^_K = _Y*_X^(_N+_K)
 
 # ++++++++++++++++++ ordering of terms, additive ++++++++++++++++++++++++++++++
 ALG Addord
-SPEC        Addord : X+X = 2*X
-ADDSPEC     Addord : N*X+X = (N+1)*X
-ADDSPEC     Addord : N*X+M*X = (N+M)*X
-ADDSPEC     Addord : Y+X+X = Y+2*X
-ADDSPEC     Addord : Y+N*X+X = Y+(N+1)*X
-ADDSPEC     Addord : Y+N*X+M*X = Y+(N+M)*X
+SPEC        Addord : _X+_X = 2*_X
+ADDSPEC     Addord : _N*_X+_X = (_N+1)*_X
+ADDSPEC     Addord : _N*_X+_K*_X = (_N+_K)*_X
+ADDSPEC     Addord : _Y+_X+_X = _Y+2*_X
+ADDSPEC     Addord : _Y+_N*_X+_X = _Y+(_N+1)*_X
+ADDSPEC     Addord : _Y+_N*_X+_K*_X = _Y+(_N+_K)*_X
 
 # ++++++++++++++++++++++++ DIFFERENTIAL CALCULUS ++++++++++++++++++++++++++
 ALG diff
-SPEC        diff : D(e,Xnu) = 0         # order matters (first check e, then replace X)
-ADDSPEC     diff : D(pi,Xnu)= 0
-ADDSPEC     diff : D(im,Xnu)= 0         # 2026
-ADDSPEC     diff : D(_x,Xnu)= 0
-ADDSPEC     diff : D(N,Xnu) = 0         # numbers are constant
-ADDSPEC     diff : D(Xnu,Xnu) = 1         # special constants
+SPEC        diff : D(e,_Xnu) = 0         # order matters (first check e, then replace X)
+ADDSPEC     diff : D(pi,_Xnu)= 0
+ADDSPEC     diff : D(im,_Xnu)= 0         # 2026
+ADDSPEC     diff : D(_x,_Xnu)= 0
+ADDSPEC     diff : D(_N,_Xnu) = 0         # numbers are constant
+ADDSPEC     diff : D(_Xnu,_Xnu) = 1         # special constants
 # 2026: linearity for terms of sort number (Linear of the real terms
 # works through _lFre)
-ADDSPEC     diff : D(Xnu+Ynu,Znu) = D(Xnu,Znu)+D(Ynu,Znu)
-ADDSPEC     diff : D(Xnu-Ynu,Znu) = D(Xnu,Znu)-D(Ynu,Znu)
-ADDSPEC     diff : D(-Xnu,Znu) = -D(Xnu,Znu)
+ADDSPEC     diff : D(_Xnu+_Ynu,_Znu) = D(_Xnu,_Znu)+D(_Ynu,_Znu)
+ADDSPEC     diff : D(_Xnu-_Ynu,_Znu) = D(_Xnu,_Znu)-D(_Ynu,_Znu)
+ADDSPEC     diff : D(-_Xnu,_Znu) = -D(_Xnu,_Znu)
 
-ADDSPEC     diff : Dn(X,Y,0) = X
-ADDSPEC     diff : Dn(X,Y,N) = Dn(D(X,Y),Y,N-1)
+ADDSPEC     diff : Dn(_X,_Y,0) = _X
+ADDSPEC     diff : Dn(_X,_Y,_N) = Dn(D(_X,_Y),_Y,_N-1)
 
-ADDSPEC     diff : D(mi Xnu,Ynu) = - D(Xnu,Ynu)*mi(Xnu^2)
-ADDSPEC     diff : D(ln Xnu,Znu) = D(Xnu,Znu)*mi Xnu
-ADDSPEC     diff : D(lg Xnu,Znu) = D(Xnu,Znu)*mi (Xnu*ln 10)
-ADDSPEC     diff : D(sin Xnu,Znu)= D(Xnu,Znu)*cos Xnu
-ADDSPEC     diff : D(arcsin Xnu,Znu)= D(Xnu,Znu)*mi((1+(-(Xnu^2)))^.5)   # 2026: was (1+X^2)
-ADDSPEC     diff : D(cos Xnu,Znu)   = - D(Xnu,Znu)*sin Xnu
-ADDSPEC     diff : D(arccos Xnu,Znu)= - D(Xnu,Znu)*mi((1+(-(Xnu^2)))^.5) # 2026: was (1+X^2)
-ADDSPEC     diff : D(tan Xnu,Znu)   = D(Xnu,Znu)*mi(cos(Xnu)^2)
-ADDSPEC     diff : D(arctan Xnu,Znu)= D(Xnu,Znu)*mi(1+Xnu^2)
-ADDSPEC     diff : D(exp Xnu,Znu)   = D(Xnu,Znu)*exp Xnu                  # 2026 added
-ADDSPEC     diff : D(sqrt Xnu,Znu)  = D(Xnu,Znu)*mi(2*sqrt Xnu)           # 2026 added
-ADDSPEC     diff : D(sinh Xnu,Znu)  = D(Xnu,Znu)*cosh Xnu                 # 2026 added
-ADDSPEC     diff : D(cosh Xnu,Znu)  = D(Xnu,Znu)*sinh Xnu                 # 2026 added
-ADDSPEC     diff : D(tanh Xnu,Znu)  = D(Xnu,Znu)*mi(cosh(Xnu)^2)          # 2026 added
-ADDSPEC     diff : D(abs Xnu,Znu)   = D(Xnu,Znu)*Xnu*mi(abs Xnu)            # 2026 added (X not equal to 0)
-ADDSPEC     diff : D(csc Xnu,Znu)     = - D(Xnu,Znu)*cot(Xnu)*csc(Xnu)      # 2026 added
-ADDSPEC     diff : D(sec Xnu,Znu)     = D(Xnu,Znu)*tan(Xnu)*sec(Xnu)        # 2026 added
-ADDSPEC     diff : D(cot Xnu,Znu)     = - D(Xnu,Znu)*csc(Xnu)^2           # 2026 added
-ADDSPEC     diff : D(arccot Xnu,Znu)  = - D(Xnu,Znu)*mi(1+Xnu^2)          # 2026 added
-ADDSPEC     diff : D(coth Xnu,Znu)    = - D(Xnu,Znu)*csch(Xnu)^2          # 2026 added
-ADDSPEC     diff : D(sech Xnu,Znu)    = - D(Xnu,Znu)*tanh(Xnu)*sech(Xnu)    # 2026 added
-ADDSPEC     diff : D(csch Xnu,Znu)    = - D(Xnu,Znu)*coth(Xnu)*csch(Xnu)    # 2026 added
-ADDSPEC     diff : D(arcsinh Xnu,Znu) = D(Xnu,Znu)*mi((1+Xnu^2)^.5)       # 2026 added
-ADDSPEC     diff : D(arccosh Xnu,Znu) = D(Xnu,Znu)*mi((Xnu^2+(-1))^.5)    # 2026 added
-ADDSPEC     diff : D(arctanh Xnu,Znu) = D(Xnu,Znu)*mi(1+(-(Xnu^2)))       # 2026 added
-ADDSPEC     diff : D(arccoth Xnu,Znu) = D(Xnu,Znu)*mi(1+(-(Xnu^2)))       # 2026 added
-ADDSPEC     diff : D(polylog(N,Xnu),Znu)  = D(Xnu,Znu)*polylog(N+(-1),Xnu)*mi(Xnu)                  # 2026 added
-ADDSPEC     diff : D(productlog Xnu,Znu)  = D(Xnu,Znu)*productlog(Xnu)*mi(Xnu*(1+productlog(Xnu)))  # 2026 added
+ADDSPEC     diff : D(mi _Xnu,_Ynu) = - D(_Xnu,_Ynu)*mi(_Xnu^2)
+ADDSPEC     diff : D(ln _Xnu,_Znu) = D(_Xnu,_Znu)*mi _Xnu
+ADDSPEC     diff : D(lg _Xnu,_Znu) = D(_Xnu,_Znu)*mi (_Xnu*ln 10)
+ADDSPEC     diff : D(sin _Xnu,_Znu)= D(_Xnu,_Znu)*cos _Xnu
+ADDSPEC     diff : D(arcsin _Xnu,_Znu)= D(_Xnu,_Znu)*mi((1+(-(_Xnu^2)))^.5)   # 2026: was (1+X^2)
+ADDSPEC     diff : D(cos _Xnu,_Znu)   = - D(_Xnu,_Znu)*sin _Xnu
+ADDSPEC     diff : D(arccos _Xnu,_Znu)= - D(_Xnu,_Znu)*mi((1+(-(_Xnu^2)))^.5) # 2026: was (1+X^2)
+ADDSPEC     diff : D(tan _Xnu,_Znu)   = D(_Xnu,_Znu)*mi(cos(_Xnu)^2)
+ADDSPEC     diff : D(arctan _Xnu,_Znu)= D(_Xnu,_Znu)*mi(1+_Xnu^2)
+ADDSPEC     diff : D(exp _Xnu,_Znu)   = D(_Xnu,_Znu)*exp _Xnu                  # 2026 added
+ADDSPEC     diff : D(sqrt _Xnu,_Znu)  = D(_Xnu,_Znu)*mi(2*sqrt _Xnu)           # 2026 added
+ADDSPEC     diff : D(sinh _Xnu,_Znu)  = D(_Xnu,_Znu)*cosh _Xnu                 # 2026 added
+ADDSPEC     diff : D(cosh _Xnu,_Znu)  = D(_Xnu,_Znu)*sinh _Xnu                 # 2026 added
+ADDSPEC     diff : D(tanh _Xnu,_Znu)  = D(_Xnu,_Znu)*mi(cosh(_Xnu)^2)          # 2026 added
+ADDSPEC     diff : D(abs _Xnu,_Znu)   = D(_Xnu,_Znu)*_Xnu*mi(abs _Xnu)            # 2026 added (X not equal to 0)
+ADDSPEC     diff : D(csc _Xnu,_Znu)     = - D(_Xnu,_Znu)*cot(_Xnu)*csc(_Xnu)      # 2026 added
+ADDSPEC     diff : D(sec _Xnu,_Znu)     = D(_Xnu,_Znu)*tan(_Xnu)*sec(_Xnu)        # 2026 added
+ADDSPEC     diff : D(cot _Xnu,_Znu)     = - D(_Xnu,_Znu)*csc(_Xnu)^2           # 2026 added
+ADDSPEC     diff : D(arccot _Xnu,_Znu)  = - D(_Xnu,_Znu)*mi(1+_Xnu^2)          # 2026 added
+ADDSPEC     diff : D(coth _Xnu,_Znu)    = - D(_Xnu,_Znu)*csch(_Xnu)^2          # 2026 added
+ADDSPEC     diff : D(sech _Xnu,_Znu)    = - D(_Xnu,_Znu)*tanh(_Xnu)*sech(_Xnu)    # 2026 added
+ADDSPEC     diff : D(csch _Xnu,_Znu)    = - D(_Xnu,_Znu)*coth(_Xnu)*csch(_Xnu)    # 2026 added
+ADDSPEC     diff : D(arcsinh _Xnu,_Znu) = D(_Xnu,_Znu)*mi((1+_Xnu^2)^.5)       # 2026 added
+ADDSPEC     diff : D(arccosh _Xnu,_Znu) = D(_Xnu,_Znu)*mi((_Xnu^2+(-1))^.5)    # 2026 added
+ADDSPEC     diff : D(arctanh _Xnu,_Znu) = D(_Xnu,_Znu)*mi(1+(-(_Xnu^2)))       # 2026 added
+ADDSPEC     diff : D(arccoth _Xnu,_Znu) = D(_Xnu,_Znu)*mi(1+(-(_Xnu^2)))       # 2026 added
+ADDSPEC     diff : D(polylog(_N,_Xnu),_Znu)  = D(_Xnu,_Znu)*polylog(_N+(-1),_Xnu)*mi(_Xnu)                  # 2026 added
+ADDSPEC     diff : D(productlog _Xnu,_Znu)  = D(_Xnu,_Znu)*productlog(_Xnu)*mi(_Xnu*(1+productlog(_Xnu)))  # 2026 added
 # 2026: derivatives of the special functions (w.r.t. the argument that depends on Z)
-ADDSPEC     diff : D(arcsec Xnu,Znu)  = D(Xnu,Znu)*mi(Xnu^2*(1+(-(mi(Xnu^2))))^.5)
-ADDSPEC     diff : D(arccsc Xnu,Znu)  = - D(Xnu,Znu)*mi(Xnu^2*(1+(-(mi(Xnu^2))))^.5)
-ADDSPEC     diff : D(arcsech Xnu,Znu) = - D(Xnu,Znu)*mi(Xnu*(1+(-(Xnu^2)))^.5)
-ADDSPEC     diff : D(arccsch Xnu,Znu) = - D(Xnu,Znu)*mi(Xnu^2*(1+mi(Xnu^2))^.5)
-ADDSPEC     diff : D(erf Xnu,Znu)     = D(Xnu,Znu)*2*mi(pi^.5)*exp(-(Xnu^2))
-ADDSPEC     diff : D(erfc Xnu,Znu)    = - D(Xnu,Znu)*2*mi(pi^.5)*exp(-(Xnu^2))
-ADDSPEC     diff : D(erfi Xnu,Znu)    = D(Xnu,Znu)*2*mi(pi^.5)*exp(Xnu^2)
-ADDSPEC     diff : D(fresnels Xnu,Znu) = D(Xnu,Znu)*sin(pi*Xnu^2*.5)
-ADDSPEC     diff : D(fresnelc Xnu,Znu) = D(Xnu,Znu)*cos(pi*Xnu^2*.5)
-ADDSPEC     diff : D(sinint Xnu,Znu)  = D(Xnu,Znu)*sin(Xnu)*mi(Xnu)
-ADDSPEC     diff : D(cosint Xnu,Znu)  = D(Xnu,Znu)*cos(Xnu)*mi(Xnu)
-ADDSPEC     diff : D(sinhint Xnu,Znu) = D(Xnu,Znu)*sinh(Xnu)*mi(Xnu)
-ADDSPEC     diff : D(coshint Xnu,Znu) = D(Xnu,Znu)*cosh(Xnu)*mi(Xnu)
-ADDSPEC     diff : D(expint Xnu,Znu)  = D(Xnu,Znu)*exp(Xnu)*mi(Xnu)
-ADDSPEC     diff : D(logint Xnu,Znu)  = D(Xnu,Znu)*mi(ln Xnu)
-ADDSPEC     diff : IF NIN(Znu,Ynu) D(expinte(Ynu,Xnu),Znu) = - D(Xnu,Znu)*expinte(Ynu+(-1),Xnu)
-ADDSPEC     diff : D(Gamma Xnu,Znu)   = D(Xnu,Znu)*Gamma(Xnu)*polygamma(0,Xnu)
-ADDSPEC     diff : IF NIN(Znu,Ynu) D(Gamma(Ynu,Xnu),Znu) = - D(Xnu,Znu)*Xnu^(Ynu+(-1))*exp(-Xnu)
-ADDSPEC     diff : D(loggamma Xnu,Znu) = D(Xnu,Znu)*polygamma(0,Xnu)
-ADDSPEC     diff : IF NIN(Znu,Ynu) D(polygamma(Ynu,Xnu),Znu) = D(Xnu,Znu)*polygamma(Ynu+1,Xnu)
-ADDSPEC     diff : IF NIN(Znu,Ynu) D(zeta(Ynu,Xnu),Znu) = - D(Xnu,Znu)*Ynu*zeta(Ynu+1,Xnu)
-ADDSPEC     diff : D(elliptice Xnu,Znu) = D(Xnu,Znu)*(elliptice(Xnu)+(-(elliptick(Xnu))))*mi(2*Xnu)
-ADDSPEC     diff : D(elliptick Xnu,Znu) = D(Xnu,Znu)*(elliptice(Xnu)+(-((1+(-Xnu))*elliptick(Xnu))))*mi(2*Xnu*(1+(-Xnu)))
-ADDSPEC     diff : IF NIN(Znu,Ynu) D(ellipticf(Xnu,Ynu),Znu) = D(Xnu,Znu)*mi((1+(-(Ynu*sin(Xnu)^2)))^.5)
-ADDSPEC     diff : IF NIN(Znu,Ynu) D(elliptice(Xnu,Ynu),Znu) = D(Xnu,Znu)*(1+(-(Ynu*sin(Xnu)^2)))^.5
-ADDSPEC     diff : IF NIN(Znu,Anu,Ynu) D(ellipticpi(Anu,Xnu,Ynu),Znu) = D(Xnu,Znu)*mi((1+(-(Anu*sin(Xnu)^2)))*(1+(-(Ynu*sin(Xnu)^2)))^.5)
-ADDSPEC     diff : IF NIN(Znu,Anu,Bnu,Cnu) D(hyp2f1(Anu,Bnu,Cnu,Xnu),Znu) = D(Xnu,Znu)*Anu*Bnu*mi(Cnu)*hyp2f1(Anu+1,Bnu+1,Cnu+1,Xnu)
-ADDSPEC     diff : IF NIN(Znu,Ynu) D(besselj(Ynu,Xnu),Znu) = D(Xnu,Znu)*(besselj(Ynu+(-1),Xnu)+(-(besselj(Ynu+1,Xnu))))*.5
+ADDSPEC     diff : D(arcsec _Xnu,_Znu)  = D(_Xnu,_Znu)*mi(_Xnu^2*(1+(-(mi(_Xnu^2))))^.5)
+ADDSPEC     diff : D(arccsc _Xnu,_Znu)  = - D(_Xnu,_Znu)*mi(_Xnu^2*(1+(-(mi(_Xnu^2))))^.5)
+ADDSPEC     diff : D(arcsech _Xnu,_Znu) = - D(_Xnu,_Znu)*mi(_Xnu*(1+(-(_Xnu^2)))^.5)
+ADDSPEC     diff : D(arccsch _Xnu,_Znu) = - D(_Xnu,_Znu)*mi(_Xnu^2*(1+mi(_Xnu^2))^.5)
+ADDSPEC     diff : D(erf _Xnu,_Znu)     = D(_Xnu,_Znu)*2*mi(pi^.5)*exp(-(_Xnu^2))
+ADDSPEC     diff : D(erfc _Xnu,_Znu)    = - D(_Xnu,_Znu)*2*mi(pi^.5)*exp(-(_Xnu^2))
+ADDSPEC     diff : D(erfi _Xnu,_Znu)    = D(_Xnu,_Znu)*2*mi(pi^.5)*exp(_Xnu^2)
+ADDSPEC     diff : D(fresnels _Xnu,_Znu) = D(_Xnu,_Znu)*sin(pi*_Xnu^2*.5)
+ADDSPEC     diff : D(fresnelc _Xnu,_Znu) = D(_Xnu,_Znu)*cos(pi*_Xnu^2*.5)
+ADDSPEC     diff : D(sinint _Xnu,_Znu)  = D(_Xnu,_Znu)*sin(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : D(cosint _Xnu,_Znu)  = D(_Xnu,_Znu)*cos(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : D(sinhint _Xnu,_Znu) = D(_Xnu,_Znu)*sinh(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : D(coshint _Xnu,_Znu) = D(_Xnu,_Znu)*cosh(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : D(expint _Xnu,_Znu)  = D(_Xnu,_Znu)*exp(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : D(logint _Xnu,_Znu)  = D(_Xnu,_Znu)*mi(ln _Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(expinte(_Ynu,_Xnu),_Znu) = - D(_Xnu,_Znu)*expinte(_Ynu+(-1),_Xnu)
+ADDSPEC     diff : D(Gamma _Xnu,_Znu)   = D(_Xnu,_Znu)*Gamma(_Xnu)*polygamma(0,_Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(Gamma(_Ynu,_Xnu),_Znu) = - D(_Xnu,_Znu)*_Xnu^(_Ynu+(-1))*exp(-_Xnu)
+ADDSPEC     diff : D(loggamma _Xnu,_Znu) = D(_Xnu,_Znu)*polygamma(0,_Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(polygamma(_Ynu,_Xnu),_Znu) = D(_Xnu,_Znu)*polygamma(_Ynu+1,_Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(zeta(_Ynu,_Xnu),_Znu) = - D(_Xnu,_Znu)*_Ynu*zeta(_Ynu+1,_Xnu)
+ADDSPEC     diff : D(elliptice _Xnu,_Znu) = D(_Xnu,_Znu)*(elliptice(_Xnu)+(-(elliptick(_Xnu))))*mi(2*_Xnu)
+ADDSPEC     diff : D(elliptick _Xnu,_Znu) = D(_Xnu,_Znu)*(elliptice(_Xnu)+(-((1+(-_Xnu))*elliptick(_Xnu))))*mi(2*_Xnu*(1+(-_Xnu)))
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(ellipticf(_Xnu,_Ynu),_Znu) = D(_Xnu,_Znu)*mi((1+(-(_Ynu*sin(_Xnu)^2)))^.5)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(elliptice(_Xnu,_Ynu),_Znu) = D(_Xnu,_Znu)*(1+(-(_Ynu*sin(_Xnu)^2)))^.5
+ADDSPEC     diff : IF NIN(_Znu,_Anu,_Ynu) D(ellipticpi(_Anu,_Xnu,_Ynu),_Znu) = D(_Xnu,_Znu)*mi((1+(-(_Anu*sin(_Xnu)^2)))*(1+(-(_Ynu*sin(_Xnu)^2)))^.5)
+ADDSPEC     diff : IF NIN(_Znu,_Anu,_Bnu,_Cnu) D(hyp2f1(_Anu,_Bnu,_Cnu,_Xnu),_Znu) = D(_Xnu,_Znu)*_Anu*_Bnu*mi(_Cnu)*hyp2f1(_Anu+1,_Bnu+1,_Cnu+1,_Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(besselj(_Ynu,_Xnu),_Znu) = D(_Xnu,_Znu)*(besselj(_Ynu+(-1),_Xnu)+(-(besselj(_Ynu+1,_Xnu))))*.5
 
-ADDSPEC     diff : D(Xnu*Ynu,Znu)=D(Xnu,Znu)*Ynu+D(Ynu,Znu)*Xnu   # general differentiation rules
-ADDSPEC     diff : D(Xnu/Ynu,Znu)=D(Xnu,Znu)/Ynu-Xnu*D(Ynu,Znu)/Ynu^2   # 2026 added: quotient rule
-ADDSPEC     diff : IF NIN (Z,X) D(_Fre(X),Z)=D(X,Z)*D(_Fre(X),X)  # chain rule
+ADDSPEC     diff : D(_Xnu*_Ynu,_Znu)=D(_Xnu,_Znu)*_Ynu+D(_Ynu,_Znu)*_Xnu   # general differentiation rules
+ADDSPEC     diff : D(_Xnu/_Ynu,_Znu)=D(_Xnu,_Znu)/_Ynu-_Xnu*D(_Ynu,_Znu)/_Ynu^2   # 2026 added: quotient rule
+ADDSPEC     diff : IF NIN (_Z,_X) D(_Fre(_X),_Z)=D(_X,_Z)*D(_Fre(_X),_X)  # chain rule
 
-ADDSPEC     diff : D(e^Xnu,Znu)  = D(Xnu,Znu)*e^Xnu
-ADDSPEC     diff : D(Xnu^N,Xnu)=N*Xnu^(N-1)      # this is faster
-ADDSPEC     diff : D(Xnu^Ynu,Znu)=D(Xnu,Znu)*Ynu*Xnu^(Ynu+(-1))+D(Ynu,Znu)*ln Xnu*Xnu^Ynu
+ADDSPEC     diff : D(e^_Xnu,_Znu)  = D(_Xnu,_Znu)*e^_Xnu
+ADDSPEC     diff : D(_Xnu^_N,_Xnu)=_N*_Xnu^(_N-1)      # this is faster
+ADDSPEC     diff : D(_Xnu^_Ynu,_Znu)=D(_Xnu,_Znu)*_Ynu*_Xnu^(_Ynu+(-1))+D(_Ynu,_Znu)*ln _Xnu*_Xnu^_Ynu
 
-ADDSPEC     diff : D(I(A,B,C,_x),Z)=Sub(C,_x,B)*D(B,Z)-Sub(C,_x,A)*D(A,Z)+I(A,B,D(C,Z),_x) # Leibnitz
+ADDSPEC     diff : D(I(_A,_B,_C,_x),_Z)=Sub(_C,_x,_B)*D(_B,_Z)-Sub(_C,_x,_A)*D(_A,_Z)+I(_A,_B,D(_C,_Z),_x) # Leibnitz
 
-ADDSPEC     diff : Tay(X,Y,Z,0) = Sub(X,Y,Z)
-ADDSPEC     diff : Tay(X,Y,Z,N) = Tay(X,Y,Z,N-1)+Sub(Dn(X,Y,N),Y,Z)*mi(N!)*(Y+(-Z))^N 
+ADDSPEC     diff : Tay(_X,_Y,_Z,0) = Sub(_X,_Y,_Z)
+ADDSPEC     diff : Tay(_X,_Y,_Z,_N) = Tay(_X,_Y,_Z,_N-1)+Sub(Dn(_X,_Y,_N),_Y,_Z)*mi(_N!)*(_Y+(-_Z))^_N 
 
 # ++++++++++++++++++++++++ Substitution ++++++++++++++++++++++++++
 ALG Subst
-SPEC        Subst : Sub(X,X,A) = A
-ADDSPEC     Subst : IF NIN(Z,X) Sub(X,Z,A) = X
-ADDSPEC     Subst : Sub(X+Y,Z,A) = Sub(X,Z,A) + Sub(Y,Z,A)
-ADDSPEC     Subst : Sub(X*Y,Z,A) = Sub(X,Z,A) * Sub(Y,Z,A)
-ADDSPEC     Subst : Sub(X^Y,Z,A) = Sub(X,Z,A) ^ Sub(Y,Z,A)
-ADDSPEC     Subst : Sub(sin X,Z,A) = sin Sub(X,Z,A) 
-ADDSPEC     Subst : Sub(cos X,Z,A) = cos Sub(X,Z,A) 
-ADDSPEC     Subst : Sub(ln X,Z,A) = ln Sub(X,Z,A) 
-ADDSPEC     Subst : Sub(-X,Z,A) = - Sub(X,Z,A) 
-ADDSPEC     Subst : Sub(mi X,Z,A) = mi Sub(X,Z,A) 
+SPEC        Subst : Sub(_X,_X,_A) = _A
+ADDSPEC     Subst : IF NIN(_Z,_X) Sub(_X,_Z,_A) = _X
+ADDSPEC     Subst : Sub(_X+_Y,_Z,_A) = Sub(_X,_Z,_A) + Sub(_Y,_Z,_A)
+ADDSPEC     Subst : Sub(_X*_Y,_Z,_A) = Sub(_X,_Z,_A) * Sub(_Y,_Z,_A)
+ADDSPEC     Subst : Sub(_X^_Y,_Z,_A) = Sub(_X,_Z,_A) ^ Sub(_Y,_Z,_A)
+ADDSPEC     Subst : Sub(sin _X,_Z,_A) = sin Sub(_X,_Z,_A) 
+ADDSPEC     Subst : Sub(cos _X,_Z,_A) = cos Sub(_X,_Z,_A) 
+ADDSPEC     Subst : Sub(ln _X,_Z,_A) = ln Sub(_X,_Z,_A) 
+ADDSPEC     Subst : Sub(-_X,_Z,_A) = - Sub(_X,_Z,_A) 
+ADDSPEC     Subst : Sub(mi _X,_Z,_A) = mi Sub(_X,_Z,_A) 
 
 # ++++++++++++++++++++++++ INTEGRALS ++++++++++++++++++++++++++++++++++++++
 ALG substint
-SPEC substint : IF NIN(_x,X) I(A,B,C,X) = _erg DO {_erg=REWR I(A,B,Sub(C,X,_x),_x) : Subst}
+SPEC substint : IF NIN(_x,_X) I(_A,_B,_C,_X) = _erg DO {_erg=REWR I(_A,_B,Sub(_C,_X,_x),_x) : Subst}
 
 ALG integr
-SPEC        integr : I(A,B,X+Y,Z) = I(A,B,X,Z)+I(A,B,Y,Z)
-ADDSPEC     integr : IF NIN (Y,C) I(A,B,C*X,Y) = C*I(A,B,X,Y)
-ADDSPEC     integr :           I(A,B,-X,Y) = - I(A,B,X,Y)
+SPEC        integr : I(_A,_B,_X+_Y,_Z) = I(_A,_B,_X,_Z)+I(_A,_B,_Y,_Z)
+ADDSPEC     integr : IF NIN (_Y,_C) I(_A,_B,_C*_X,_Y) = _C*I(_A,_B,_X,_Y)
+ADDSPEC     integr :           I(_A,_B,-_X,_Y) = - I(_A,_B,_X,_Y)
 
-ADDSPEC     integr : I(A,A,X,Y) = 0
-ADDSPEC     integr : IF NIN (Z,C) I(A,B,C,Z)   = C*(B+(-A))
+ADDSPEC     integr : I(_A,_A,_X,_Y) = 0
+ADDSPEC     integr : IF NIN (_Z,_C) I(_A,_B,_C,_Z)   = _C*(_B+(-_A))
 
-ADDSPEC     integr : IF NIN (X,Y) I(A,B,Y^X,X) = (Y^B + (-(Y^A))) * mi (ln Y)
-ADDSPEC     integr : IF NIN (X,Y) I(A,B,sin X,X) = - (cos B+(-cos A))
-ADDSPEC     integr : IF NIN (X,Y) I(A,B,cos X,X) = sin B +(-sin A)
+ADDSPEC     integr : IF NIN (_X,_Y) I(_A,_B,_Y^_X,_X) = (_Y^_B + (-(_Y^_A))) * mi (ln _Y)
+ADDSPEC     integr : IF NIN (_X,_Y) I(_A,_B,sin _X,_X) = - (cos _B+(-cos _A))
+ADDSPEC     integr : IF NIN (_X,_Y) I(_A,_B,cos _X,_X) = sin _B +(-sin _A)
 
 
-ADDSPEC     integr : IF NIN (Z,C + Y) I(A,B,(X+C)^Y,X) = I(A+C,B+C,X^Y,X)
-ADDSPEC     integr : IF NIN (Z,C + Y) I(A,B,(C+X)^Y,X) = I(A+C,B+C,X^Y,X)
+ADDSPEC     integr : IF NIN (_Z,_C + _Y) I(_A,_B,(_X+_C)^_Y,_X) = I(_A+_C,_B+_C,_X^_Y,_X)
+ADDSPEC     integr : IF NIN (_Z,_C + _Y) I(_A,_B,(_C+_X)^_Y,_X) = I(_A+_C,_B+_C,_X^_Y,_X)
 
-ADDSPEC     integr :                 I(A,B,mi X,X)   = ln B +(- ln A)
+ADDSPEC     integr :                 I(_A,_B,mi _X,_X)   = ln _B +(- ln _A)
 
-ADDSPEC     integr : IF NIN (X,Y)    I(A,B,X^Y,X)    = mi(Y+1)*(B^(Y+1)+(-(A^(Y+1))))
-ADDSPEC     integr :                 I(A,B,X,X)      = .5*(B^2+(-(A^2)))
+ADDSPEC     integr : IF NIN (_X,_Y)    I(_A,_B,_X^_Y,_X)    = mi(_Y+1)*(_B^(_Y+1)+(-(_A^(_Y+1))))
+ADDSPEC     integr :                 I(_A,_B,_X,_X)      = .5*(_B^2+(-(_A^2)))
 
 
 # +++++++++++ Algebra for *, - standard +++++++++++++++++++++++++++++++++++++++
 ALG Combine1
-SPEC        Combine1 : mi X *mi Y = mi (X*Y)
-ADDSPEC     Combine1 : mi X * Y = Y * mi X
-ADDSPEC     Combine1 : mi mi X  = X
-ADDSPEC     Combine1 : (- X) * Y = -(X*Y)
-ADDSPEC     Combine1 : X *(- Y) = -(X*Y)
-ADDSPEC     Combine1 : (-X)+(-Y) = -(X+Y)  # prevents cooperation with Group
-ADDSPEC     Combine1 : (-X) + Y =  Y+(-X)
-ADDSPEC     Combine1 : - - X  = X
+SPEC        Combine1 : mi _X *mi _Y = mi (_X*_Y)
+ADDSPEC     Combine1 : mi _X * _Y = _Y * mi _X
+ADDSPEC     Combine1 : mi mi _X  = _X
+ADDSPEC     Combine1 : (- _X) * _Y = -(_X*_Y)
+ADDSPEC     Combine1 : _X *(- _Y) = -(_X*_Y)
+ADDSPEC     Combine1 : (-_X)+(-_Y) = -(_X+_Y)  # prevents cooperation with Group
+ADDSPEC     Combine1 : (-_X) + _Y =  _Y+(-_X)
+ADDSPEC     Combine1 : - - _X  = _X
 
-ADDSPEC     Combine1 : (mi X)^Y  = mi (X^Y)
-ADDSPEC     Combine1 : X^(-Y)  = mi (X^Y)
+ADDSPEC     Combine1 : (mi _X)^_Y  = mi (_X^_Y)
+ADDSPEC     Combine1 : _X^(-_Y)  = mi (_X^_Y)
 
-ADDSPEC     Combine1 : X*Y*Z=X*(Y*Z)  # associative law
-ADDSPEC     Combine1 : X+Y+Z=X+(Y+Z)  # associative law
+ADDSPEC     Combine1 : _X*_Y*_Z=_X*(_Y*_Z)  # associative law
+ADDSPEC     Combine1 : _X+_Y+_Z=_X+(_Y+_Z)  # associative law
 
 # +++++++++++ Algebra for further simplifying and combining ++++++++++++
 ALG more
-SPEC        more : X*(Y*Z)=X*Y*Z
-ADDSPEC     more : X+(Y+Z)=X+Y+Z  # associative law
-ADDSPEC     more : X*(Y/Z)=X*Y/Z  # associative law
-ADDSPEC     more : X+(Y-Z)=X+Y-Z  # associative law
+SPEC        more : _X*(_Y*_Z)=_X*_Y*_Z
+ADDSPEC     more : _X+(_Y+_Z)=_X+_Y+_Z  # associative law
+ADDSPEC     more : _X*(_Y/_Z)=_X*_Y/_Z  # associative law
+ADDSPEC     more : _X+(_Y-_Z)=_X+_Y-_Z  # associative law
 
-ADDSPEC     more : X^Y*X^Z=X^(Y+Z)
-ADDSPEC     more : X^Y*X=X^(Y+1)
-ADDSPEC     more : X*X^Y=X^(Y+1)
-ADDSPEC     more : X+X=2*X
+ADDSPEC     more : _X^_Y*_X^_Z=_X^(_Y+_Z)
+ADDSPEC     more : _X^_Y*_X=_X^(_Y+1)
+ADDSPEC     more : _X*_X^_Y=_X^(_Y+1)
+ADDSPEC     more : _X+_X=2*_X
 
-ADDSPEC     more : X * mi Y=X/Y
-ADDSPEC     more : X+(-Y)=X-Y  
+ADDSPEC     more : _X * mi _Y=_X/_Y
+ADDSPEC     more : _X+(-_Y)=_X-_Y  
 
-ADDSPEC     more : 0+X   = X         # special constants
-ADDSPEC     more : X+0   = X
-ADDSPEC     more : X*0   = 0
-ADDSPEC     more : 0*X   = 0
-ADDSPEC     more : 1*X   = X
-ADDSPEC     more : X*1   = X
+ADDSPEC     more : 0+_X   = _X         # special constants
+ADDSPEC     more : _X+0   = _X
+ADDSPEC     more : _X*0   = 0
+ADDSPEC     more : 0*_X   = 0
+ADDSPEC     more : 1*_X   = _X
+ADDSPEC     more : _X*1   = _X
 # ++++++++++++++++++++++++ NUMERICS ++++++++++++++++++++++++++
-ADDSPEC     more : X+N = N+X
-ADDSPEC     more : X*N = N*X
+ADDSPEC     more : _X+_N = _N+_X
+ADDSPEC     more : _X*_N = _N*_X
 
 ALG NoMi
-SPEC    NoMi : mi X=1/X
+SPEC    NoMi : mi _X=1/_X
 
 ALG GrRi 
 SPEC GrRi : Group,Ring

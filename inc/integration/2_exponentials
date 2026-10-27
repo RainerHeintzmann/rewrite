@@ -10,14 +10,14 @@
 # for a number F as Kf^(e+f*x).
 
 # Int[(F_^(c_.*(a_. + b_.*x_)))^n_., x_Symbol] := (F^(c*(a + b*x)))^n/(b*c*n*Log[F]) /; FreeQ[{F, a, b, c, n}, x]
-ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb) Int(exp(Qa+Qb*Xv),Xv) = exp(Qa+Qb*Xv)/Qb
-ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb) Int(Kf^(Qa+Qb*Xv),Xv) = Kf^(Qa+Qb*Xv)/(Qb*ln(Kf))
+ADDSPEC IntRubi : IF NIN(_Xv,_Qa,_Qb) Int(exp(_Qa+_Qb*_Xv),_Xv) = exp(_Qa+_Qb*_Xv)/_Qb
+ADDSPEC IntRubi : IF NIN(_Xv,_Qa,_Qb) Int(_Kf^(_Qa+_Qb*_Xv),_Xv) = _Kf^(_Qa+_Qb*_Xv)/(_Qb*ln(_Kf))
 
 # Int[(c_. + d_.*x_)^m_.*(b_.*F_^(g_.*(e_. + f_.*x_)))^n_., x_Symbol] :=
 #    (c + d*x)^m*(b*F^(g*(e + f*x)))^n/(f*g*n*Log[F])
 #    - d*m/(f*g*n*Log[F])*Int[(c + d*x)^(m - 1)*(b*F^(g*(e + f*x)))^n, x]
 #    /; FreeQ[{F, b, c, d, e, f, g, n}, x] && GtQ[m, 0] && IntegerQ[2*m]
-ADDSPEC IntRubi : IF NIN(Xv,Qc,Qd,Qe,Qf), (Qm > 0), (is_int(2*Qm)) \
-                  Int((Qc+Qd*Xv)^Qm*exp(Qe+Qf*Xv),Xv) = \
-                  (Qc+Qd*Xv)^Qm*exp(Qe+Qf*Xv)/Qf \
-                  - Qd*Qm/Qf*Int((Qc+Qd*Xv)^(Qm-1)*exp(Qe+Qf*Xv),Xv)
+ADDSPEC IntRubi : IF NIN(_Xv,_Qc,_Qd,_Qe,_Qf), (_Qm > 0), (is_int(2*_Qm)) \
+                  Int((_Qc+_Qd*_Xv)^_Qm*exp(_Qe+_Qf*_Xv),_Xv) = \
+                  (_Qc+_Qd*_Xv)^_Qm*exp(_Qe+_Qf*_Xv)/_Qf \
+                  - _Qd*_Qm/_Qf*Int((_Qc+_Qd*_Xv)^(_Qm-1)*exp(_Qe+_Qf*_Xv),_Xv)

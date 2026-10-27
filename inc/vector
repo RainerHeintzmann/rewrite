@@ -1,10 +1,10 @@
 SORT vector
-PAT  A_v : vector
-PAT  B_v : vector
-PAT  C_v : vector
-PAT  X_v : vector
-PAT  Y_v : vector
-PAT  Z_v : vector
+PAT  _A_v : vector
+PAT  _B_v : vector
+PAT  _C_v : vector
+PAT  _X_v : vector
+PAT  _Y_v : vector
+PAT  _Z_v : vector
 
 SYM 1_v : vector                   # ones vector
 SYM e1 : vector                    # 1st unit vector
@@ -27,12 +27,12 @@ FUNC grad : real >> vector           # cross product
 FUNC _x_   : vector,vector >> vector  LA4 # cross product (same precedence as ^,inx)
 
 SORT matrix
-PAT  A_m : matrix
-PAT  B_m : matrix
-PAT  C_m : matrix
-PAT  X_m : matrix
-PAT  Y_m : matrix
-PAT  Z_m : matrix
+PAT  _A_m : matrix
+PAT  _B_m : matrix
+PAT  _C_m : matrix
+PAT  _X_m : matrix
+PAT  _Y_m : matrix
+PAT  _Z_m : matrix
 
 SYM E : matrix                    # identity matrix
 SYM 0_m : matrix						# zero matrix
@@ -51,65 +51,65 @@ FUNC mat : vector,vector,vector >> matrix # definition of a 3*3 matrix
 FUNC elem : real,real,real >> matrix # row,column,value
 
 ALG Vector
-SPEC    Vector : A_v+(B_v+C_v)=A_v+B_v+C_v
-ADDSPEC Vector : A*(A_v*B)=A*A_v*B
-ADDSPEC Vector : A_v*A=A*A_v
-ADDSPEC Vector : A_v - B_v = A_v + - B_v
-ADDSPEC Vector : A_v _x_ (B_v _x_ C_v)=B_v*(A_v*C_v)+ - (C_v*(A_v*B_v))
-ADDSPEC Vector : grad A = vec(Dp(A,e1),Dp(A,e2),Dp(A,e3))
+SPEC    Vector : _A_v+(_B_v+_C_v)=_A_v+_B_v+_C_v
+ADDSPEC Vector : _A*(_A_v*_B)=_A*_A_v*_B
+ADDSPEC Vector : _A_v*_A=_A*_A_v
+ADDSPEC Vector : _A_v - _B_v = _A_v + - _B_v
+ADDSPEC Vector : _A_v _x_ (_B_v _x_ _C_v)=_B_v*(_A_v*_C_v)+ - (_C_v*(_A_v*_B_v))
+ADDSPEC Vector : grad _A = vec(Dp(_A,e1),Dp(_A,e2),Dp(_A,e3))
 
 # explicit vectors
-ADDSPEC Vector : vec(A,B,C)*vec(X,Y,Z)=A*X+B*Y+C*Z
-ADDSPEC Vector : vec(A,B,C)^2=A^2+B^2+C^2
+ADDSPEC Vector : vec(_A,_B,_C)*vec(_X,_Y,_Z)=_A*_X+_B*_Y+_C*_Z
+ADDSPEC Vector : vec(_A,_B,_C)^2=_A^2+_B^2+_C^2
 # ADDSPEC Vector : A*vec(X,Y,Z)=vec(A*X,A*Y,A*Z)
-ADDSPEC Vector : N*vec(X,Y,Z)=vec(N*X,N*Y,N*Z)
-ADDSPEC Vector : vec(A,B,C)+vec(X,Y,Z)=vec(A+X,B+Y,C+Z)
-ADDSPEC Vector : - vec(A,B,C)=vec(-A,-B,-C)
-ADDSPEC Vector : vec(A,B,C) _x_ vec(X,Y,Z)=vec(B*Z+ -Y*C,C*X+ -Z*A,A*Y+ -X*B)
+ADDSPEC Vector : _N*vec(_X,_Y,_Z)=vec(_N*_X,_N*_Y,_N*_Z)
+ADDSPEC Vector : vec(_A,_B,_C)+vec(_X,_Y,_Z)=vec(_A+_X,_B+_Y,_C+_Z)
+ADDSPEC Vector : - vec(_A,_B,_C)=vec(-_A,-_B,-_C)
+ADDSPEC Vector : vec(_A,_B,_C) _x_ vec(_X,_Y,_Z)=vec(_B*_Z+ -_Y*_C,_C*_X+ -_Z*_A,_A*_Y+ -_X*_B)
 ADDSPEC Vector : 1_v=vec(1,1,1)
 
-ADDSPEC Vector : mat(A_v,B_v,C_v)*X_v=vec(A_v*X_v,B_v*X_v,C_v*X_v)
+ADDSPEC Vector : mat(_A_v,_B_v,_C_v)*_X_v=vec(_A_v*_X_v,_B_v*_X_v,_C_v*_X_v)
 
 ALG Matrix
 
-SPEC    Matrix : elem(A,B,X)*elem(B,Z,Y)=elem(A,Z,X*Y)
-ADDSPEC Matrix : elem(N,M,X)+elem(N,M,Y)=elem(N,M,X+Y)
-ADDSPEC Matrix : A_m+elem(N,M,X)+elem(N,M,Y)=A_m+elem(N,M,X+Y)
-ADDSPEC Matrix : (A_m+B_m)*C_m=A_m*C_m+B_m*C_m
-ADDSPEC Matrix : C_m*(A_m+B_m)=C_m*A_m+C_m*B_m
-ADDSPEC Matrix : C_m+(A_m+B_m)=C_m+A_m+B_m
-ADDSPEC Matrix : det (A_m+B_m)=det A_m+ det B_m
+SPEC    Matrix : elem(_A,_B,_X)*elem(_B,_Z,_Y)=elem(_A,_Z,_X*_Y)
+ADDSPEC Matrix : elem(_N,_K,_X)+elem(_N,_K,_Y)=elem(_N,_K,_X+_Y)
+ADDSPEC Matrix : _A_m+elem(_N,_K,_X)+elem(_N,_K,_Y)=_A_m+elem(_N,_K,_X+_Y)
+ADDSPEC Matrix : (_A_m+_B_m)*_C_m=_A_m*_C_m+_B_m*_C_m
+ADDSPEC Matrix : _C_m*(_A_m+_B_m)=_C_m*_A_m+_C_m*_B_m
+ADDSPEC Matrix : _C_m+(_A_m+_B_m)=_C_m+_A_m+_B_m
+ADDSPEC Matrix : det (_A_m+_B_m)=det _A_m+ det _B_m
 
 ALG wegdamit
-SPEC    wegdamit : elem(X,Y,Z)*elem(A,B,C)=0_m
-ADDSPEC wegdamit : 0_m+A_m=A_m
-ADDSPEC wegdamit : A_m+0_m=A_m
+SPEC    wegdamit : elem(_X,_Y,_Z)*elem(_A,_B,_C)=0_m
+ADDSPEC wegdamit : 0_m+_A_m=_A_m
+ADDSPEC wegdamit : _A_m+0_m=_A_m
 
 ALG mso1
-SPEC    mso1 : IF (M>N) elem(M,A,X)+elem(N,B,Y)=elem(N,B,Y)+elem(M,A,X)
-ADDSPEC mso1 : IF (M>N) A_m+elem(M,A,X)+elem(N,B,Y)=A_m+elem(N,B,Y)+elem(M,A,X)
-ADDSPEC mso1 : A_m+(B_m+C_m)=A_m+B_m+C_m
+SPEC    mso1 : IF (_K>_N) elem(_K,_A,_X)+elem(_N,_B,_Y)=elem(_N,_B,_Y)+elem(_K,_A,_X)
+ADDSPEC mso1 : IF (_K>_N) _A_m+elem(_K,_A,_X)+elem(_N,_B,_Y)=_A_m+elem(_N,_B,_Y)+elem(_K,_A,_X)
+ADDSPEC mso1 : _A_m+(_B_m+_C_m)=_A_m+_B_m+_C_m
 
 ALG mso2
-SPEC    mso2 : IF (M>N) elem(A,M,X)+elem(A,N,Y)=elem(A,N,Y)+elem(A,M,X)
-ADDSPEC mso2 : IF (M>N) A_m+elem(A,M,X)+elem(A,N,Y)=A_m+elem(A,N,Y)+elem(A,M,X)
-ADDSPEC mso2 : A_m+(B_m+C_m)=A_m+B_m+C_m
+SPEC    mso2 : IF (_K>_N) elem(_A,_K,_X)+elem(_A,_N,_Y)=elem(_A,_N,_Y)+elem(_A,_K,_X)
+ADDSPEC mso2 : IF (_K>_N) _A_m+elem(_A,_K,_X)+elem(_A,_N,_Y)=_A_m+elem(_A,_N,_Y)+elem(_A,_K,_X)
+ADDSPEC mso2 : _A_m+(_B_m+_C_m)=_A_m+_B_m+_C_m
 
 ALG det1
-SPEC    det1 : det(A_m+elem(N,M,X))=det(entwz(N,A_m+elem(N,M,X)))
-ADDSPEC det1 : det(entwz(N,A_m+elem(N,M,X)))=X*sgn(-1^(N+M))*det(entwz(N- 1,ohne(N,M,A_m)))+det(entwz(N,A_m))
-ADDSPEC det1 : IF (N>M) det(entwz(N,A_m+elem(M,C,Y)))=0
-ADDSPEC det1 : IF (N>M) det(entwz(N,elem(M,C,Y)))=0
-ADDSPEC det1 : det(entwz(N,elem(N,M,X)))=X*sgn(-1^(N+M))
-ADDSPEC det1 : ohne(A,B,A_m+B_m)=ohne(A,B,A_m)+ohne(A,B,B_m)
-ADDSPEC det1 : ohne(A,B,elem(A,Y,Z))=0_m
-ADDSPEC det1 : ohne(A,B,elem(X,B,Z))=0_m
+SPEC    det1 : det(_A_m+elem(_N,_K,_X))=det(entwz(_N,_A_m+elem(_N,_K,_X)))
+ADDSPEC det1 : det(entwz(_N,_A_m+elem(_N,_K,_X)))=_X*sgn(-1^(_N+_K))*det(entwz(_N- 1,ohne(_N,_K,_A_m)))+det(entwz(_N,_A_m))
+ADDSPEC det1 : IF (_N>_K) det(entwz(_N,_A_m+elem(_K,_C,_Y)))=0
+ADDSPEC det1 : IF (_N>_K) det(entwz(_N,elem(_K,_C,_Y)))=0
+ADDSPEC det1 : det(entwz(_N,elem(_N,_K,_X)))=_X*sgn(-1^(_N+_K))
+ADDSPEC det1 : ohne(_A,_B,_A_m+_B_m)=ohne(_A,_B,_A_m)+ohne(_A,_B,_B_m)
+ADDSPEC det1 : ohne(_A,_B,elem(_A,_Y,_Z))=0_m
+ADDSPEC det1 : ohne(_A,_B,elem(_X,_B,_Z))=0_m
 # ADDSPEC det1 : IF (LB(A,X) && LB(B,Y)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z) # better: Notequal
 # ADDSPEC det1 : IF (LB(A,X) && LB(Y,B)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)
 # ADDSPEC det1 : IF (LB(X,A) && LB(B,Y)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)
 # ADDSPEC det1 : IF (LB(X,A) && LB(Y,B)) ohne(A,B,elem(X,Y,Z))=elem(X,Y,Z)
-ADDSPEC det1 : 0_m+A_m=A_m
-ADDSPEC det1 : A_m+0_m=A_m
+ADDSPEC det1 : 0_m+_A_m=_A_m
+ADDSPEC det1 : _A_m+0_m=_A_m
 ADDSPEC det1 : det 0_m=0
 
 

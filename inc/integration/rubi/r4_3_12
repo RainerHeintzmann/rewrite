@@ -8,32 +8,32 @@
 
 # Rule 1 (108 variants):
 #   Int[Tan[a_. + b_.*x_ + c_.*x_^2]^n_., x_Symbol] := Unintegrable[Tan[a + b*x + c*x^2]^n, x] /; FreeQ[{a, b, c, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n) Int((tan((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))))^(O_n),Xv) = unintegrable(((tan(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))^(O_n)),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_n) Int((tan((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2)))))^(_O_n),_Xv) = unintegrable(((tan(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2))))))))^(_O_n)),_Xv)
 
 # Rule 2 (108 variants):
 #   Int[Cot[a_. + b_.*x_ + c_.*x_^2]^n_., x_Symbol] := Unintegrable[Cot[a + b*x + c*x^2]^n, x] /; FreeQ[{a, b, c, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n) Int((cot((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))))^(O_n),Xv) = unintegrable(((cot(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))^(O_n)),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_n) Int((cot((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2)))))^(_O_n),_Xv) = unintegrable(((cot(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2))))))))^(_O_n)),_Xv)
 
 # Rule 3 (648 variants):
 #   Int[(d_ + e_.*x_)*Tan[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := -e*Log[Cos[a + b*x + c*x^2]]/(2*c) /; FreeQ[{a, b, c, d, e}, x] && EqQ[2*c*d - b*e, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((2)*(O_c)*(P_d)))+((((-1))*(O_b)*(O_e)))),0)) Int(((P_d)+((O_e)*(Xv)))*(tan((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))),Xv) = (((-(1/2)))*(O_e)*(ln(cos(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))))*(((O_c)^((-1)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_P_d,_O_e), (eqq(((((2)*(_O_c)*(_P_d)))+((((-1))*(_O_b)*(_O_e)))),0)) Int(((_P_d)+((_O_e)*(_Xv)))*(tan((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2))))),_Xv) = (((-(1/2)))*(_O_e)*(ln(cos(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2)))))))))*(((_O_c)^((-1)))))
 
 # Rule 4 (648 variants):
 #   Int[(d_ + e_.*x_)*Cot[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := e*Log[Sin[a + b*x + c*x^2]]/(2*c) /; FreeQ[{a, b, c, d, e}, x] && EqQ[2*c*d - b*e, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e), (eqq(((((2)*(O_c)*(P_d)))+((((-1))*(O_b)*(O_e)))),0)) Int(((P_d)+((O_e)*(Xv)))*(cot((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))),Xv) = ((O_e)*(ln(sin(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))))*((1/2))*(((O_c)^((-1)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_P_d,_O_e), (eqq(((((2)*(_O_c)*(_P_d)))+((((-1))*(_O_b)*(_O_e)))),0)) Int(((_P_d)+((_O_e)*(_Xv)))*(cot((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2))))),_Xv) = ((_O_e)*(ln(sin(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2)))))))))*((1/2))*(((_O_c)^((-1)))))
 
 # Rule 5 (972 variants):
 #   Int[(d_. + e_.*x_)*Tan[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := -e*Log[Cos[a + b*x + c*x^2]]/(2*c) + (2*c*d - b*e)/(2*c)*Int[Tan[a + b*x + c*x^2], x] /; FreeQ[{a, b, c, d, e}, x] && NeQ[2*c*d - b*e, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e), (neq(((((2)*(O_c)*(O_d)))+((((-1))*(O_b)*(O_e)))),0)) Int(((O_d)+((O_e)*(Xv)))*(tan((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))),Xv) = (((((-(1/2)))*(O_e)*(ln(cos(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))))*(((O_c)^((-1))))))+(((((((2)*(O_c)*(O_d)))+((((-1))*(O_b)*(O_e)))))*((1/2))*(((O_c)^((-1))))*(Int(tan(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_e), (neq(((((2)*(_O_c)*(_O_d)))+((((-1))*(_O_b)*(_O_e)))),0)) Int(((_O_d)+((_O_e)*(_Xv)))*(tan((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2))))),_Xv) = (((((-(1/2)))*(_O_e)*(ln(cos(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2)))))))))*(((_O_c)^((-1))))))+(((((((2)*(_O_c)*(_O_d)))+((((-1))*(_O_b)*(_O_e)))))*((1/2))*(((_O_c)^((-1))))*(Int(tan(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2))))))),_Xv)))))
 
 # Rule 6 (972 variants):
 #   Int[(d_. + e_.*x_)*Cot[a_. + b_.*x_ + c_.*x_^2], x_Symbol] := e*Log[Sin[a + b*x + c*x^2]]/(2*c) + (2*c*d - b*e)/(2*c)*Int[Cot[a + b*x + c*x^2], x] /; FreeQ[{a, b, c, d, e}, x] && NeQ[2*c*d - b*e, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e), (neq(((((2)*(O_c)*(O_d)))+((((-1))*(O_b)*(O_e)))),0)) Int(((O_d)+((O_e)*(Xv)))*(cot((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2))))),Xv) = ((((O_e)*(ln(sin(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2)))))))))*((1/2))*(((O_c)^((-1))))))+(((((((2)*(O_c)*(O_d)))+((((-1))*(O_b)*(O_e)))))*((1/2))*(((O_c)^((-1))))*(Int(cot(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_e), (neq(((((2)*(_O_c)*(_O_d)))+((((-1))*(_O_b)*(_O_e)))),0)) Int(((_O_d)+((_O_e)*(_Xv)))*(cot((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2))))),_Xv) = ((((_O_e)*(ln(sin(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2)))))))))*((1/2))*(((_O_c)^((-1))))))+(((((((2)*(_O_c)*(_O_d)))+((((-1))*(_O_b)*(_O_e)))))*((1/2))*(((_O_c)^((-1))))*(Int(cot(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2))))))),_Xv)))))
 
 # Rule 7 (3888 variants):
 #   Int[(d_. + e_.*x_)^m_.*Tan[a_. + b_.*x_ + c_.*x_^2]^n_., x_Symbol] := Unintegrable[(d + e*x)^m*Tan[a + b*x + c*x^2]^n, x] /; FreeQ[{a, b, c, d, e, m, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n) Int((((O_d)+((O_e)*(Xv)))^(O_m))*((tan((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))))^(O_n)),Xv) = unintegrable(((((((O_d)+(((O_e)*(Xv)))))^(O_m)))*(((tan(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_e,_O_m,_O_n) Int((((_O_d)+((_O_e)*(_Xv)))^(_O_m))*((tan((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2)))))^(_O_n)),_Xv) = unintegrable(((((((_O_d)+(((_O_e)*(_Xv)))))^(_O_m)))*(((tan(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2))))))))^(_O_n)))),_Xv)
 
 # Rule 8 (3888 variants):
 #   Int[(d_. + e_.*x_)^m_.*Cot[a_. + b_.*x_ + c_.*x_^2]^n_., x_Symbol] := Unintegrable[(d + e*x)^m*Cot[a + b*x + c*x^2]^n, x] /; FreeQ[{a, b, c, d, e, m, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n) Int((((O_d)+((O_e)*(Xv)))^(O_m))*((cot((O_a)+((O_b)*(Xv))+((O_c)*((Xv)^(2)))))^(O_n)),Xv) = unintegrable(((((((O_d)+(((O_e)*(Xv)))))^(O_m)))*(((cot(((O_a)+(((O_b)*(Xv)))+(((O_c)*(((Xv)^(2))))))))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_e,_O_m,_O_n) Int((((_O_d)+((_O_e)*(_Xv)))^(_O_m))*((cot((_O_a)+((_O_b)*(_Xv))+((_O_c)*((_Xv)^(2)))))^(_O_n)),_Xv) = unintegrable(((((((_O_d)+(((_O_e)*(_Xv)))))^(_O_m)))*(((cot(((_O_a)+(((_O_b)*(_Xv)))+(((_O_c)*(((_Xv)^(2))))))))^(_O_n)))),_Xv)

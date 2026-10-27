@@ -8,92 +8,92 @@
 
 # Rule 1 (9 variants):
 #   Int[Gamma[n_, a_. + b_.*x_], x_Symbol] := (a + b*x)*Gamma[n, a + b*x]/b - Gamma[n + 1, a + b*x]/b /; FreeQ[{a, b, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_n) Int(Gamma(P_n,(O_a)+((O_b)*(Xv))),Xv) = ((((((O_a)+(((O_b)*(Xv)))))*(Gamma(P_n,((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(Gamma(((P_n)+(1)),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1)))))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_P_n) Int(Gamma(_P_n,(_O_a)+((_O_b)*(_Xv))),_Xv) = ((((((_O_a)+(((_O_b)*(_Xv)))))*(Gamma(_P_n,((_O_a)+(((_O_b)*(_Xv))))))*(((_O_b)^((-1))))))+((((-1))*(Gamma(((_P_n)+(1)),((_O_a)+(((_O_b)*(_Xv))))))*(((_O_b)^((-1)))))))
 
 # Rule 2 not translated: function HypergeometricPFQ
 #   Int[Gamma[0, b_.*x_]/x_, x_Symbol] := b*x*HypergeometricPFQ[{1, 1, 1}, {2, 2, 2}, -b*x] - EulerGamma*Log[x] - 1/2*Log[b*x]^2 /; FreeQ[b, x]
 
 # Rule 3 (6 variants):
 #   Int[Gamma[n_, b_.*x_]/x_, x_Symbol] := -Gamma[n - 1, b*x] + (n - 1)*Int[Gamma[n - 1, b*x]/x, x] /; FreeQ[b, x] && IGtQ[n, 1]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_b), (igtq(P_n,1)) Int((Gamma(P_n,(O_b)*(Xv)))*((Xv)^(K_1)),Xv) = (((((-1))*(Gamma(((P_n)+((-1))),((O_b)*(Xv))))))+(((((P_n)+((-1))))*(Int(((Gamma(((P_n)+((-1))),((O_b)*(Xv))))*(((Xv)^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (_K_1 == (-1)), NIN(_Xv,_O_b), (igtq(_P_n,1)) Int((Gamma(_P_n,(_O_b)*(_Xv)))*((_Xv)^(_K_1)),_Xv) = (((((-1))*(Gamma(((_P_n)+((-1))),((_O_b)*(_Xv))))))+(((((_P_n)+((-1))))*(Int(((Gamma(((_P_n)+((-1))),((_O_b)*(_Xv))))*(((_Xv)^((-1))))),_Xv)))))
 
 # Rule 4 (6 variants):
 #   Int[Gamma[n_, b_.*x_]/x_, x_Symbol] := Gamma[n, b*x]/n + 1/n*Int[Gamma[n + 1, b*x]/x, x] /; FreeQ[b, x] && ILtQ[n, 0]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_b), (iltq(P_n,0)) Int((Gamma(P_n,(O_b)*(Xv)))*((Xv)^(K_1)),Xv) = ((((Gamma(P_n,((O_b)*(Xv))))*(((P_n)^((-1))))))+(((((P_n)^((-1))))*(Int(((Gamma(((P_n)+(1)),((O_b)*(Xv))))*(((Xv)^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (_K_1 == (-1)), NIN(_Xv,_O_b), (iltq(_P_n,0)) Int((Gamma(_P_n,(_O_b)*(_Xv)))*((_Xv)^(_K_1)),_Xv) = ((((Gamma(_P_n,((_O_b)*(_Xv))))*(((_P_n)^((-1))))))+(((((_P_n)^((-1))))*(Int(((Gamma(((_P_n)+(1)),((_O_b)*(_Xv))))*(((_Xv)^((-1))))),_Xv)))))
 
 # Rule 5 not translated: function HypergeometricPFQ
 #   Int[Gamma[n_, b_.*x_]/x_, x_Symbol] := Gamma[n]*Log[x] - (b*x)^n/n^2* HypergeometricPFQ[{n, n}, {1 + n, 1 + n}, -b*x] /; FreeQ[{b, n}, x] && Not[IntegerQ[n]]
 
 # Rule 6 (36 variants):
 #   Int[(d_.*x_)^m_.*Gamma[n_, b_.*x_], x_Symbol] := (d*x)^(m + 1)*Gamma[n, b*x]/(d*(m + 1)) - (d*x)^m*Gamma[m + n + 1, b*x]/(b*(m + 1)*(b*x)^m) /; FreeQ[{b, d, m, n}, x] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_b,O_d,O_m,P_n), (neq(O_m,(-1))) Int((((O_d)*(Xv))^(O_m))*(Gamma(P_n,(O_b)*(Xv))),Xv) = ((((((((O_d)*(Xv)))^(((O_m)+(1)))))*(Gamma(P_n,((O_b)*(Xv))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(((((O_d)*(Xv)))^(O_m)))*(Gamma(((O_m)+(P_n)+(1)),((O_b)*(Xv))))*(((O_b)^((-1))))*(((((O_m)+(1)))^((-1))))*(((((((O_b)*(Xv)))^(O_m)))^((-1)))))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_b,_O_d,_O_m,_P_n), (neq(_O_m,(-1))) Int((((_O_d)*(_Xv))^(_O_m))*(Gamma(_P_n,(_O_b)*(_Xv))),_Xv) = ((((((((_O_d)*(_Xv)))^(((_O_m)+(1)))))*(Gamma(_P_n,((_O_b)*(_Xv))))*(((_O_d)^((-1))))*(((((_O_m)+(1)))^((-1))))))+((((-1))*(((((_O_d)*(_Xv)))^(_O_m)))*(Gamma(((_O_m)+(_P_n)+(1)),((_O_b)*(_Xv))))*(((_O_b)^((-1))))*(((((_O_m)+(1)))^((-1))))*(((((((_O_b)*(_Xv)))^(_O_m)))^((-1)))))))
 
 # Rule 7 (144 variants):
 #   Int[(c_ + d_.*x_)^m_.*Gamma[n_, a_ + b_.*x_], x_Symbol] := 1/b*Subst[Int[(d*x/b)^m*Gamma[n, x], x], x, a + b*x] /; FreeQ[{a, b, c, d, m, n}, x] && EqQ[b*c - a*d, 0]
-ADDSPEC RubiRules : IF NIN(Xv,P_a,O_b,P_c,O_d,O_m,P_n), (eqq(((((O_b)*(P_c)))+((((-1))*(P_a)*(O_d)))),0)) Int((((P_c)+((O_d)*(Xv)))^(O_m))*(Gamma(P_n,(P_a)+((O_b)*(Xv)))),Xv) = ((((O_b)^((-1))))*(intsubst(((((((O_d)*(Xv)*(((O_b)^((-1))))))^(O_m)))*(Gamma(P_n,Xv))),Xv,((P_a)+(((O_b)*(Xv)))))))
+ADDSPEC RubiRules : IF NIN(_Xv,_P_a,_O_b,_P_c,_O_d,_O_m,_P_n), (eqq(((((_O_b)*(_P_c)))+((((-1))*(_P_a)*(_O_d)))),0)) Int((((_P_c)+((_O_d)*(_Xv)))^(_O_m))*(Gamma(_P_n,(_P_a)+((_O_b)*(_Xv)))),_Xv) = ((((_O_b)^((-1))))*(intsubst(((((((_O_d)*(_Xv)*(((_O_b)^((-1))))))^(_O_m)))*(Gamma(_P_n,_Xv))),_Xv,((_P_a)+(((_O_b)*(_Xv)))))))
 
 # Rule 8 (162 variants):
 #   Int[Gamma[n_, a_. + b_.*x_]/(c_. + d_.*x_), x_Symbol] := Int[(a + b*x)^(n - 1)/((c + d*x)*E^(a + b*x)), x] + (n - 1)* Int[Gamma[n - 1, a + b*x]/(c + d*x), x] /; FreeQ[{a, b, c, d}, x] && IGtQ[n, 1]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d), (igtq(P_n,1)) Int((Gamma(P_n,(O_a)+((O_b)*(Xv))))*(((O_c)+((O_d)*(Xv)))^(K_1)),Xv) = ((Int(((((((O_a)+(((O_b)*(Xv)))))^(((P_n)+((-1))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))*((((eE^(((O_a)+(((O_b)*(Xv)))))))^((-1))))),Xv))+(((((P_n)+((-1))))*(Int(((Gamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((((O_c)+(((O_d)*(Xv)))))^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF (_K_1 == (-1)), NIN(_Xv,_O_a,_O_b,_O_c,_O_d), (igtq(_P_n,1)) Int((Gamma(_P_n,(_O_a)+((_O_b)*(_Xv))))*(((_O_c)+((_O_d)*(_Xv)))^(_K_1)),_Xv) = ((Int(((((((_O_a)+(((_O_b)*(_Xv)))))^(((_P_n)+((-1))))))*(((((_O_c)+(((_O_d)*(_Xv)))))^((-1))))*((((eE^(((_O_a)+(((_O_b)*(_Xv)))))))^((-1))))),_Xv))+(((((_P_n)+((-1))))*(Int(((Gamma(((_P_n)+((-1))),((_O_a)+(((_O_b)*(_Xv))))))*(((((_O_c)+(((_O_d)*(_Xv)))))^((-1))))),_Xv)))))
 
 # Rule 9 not translated: Block
 #   Int[(c_. + d_.*x_)^m_.*Gamma[n_, a_. + b_.*x_], x_Symbol] := Block[{$UseGamma = True}, (c + d*x)^(m + 1)*Gamma[n, a + b*x]/(d*(m + 1)) + b/(d*(m + 1))* Int[(c + d*x)^(m + 1)*(a + b*x)^(n - 1)/E^(a + b*x), x]] /; FreeQ[{a, b, c, d, m, n}, x] && (IGtQ[m, 0] || IGtQ[n, 0] || IntegersQ[m, n]) && NeQ[m, -1]
 
 # Rule 10 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*Gamma[n_, a_. + b_.*x_], x_Symbol] := Unintegrable[(c + d*x)^m*Gamma[n, a + b*x], x] /; FreeQ[{a, b, c, d, m, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,P_n) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(Gamma(P_n,(O_a)+((O_b)*(Xv)))),Xv) = unintegrable(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(Gamma(P_n,((O_a)+(((O_b)*(Xv))))))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_m,_P_n) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(Gamma(_P_n,(_O_a)+((_O_b)*(_Xv)))),_Xv) = unintegrable(((((((_O_c)+(((_O_d)*(_Xv)))))^(_O_m)))*(Gamma(_P_n,((_O_a)+(((_O_b)*(_Xv))))))),_Xv)
 
 # Rule 11 (9 variants):
 #   Int[LogGamma[a_. + b_.*x_], x_Symbol] := PolyGamma[-2, a + b*x]/b /; FreeQ[{a, b}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b) Int(loggamma((O_a)+((O_b)*(Xv))),Xv) = ((polygamma((-2),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b) Int(loggamma((_O_a)+((_O_b)*(_Xv))),_Xv) = ((polygamma((-2),((_O_a)+(((_O_b)*(_Xv))))))*(((_O_b)^((-1)))))
 
 # Rule 12 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*LogGamma[a_. + b_.*x_], x_Symbol] := (c + d*x)^m*PolyGamma[-2, a + b*x]/b - d*m/b*Int[(c + d*x)^(m - 1)*PolyGamma[-2, a + b*x], x] /; FreeQ[{a, b, c, d}, x] && IGtQ[m, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d), (igtq(O_m,0)) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(loggamma((O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(polygamma((-2),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(O_d)*(O_m)*(((O_b)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(polygamma((-2),((O_a)+(((O_b)*(Xv))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d), (igtq(_O_m,0)) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(loggamma((_O_a)+((_O_b)*(_Xv)))),_Xv) = ((((((((_O_c)+(((_O_d)*(_Xv)))))^(_O_m)))*(polygamma((-2),((_O_a)+(((_O_b)*(_Xv))))))*(((_O_b)^((-1))))))+((((-1))*(_O_d)*(_O_m)*(((_O_b)^((-1))))*(Int(((((((_O_c)+(((_O_d)*(_Xv)))))^(((_O_m)+((-1))))))*(polygamma((-2),((_O_a)+(((_O_b)*(_Xv))))))),_Xv)))))
 
 # Rule 13 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*LogGamma[a_. + b_.*x_], x_Symbol] := Unintegrable[(c + d*x)^m*LogGamma[a + b*x], x] /; FreeQ[{a, b, c, d, m}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(loggamma((O_a)+((O_b)*(Xv)))),Xv) = unintegrable(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(loggamma(((O_a)+(((O_b)*(Xv))))))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_m) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(loggamma((_O_a)+((_O_b)*(_Xv)))),_Xv) = unintegrable(((((((_O_c)+(((_O_d)*(_Xv)))))^(_O_m)))*(loggamma(((_O_a)+(((_O_b)*(_Xv))))))),_Xv)
 
 # Rule 14 (9 variants):
 #   Int[PolyGamma[n_, a_. + b_.*x_], x_Symbol] := PolyGamma[n - 1, a + b*x]/b /; FreeQ[{a, b, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,P_n) Int(polygamma(P_n,(O_a)+((O_b)*(Xv))),Xv) = ((polygamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_P_n) Int(polygamma(_P_n,(_O_a)+((_O_b)*(_Xv))),_Xv) = ((polygamma(((_P_n)+((-1))),((_O_a)+(((_O_b)*(_Xv))))))*(((_O_b)^((-1)))))
 
 # Rule 15 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*PolyGamma[n_, a_. + b_.*x_], x_Symbol] := (c + d*x)^m*PolyGamma[n - 1, a + b*x]/b - d*m/b*Int[(c + d*x)^(m - 1)*PolyGamma[n - 1, a + b*x], x] /; FreeQ[{a, b, c, d, n}, x] && GtQ[m, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_n), (((gtq(O_m,0)))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(polygamma(P_n,(O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(polygamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))*(((O_b)^((-1))))))+((((-1))*(O_d)*(O_m)*(((O_b)^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+((-1))))))*(polygamma(((P_n)+((-1))),((O_a)+(((O_b)*(Xv))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_P_n), (((gtq(_O_m,0)))) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(polygamma(_P_n,(_O_a)+((_O_b)*(_Xv)))),_Xv) = ((((((((_O_c)+(((_O_d)*(_Xv)))))^(_O_m)))*(polygamma(((_P_n)+((-1))),((_O_a)+(((_O_b)*(_Xv))))))*(((_O_b)^((-1))))))+((((-1))*(_O_d)*(_O_m)*(((_O_b)^((-1))))*(Int(((((((_O_c)+(((_O_d)*(_Xv)))))^(((_O_m)+((-1))))))*(polygamma(((_P_n)+((-1))),((_O_a)+(((_O_b)*(_Xv))))))),_Xv)))))
 
 # Rule 16 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*PolyGamma[n_, a_. + b_.*x_], x_Symbol] := (c + d*x)^(m + 1)*PolyGamma[n, a + b*x]/(d*(m + 1)) - b/(d*(m + 1))* Int[(c + d*x)^(m + 1)*PolyGamma[n + 1, a + b*x], x] /; FreeQ[{a, b, c, d, n}, x] && LtQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,P_n), (((ltq(O_m,(-1))))) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(polygamma(P_n,(O_a)+((O_b)*(Xv)))),Xv) = ((((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(polygamma(P_n,((O_a)+(((O_b)*(Xv))))))*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))))+((((-1))*(O_b)*(((O_d)^((-1))))*(((((O_m)+(1)))^((-1))))*(Int(((((((O_c)+(((O_d)*(Xv)))))^(((O_m)+(1)))))*(polygamma(((P_n)+(1)),((O_a)+(((O_b)*(Xv))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_P_n), (((ltq(_O_m,(-1))))) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(polygamma(_P_n,(_O_a)+((_O_b)*(_Xv)))),_Xv) = ((((((((_O_c)+(((_O_d)*(_Xv)))))^(((_O_m)+(1)))))*(polygamma(_P_n,((_O_a)+(((_O_b)*(_Xv))))))*(((_O_d)^((-1))))*(((((_O_m)+(1)))^((-1))))))+((((-1))*(_O_b)*(((_O_d)^((-1))))*(((((_O_m)+(1)))^((-1))))*(Int(((((((_O_c)+(((_O_d)*(_Xv)))))^(((_O_m)+(1)))))*(polygamma(((_P_n)+(1)),((_O_a)+(((_O_b)*(_Xv))))))),_Xv)))))
 
 # Rule 17 (324 variants):
 #   Int[(c_. + d_.*x_)^m_.*PolyGamma[n_, a_. + b_.*x_], x_Symbol] := Unintegrable[(c + d*x)^m*PolyGamma[n, a + b*x], x] /; FreeQ[{a, b, c, d, m, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_m,P_n) Int((((O_c)+((O_d)*(Xv)))^(O_m))*(polygamma(P_n,(O_a)+((O_b)*(Xv)))),Xv) = unintegrable(((((((O_c)+(((O_d)*(Xv)))))^(O_m)))*(polygamma(P_n,((O_a)+(((O_b)*(Xv))))))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_m,_P_n) Int((((_O_c)+((_O_d)*(_Xv)))^(_O_m))*(polygamma(_P_n,(_O_a)+((_O_b)*(_Xv)))),_Xv) = unintegrable(((((((_O_c)+(((_O_d)*(_Xv)))))^(_O_m)))*(polygamma(_P_n,((_O_a)+(((_O_b)*(_Xv))))))),_Xv)
 
 # Rule 18 (324 variants):
 #   Int[Gamma[a_. + b_.*x_]^n_.*PolyGamma[0, a_. + b_.*x_], x_Symbol] := Gamma[a + b*x]^n/(b*n) /; FreeQ[{a, b, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_n) Int(((Gamma((O_a)+((O_b)*(Xv))))^(O_n))*(polygamma(0,(O_a)+((O_b)*(Xv)))),Xv) = ((((Gamma(((O_a)+(((O_b)*(Xv))))))^(O_n)))*(((O_b)^((-1))))*(((O_n)^((-1)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_n) Int(((Gamma((_O_a)+((_O_b)*(_Xv))))^(_O_n))*(polygamma(0,(_O_a)+((_O_b)*(_Xv)))),_Xv) = ((((Gamma(((_O_a)+(((_O_b)*(_Xv))))))^(_O_n)))*(((_O_b)^((-1))))*(((_O_n)^((-1)))))
 
 # Rule 19 not translated: parse error: expected ')', got '!'
 #   Int[((a_. + b_.*x_)!)^n_.*PolyGamma[0, c_. + b_.*x_], x_Symbol] := ((a + b*x)!)^n/(b*n) /; FreeQ[{a, b, c, n}, x] && EqQ[c, a + 1]
 
 # Rule 20 (162 variants):
 #   Int[Gamma[p_, d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := x*Gamma[p, d*(a + b*Log[c*x^n])] + b*d*n*E^(-a*d)* Int[(d*(a + b*Log[c*x^n]))^(p - 1)/(c*x^n)^(b*d), x] /; FreeQ[{a, b, c, d, n, p}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p) Int(Gamma(P_p,(O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))),Xv) = ((((Xv)*(Gamma(P_p,((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))))+(((O_b)*(O_d)*(O_n)*((eE^((((-1))*(O_a)*(O_d)))))*(Int(((((((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))^(((P_p)+((-1))))))*(((((((O_c)*(((Xv)^(O_n)))))^(((O_b)*(O_d)))))^((-1))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_n,_P_p) Int(Gamma(_P_p,(_O_d)*((_O_a)+((_O_b)*(ln((_O_c)*((_Xv)^(_O_n))))))),_Xv) = ((((_Xv)*(Gamma(_P_p,((_O_d)*(((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n)))))))))))))))+(((_O_b)*(_O_d)*(_O_n)*((eE^((((-1))*(_O_a)*(_O_d)))))*(Int(((((((_O_d)*(((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n))))))))))))^(((_P_p)+((-1))))))*(((((((_O_c)*(((_Xv)^(_O_n)))))^(((_O_b)*(_O_d)))))^((-1))))),_Xv)))))
 
 # Rule 21 (324 variants):
 #   Int[Gamma[p_, d_.*(a_. + b_.*Log[c_.*x_^n_.])]/x_, x_Symbol] := 1/n*Subst[Gamma[p, d*(a + b*x)], x, Log[c*x^n]] /; FreeQ[{a, b, c, d, n, p}, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_a,O_b,O_c,O_d,O_n,P_p) Int((Gamma(P_p,(O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))))*((Xv)^(K_1)),Xv) = ((((O_n)^((-1))))*(subst(Gamma(P_p,((O_d)*(((O_a)+(((O_b)*(Xv))))))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
+ADDSPEC RubiRules : IF (_K_1 == (-1)), NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_n,_P_p) Int((Gamma(_P_p,(_O_d)*((_O_a)+((_O_b)*(ln((_O_c)*((_Xv)^(_O_n))))))))*((_Xv)^(_K_1)),_Xv) = ((((_O_n)^((-1))))*(subst(Gamma(_P_p,((_O_d)*(((_O_a)+(((_O_b)*(_Xv))))))),_Xv,ln(((_O_c)*(((_Xv)^(_O_n))))))))
 
 # Rule 22 (1944 variants):
 #   Int[(e_.*x_)^m_.*Gamma[p_, d_.*(a_. + b_.*Log[c_.*x_^n_.])], x_Symbol] := (e*x)^(m + 1)*Gamma[p, d*(a + b*Log[c*x^n])]/(e*(m + 1)) + b*d*n*E^(-a*d)*(e*x)^(b*d*n)/((m + 1)*(c*x^n)^(b*d))* Int[(e*x)^(m - b*d*n)*(d*(a + b*Log[c*x^n]))^(p - 1), x] /; FreeQ[{a, b, c, d, e, m, n, p}, x] && NeQ[m, -1]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_d,O_e,O_m,O_n,P_p), (neq(O_m,(-1))) Int((((O_e)*(Xv))^(O_m))*(Gamma(P_p,(O_d)*((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n)))))))),Xv) = ((((((((O_e)*(Xv)))^(((O_m)+(1)))))*(Gamma(P_p,((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))*(((O_e)^((-1))))*(((((O_m)+(1)))^((-1))))))+(((O_b)*(O_d)*(O_n)*((eE^((((-1))*(O_a)*(O_d)))))*(((((O_e)*(Xv)))^(((O_b)*(O_d)*(O_n)))))*(((((O_m)+(1)))^((-1))))*(((((((O_c)*(((Xv)^(O_n)))))^(((O_b)*(O_d)))))^((-1))))*(Int(((((((O_e)*(Xv)))^(((O_m)+((((-1))*(O_b)*(O_d)*(O_n)))))))*(((((O_d)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))))^(((P_p)+((-1))))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_e,_O_m,_O_n,_P_p), (neq(_O_m,(-1))) Int((((_O_e)*(_Xv))^(_O_m))*(Gamma(_P_p,(_O_d)*((_O_a)+((_O_b)*(ln((_O_c)*((_Xv)^(_O_n)))))))),_Xv) = ((((((((_O_e)*(_Xv)))^(((_O_m)+(1)))))*(Gamma(_P_p,((_O_d)*(((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n)))))))))))))*(((_O_e)^((-1))))*(((((_O_m)+(1)))^((-1))))))+(((_O_b)*(_O_d)*(_O_n)*((eE^((((-1))*(_O_a)*(_O_d)))))*(((((_O_e)*(_Xv)))^(((_O_b)*(_O_d)*(_O_n)))))*(((((_O_m)+(1)))^((-1))))*(((((((_O_c)*(((_Xv)^(_O_n)))))^(((_O_b)*(_O_d)))))^((-1))))*(Int(((((((_O_e)*(_Xv)))^(((_O_m)+((((-1))*(_O_b)*(_O_d)*(_O_n)))))))*(((((_O_d)*(((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n))))))))))))^(((_P_p)+((-1))))))),_Xv)))))
 
 # Rule 23 (972 variants):
 #   Int[Gamma[p_, f_.*(a_. + b_.*Log[c_.*(d_ + e_.*x_)^n_.])], x_Symbol] := 1/e*Subst[Int[Gamma[p, f*(a + b*Log[c*x^n])], x], x, d + e*x] /; FreeQ[{a, b, c, d, e, f, n, p}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,O_n,P_p) Int(Gamma(P_p,(O_f)*((O_a)+((O_b)*(ln((O_c)*(((P_d)+((O_e)*(Xv)))^(O_n))))))),Xv) = ((((O_e)^((-1))))*(intsubst(Gamma(P_p,((O_f)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))),Xv,((P_d)+(((O_e)*(Xv)))))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_P_d,_O_e,_O_f,_O_n,_P_p) Int(Gamma(_P_p,(_O_f)*((_O_a)+((_O_b)*(ln((_O_c)*(((_P_d)+((_O_e)*(_Xv)))^(_O_n))))))),_Xv) = ((((_O_e)^((-1))))*(intsubst(Gamma(_P_p,((_O_f)*(((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n)))))))))))),_Xv,((_P_d)+(((_O_e)*(_Xv)))))))
 
 # Rule 24 (23328 variants):
 #   Int[(g_ + h_. x_)^m_.* Gamma[p_, f_.*(a_. + b_.*Log[c_.*(d_ + e_.*x_)^n_.])], x_Symbol] := 1/e*Subst[Int[(g*x/d)^m*Gamma[p, f*(a + b*Log[c*x^n])], x], x, d + e*x] /; FreeQ[{a, b, c, d, e, f, g, h, m, n, p}, x] && EqQ[e*g - d*h, 0]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_d,O_e,O_f,P_g,O_h,O_m,O_n,P_p), (eqq(((((O_e)*(P_g)))+((((-1))*(P_d)*(O_h)))),0)) Int((((P_g)+((O_h)*(Xv)))^(O_m))*(Gamma(P_p,(O_f)*((O_a)+((O_b)*(ln((O_c)*(((P_d)+((O_e)*(Xv)))^(O_n)))))))),Xv) = ((((O_e)^((-1))))*(intsubst(((((((P_g)*(Xv)*(((P_d)^((-1))))))^(O_m)))*(Gamma(P_p,((O_f)*(((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n)))))))))))))),Xv,((P_d)+(((O_e)*(Xv)))))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_P_d,_O_e,_O_f,_P_g,_O_h,_O_m,_O_n,_P_p), (eqq(((((_O_e)*(_P_g)))+((((-1))*(_P_d)*(_O_h)))),0)) Int((((_P_g)+((_O_h)*(_Xv)))^(_O_m))*(Gamma(_P_p,(_O_f)*((_O_a)+((_O_b)*(ln((_O_c)*(((_P_d)+((_O_e)*(_Xv)))^(_O_n)))))))),_Xv) = ((((_O_e)^((-1))))*(intsubst(((((((_P_g)*(_Xv)*(((_P_d)^((-1))))))^(_O_m)))*(Gamma(_P_p,((_O_f)*(((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n)))))))))))))),_Xv,((_P_d)+(((_O_e)*(_Xv)))))))

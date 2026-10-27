@@ -8,24 +8,24 @@
 
 # Rule 1 (6 variants):
 #   Int[Log[c_.*x_^n_.], x_Symbol] := x*Log[c*x^n] - n*x /; FreeQ[{c, n}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_c,O_n) Int(ln((O_c)*((Xv)^(O_n))),Xv) = ((((Xv)*(ln(((O_c)*(((Xv)^(O_n))))))))+((((-1))*(O_n)*(Xv))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_c,_O_n) Int(ln((_O_c)*((_Xv)^(_O_n))),_Xv) = ((((_Xv)*(ln(((_O_c)*(((_Xv)^(_O_n))))))))+((((-1))*(_O_n)*(_Xv))))
 
 # Rule 2 (108 variants):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_., x_Symbol] := x*(a + b*Log[c*x^n])^p - b*n*p*Int[(a + b*Log[c*x^n])^(p - 1), x] /; FreeQ[{a, b, c, n}, x] && GtQ[p, 0] && IntegerQ[2*p]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (((gtq(O_p,0)))), (integerq(((2)*(O_p)))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(O_p),Xv) = ((((Xv)*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(O_p)))))+((((-1))*(O_b)*(O_n)*(O_p)*(Int(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((O_p)+((-1))))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_n), (((gtq(_O_p,0)))), (integerq(((2)*(_O_p)))) Int(((_O_a)+((_O_b)*(ln((_O_c)*((_Xv)^(_O_n))))))^(_O_p),_Xv) = ((((_Xv)*(((((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n))))))))))^(_O_p)))))+((((-1))*(_O_b)*(_O_n)*(_O_p)*(Int(((((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n))))))))))^(((_O_p)+((-1))))),_Xv)))))
 
 # Rule 3 (54 variants):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := x*(a + b*Log[c*x^n])^(p + 1)/(b*n*(p + 1)) - 1/(b*n*(p + 1))*Int[(a + b*Log[c*x^n])^(p + 1), x] /; FreeQ[{a, b, c, n}, x] && LtQ[p, -1] && IntegerQ[2*p]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n), (((ltq(P_p,(-1))))), (integerq(((2)*(P_p)))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p),Xv) = ((((Xv)*(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))))*(((O_b)^((-1))))*(((O_n)^((-1))))*(((((P_p)+(1)))^((-1))))))+((((-1))*(((O_b)^((-1))))*(((O_n)^((-1))))*(((((P_p)+(1)))^((-1))))*(Int(((((O_a)+(((O_b)*(ln(((O_c)*(((Xv)^(O_n))))))))))^(((P_p)+(1)))),Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_n), (((ltq(_P_p,(-1))))), (integerq(((2)*(_P_p)))) Int(((_O_a)+((_O_b)*(ln((_O_c)*((_Xv)^(_O_n))))))^(_P_p),_Xv) = ((((_Xv)*(((((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n))))))))))^(((_P_p)+(1)))))*(((_O_b)^((-1))))*(((_O_n)^((-1))))*(((((_P_p)+(1)))^((-1))))))+((((-1))*(((_O_b)^((-1))))*(((_O_n)^((-1))))*(((((_P_p)+(1)))^((-1))))*(Int(((((_O_a)+(((_O_b)*(ln(((_O_c)*(((_Xv)^(_O_n))))))))))^(((_P_p)+(1)))),_Xv)))))
 
 # Rule 4 (3 variants):
 #   Int[1/Log[c_.*x_], x_Symbol] := LogIntegral[c*x]/c /; FreeQ[c, x]
-ADDSPEC RubiRules : IF (K_1 == (-1)), NIN(Xv,O_c) Int((ln((O_c)*(Xv)))^(K_1),Xv) = ((logint(((O_c)*(Xv))))*(((O_c)^((-1)))))
+ADDSPEC RubiRules : IF (_K_1 == (-1)), NIN(_Xv,_O_c) Int((ln((_O_c)*(_Xv)))^(_K_1),_Xv) = ((logint(((_O_c)*(_Xv))))*(((_O_c)^((-1)))))
 
 # Rule 5 (54 variants):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := 1/(n*c^(1/n))*Subst[Int[E^(x/n)*(a + b*x)^p, x], x, Log[c*x^n]] /; FreeQ[{a, b, c, p}, x] && IntegerQ[1/n]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,P_p), (integerq(((O_n)^((-1))))) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p),Xv) = ((((O_n)^((-1))))*(((((O_c)^(((O_n)^((-1))))))^((-1))))*(intsubst((((eE^(((Xv)*(((O_n)^((-1))))))))*(((((O_a)+(((O_b)*(Xv)))))^(P_p)))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_P_p), (integerq(((_O_n)^((-1))))) Int(((_O_a)+((_O_b)*(ln((_O_c)*((_Xv)^(_O_n))))))^(_P_p),_Xv) = ((((_O_n)^((-1))))*(((((_O_c)^(((_O_n)^((-1))))))^((-1))))*(intsubst((((eE^(((_Xv)*(((_O_n)^((-1))))))))*(((((_O_a)+(((_O_b)*(_Xv)))))^(_P_p)))),_Xv,ln(((_O_c)*(((_Xv)^(_O_n))))))))
 
 # Rule 6 (54 variants):
 #   Int[(a_. + b_.*Log[c_.*x_^n_.])^p_, x_Symbol] := x/(n*(c*x^n)^(1/n))* Subst[Int[E^(x/n)*(a + b*x)^p, x], x, Log[c*x^n]] /; FreeQ[{a, b, c, n, p}, x]
-ADDSPEC RubiRules : IF NIN(Xv,O_a,O_b,O_c,O_n,P_p) Int(((O_a)+((O_b)*(ln((O_c)*((Xv)^(O_n))))))^(P_p),Xv) = ((Xv)*(((O_n)^((-1))))*(((((((O_c)*(((Xv)^(O_n)))))^(((O_n)^((-1))))))^((-1))))*(intsubst((((eE^(((Xv)*(((O_n)^((-1))))))))*(((((O_a)+(((O_b)*(Xv)))))^(P_p)))),Xv,ln(((O_c)*(((Xv)^(O_n))))))))
+ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_n,_P_p) Int(((_O_a)+((_O_b)*(ln((_O_c)*((_Xv)^(_O_n))))))^(_P_p),_Xv) = ((_Xv)*(((_O_n)^((-1))))*(((((((_O_c)*(((_Xv)^(_O_n)))))^(((_O_n)^((-1))))))^((-1))))*(intsubst((((eE^(((_Xv)*(((_O_n)^((-1))))))))*(((((_O_a)+(((_O_b)*(_Xv)))))^(_P_p)))),_Xv,ln(((_O_c)*(((_Xv)^(_O_n))))))))

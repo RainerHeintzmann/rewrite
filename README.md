@@ -317,6 +317,7 @@ rewrite the inner calls themselves. The rules are added after the
 declaration, so the algebra is declared first:
 
 ```text
+PAT X,Y,Z : real
 ALG PdDef
 ALG PdConst
 FUNC pd : real,real >> real ATT RULES PdDef,(PdConst,Linear,diff)
@@ -347,7 +348,11 @@ list in parentheses, like `(Linear,Compl,diff)`, is applied repeatedly
 until nothing changes any more.
 
 Pattern variables (`PAT`) in a rule match any term. Pattern variables
-declared with `NUMPAT` only match numbers. A rule can have conditions:
+declared with `NUMPAT` only match numbers. The pattern variables of the
+library all begin with `_` (`_X`, `_Xnu`, `_N`, Rubi's `_P_a`), so names
+such as `X`, `A`, `Pa` are free: declare your own pattern variables for
+your rules, and a `TERM Y` of yours does not change a library rule. A rule
+can have conditions:
 
 - `LB(term,term)`: "lower or between", an ordering of terms, used for
   example to sort sums.
@@ -436,8 +441,8 @@ The trick behind `LIFT`: once the group rules for `+` and `-` are written,
 the ring rules for `*` and `/` can be derived from them:
 
 ```text
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
+LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar+_Ar,_Ar-_Ar,-_Ar,0r)
+LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar*_Ar,_Ar/_Ar,mi(_Ar),1r)
 ```
 
 ### Exact numbers and subsorts
@@ -1158,6 +1163,7 @@ combined with `&&` and `||`:
 
 ```text
 INC "inc/helpers"
+PAT A,X : real
 FUNC sq : real,real >> real
 ALG t2
 SPEC t2 : IF (polyq(A,X) && (expon(A,X) == 2)) sq(A,X) = coeff(A,X,2)
@@ -1268,16 +1274,22 @@ where the library [inc/](inc) and the tests are used from.
   `exp(a)*exp(b)` to `exp(a+b)` and simplifies `exp(ln(x))`,
   `exp(-ln(x))`, `exp(n*ln(x))`; `fourier` knows the Gaussians
   `exp(-c*t^2+b*t+d)` from its table (fast, and with `im` cancelled).
+- All pattern variables of the library begin with `_` (`X`, `N`, `Xnu`,
+  `Ag`, Rubi's `P_a`, ... are now `_X`, `_N`, `_Xnu`, `_Ag`, `_P_a`; `M`
+  is `_K`, since `_M` is the unit prefix of inc/physik). A `TERM Y` of the
+  user used to change the rules with `Y` (for example `Sub`); now these
+  names are free, and rules of your own declare their own pattern
+  variables (`PAT X : real`).
 - `REWR` calculates the term before the first rule set, as it does after
   each rule set (a function defined by rules is computed before the rules
   of the user apply). After the arguments of a function defined by rules
   are calculated, its variant is chosen again for their sorts, also in the
   conditions of rules.
 - In exact mode, the real numbers of rules loaded before inc/exact (the 1
-  of `mi X = 1/X`) become exact next to exact expressions such as `2*pi`,
+  of `mi _X = 1/_X`) become exact next to exact expressions such as `2*pi`,
   so `t*mi(2*pi)` stays `t/(2*pi)` instead of `t*0.159155`. A
   calculation of such integers alone that has no integer value (the
-  `mi(2)` of `D(sqrt(X),Z) = D(X,Z)*mi(2*sqrt(X))`) is done exactly, so
+  `mi(2)` of `D(sqrt(_X),_Z) = D(_X,_Z)*mi(2*sqrt(_X))`) is done exactly, so
   `D(sqrt(pi*t),t)` is `(1/2)*pi/sqrt(pi*t)`, not `1.5708/sqrt(pi*t)`.
 - Fixed: a number of a sort that is not below `real` (complex, bool) was
   shared instead of copied by the symbolic helpers, so freeing a copy freed

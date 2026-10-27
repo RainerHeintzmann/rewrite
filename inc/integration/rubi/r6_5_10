@@ -8,8 +8,8 @@
 
 # Rule 1 (8 variants):
 #   Int[u_^m_.*Sech[v_]^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*Sech[ExpandToSum[v, x]]^n, x] /; FreeQ[{m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
-ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((matchq(P_u,(O_mq_a)+((O_mq_b)*(Xv)),((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv))))) && (matchq(P_v,(O_mq_a)+((O_mq_b)*(Xv)),((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv)))))))) Int(((P_u)^(O_m))*((sech(P_v))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((sech(expandtosum(P_v,Xv)))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_m,_O_n), (((linearq(_P_u,_Xv)) && (linearq(_P_v,_Xv)))), (not(((matchq(_P_u,(_O_mq_a)+((_O_mq_b)*(_Xv)),((freeq(_O_mq_a,_Xv) && freeq(_O_mq_b,_Xv))))) && (matchq(_P_v,(_O_mq_a)+((_O_mq_b)*(_Xv)),((freeq(_O_mq_a,_Xv) && freeq(_O_mq_b,_Xv)))))))) Int(((_P_u)^(_O_m))*((sech(_P_v))^(_O_n)),_Xv) = Int(((((expandtosum(_P_u,_Xv))^(_O_m)))*(((sech(expandtosum(_P_v,_Xv)))^(_O_n)))),_Xv)
 
 # Rule 2 (8 variants):
 #   Int[u_^m_.*Csch[v_]^n_., x_Symbol] := Int[ExpandToSum[u, x]^m*Csch[ExpandToSum[v, x]]^n, x] /; FreeQ[{m, n}, x] && LinearQ[{u, v}, x] && Not[LinearMatchQ[{u, v}, x]]
-ADDSPEC RubiRules : IF NIN(Xv,O_m,O_n), (((linearq(P_u,Xv)) && (linearq(P_v,Xv)))), (not(((matchq(P_u,(O_mq_a)+((O_mq_b)*(Xv)),((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv))))) && (matchq(P_v,(O_mq_a)+((O_mq_b)*(Xv)),((freeq(O_mq_a,Xv) && freeq(O_mq_b,Xv)))))))) Int(((P_u)^(O_m))*((csch(P_v))^(O_n)),Xv) = Int(((((expandtosum(P_u,Xv))^(O_m)))*(((csch(expandtosum(P_v,Xv)))^(O_n)))),Xv)
+ADDSPEC RubiRules : IF NIN(_Xv,_O_m,_O_n), (((linearq(_P_u,_Xv)) && (linearq(_P_v,_Xv)))), (not(((matchq(_P_u,(_O_mq_a)+((_O_mq_b)*(_Xv)),((freeq(_O_mq_a,_Xv) && freeq(_O_mq_b,_Xv))))) && (matchq(_P_v,(_O_mq_a)+((_O_mq_b)*(_Xv)),((freeq(_O_mq_a,_Xv) && freeq(_O_mq_b,_Xv)))))))) Int(((_P_u)^(_O_m))*((csch(_P_v))^(_O_n)),_Xv) = Int(((((expandtosum(_P_u,_Xv))^(_O_m)))*(((csch(expandtosum(_P_v,_Xv)))^(_O_n)))),_Xv)

@@ -2,12 +2,12 @@
 SORT doperator   # differential op.
 SORT vdoperator  # vector differential op.
 
-PAT DOP1 : doperator
-PAT DOP2 : doperator
-PAT DOP3 : doperator
-PAT VDOP1 : vdoperator
-PAT VDOP2 : vdoperator
-PAT VDOP3 : vdoperator
+PAT _DOP1 : doperator
+PAT _DOP2 : doperator
+PAT _DOP3 : doperator
+PAT _VDOP1 : vdoperator
+PAT _VDOP2 : vdoperator
+PAT _VDOP3 : vdoperator
 
 SYM \/ : vdoperator # Nabla
 SYM /\ : doperator # Laplace
@@ -29,9 +29,9 @@ OTHER + : vdoperator,vdoperator  >> vdoperator
 
 ALG Oper
 SPEC    Oper : \/ * \/ = /\  #  caution : backslash
-ADDSPEC Oper : \/ *(\/ * A) = 0
-ADDSPEC Oper : VDOP1+VDOP1=2*VDOP1
-ADDSPEC Oper : A*VDOP1+VDOP1=(A+1)*VDOP1
-ADDSPEC Oper : VDOP1+A*VDOP1=(A+1)*VDOP1
-ADDSPEC Oper : A*VDOP1+B*VDOP1=(A+B)*VDOP1
+ADDSPEC Oper : \/ *(\/ * _A) = 0
+ADDSPEC Oper : _VDOP1+_VDOP1=2*_VDOP1
+ADDSPEC Oper : _A*_VDOP1+_VDOP1=(_A+1)*_VDOP1
+ADDSPEC Oper : _VDOP1+_A*_VDOP1=(_A+1)*_VDOP1
+ADDSPEC Oper : _A*_VDOP1+_B*_VDOP1=(_A+_B)*_VDOP1
 

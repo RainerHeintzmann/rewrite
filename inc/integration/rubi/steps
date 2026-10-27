@@ -1,8 +1,8 @@
-0	Rubi loader	IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
-1	Rubi loader	Int(Uv,Xv) = Int(trignorm(Uv,Xv),Xv)
-2	Rubi loader	Int(Uv,Xv) = Int(trigexpand(Uv,Xv),Xv)
-3	Rubi loader	Int(Uv,Xv) = Int(normpoly(Uv,Xv),Xv)
-4	Rubi loader	Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)
+0	Rubi loader	IF NIN(_Xv,_Pa) Int(_Pa*_Uv,_Xv) = _Pa*Int(_Uv,_Xv)
+1	Rubi loader	Int(_Uv,_Xv) = Int(trignorm(_Uv,_Xv),_Xv)
+2	Rubi loader	Int(_Uv,_Xv) = Int(trigexpand(_Uv,_Xv),_Xv)
+3	Rubi loader	Int(_Uv,_Xv) = Int(normpoly(_Uv,_Xv),_Xv)
+4	Rubi loader	Int(_Uv+_Vv,_Xv) = Int(_Uv,_Xv)+Int(_Vv,_Xv)
 5	1.1.1.1 (a+b x)^m, rule 1	Int[1/x_, x_Symbol] := Log[x]
 6	1.1.1.1 (a+b x)^m, rule 2	Int[x_^m_., x_Symbol] := x^(m + 1)/(m + 1) /; FreeQ[m, x] && NeQ[m, -1]
 7	1.1.1.1 (a+b x)^m, rule 3	Int[1/(a_ + b_.*x_), x_Symbol] := Log[RemoveContent[a + b*x, x]]/b /; FreeQ[{a, b}, x]
@@ -7678,4 +7678,4 @@
 7677	9.3 Miscellaneous integration rules, rule 71	Int[u_,x_Symbol] := With[{v=ExpandIntegrand[u,x]}, Int[v,x] /; SumQ[v]]
 7678	9.3 Miscellaneous integration rules, rule 72	Int[u_.*(a_.+b_.*x_^m_.)^p_.*(c_.+d_.*x_^n_.)^q_., x_Symbol] := (a+b*x^m)^p*(c+d*x^n)^q/x^(m*p) \[Star] Int[u*x^(m*p),x] /; FreeQ[{a,b,c,d,m,n,p,q},x] && EqQ[a+d,0] && EqQ[b+c,0] && EqQ[m+n,0] && EqQ[p+q,0]
 7679	9.3 Miscellaneous integration rules, rule 73	Int[u_*(a_+b_.*x_^n_.+c_.*x_^n2_.)^p_, x_Symbol] := Sqrt[a+b*x^n+c*x^(2*n)]/((4*c)^(p-1/2)*(b+2*c*x^n)) \[Star] Int[u*(b+2*c*x^n)^(2*p),x] /; FreeQ[{a,b,c,n,p},x] && EqQ[n2,2*n] && EqQ[b^2-4*a*c,0] && IntegerQ[p-1/2]
-7680	Rubi loader	Int(Uv,Xv) = Int(hyp2exp(Uv,Xv),Xv)
+7680	Rubi loader	Int(_Uv,_Xv) = Int(hyp2exp(_Uv,_Xv),_Xv)

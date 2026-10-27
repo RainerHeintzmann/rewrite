@@ -10,146 +10,146 @@ FUNC _    : real,real >> real  LA1 # masks + operation in the polynomial
 
 # +++++++++++++++++ additive inverse to1 -1 + so that polynomials ++++
 ALG ai_m1
-SPEC     ai_m1 : -A = -1*A
+SPEC     ai_m1 : -_A = -1*_A
 
 # +++++++++++++++++ specifications: term multiplicative to the back  +++++++++++
 # +++++++++++++++++ STD : A*SLV^X+B*SLV^Y ...  +++++++++++
 ALG MulBack
-SPEC       MulBack : X*Y*Z=X*(Y*Z)
-ADDSPEC    MulBack : SLV*X=X*SLV
+SPEC       MulBack : _X*_Y*_Z=_X*(_Y*_Z)
+ADDSPEC    MulBack : SLV*_X=_X*SLV
 ADDSPEC    MulBack : SLV*SLV=SLV^2
-ADDSPEC    MulBack : SLV*SLV^X=SLV^(X+1)
-ADDSPEC    MulBack : SLV^X*SLV=SLV^(X+1)
-ADDSPEC    MulBack : SLV^X*SLV^Y=SLV^(X+Y)
+ADDSPEC    MulBack : SLV*SLV^_X=SLV^(_X+1)
+ADDSPEC    MulBack : SLV^_X*SLV=SLV^(_X+1)
+ADDSPEC    MulBack : SLV^_X*SLV^_Y=SLV^(_X+_Y)
 
 # +++++++++++++++++ specifications: term multiplicative to the back  +++++++++++
 ALG Mulass
-SPEC       Mulass : X*(Y*Z)=X*Y*Z
+SPEC       Mulass : _X*(_Y*_Z)=_X*_Y*_Z
 
 # +++++++++++++++++ specifications: term additive to the front  ++++++++++++++++++
 # +++++++++++++++++ STD : A*SLV+B  +++++++++++
 ALG AddFront
-SPEC       AddFront : X+(Y+Z)=X+Y+Z
-ADDSPEC    AddFront : X+SLV=SLV+X
-ADDSPEC    AddFront : X+Y*SLV=Y*SLV+X
+SPEC       AddFront : _X+(_Y+_Z)=_X+_Y+_Z
+ADDSPEC    AddFront : _X+SLV=SLV+_X
+ADDSPEC    AddFront : _X+_Y*SLV=_Y*SLV+_X
 ADDSPEC    AddFront : SLV+SLV=2*SLV
-ADDSPEC    AddFront : X*SLV+SLV=(X+1)*SLV
-ADDSPEC    AddFront : SLV+X*SLV=(X+1)*SLV
-ADDSPEC    AddFront : X*SLV+Y*SLV=(X+Y)*SLV
+ADDSPEC    AddFront : _X*SLV+SLV=(_X+1)*SLV
+ADDSPEC    AddFront : SLV+_X*SLV=(_X+1)*SLV
+ADDSPEC    AddFront : _X*SLV+_Y*SLV=(_X+_Y)*SLV
 
 
 # +++++++++++++++++ presorting: everything matching A*SLV^B to the front ++++
 
 ALG PreSort
-SPEC      PreSort :          A+(B+C)=A+B+C
-ADDSPEC   PreSort :      A _ (B _ C)=A _ B _ C
-ADDSPEC   PreSort :            X+SLV=poly(SLV)+X
-ADDSPEC   PreSort :            SLV+X=poly(SLV)+X
-ADDSPEC   PreSort :          X+A*SLV=poly(A*SLV)+X
-ADDSPEC   PreSort :          A*SLV+X=poly(A*SLV)+X
-ADDSPEC   PreSort :          X+SLV^N=poly(SLV^N)+X
-ADDSPEC   PreSort :          SLV^N+X=poly(SLV^N)+X
-ADDSPEC   PreSort :        X+A*SLV^N=poly(A*SLV^N)+X
-ADDSPEC   PreSort :        A*SLV^N+X=poly(A*SLV^N)+X
-ADDSPEC   PreSort :  poly(A)+poly(B)=poly(A _ B)
-ADDSPEC   PreSort :        A+poly(B)=poly(B)+A
+SPEC      PreSort :          _A+(_B+_C)=_A+_B+_C
+ADDSPEC   PreSort :      _A _ (_B _ _C)=_A _ _B _ _C
+ADDSPEC   PreSort :            _X+SLV=poly(SLV)+_X
+ADDSPEC   PreSort :            SLV+_X=poly(SLV)+_X
+ADDSPEC   PreSort :          _X+_A*SLV=poly(_A*SLV)+_X
+ADDSPEC   PreSort :          _A*SLV+_X=poly(_A*SLV)+_X
+ADDSPEC   PreSort :          _X+SLV^_N=poly(SLV^_N)+_X
+ADDSPEC   PreSort :          SLV^_N+_X=poly(SLV^_N)+_X
+ADDSPEC   PreSort :        _X+_A*SLV^_N=poly(_A*SLV^_N)+_X
+ADDSPEC   PreSort :        _A*SLV^_N+_X=poly(_A*SLV^_N)+_X
+ADDSPEC   PreSort :  poly(_A)+poly(_B)=poly(_A _ _B)
+ADDSPEC   PreSort :        _A+poly(_B)=poly(_B)+_A
 
 # +++++++++ constants to the very front +++++++++++++++++
 ALG ConstFront
-SPEC      ConstFront : A+(B+C)=A+B+C
+SPEC      ConstFront : _A+(_B+_C)=_A+_B+_C
 # ADDSPEC   ConstFront : IF (NIN(SLV,A) && IN(SLV,B)) B+A=A+B
 
 # +++++++++ insert constants at the back of the polynomial ++++
 # constants are placed at the back of poly
 
 ALG Constsort
-SPEC      Constsort : IF NIN(SLV,A) A+poly(B)=poly(B+A)
-ADDSPEC   Constsort : A _ B = A+B
+SPEC      Constsort : IF NIN(SLV,_A) _A+poly(_B)=poly(_B+_A)
+ADDSPEC   Constsort : _A _ _B = _A+_B
 
 # +++++++++++++++++ specifications: bring term into polynomial form ++++++++++++++++++
 ALG Pln
-SPEC       Pln : X+(Y+Z)=X+Y+Z
-ADDSPEC    Pln : 0*X=0      # for combining
-ADDSPEC    Pln : X*0=0 
-ADDSPEC    Pln : 0+X=X
-ADDSPEC    Pln : X+0=X
+SPEC       Pln : _X+(_Y+_Z)=_X+_Y+_Z
+ADDSPEC    Pln : 0*_X=0      # for combining
+ADDSPEC    Pln : _X*0=0 
+ADDSPEC    Pln : 0+_X=_X
+ADDSPEC    Pln : _X+0=_X
 # ADDSPEC    Pln : IF NIN(SLV,X) X+SLV=SLV+X
 # ADDSPEC    Pln : IF NIN(SLV,X) X+SLV^N=SLV^N+X
 # ADDSPEC    Pln : IF NIN(SLV,X) X+Y*SLV=Y*SLV+X
 # ADDSPEC    Pln : IF NIN(SLV,X) X+Y*SLV^N=Y*SLV^N+X
 
-ADDSPEC    Pln : SLV+SLV^N=SLV^N+SLV               # swap
-ADDSPEC    Pln : SLV+X*SLV^N=X*SLV^N+SLV
-ADDSPEC    Pln : X*SLV+SLV^N=SLV^N+X*SLV
-ADDSPEC    Pln : X*SLV+Y*SLV^N=Y*SLV^N+X*SLV
+ADDSPEC    Pln : SLV+SLV^_N=SLV^_N+SLV               # swap
+ADDSPEC    Pln : SLV+_X*SLV^_N=_X*SLV^_N+SLV
+ADDSPEC    Pln : _X*SLV+SLV^_N=SLV^_N+_X*SLV
+ADDSPEC    Pln : _X*SLV+_Y*SLV^_N=_Y*SLV^_N+_X*SLV
 
-ADDSPEC    Pln : IF (N>M) SLV^M+SLV^N=SLV^N+SLV^M
-ADDSPEC    Pln : IF (N>M) SLV^M+X*SLV^N=X*SLV^N+SLV^M
-ADDSPEC    Pln : IF (N>M) X*SLV^M+SLV^N=SLV^N+X*SLV^M
-ADDSPEC    Pln : IF (N>M) X*SLV^M+Y*SLV^N=Y*SLV^N+X*SLV^M
+ADDSPEC    Pln : IF (_N>_K) SLV^_K+SLV^_N=SLV^_N+SLV^_K
+ADDSPEC    Pln : IF (_N>_K) SLV^_K+_X*SLV^_N=_X*SLV^_N+SLV^_K
+ADDSPEC    Pln : IF (_N>_K) _X*SLV^_K+SLV^_N=SLV^_N+_X*SLV^_K
+ADDSPEC    Pln : IF (_N>_K) _X*SLV^_K+_Y*SLV^_N=_Y*SLV^_N+_X*SLV^_K
 
 ADDSPEC    Pln : SLV+SLV=2*SLV							# combine
-ADDSPEC    Pln : X*SLV+SLV=(X+1)*SLV
-ADDSPEC    Pln : SLV+X*SLV=(X+1)*SLV
-ADDSPEC    Pln : X*SLV+Y*SLV=(X+Y)*SLV
+ADDSPEC    Pln : _X*SLV+SLV=(_X+1)*SLV
+ADDSPEC    Pln : SLV+_X*SLV=(_X+1)*SLV
+ADDSPEC    Pln : _X*SLV+_Y*SLV=(_X+_Y)*SLV
 
-ADDSPEC    Pln : SLV^N+SLV^N=2*SLV^N
-ADDSPEC    Pln : X*SLV^N+SLV^N=(X+1)*SLV^N
-ADDSPEC    Pln : SLV^N+X*SLV^N=(X+1)*SLV^N
-ADDSPEC    Pln : X*SLV^N+Y*SLV^N=(X+Y)*SLV^N
+ADDSPEC    Pln : SLV^_N+SLV^_N=2*SLV^_N
+ADDSPEC    Pln : _X*SLV^_N+SLV^_N=(_X+1)*SLV^_N
+ADDSPEC    Pln : SLV^_N+_X*SLV^_N=(_X+1)*SLV^_N
+ADDSPEC    Pln : _X*SLV^_N+_Y*SLV^_N=(_X+_Y)*SLV^_N
 
 																# now everything if A + ...
 # ADDSPEC    Pln : IF NIN(SLV,X) A+X+SLV=A+SLV+X
 # ADDSPEC    Pln : IF NIN(SLV,X) A+X+SLV^N=A+SLV^N+X
 # ADDSPEC    Pln : IF NIN(SLV,X) A+X+Y*SLV=A+Y*SLV+X
 # ADDSPEC    Pln : IF NIN(SLV,X) A+X+Y*SLV^N=A+Y*SLV^N+X
-ADDSPEC    Pln : A+SLV+SLV^N=A+SLV^N+SLV               # swap
-ADDSPEC    Pln : A+SLV+X*SLV^N=A+X*SLV^N+SLV
-ADDSPEC    Pln : A+X*SLV+SLV^N=A+SLV^N+X*SLV
-ADDSPEC    Pln : A+X*SLV+Y*SLV^N=A+Y*SLV^N+X*SLV
+ADDSPEC    Pln : _A+SLV+SLV^_N=_A+SLV^_N+SLV               # swap
+ADDSPEC    Pln : _A+SLV+_X*SLV^_N=_A+_X*SLV^_N+SLV
+ADDSPEC    Pln : _A+_X*SLV+SLV^_N=_A+SLV^_N+_X*SLV
+ADDSPEC    Pln : _A+_X*SLV+_Y*SLV^_N=_A+_Y*SLV^_N+_X*SLV
 
-ADDSPEC    Pln : IF (N>M) A+SLV^M+SLV^N=A+SLV^N+SLV^M
-ADDSPEC    Pln : IF (N>M) A+SLV^M+X*SLV^N=A+X*SLV^N+SLV^M
-ADDSPEC    Pln : IF (N>M) A+X*SLV^M+SLV^N=A+SLV^N+X*SLV^M
-ADDSPEC    Pln : IF (N>M) A+X*SLV^M+Y*SLV^N=A+Y*SLV^N+X*SLV^M
+ADDSPEC    Pln : IF (_N>_K) _A+SLV^_K+SLV^_N=_A+SLV^_N+SLV^_K
+ADDSPEC    Pln : IF (_N>_K) _A+SLV^_K+_X*SLV^_N=_A+_X*SLV^_N+SLV^_K
+ADDSPEC    Pln : IF (_N>_K) _A+_X*SLV^_K+SLV^_N=_A+SLV^_N+_X*SLV^_K
+ADDSPEC    Pln : IF (_N>_K) _A+_X*SLV^_K+_Y*SLV^_N=_A+_Y*SLV^_N+_X*SLV^_K
 
-ADDSPEC    Pln : A+SLV+SLV=A+2*SLV							# combine
-ADDSPEC    Pln : A+X*SLV+SLV=A+(X+1)*SLV
-ADDSPEC    Pln : A+SLV+X*SLV=A+(X+1)*SLV
-ADDSPEC    Pln : A+X*SLV+Y*SLV=A+(X+Y)*SLV
+ADDSPEC    Pln : _A+SLV+SLV=_A+2*SLV							# combine
+ADDSPEC    Pln : _A+_X*SLV+SLV=_A+(_X+1)*SLV
+ADDSPEC    Pln : _A+SLV+_X*SLV=_A+(_X+1)*SLV
+ADDSPEC    Pln : _A+_X*SLV+_Y*SLV=_A+(_X+_Y)*SLV
 
-ADDSPEC    Pln : A+SLV^N+SLV^N=A+2*SLV^N
-ADDSPEC    Pln : A+X*SLV^N+SLV^N=A+(X+1)*SLV^N
-ADDSPEC    Pln : A+SLV^N+X*SLV^N=A+(X+1)*SLV^N
-ADDSPEC    Pln : A+X*SLV^N+Y*SLV^N=A+(X+Y)*SLV^N
+ADDSPEC    Pln : _A+SLV^_N+SLV^_N=_A+2*SLV^_N
+ADDSPEC    Pln : _A+_X*SLV^_N+SLV^_N=_A+(_X+1)*SLV^_N
+ADDSPEC    Pln : _A+SLV^_N+_X*SLV^_N=_A+(_X+1)*SLV^_N
+ADDSPEC    Pln : _A+_X*SLV^_N+_Y*SLV^_N=_A+(_X+_Y)*SLV^_N
 
 # +++++++++++++++++ remove poly +++++++++++++++++++++++++++++++++++++++++++++++
 ALG PolyOff
-SPEC    PolyOff : poly(A)=A
-ADDSPEC PolyOff : A _ B = A+B
+SPEC    PolyOff : poly(_A)=_A
+ADDSPEC PolyOff : _A _ _B = _A+_B
 
 # +++++++++++++++++ -1 to additive inverse ++++++++++++++++++++++++++++++++
 ALG xm1_ai
-SPEC     xm1_ai : -1*A= -A
-ADDSPEC  xm1_ai : A* -1= -A
-ADDSPEC  xm1_ai : (-A)*B= -(A*B)
-ADDSPEC  xm1_ai : A* -B= -(A*B)
+SPEC     xm1_ai : -1*_A= -_A
+ADDSPEC  xm1_ai : _A* -1= -_A
+ADDSPEC  xm1_ai : (-_A)*_B= -(_A*_B)
+ADDSPEC  xm1_ai : _A* -_B= -(_A*_B)
 
 # +++++++++++++++++ specifications for solving equations ++++++++++++++++++
 ALG Slv
 SPEC       Slv : EQN (SLV)                     = SLV==0
 ADDSPEC    Slv : EQN(SLV^2)                    = SLV==0
 ADDSPEC    Slv : EQN(SLV^2+SLV)                = SLV==0
-ADDSPEC    Slv : IF NIN(SLV,Y) EQN(Y)             = SLV== ALL SLV
-ADDSPEC    Slv : IF NIN(SLV,X) EQN(SLV + X)       = SLV== - X
-ADDSPEC    Slv : IF NIN(SLV,Y) EQN(Y*X)           = EQN(X)
-ADDSPEC    Slv : IF NIN(SLV,A) EQN(A*X+B)         = EQN (X+(mi A * B))
-ADDSPEC    Slv : IF NIN(SLV,A) EQN(A*X+B+C)       = EQN (X+mi A *B+mi A*C)
+ADDSPEC    Slv : IF NIN(SLV,_Y) EQN(_Y)             = SLV== ALL SLV
+ADDSPEC    Slv : IF NIN(SLV,_X) EQN(SLV + _X)       = SLV== - _X
+ADDSPEC    Slv : IF NIN(SLV,_Y) EQN(_Y*_X)           = EQN(_X)
+ADDSPEC    Slv : IF NIN(SLV,_A) EQN(_A*_X+_B)         = EQN (_X+(mi _A * _B))
+ADDSPEC    Slv : IF NIN(SLV,_A) EQN(_A*_X+_B+_C)       = EQN (_X+mi _A *_B+mi _A*_C)
 # ADDSPEC    Slv : IF (NIN(SLV,A) && (-A>0)) EQN(SLV^N+A)       = (SLV == (- A)^mi N) || (SLV == - ((- A)^mi N))
-ADDSPEC    Slv : IF NIN(SLV,A) EQN(SLV^2+A*SLV)   = (SLV == 0) || (SLV == -(A))
-ADDSPEC    Slv : IF NIN(SLV,B) EQN(SLV^2+SLV+B)   = (SLV == - .5 +(- B+.25)^.5) || (SLV == - .5 -(- B+.25)^.5)
-ADDSPEC    Slv : IF NIN(SLV,B) EQN(SLV^2+A*SLV+B) = (SLV == - .5*A +(- B+.25*A^2)^.5) || (SLV == - .5*A -(- B+.25*A^2)^.5)
-ADDSPEC    Slv : X*(Y*Z)=X*Y*Z
+ADDSPEC    Slv : IF NIN(SLV,_A) EQN(SLV^2+_A*SLV)   = (SLV == 0) || (SLV == -(_A))
+ADDSPEC    Slv : IF NIN(SLV,_B) EQN(SLV^2+SLV+_B)   = (SLV == - .5 +(- _B+.25)^.5) || (SLV == - .5 -(- _B+.25)^.5)
+ADDSPEC    Slv : IF NIN(SLV,_B) EQN(SLV^2+_A*SLV+_B) = (SLV == - .5*_A +(- _B+.25*_A^2)^.5) || (SLV == - .5*_A -(- _B+.25*_A^2)^.5)
+ADDSPEC    Slv : _X*(_Y*_Z)=_X*_Y*_Z
 
 ALG Eqn
 SPEC Eqn : ai_m1,MulBack,Mulass,AddFront,PreSort,ConstFront,Constsort,Pln,PolyOff,Slv,xm1_ai

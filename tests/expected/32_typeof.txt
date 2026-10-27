@@ -2,8 +2,8 @@ SYM kk : real (no value)
 SYM kk : real = 3 
 SYM a : real (no value)
 TERM vv : vector = [1, 2, 3] 
-PAT X : real
-NUMPAT N : real
+PAT _X : real
+NUMPAT _N : real
 3 : natural
 1 / 2 : rational
 0.5 : real

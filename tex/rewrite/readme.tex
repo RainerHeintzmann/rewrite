@@ -233,7 +233,12 @@ x+y*2                                       # gibt 4 + y * 2 aus
 \item[PAT name {[},name ..{]} : sortname]
   Deklariert eine Muster-Variable (bis 2026 \kw{VAR}). Sie steht in Regeln
   für einen beliebigen Term ihrer Sorte oder einer Sorte darunter.
-  Bsp.: \kw{PAT A : real} \quad \kw{SPEC xyz : A+0=A}
+  Bsp.: \kw{PAT A : real} \quad \kw{SPEC xyz : A+0=A}\\
+  Die Muster-Variablen der Bibliothek beginnen alle mit \kw{\_}
+  (\kw{\_X}, \kw{\_Xnu}, \kw{\_N}), damit Namen wie \kw{X} oder \kw{A}
+  frei bleiben und ein \kw{TERM Y} des Benutzers keine Regel der
+  Bibliothek verändert. Eigene Regeln deklarieren ihre eigenen
+  Muster-Variablen.
 
 \item[NUMPAT name {[},name ..{]} : sortname]
   Deklariert eine Muster-Variable, die nur für Zahlen steht (bis 2026
@@ -359,8 +364,8 @@ ATT complex show_complex,cmp_complex,cpy_complex,del_complex
   Als Konstanten sind auch 0 und 1 möglich. Mit diesem Trick folgen die
   Ringregeln aus den Gruppenregeln:
 \begin{beispiel}
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
+LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar+_Ar,_Ar-_Ar,-_Ar,0r)
+LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar*_Ar,_Ar/_Ar,mi(_Ar),1r)
 \end{beispiel}
 \end{description}
 

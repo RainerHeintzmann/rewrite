@@ -99,7 +99,7 @@ ADDSPEC LaplaceT : IF (knownpos(_Ls)), (entireq(_Lf,_Lt)) \
 ADDSPEC LaplaceT : IF (freeq(_Li,_Lt)) lapint(_Li,_Lf,_Lt,_Ls) = _Li
 
 # ---- the inverse transform
-PAT _Mf,_Mg,_Ms,_Mt,_Mc,_Mb,_Mq,_Me : number
+PAT _Mf,_Mg,_Ms,_Mt,_Mk,_Mh,_Mq,_Me : number
 NUMPAT _Mn : number
 
 # linearity
@@ -107,9 +107,9 @@ SPEC    InvLaplaceT : invlaplace(_Mf+_Mg,_Ms,_Mt) = invlaplace(_Mf,_Ms,_Mt)+invl
 ADDSPEC InvLaplaceT : invlaplace(_Mf-_Mg,_Ms,_Mt) = invlaplace(_Mf,_Ms,_Mt)-invlaplace(_Mg,_Ms,_Mt)
 ADDSPEC InvLaplaceT : invlaplace(-_Mf,_Ms,_Mt) = -invlaplace(_Mf,_Ms,_Mt)
 ADDSPEC InvLaplaceT : IF (freeq(_Mf,_Ms)) invlaplace(_Mf,_Ms,_Mt) = _Mf*dirac(_Mt)
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)) invlaplace(_Mc*_Mf,_Ms,_Mt) = _Mc*invlaplace(_Mf,_Ms,_Mt)
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)) invlaplace(_Mf/_Mc,_Ms,_Mt) = invlaplace(_Mf,_Ms,_Mt)/_Mc
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)), (neq(_Mc,1)) invlaplace(_Mc/_Mf,_Ms,_Mt) = _Mc*invlaplace(1/_Mf,_Ms,_Mt)
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)) invlaplace(_Mk*_Mf,_Ms,_Mt) = _Mk*invlaplace(_Mf,_Ms,_Mt)
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)) invlaplace(_Mf/_Mk,_Ms,_Mt) = invlaplace(_Mf,_Ms,_Mt)/_Mk
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)), (neq(_Mk,1)) invlaplace(_Mk/_Mf,_Ms,_Mt) = _Mk*invlaplace(1/_Mf,_Ms,_Mt)
 # the delay: exp(-c s) F(s) -> heaviside(t-c) f(t-c)
 ADDSPEC InvLaplaceT : IF (linearq(_Me,_Ms)), (eqq(coeff(_Me,_Ms,0),0)), (knownneg(coeff(_Me,_Ms))) \
                       invlaplace(exp(_Me)*_Mf,_Ms,_Mt) = heaviside(_Mt+coeff(_Me,_Ms)) \
@@ -118,30 +118,30 @@ ADDSPEC InvLaplaceT : IF (linearq(_Me,_Ms)), (eqq(coeff(_Me,_Ms,0),0)), (knownne
                       invlaplace(exp(_Me)/_Mf,_Ms,_Mt) = heaviside(_Mt+coeff(_Me,_Ms)) \
                           *subst(invlaplace(1/_Mf,_Ms,_Mt),_Mt,_Mt+coeff(_Me,_Ms))
 # (k s + m)^-n -> t^(n-1) exp(-m t/k) / (Gamma(n) k^n) for n > 0
-ADDSPEC InvLaplaceT : IF (linearq(_Mb,_Ms)), (_Mn < 0) invlaplace(_Mb^_Mn,_Ms,_Mt) = \
-                      _Mt^(-_Mn-1)*exp(-coeff(_Mb,_Ms,0)/coeff(_Mb,_Ms)*_Mt)/(Gamma(-_Mn)*coeff(_Mb,_Ms)^(-_Mn))
-ADDSPEC InvLaplaceT : IF (linearq(_Mb,_Ms)) invlaplace(mi(_Mb),_Ms,_Mt) = \
-                      exp(-coeff(_Mb,_Ms,0)/coeff(_Mb,_Ms)*_Mt)/coeff(_Mb,_Ms)
-ADDSPEC InvLaplaceT : IF (linearq(_Mb,_Ms)) invlaplace(1/_Mb,_Ms,_Mt) = \
-                      exp(-coeff(_Mb,_Ms,0)/coeff(_Mb,_Ms)*_Mt)/coeff(_Mb,_Ms)
-ADDSPEC InvLaplaceT : IF (linearq(_Mb,_Ms)), (_Mn > 0) invlaplace(1/_Mb^_Mn,_Ms,_Mt) = \
-                      _Mt^(_Mn-1)*exp(-coeff(_Mb,_Ms,0)/coeff(_Mb,_Ms)*_Mt)/(Gamma(_Mn)*coeff(_Mb,_Ms)^_Mn)
+ADDSPEC InvLaplaceT : IF (linearq(_Mh,_Ms)), (_Mn < 0) invlaplace(_Mh^_Mn,_Ms,_Mt) = \
+                      _Mt^(-_Mn-1)*exp(-coeff(_Mh,_Ms,0)/coeff(_Mh,_Ms)*_Mt)/(Gamma(-_Mn)*coeff(_Mh,_Ms)^(-_Mn))
+ADDSPEC InvLaplaceT : IF (linearq(_Mh,_Ms)) invlaplace(mi(_Mh),_Ms,_Mt) = \
+                      exp(-coeff(_Mh,_Ms,0)/coeff(_Mh,_Ms)*_Mt)/coeff(_Mh,_Ms)
+ADDSPEC InvLaplaceT : IF (linearq(_Mh,_Ms)) invlaplace(1/_Mh,_Ms,_Mt) = \
+                      exp(-coeff(_Mh,_Ms,0)/coeff(_Mh,_Ms)*_Mt)/coeff(_Mh,_Ms)
+ADDSPEC InvLaplaceT : IF (linearq(_Mh,_Ms)), (_Mn > 0) invlaplace(1/_Mh^_Mn,_Ms,_Mt) = \
+                      _Mt^(_Mn-1)*exp(-coeff(_Mh,_Ms,0)/coeff(_Mh,_Ms)*_Mt)/(Gamma(_Mn)*coeff(_Mh,_Ms)^_Mn)
 # s^2 + k^2 with a symbol k: sine and cosine
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)) invlaplace(1/(_Ms^2+_Mc^2),_Ms,_Mt) = sin(_Mc*_Mt)/_Mc
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)) invlaplace(_Ms/(_Ms^2+_Mc^2),_Ms,_Mt) = cos(_Mc*_Mt)
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)) invlaplace((_Ms^2+_Mc^2)^-1,_Ms,_Mt) = sin(_Mc*_Mt)/_Mc
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)) invlaplace(_Ms*(_Ms^2+_Mc^2)^-1,_Ms,_Mt) = cos(_Mc*_Mt)
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)) invlaplace(1/(_Ms^2-_Mc^2),_Ms,_Mt) = sinh(_Mc*_Mt)/_Mc
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)) invlaplace(_Ms/(_Ms^2-_Mc^2),_Ms,_Mt) = cosh(_Mc*_Mt)
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)) invlaplace(1/(_Ms^2+_Mk^2),_Ms,_Mt) = sin(_Mk*_Mt)/_Mk
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)) invlaplace(_Ms/(_Ms^2+_Mk^2),_Ms,_Mt) = cos(_Mk*_Mt)
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)) invlaplace((_Ms^2+_Mk^2)^-1,_Ms,_Mt) = sin(_Mk*_Mt)/_Mk
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)) invlaplace(_Ms*(_Ms^2+_Mk^2)^-1,_Ms,_Mt) = cos(_Mk*_Mt)
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)) invlaplace(1/(_Ms^2-_Mk^2),_Ms,_Mt) = sinh(_Mk*_Mt)/_Mk
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)) invlaplace(_Ms/(_Ms^2-_Mk^2),_Ms,_Mt) = cosh(_Mk*_Mt)
 # the resonance: (s^2 + c)^-2 with c = k^2 > 0
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)), (knownpos(_Mc)) invlaplace((_Ms^2+_Mc)^-2,_Ms,_Mt) = \
-                      (sin(sqrt(_Mc)*_Mt)-sqrt(_Mc)*_Mt*cos(sqrt(_Mc)*_Mt))/(2*sqrt(_Mc)^3)
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)), (knownpos(_Mc)) invlaplace(1/(_Ms^2+_Mc)^2,_Ms,_Mt) = \
-                      (sin(sqrt(_Mc)*_Mt)-sqrt(_Mc)*_Mt*cos(sqrt(_Mc)*_Mt))/(2*sqrt(_Mc)^3)
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)), (knownpos(_Mc)) invlaplace(_Ms*(_Ms^2+_Mc)^-2,_Ms,_Mt) = \
-                      _Mt*sin(sqrt(_Mc)*_Mt)/(2*sqrt(_Mc))
-ADDSPEC InvLaplaceT : IF (freeq(_Mc,_Ms)), (knownpos(_Mc)) invlaplace(_Ms/(_Ms^2+_Mc)^2,_Ms,_Mt) = \
-                      _Mt*sin(sqrt(_Mc)*_Mt)/(2*sqrt(_Mc))
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)), (knownpos(_Mk)) invlaplace((_Ms^2+_Mk)^-2,_Ms,_Mt) = \
+                      (sin(sqrt(_Mk)*_Mt)-sqrt(_Mk)*_Mt*cos(sqrt(_Mk)*_Mt))/(2*sqrt(_Mk)^3)
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)), (knownpos(_Mk)) invlaplace(1/(_Ms^2+_Mk)^2,_Ms,_Mt) = \
+                      (sin(sqrt(_Mk)*_Mt)-sqrt(_Mk)*_Mt*cos(sqrt(_Mk)*_Mt))/(2*sqrt(_Mk)^3)
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)), (knownpos(_Mk)) invlaplace(_Ms*(_Ms^2+_Mk)^-2,_Ms,_Mt) = \
+                      _Mt*sin(sqrt(_Mk)*_Mt)/(2*sqrt(_Mk))
+ADDSPEC InvLaplaceT : IF (freeq(_Mk,_Ms)), (knownpos(_Mk)) invlaplace(_Ms/(_Ms^2+_Mk)^2,_Ms,_Mt) = \
+                      _Mt*sin(sqrt(_Mk)*_Mt)/(2*sqrt(_Mk))
 # a linear numerator over a quadratic without real roots: complete the square,
 # (A s + B)/(a (s-p)^2 + a w^2) -> exp(p t) (A cos(w t) + (B + A p)/w sin(w t))/a
 ADDSPEC InvLaplaceT : IF (polyq(_Mq,_Ms,2)), (polyq(_Mf,_Ms)), (ileq(expon(_Mf,_Ms),1)), \
@@ -166,10 +166,10 @@ COMM
 
 # (A s + B)/(a s^2 + b s + c) = (A/a (s-p) + B/a + A/a p)/((s-p)^2 + w^2)
 # with p = -b/(2a), w^2 = c/a - p^2: exp(p t) (A/a cos(w t) + (B/a + A/a p)/w sin(w t))
-PAT _Qa,_Qb,_Qc,_Qd,_Qe,_Qt : number
-SPEC InvQuad : invquad(_Qa,_Qb,_Qc,_Qd,_Qe,_Qt) = \
-    exp(-_Qd/(2*_Qc)*_Qt)*(_Qa/_Qc*cos(sqrt(_Qe/_Qc-_Qd^2/(4*_Qc^2))*_Qt) \
-      + (_Qb/_Qc-_Qa*_Qd/(2*_Qc^2))/sqrt(_Qe/_Qc-_Qd^2/(4*_Qc^2))*sin(sqrt(_Qe/_Qc-_Qd^2/(4*_Qc^2))*_Qt))
+PAT _Ha,_Hb,_Hc,_Hd,_He,_Ht : number
+SPEC InvQuad : invquad(_Ha,_Hb,_Hc,_Hd,_He,_Ht) = \
+    exp(-_Hd/(2*_Hc)*_Ht)*(_Ha/_Hc*cos(sqrt(_He/_Hc-_Hd^2/(4*_Hc^2))*_Ht) \
+      + (_Hb/_Hc-_Ha*_Hd/(2*_Hc^2))/sqrt(_He/_Hc-_Hd^2/(4*_Hc^2))*sin(sqrt(_He/_Hc-_Hd^2/(4*_Hc^2))*_Ht))
 
 # an ordinary rule (in a rule list it would count as a cycle): the
 # transform stays if the integral stayed

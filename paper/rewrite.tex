@@ -38,9 +38,9 @@
 % results of the test-suite measurement (tools/rubitest.py)
 \newcommand{\nproblems}{1540}
 \newcommand{\ntested}{1539}
-\newcommand{\nsolved}{1392}
-\newcommand{\psolved}{90.4\%}
-\newcommand{\nwrong}{3}
+\newcommand{\nsolved}{1438}
+\newcommand{\psolved}{93.4\%}
+\newcommand{\nwrong}{1}
 \newcommand{\nfailed}{0}
 
 \title{\texttt{rewrite}: a programming language that learns its\\
@@ -76,7 +76,9 @@ with a backtracking matcher for optional pattern parts, commutative
 operators and condition lists, symbolic helper functions and special
 functions. On \nproblems{} integration problems from four independent
 textbook collections, \psolved{} of the results are verified correct by
-numerical differentiation.
+numerical differentiation. On top of the integrator, limits, definite
+integrals and the Laplace and Fourier transforms are further rule files,
+with which ordinary and partial differential equations are solved.
 \end{abstract}
 
 \section{Introduction}
@@ -114,7 +116,10 @@ The main contributions of this paper are:
   \item an automatic translation of the rule-based integrator
         Rubi~\cite{rich2018rubi} into \texttt{rewrite}, with a measurement on
         independent test problems and a discussion of what the translation
-        requires from the host system.
+        requires from the host system;
+  \item limits, definite integrals and integral transforms written as rule
+        files on top of the integrator, applied to ordinary and partial
+        differential equations.
 \end{itemize}
 
 \section{Language design}
@@ -155,6 +160,7 @@ vectors and matrices are executed by C functions, so they run at compiled
 speed.
 
 \subsection{Rules and algebras}
+\label{sec:rules}
 
 Rules are collected in named rule sets, called \emph{algebras}. A rule has
 a left side, a right side, an optional condition and an optional block of
@@ -171,7 +177,11 @@ REWR (u*1)+0 : simp                # prints u
 
 \texttt{PAT} declares pattern variables that match any term of their sort.
 \texttt{NUMPAT} declares pattern variables that only match numbers, which makes
-rules like ``evaluate if the argument is a number'' easy to write.
+rules like ``evaluate if the argument is a number'' easy to write. Pattern
+variables are ordinary names, so a user who assigns a term to a name used
+by a library rule changes that rule; the pattern variables of the library
+therefore all begin with an underscore (\texttt{\_X}, \texttt{\_N}), and
+names like \texttt{X} are left to the user.
 Conditions test whether a term occurs in another one (\texttt{IN},
 \texttt{NIN}), compare terms in a total order (\texttt{LB}, used for
 sorting sums), or evaluate any expression with a boolean result.
@@ -182,10 +192,13 @@ of the library is defined like this:
 
 \begin{lstlisting}
 SPEC All : Std,Doit,(Linear,Compl,diff,GrRi),AGroup,integr,
-           (Subst,GrRi),Std,Combine,NoMi
+           (Subst,GrRi),Std,Combine,NoMi,Final,Expprod,Final
 \end{lstlisting}
 
-With the library loaded, \texttt{REWR D(sin cos x,x) : All} returns
+\texttt{Final} brings the result into a normal form, which puts equal
+factors next to each other, so that \texttt{Expprod} can combine
+$e^a e^b$ to $e^{a+b}$. With the library loaded,
+\texttt{REWR D(sin cos x,x) : All} returns
 \texttt{- cos (cos (x ))* sin (x )}.
 
 \subsection{Transferring rules with LIFT}
@@ -196,9 +209,9 @@ also hold for another set. The standard library writes the laws of a group
 once and transfers them step by step:
 
 \begin{lstlisting}
-LIFT (Ag+Ag,Ag-Ag,-Ag,0g) TO (Aag+Aag,Aag-Aag,-Aag,0ag)
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
-LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar*Ar,Ar/Ar,mi(Ar),1r)
+LIFT (_Ag+_Ag,_Ag-_Ag,-_Ag,0g) TO (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag)
+LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar+_Ar,_Ar-_Ar,-_Ar,0r)
+LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar*_Ar,_Ar/_Ar,mi(_Ar),1r)
 \end{lstlisting}
 
 The last line reuses the rules of an abelian group for multiplication,
@@ -228,7 +241,8 @@ SUBSORT rational,real ATT rat2real       # every fraction is a real number
 OTHER + : rational,rational >> rational ATT rat_plus
 OTHER / : integer,integer >> rational  ATT int_div
 ...
-LIFT (A+A,A-A,A*A,A/A,-A,mi(A),A^A) TO (Aq+Aq,Aq-Aq,Aq*Aq,Aq/Aq,-Aq,mi(Aq),Aq^Az)
+LIFT (_A+_A,_A-_A,_A*_A,_A/_A,-_A,mi(_A),_A^_A)
+  TO (_Aq+_Aq,_Aq-_Aq,_Aq*_Aq,_Aq/_Aq,-_Aq,mi(_Aq),_Aq^_Az)
 INTNUM natural ATT read_int              # 12 is a natural number, 0.5 real
 \end{lstlisting}
 
@@ -370,7 +384,11 @@ for output or for a numerical test in a rule condition, falls back to real
 arithmetic ($\sqrt{2}$ prints 1.41421). A real number in an operation makes
 it numeric, as Mathematica's numeric contagion: $\sqrt{2}\cdot 0.5$ is
 0.707107, whereas a real 1.0 next to an exact number counts as the integer
-1, since the rules of the old library were written with real numbers.
+1, since the rules of the old library were written with real numbers. For
+the same reason, an operation on such integers alone whose value is not an
+integer is done exactly: the derivative rule
+\texttt{D(sqrt(\_X),\_Z) = D(\_X,\_Z)*mi(2*sqrt(\_X))} gives $\frac12$, not
+0.5, so that the derivative of $\sqrt{\pi t}$ keeps the symbol $\pi$.
 
 \subsection{Interleaving rewriting and numerics}
 
@@ -384,15 +402,15 @@ rule whose \texttt{DO} block computes the value:
 
 \begin{lstlisting}
 ALG calc
-SPEC calc : I(N,M,A,_x)=_myerg DO { _myerg=0;_tmp1=0;_tmp2=0  # Simpson
-        FOR n=N+_step/2 TO M-_step STEP _step DO { _x=n;_tmp1=_tmp1+A
-        _x=n+_step/2
-        _tmp2=_tmp2+A }
-        _x=M-_step/2
-        _tmp1=_tmp1+A
-        _x=N;_myerg=A+4*_tmp1+2*_tmp2
-        _x=M;_myerg=(_myerg+A)*_step/2/3
-        _x=dummy }
+SPEC calc : I(_N,_K,_A,_x)=_myerg DO { _myerg=0;_tmp1=0;_tmp2=0  # Simpson
+        FOR _n=_N+_step/2 TO _K-_step STEP _step DO { _x=_n;_tmp1=_tmp1+_A
+        _x=_n+_step/2
+        _tmp2=_tmp2+_A }
+        _x=_K-_step/2
+        _tmp1=_tmp1+_A
+        _x=_N;_myerg=_A+4*_tmp1+2*_tmp2
+        _x=_K;_myerg=(_myerg+_A)*_step/2/3
+        _x=nothing }
 \end{lstlisting}
 
 A second rule set first substitutes the integration variable by the
@@ -663,24 +681,23 @@ Table~\ref{tab:int} shows examples.
 \toprule
 Integrand & Result of \texttt{REWR Int(f,x) : RubiIntegrate} \\
 \midrule
-\texttt{1/(1+x\^{}3)} & \texttt{(1/3)*ln(1+x) + (1/3)*3\^{}(1/2)*arctan(-1/3\^{}(1/2)+2*x/3\^{}(1/2))} \\
+\texttt{1/(1+x\^{}3)} & \texttt{(1/3)*ln(1+x) + arctan(2*x/3\^{}(1/2)-1/3\^{}(1/2))/3\^{}(1/2)} \\
                       & \texttt{\ \ - (1/6)*ln(1+x\^{}2-x)} \\
 \texttt{x/(1+x\^{}4)}  & \texttt{(1/2)*arctan(x\^{}2)} \\
-\texttt{sqrt(1-x\^{}2)} & \texttt{(1/2)*arcsin(x) + (1/2)*(1-x\^{}2)\^{}(1/2)*x} \\
+\texttt{sqrt(1-x\^{}2)} & \texttt{(1/2)*x*(1-x\^{}2)\^{}(1/2) + (1/2)*arcsin(x)} \\
 \texttt{x*sqrt(1+x)}  & \texttt{(2/5)*(1+x)\^{}(5/2) - (2/3)*(1+x)\^{}(3/2)} \\
 \texttt{sin(x)\^{}2*cos(x)\^{}3} & \texttt{(1/3)*sin(x)\^{}3 - (1/5)*sin(x)\^{}5} \\
 \texttt{1/(1+tan(x))\^{}2} & \texttt{(1/2)*ln(cos(x)+sin(x)) - (1/2)/(1+tan(x))} \\
-\texttt{x*arcsec(x)} & \texttt{(1/2)*x\^{}2*arcsec(x) - (1/2)*(1-1/x\^{}2)\^{}(1/2)*x} \\
-\texttt{exp(-x\^{}2)} & \texttt{0.886227*erf(x)} \\
+\texttt{x*arcsec(x)} & \texttt{(1/2)*x\^{}2*arcsec(x) - (1/2)*x*(1-1/x\^{}2)\^{}(1/2)} \\
+\texttt{exp(-x\^{}2)} & \texttt{(1/2)*pi\^{}(1/2)*erf(x)} \\
 \texttt{sin(x)/x}     & \texttt{sinint(x)} \\
 \texttt{1/sqrt(1-x\^{}4)} & \texttt{ellipticf(arcsin(x),-1)} \\
-\texttt{(1+x\^{}3)\^{}(1/3)} & \texttt{hyp2f1((-1/3),(1/3),(4/3),-x\^{}3)*x} \\
+\texttt{(1+x\^{}3)\^{}(1/3)} & \texttt{x*hyp2f1((-1/3),(1/3),(4/3),-x\^{}3)} \\
 \bottomrule
 \end{tabular}
 \caption{Indefinite integrals computed with the automatically translated
-Rubi rules (output slightly condensed). Rational coefficients and roots
-such as $1/\sqrt{3}$ are exact; $\sqrt{\pi}/2$ is a real number, since
-$\pi$ is.}
+Rubi rules (output slightly condensed). Rational coefficients, roots
+such as $1/\sqrt{3}$ and $\pi$ are exact.}
 \label{tab:int}
 \end{table}
 
@@ -703,10 +720,10 @@ suite (from the textbooks of Apostol, Hearn, Stewart and Timofeev,
 Result & Problems & Share \\
 \midrule
 solved and verified       & \nsolved & \psolved \\
-no antiderivative found   & 123 & 8.0\% \\
-wrong result              & \nwrong  & 0.2\% \\
+no antiderivative found   & 82 & 5.3\% \\
+wrong result              & \nwrong  & 0.1\% \\
 crash or time-out         & \nfailed & 0.0\% \\
-not verifiable            & 21 & 1.4\% \\
+not verifiable            & 18 & 1.2\% \\
 \bottomrule
 \end{tabular}
 \caption{Results on the \ntested{} tested problems of four independent
@@ -738,13 +755,11 @@ after them, 79\% after partial fractions, the inside-out evaluation of
 nested helpers and the flat matching of products, 84\% with Rubi's
 substitutions, 85.5\% with the normal form of trigonometric products, and
 88\% with Rubi's meaning of \texttt{GtQ} and the substitutions for roots,
-and 90\% with the expansion of multiple angles. Two of the
-results counted as wrong contain special functions evaluated outside their
-real domain (${}_2F_1$ at an argument $e^{7x}/3>1$, the incomplete Gamma
-function of a negative argument), where the check compares different
-complex branches; the third writes $\sqrt{\sin x\cos^3x}$ as
+90\% with the expansion of multiple angles, and 93\% in the current
+version, after the imaginary unit and the exact constants. The one result
+counted as wrong writes $\sqrt{\sin x\cos^3x}$ as
 $\cos^{3/2}x\,\sin^{1/2}x$, which is wrong where both factors are
-negative. A run takes about five minutes.
+negative. A run takes less than two minutes.
 
 The translation also served as a test of the library itself. It revealed
 two incorrect simplification rules in the standard algebra, which turned
@@ -757,13 +772,110 @@ sorts \texttt{nonneg} and \texttt{positive}. The numerical check of the
 harness found these errors, because Rubi's results were differentiated at
 negative arguments.
 
+\section{Limits, transforms and differential equations}
+
+With an integrator in place, further parts of calculus are rule files on
+top of it. They also show how the pieces of the language combine: functions
+defined by rule lists, sign predicates written as rules, and the
+interleaving of table look-up and computation.
+
+\paragraph{Limits and definite integrals.} \texttt{limit(u,x,infinity)}
+evaluates finite limits at $\pm\infty$ only: polynomials against
+exponentials, quotients by their leading terms, and functions such as
+$\operatorname{erf}$ with known limits; a limit that is not known or does
+not exist stays as it is, so that $\infty-\infty$ never becomes 0. The
+sign of a term is decided by the rule functions \texttt{knownpos} and
+\texttt{knownneg}, which use the sorts (\texttt{SYM a : positive}) and
+the structure of the term. \texttt{Int(f,x,a,b)} takes the antiderivative of
+\texttt{RubiIntegrate} at the bounds, with limits at infinity, but only for
+integrands that are continuous on the real line, so that
+$\int_{-1}^{1}t^{-2}\,dt$ stays unevaluated. Thus
+$\int_{-\infty}^{\infty}e^{-at^2}dt$ gives \texttt{pi\^{}(1/2)/a\^{}(1/2)}
+and $\int_0^\infty e^{-at}\cos(wt)\,dt$ gives \texttt{a/(w\^{}2+a\^{}2)}.
+The Heaviside step and the Dirac delta are handled before the integration.
+
+\paragraph{Laplace transform.} \texttt{laplace(f,t,s)} combines a table
+with the theorems (shift, damping, multiplication by $t$, derivatives) and
+the definite integral for the rest. The transform of a derivative refers to
+the initial values, \texttt{v(0)} and \texttt{initial(D(v(t),t),t)}, which
+a user supplies as rules. The inverse uses partial fractions; quadratic
+denominators give damped oscillations and \texttt{exp(-c*s)} a delay. An
+initial value problem is then solved in three steps, here a driven
+oscillator at its resonance, $v''+v=\sin t$, $v(0)=v'(0)=0$:
+
+\begin{lstlisting}
+SYM s : positive
+FUNC v : real >> real     # the unknown function
+SYM V : real              # its transform
+ALG Init
+SPEC    Init : v(0) = 0
+ADDSPEC Init : initial(D(v(t),t),t) = 0
+ADDSPEC Init : laplace(v(t),t,s) = V
+E = REWR laplace(D(D(v(t),t),t) + v(t) - sin(t), t, s) : Init, All
+R = REWR solve(E == 0, V) : Solve
+Vs = REWR part(R,1) : All               # prints 1 / (1 + s ^ 2 )^ 2
+invlaplace(Vs, s, t)      # prints (1/2) * sin (t )- (1/2) * t * cos (t )
+\end{lstlisting}
+
+\paragraph{Fourier transform.} \texttt{fourier(f,t,w)} uses the convention
+$F(w)=\int f(t)\,e^{-iwt}dt$. Its table holds the entries that are
+distributions or need contour integrals (constants and $\cos$ give deltas,
+$e^{-a|t|}$, $1/(t^2+c)$, $\sin(at)/t$) and the Gaussians
+$e^{-ct^2+bt+d}$, whose transform
+$\sqrt{\pi/c}\,e^{d+(b-iw)^2/(4c)}$ is written with the square expanded so
+that $i^2=-1$ cancels; the theorems cover modulation, multiplication by
+$t$ and derivatives, and the integral of \texttt{inc/limits} the rest. The
+inverse is the duality $f(t)=F(w)|_{w\to-t}/(2\pi)$ of the same rules, so
+the table works in both directions. The derivative theorem turns a linear
+partial differential equation in $x$ into an ordinary one in $t$: for the
+heat equation $u_t=a\,u_{xx}$ the transform is $U_t=-aw^2U$, so
+$U=U_0(w)\,e^{-aw^2t}$, and a point source gives the heat kernel:
+
+\begin{lstlisting}
+SYM w : real
+SYM a, t : positive
+FUNC v : real,real >> real
+REWR fourier(D(D(v(x,t),x),x), x, w) : All
+                        # prints - w ^ 2 * fourier (v (x ,t ),x ,w )
+invfourier(exp(-a*w^2*t), w, x)
+   # prints (1/2) * exp (- (1/4) * x ^ 2 / (a * t ))
+   #          / (pi ^ (1/2) * a ^ (1/2) * t ^ (1/2) )
+\end{lstlisting}
+
+In the same way an initial Gaussian $e^{-x^2}$ spreads to
+$e^{-x^2/(1+4at)}/\sqrt{1+4at}$, and the transport equation
+$u_t+cu_x=0$, with $U=U_0\,e^{-icwt}$, moves it to $e^{-(x-ct)^2}$.
+
+\paragraph{Checking and other methods.} Since \texttt{deriv} differentiates
+partially, a proposed solution is checked by substituting it: the wave,
+heat and Laplace equations with $\sin(x-ct)$, $e^{-ak^2t}\sin kx$,
+$e^{-x^2/(4at)}/\sqrt t$ or $\ln(x^2+y^2)$ reduce to 0 with \texttt{All}
+(the last after \texttt{cancel}). The example programs for ordinary
+equations also find the characteristic roots with \texttt{solve}, apply
+the integrating factor and the separation of variables with
+\texttt{RubiIntegrate}, iterate Picard's integral equation with definite
+integrals in a loop, and integrate $y'=1+y^2$ with a Runge--Kutta loop
+written in the language; they run as part of the test suite.
+
+Some of this needed additions to the library rather than to the
+interpreter: the rules $e^ae^b=e^{a+b}$ and $e^{\ln x}=x$ had been missing
+from the general simplification, so that integrating factors did not
+cancel. And each rule set of these libraries has its own pattern
+variables: a rule function called in a condition, such as a sign test,
+matches with its own variables and must not rebind those of the rule that
+called it. The same concern for the user led to the underscore convention
+for the pattern variables of the library (Section~\ref{sec:rules}).
+Simplification remains the limiting factor: the second derivatives of a
+rational function of $x+ct$ take minutes, and results are not always in
+their simplest form.
+
 \section{Implementation and revival}
 
-The interpreter consists of about 17\,900 lines of C (about 8400 in the
+The interpreter consists of about 20\,800 lines of C (about 8400 in the
 original program); the additions of 2026 are the rule lists, subsorts,
 exact numbers, special and symbolic helper functions, lists and matrices,
 equation solving and the interactive environment. The grammar for the
-scanner and parser generators flex and bison has about 540 lines. Terms are binary trees of nodes taken
+scanner and parser generators flex and bison has about 590 lines. Terms are binary trees of nodes taken
 from memory pools; symbols carry their sort, value and the links used by
 \texttt{LIFT}. The rules of an algebra are merged into a single tree, in
 which rules with a common left-hand-side structure share nodes and
@@ -777,11 +889,11 @@ with current tools. The port to 64-bit Linux and Windows (MSYS2) required
 only small changes to the C code itself. The main problems were changed
 semantics in the scanner generator, the release of static memory that old
 C libraries tolerated, and errors in the handling of declarations inside
-loops and included files. A regression test suite with 50 test programs
+loops and included files. A regression test suite with 58 test programs
 now covers the core language, the library, the pattern features, exact
 numbers, helper and special functions, lists, matrices and equations, the
-integration rules, the original example programs and the example programs
-for new users; the integration tests check every result by
+integration rules, limits and transforms, the original example programs and
+the example programs for new users; the integration tests check every result by
 differentiating it again. Writing them also uncovered old faults: a
 second declaration of a function left its earlier variants in a broken
 ring, so that a later lookup did not end, and every message was formatted
@@ -798,7 +910,7 @@ the tests.
 
 Performance is adequate for interactive use. Loading the standard library,
 including the translated integration rules, and computing a derivative
-takes about 0.9\,s on a current laptop. A scalar loop
+takes about 0.7\,s on a current laptop. A scalar loop
 written in the language itself needs about 0.25\,$\mu$s per iteration
 (measured for $10^7$ iterations of \texttt{s = s + k*k}). We estimate this
 to be about two orders of magnitude slower than an equivalent compiled
@@ -806,8 +918,8 @@ loop. Operations on whole vectors and matrices run in C.
 
 \paragraph{Library organisation.} \texttt{INC "inc/all"} loads the
 mathematical library: the basic sorts and rules, exact numbers, the
-symbolic helpers, lists, matrices, equations and both integration rule
-sets. The physical units and constants of the original application, whose
+symbolic helpers, lists, matrices, equations, both integration rule
+sets, limits and the Laplace and Fourier transforms. The physical units and constants of the original application, whose
 many short names (\texttt{c}, \texttt{g}, \texttt{m}, \texttt{t}) would
 otherwise not be free symbols, are a separate library \texttt{inc/physics}.
 The rule list \texttt{All} ends with the normal form of the symbolic

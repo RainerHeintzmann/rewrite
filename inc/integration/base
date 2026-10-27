@@ -23,41 +23,41 @@ OTHER inthide     : number,number >> number ATT SYMBOLIC inthide
 FUNC unintegrable : real,real >> real                   # Rubi Unintegrable: stays as is, IntOut turns it into Int
 OTHER unintegrable : number,number >> number
 
-PAT Uv,Vv,Wv,Xv : number                  # arbitrary terms
-PAT Pa,Pb,Pc,Pd,Pe,Pf,Pm,Pn : number      # Rubi a_ , b_ , ...
-PAT Qa,Qb,Qc,Qd,Qe,Qf,Qm,Qn : number      # Rubi a_., b_., ...
-NUMPAT Kc,Kd,Kf : real                       # numbers only
+PAT _Uv,_Vv,_Wv,_Xv : number                  # arbitrary terms
+PAT _Pa,_Pb,_Pc,_Pd,_Pe,_Pf,_Pm,_Pn : number      # Rubi a_ , b_ , ...
+PAT _Qa,_Qb,_Qc,_Qd,_Qe,_Qf,_Qm,_Qn : number      # Rubi a_., b_., ...
+NUMPAT _Kc,_Kd,_Kf : real                       # numbers only
 
 # ---------------- Normal form as in Mathematica ----------------
 # x-y -> x+(-1)*y,  x/y -> x*y^(-1),  sqrt(x) -> x^0.5,  e^x -> exp(x),
 # numeric factors to the front, multiply out products with sums.
 # These rules come before OPT/COMM and are therefore not extended.
 ALG IntNorm
-SPEC    IntNorm : Uv-Vv   = Uv+(-1)*Vv
-ADDSPEC IntNorm : -Uv     = (-1)*Uv
-ADDSPEC IntNorm : Uv/Vv   = Uv*Vv^(-1)
-ADDSPEC IntNorm : mi Uv   = Uv^(-1)
-ADDSPEC IntNorm : sqrt Uv = Uv^(1/2)
-ADDSPEC IntNorm : IF (abs(Kf - e) < 1e-9) Kf^Uv = exp(Uv)
-ADDSPEC IntNorm : IF (Kc == 0) Uv^Kc = 1
-ADDSPEC IntNorm : IF (Kc == 1) Uv^Kc = Uv
-ADDSPEC IntNorm : IF (Kc == 1) Kc*Uv = Uv
-ADDSPEC IntNorm : IF (Kc == 0) Kc*Uv = 0
-ADDSPEC IntNorm : IF (Kc == 0) Kc+Uv = Uv
-ADDSPEC IntNorm : IF (Kc == 0) Uv+Kc = Uv
-ADDSPEC IntNorm : IF (is_int(Kc)) (Uv^Vv)^Kc = Uv^(Vv*Kc)   # not (x^2)^0.5 = x
-ADDSPEC IntNorm : Uv*Uv = Uv^2
-ADDSPEC IntNorm : Uv^Vv*Uv = Uv^(Vv+1)
-ADDSPEC IntNorm : Uv*Uv^Vv = Uv^(Vv+1)
-ADDSPEC IntNorm : Uv^Vv*Uv^Wv = Uv^(Vv+Wv)
+SPEC    IntNorm : _Uv-_Vv   = _Uv+(-1)*_Vv
+ADDSPEC IntNorm : -_Uv     = (-1)*_Uv
+ADDSPEC IntNorm : _Uv/_Vv   = _Uv*_Vv^(-1)
+ADDSPEC IntNorm : mi _Uv   = _Uv^(-1)
+ADDSPEC IntNorm : sqrt _Uv = _Uv^(1/2)
+ADDSPEC IntNorm : IF (abs(_Kf - e) < 1e-9) _Kf^_Uv = exp(_Uv)
+ADDSPEC IntNorm : IF (_Kc == 0) _Uv^_Kc = 1
+ADDSPEC IntNorm : IF (_Kc == 1) _Uv^_Kc = _Uv
+ADDSPEC IntNorm : IF (_Kc == 1) _Kc*_Uv = _Uv
+ADDSPEC IntNorm : IF (_Kc == 0) _Kc*_Uv = 0
+ADDSPEC IntNorm : IF (_Kc == 0) _Kc+_Uv = _Uv
+ADDSPEC IntNorm : IF (_Kc == 0) _Uv+_Kc = _Uv
+ADDSPEC IntNorm : IF (is_int(_Kc)) (_Uv^_Vv)^_Kc = _Uv^(_Vv*_Kc)   # not (x^2)^0.5 = x
+ADDSPEC IntNorm : _Uv*_Uv = _Uv^2
+ADDSPEC IntNorm : _Uv^_Vv*_Uv = _Uv^(_Vv+1)
+ADDSPEC IntNorm : _Uv*_Uv^_Vv = _Uv^(_Vv+1)
+ADDSPEC IntNorm : _Uv^_Vv*_Uv^_Wv = _Uv^(_Vv+_Wv)
 # (order matters: combine two numbers first, otherwise
 #  5*(-1*a) and -1*(5*a) alternate endlessly)
-ADDSPEC IntNorm : Kc*(Kd*Uv) = (Kc*Kd)*Uv
-ADDSPEC IntNorm : Uv*Kc = Kc*Uv
-ADDSPEC IntNorm : (Kc*Uv)*Vv = Kc*(Uv*Vv)
-ADDSPEC IntNorm : Uv*(Kc*Vv) = Kc*(Uv*Vv)
-ADDSPEC IntNorm : Uv*(Vv+Wv) = Uv*Vv+Uv*Wv
-ADDSPEC IntNorm : (Vv+Wv)*Uv = Vv*Uv+Wv*Uv
+ADDSPEC IntNorm : _Kc*(_Kd*_Uv) = (_Kc*_Kd)*_Uv
+ADDSPEC IntNorm : _Uv*_Kc = _Kc*_Uv
+ADDSPEC IntNorm : (_Kc*_Uv)*_Vv = _Kc*(_Uv*_Vv)
+ADDSPEC IntNorm : _Uv*(_Kc*_Vv) = _Kc*(_Uv*_Vv)
+ADDSPEC IntNorm : _Uv*(_Vv+_Wv) = _Uv*_Vv+_Uv*_Wv
+ADDSPEC IntNorm : (_Vv+_Wv)*_Uv = _Vv*_Uv+_Wv*_Uv
 
 # ---------------- Conversion back for output ----------------
 # negative numbers as minus sign and reciprocals as fraction, so that All
@@ -71,32 +71,32 @@ SYM eE : positive
 # a symbol in terms; the C helpers know im^2 = -1 (role "im").
 
 ALG RubiNorm
-SPEC    RubiNorm : Uv-Vv   = Uv+(-1)*Vv
-ADDSPEC RubiNorm : -Uv     = (-1)*Uv
-ADDSPEC RubiNorm : Uv/Vv   = Uv*Vv^(-1)
-ADDSPEC RubiNorm : mi Uv   = Uv^(-1)
-ADDSPEC RubiNorm : sqrt Uv = Uv^(1/2)
-ADDSPEC RubiNorm : exp(Uv) = eE^Uv   # like Mathematica: E^u, so that F^u patterns match
-ADDSPEC RubiNorm : IF (abs(Kf - e) < 1e-9) Kf^Uv = eE^Uv
+SPEC    RubiNorm : _Uv-_Vv   = _Uv+(-1)*_Vv
+ADDSPEC RubiNorm : -_Uv     = (-1)*_Uv
+ADDSPEC RubiNorm : _Uv/_Vv   = _Uv*_Vv^(-1)
+ADDSPEC RubiNorm : mi _Uv   = _Uv^(-1)
+ADDSPEC RubiNorm : sqrt _Uv = _Uv^(1/2)
+ADDSPEC RubiNorm : exp(_Uv) = eE^_Uv   # like Mathematica: E^u, so that F^u patterns match
+ADDSPEC RubiNorm : IF (abs(_Kf - e) < 1e-9) _Kf^_Uv = eE^_Uv
 ADDSPEC RubiNorm : ln(eE) = 1        # exact, for Rubi's Log[E]
-ADDSPEC RubiNorm : IF (Kc == 0) Uv^Kc = 1
-ADDSPEC RubiNorm : IF (Kc == 1) Uv^Kc = Uv
-ADDSPEC RubiNorm : IF (Kc == 1) Kc*Uv = Uv
-ADDSPEC RubiNorm : IF (Kc == 0) Kc*Uv = 0
-ADDSPEC RubiNorm : IF (Kc == 0) Kc+Uv = Uv
-ADDSPEC RubiNorm : IF (Kc == 0) Uv+Kc = Uv
-ADDSPEC RubiNorm : IF (is_int(Kc)) (Uv^Vv)^Kc = Uv^(Vv*Kc)   # not (x^2)^0.5 = x
-ADDSPEC RubiNorm : IF (is_int(Kc)) (Uv*Vv)^Kc = Uv^Kc*Vv^Kc   # like Mathematica: 1/(u v) = u^-1 v^-1
-ADDSPEC RubiNorm : Uv*Uv = Uv^2
-ADDSPEC RubiNorm : Uv^Vv*Uv = Uv^(Vv+1)
-ADDSPEC RubiNorm : Uv*Uv^Vv = Uv^(Vv+1)
-ADDSPEC RubiNorm : Uv^Vv*Uv^Wv = Uv^(Vv+Wv)
+ADDSPEC RubiNorm : IF (_Kc == 0) _Uv^_Kc = 1
+ADDSPEC RubiNorm : IF (_Kc == 1) _Uv^_Kc = _Uv
+ADDSPEC RubiNorm : IF (_Kc == 1) _Kc*_Uv = _Uv
+ADDSPEC RubiNorm : IF (_Kc == 0) _Kc*_Uv = 0
+ADDSPEC RubiNorm : IF (_Kc == 0) _Kc+_Uv = _Uv
+ADDSPEC RubiNorm : IF (_Kc == 0) _Uv+_Kc = _Uv
+ADDSPEC RubiNorm : IF (is_int(_Kc)) (_Uv^_Vv)^_Kc = _Uv^(_Vv*_Kc)   # not (x^2)^0.5 = x
+ADDSPEC RubiNorm : IF (is_int(_Kc)) (_Uv*_Vv)^_Kc = _Uv^_Kc*_Vv^_Kc   # like Mathematica: 1/(u v) = u^-1 v^-1
+ADDSPEC RubiNorm : _Uv*_Uv = _Uv^2
+ADDSPEC RubiNorm : _Uv^_Vv*_Uv = _Uv^(_Vv+1)
+ADDSPEC RubiNorm : _Uv*_Uv^_Vv = _Uv^(_Vv+1)
+ADDSPEC RubiNorm : _Uv^_Vv*_Uv^_Wv = _Uv^(_Vv+_Wv)
 # (order matters: combine two numbers first, otherwise
 #  5*(-1*a) and -1*(5*a) alternate endlessly)
-ADDSPEC RubiNorm : Kc*(Kd*Uv) = (Kc*Kd)*Uv
-ADDSPEC RubiNorm : Uv*Kc = Kc*Uv
-ADDSPEC RubiNorm : (Kc*Uv)*Vv = Kc*(Uv*Vv)
-ADDSPEC RubiNorm : Uv*(Kc*Vv) = Kc*(Uv*Vv)
+ADDSPEC RubiNorm : _Kc*(_Kd*_Uv) = (_Kc*_Kd)*_Uv
+ADDSPEC RubiNorm : _Uv*_Kc = _Kc*_Uv
+ADDSPEC RubiNorm : (_Kc*_Uv)*_Vv = _Kc*(_Uv*_Vv)
+ADDSPEC RubiNorm : _Uv*(_Kc*_Vv) = _Kc*(_Uv*_Vv)
 # ---------------- Conversion back for output ----------------
 # negative numbers as minus sign and reciprocals as fraction, so that All
 # prints the usual form
@@ -105,61 +105,61 @@ ADDSPEC RubiNorm : Uv*(Kc*Vv) = Kc*(Uv*Vv)
 # a non-negative expression like sqrt(a+b*x), Xre for an arbitrary one
 SYM Xnn : nonneg
 SYM Xre : real
-PAT Un : nonneg
-ADDSPEC RubiNorm : (Un^Vv)^Wv = Un^(Vv*Wv)   # only for nonneg (sqrt(x^2) = x)
+PAT _Un : nonneg
+ADDSPEC RubiNorm : (_Un^_Vv)^_Wv = _Un^(_Vv*_Wv)   # only for nonneg (sqrt(x^2) = x)
 
 ALG IntOut
-SPEC    IntOut : IF (Kc < 0) Uv^Kc = mi(Uv^(-Kc))
-ADDSPEC IntOut : IF (Kc == -1) Kc*Uv = -Uv
-ADDSPEC IntOut : IF (Kc < 0), (Kc != -1) Kc*Uv = -((-Kc)*Uv)
-ADDSPEC IntOut : unintegrable(Uv,Vv) = Int(Uv,Vv)
+SPEC    IntOut : IF (_Kc < 0) _Uv^_Kc = mi(_Uv^(-_Kc))
+ADDSPEC IntOut : IF (_Kc == -1) _Kc*_Uv = -_Uv
+ADDSPEC IntOut : IF (_Kc < 0), (_Kc != -1) _Kc*_Uv = -((-_Kc)*_Uv)
+ADDSPEC IntOut : unintegrable(_Uv,_Vv) = Int(_Uv,_Vv)
 # 2026: convert arguments with pi/2 (from r4_0_unify) back: sin(pi/2+u) = cos(u) ...
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sin(Kc+Uv) = cos(Uv)
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sin(Uv+Kc) = cos(Uv)
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cos(Kc+Uv) = -(sin(Uv))
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cos(Uv+Kc) = -(sin(Uv))
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) tan(Kc+Uv) = -(cot(Uv))
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) tan(Uv+Kc) = -(cot(Uv))
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cot(Kc+Uv) = -(tan(Uv))
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) cot(Uv+Kc) = -(tan(Uv))
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sec(Kc+Uv) = -(csc(Uv))
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) sec(Uv+Kc) = -(csc(Uv))
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) csc(Kc+Uv) = sec(Uv)
-ADDSPEC IntOut : IF (abs(Kc - pi/2) < 1e-9) csc(Uv+Kc) = sec(Uv)
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sin(Kc+Uv) = -(cos(Uv))
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sin(Uv+Kc) = -(cos(Uv))
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) cos(Kc+Uv) = sin(Uv)
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) cos(Uv+Kc) = sin(Uv)
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) tan(Kc+Uv) = -(cot(Uv))
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) tan(Uv+Kc) = -(cot(Uv))
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) cot(Kc+Uv) = -(tan(Uv))
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) cot(Uv+Kc) = -(tan(Uv))
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sec(Kc+Uv) = csc(Uv)
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) sec(Uv+Kc) = csc(Uv)
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) csc(Kc+Uv) = -(sec(Uv))
-ADDSPEC IntOut : IF (abs(Kc + pi/2) < 1e-9) csc(Uv+Kc) = -(sec(Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) sin(_Kc+_Uv) = cos(_Uv)
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) sin(_Uv+_Kc) = cos(_Uv)
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) cos(_Kc+_Uv) = -(sin(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) cos(_Uv+_Kc) = -(sin(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) tan(_Kc+_Uv) = -(cot(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) tan(_Uv+_Kc) = -(cot(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) cot(_Kc+_Uv) = -(tan(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) cot(_Uv+_Kc) = -(tan(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) sec(_Kc+_Uv) = -(csc(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) sec(_Uv+_Kc) = -(csc(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) csc(_Kc+_Uv) = sec(_Uv)
+ADDSPEC IntOut : IF (abs(_Kc - pi/2) < 1e-9) csc(_Uv+_Kc) = sec(_Uv)
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) sin(_Kc+_Uv) = -(cos(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) sin(_Uv+_Kc) = -(cos(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) cos(_Kc+_Uv) = sin(_Uv)
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) cos(_Uv+_Kc) = sin(_Uv)
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) tan(_Kc+_Uv) = -(cot(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) tan(_Uv+_Kc) = -(cot(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) cot(_Kc+_Uv) = -(tan(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) cot(_Uv+_Kc) = -(tan(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) sec(_Kc+_Uv) = csc(_Uv)
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) sec(_Uv+_Kc) = csc(_Uv)
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) csc(_Kc+_Uv) = -(sec(_Uv))
+ADDSPEC IntOut : IF (abs(_Kc + pi/2) < 1e-9) csc(_Uv+_Kc) = -(sec(_Uv))
 # shift by pi (twice pi/2): sin(u+pi) = -sin(u), ...
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) sin(Kc+Uv) = -(sin(Uv))
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) sin(Uv+Kc) = -(sin(Uv))
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) cos(Kc+Uv) = -(cos(Uv))
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) cos(Uv+Kc) = -(cos(Uv))
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) tan(Kc+Uv) = tan(Uv)
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) tan(Uv+Kc) = tan(Uv)
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) cot(Kc+Uv) = cot(Uv)
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) cot(Uv+Kc) = cot(Uv)
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) sec(Kc+Uv) = -(sec(Uv))
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) sec(Uv+Kc) = -(sec(Uv))
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) csc(Kc+Uv) = -(csc(Uv))
-ADDSPEC IntOut : IF (abs(abs(Kc) - pi) < 1e-9) csc(Uv+Kc) = -(csc(Uv))
-ADDSPEC IntOut : IF (abs(Kf - e) < 1e-9) Kf^Uv = exp(Uv)
-ADDSPEC IntOut : eE^Uv = exp(Uv)
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) sin(_Kc+_Uv) = -(sin(_Uv))
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) sin(_Uv+_Kc) = -(sin(_Uv))
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) cos(_Kc+_Uv) = -(cos(_Uv))
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) cos(_Uv+_Kc) = -(cos(_Uv))
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) tan(_Kc+_Uv) = tan(_Uv)
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) tan(_Uv+_Kc) = tan(_Uv)
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) cot(_Kc+_Uv) = cot(_Uv)
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) cot(_Uv+_Kc) = cot(_Uv)
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) sec(_Kc+_Uv) = -(sec(_Uv))
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) sec(_Uv+_Kc) = -(sec(_Uv))
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) csc(_Kc+_Uv) = -(csc(_Uv))
+ADDSPEC IntOut : IF (abs(abs(_Kc) - pi) < 1e-9) csc(_Uv+_Kc) = -(csc(_Uv))
+ADDSPEC IntOut : IF (abs(_Kf - e) < 1e-9) _Kf^_Uv = exp(_Uv)
+ADDSPEC IntOut : eE^_Uv = exp(_Uv)
 ADDSPEC IntOut : ln(eE) = 1
-ADDSPEC IntOut : ln(eE^Uv) = Uv          # for real u
-ADDSPEC IntOut : ln(exp(Uv)) = Uv
+ADDSPEC IntOut : ln(eE^_Uv) = _Uv          # for real u
+ADDSPEC IntOut : ln(exp(_Uv)) = _Uv
 
 # ---------------- Settings for the Rubi rules ----------------
 # (deleted again at the end of inc/integration/all)
-OPT Qa,Qb,Qc,Qd,Qe,Qf,Qm,Qn
+OPT _Qa,_Qb,_Qc,_Qd,_Qe,_Qf,_Qm,_Qn
 DEFAULT + = 0
 DEFAULT * = 1
 DEFAULT RIGHT ^ = 1
@@ -168,8 +168,8 @@ COMM +,*
 # ---------------- Rubi 9.1 Integrand simplification rules (selection) -----
 ALG IntRubi
 # Int[u_, x_Symbol] := IntSum[u, x] /; SumQ[u]
-SPEC    IntRubi : Int(Uv+Vv,Xv) = Int(Uv,Xv)+Int(Vv,Xv)
+SPEC    IntRubi : Int(_Uv+_Vv,_Xv) = Int(_Uv,_Xv)+Int(_Vv,_Xv)
 # Int[a_, x_Symbol] := a*x /; FreeQ[a, x]
-ADDSPEC IntRubi : IF NIN(Xv,Pa) Int(Pa,Xv) = Pa*Xv
+ADDSPEC IntRubi : IF NIN(_Xv,_Pa) Int(_Pa,_Xv) = _Pa*_Xv
 # Int[a_*u_, x_Symbol] := a*Int[u, x] /; FreeQ[a, x]
-ADDSPEC IntRubi : IF NIN(Xv,Pa) Int(Pa*Uv,Xv) = Pa*Int(Uv,Xv)
+ADDSPEC IntRubi : IF NIN(_Xv,_Pa) Int(_Pa*_Uv,_Xv) = _Pa*Int(_Uv,_Xv)

@@ -5,6 +5,7 @@ INC "inc/all"
 SYM a, b, n : real
 FUNC never : real >> real
 ALG raw
+PAT X : real
 SPEC raw : never(X) = X
 SYM g,p,qq,r,ss,t,u,v,w : real
 TERM AA : matrix

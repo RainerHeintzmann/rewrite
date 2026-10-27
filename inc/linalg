@@ -31,8 +31,8 @@ OTHER threadq   : algebra >> bool    ATT SYMBOLIC threadq
 # functions above thread their arguments: det(m - x*identity(2)) is the
 # characteristic polynomial of m.
 ALG Listable
-SPEC    Listable : IF (threadq(Xnu)) Xnu = thread(Xnu)
-ADDSPEC Listable : IF (threadq(Xal)) Xal = thread(Xal)
+SPEC    Listable : IF (threadq(_Xnu)) _Xnu = thread(_Xnu)
+ADDSPEC Listable : IF (threadq(_Xal)) _Xal = thread(_Xal)
 
 # ---------------- symbolic matrices (2026) ----------------
 # The sort matrix (inc/list) is below algebra (inc/alg): its product is
@@ -41,7 +41,7 @@ ADDSPEC Listable : IF (threadq(Xal)) Xal = thread(Xal)
 # SYM A,B : matrix are symbolic matrices, REWR transpose(A*B) :
 # MatrixRules gives transpose(B)*transpose(A). Explicit matrices are
 # calculated at once.
-PAT Ma,Mb,Mc,Mc2 : matrix
+PAT _Ma,_Mb,_Mc,_Mc2 : matrix
 SYM Id,Zm : matrix                       # the identity and the zero matrix
 FUNC  sortleq   : algebra,algebra >> bool ATT SYMBOLIC sortleq # the sort of u is that of v or below
 # numbers commute with matrices, vectors do not: not(sortleq(Xnu, nil)),
@@ -56,7 +56,7 @@ FUNC  sortleq   : algebra,algebra >> bool ATT SYMBOLIC sortleq # the sort of u i
 # is linear, so sums and multiples of covectors are taken back to vectors.
 SORT covector
 SUBSORT covector,algebra
-PAT Va,Vb : vector
+PAT _Va,_Vb : vector
 ALG Covec
 OTHER transpose : vector >> covector                      # stays a term
 OTHER transpose : covector >> vector      ATT RULES Covec
@@ -67,58 +67,58 @@ OTHER *         : number,covector >> covector ATT RULES Covec
 OTHER +         : covector,covector >> covector ATT RULES Covec
 OTHER -         : covector,covector >> covector ATT RULES Covec
 OTHER -         : covector >> covector    ATT RULES Covec
-SPEC    Covec : transpose(transpose(Va)) = Va
-ADDSPEC Covec : IF (listq(Va)), (listq(Vb)) transpose(Va)*Vb = dot(Va,Vb)
-ADDSPEC Covec : IF (listq(Va)), (listq(Vb)) Va*transpose(Vb) = dot(transpose([Va]),[Vb])
-ADDSPEC Covec : IF (listq(Va)), (listq(Ma)) transpose(Va)*Ma = transpose(Va*Ma)
-ADDSPEC Covec : IF (not(sortleq(Xnu, nil))) Xnu*transpose(Va) = transpose(Xnu*Va)
-ADDSPEC Covec : transpose(Va)+transpose(Vb) = transpose(Va+Vb)
-ADDSPEC Covec : transpose(Va)-transpose(Vb) = transpose(Va-Vb)
-ADDSPEC Covec : -transpose(Va) = transpose(-Va)
+SPEC    Covec : transpose(transpose(_Va)) = _Va
+ADDSPEC Covec : IF (listq(_Va)), (listq(_Vb)) transpose(_Va)*_Vb = dot(_Va,_Vb)
+ADDSPEC Covec : IF (listq(_Va)), (listq(_Vb)) _Va*transpose(_Vb) = dot(transpose([_Va]),[_Vb])
+ADDSPEC Covec : IF (listq(_Va)), (listq(_Ma)) transpose(_Va)*_Ma = transpose(_Va*_Ma)
+ADDSPEC Covec : IF (not(sortleq(_Xnu, nil))) _Xnu*transpose(_Va) = transpose(_Xnu*_Va)
+ADDSPEC Covec : transpose(_Va)+transpose(_Vb) = transpose(_Va+_Vb)
+ADDSPEC Covec : transpose(_Va)-transpose(_Vb) = transpose(_Va-_Vb)
+ADDSPEC Covec : -transpose(_Va) = transpose(-_Va)
 # printed as a row [1 2 3] (up to 10 entries) when it is the whole output
 SHOW transpose ATT show_covec
 
 ALG MatrixRules
 # products associated to the left, so that A*B*inverse(B) cancels
-SPEC    MatrixRules : Ma*(Mb*Mc) = Ma*Mb*Mc
-ADDSPEC MatrixRules : Ma*(Mb+Mc) = Ma*Mb+Ma*Mc
-ADDSPEC MatrixRules : (Ma+Mb)*Mc = Ma*Mc+Mb*Mc
+SPEC    MatrixRules : _Ma*(_Mb*_Mc) = _Ma*_Mb*_Mc
+ADDSPEC MatrixRules : _Ma*(_Mb+_Mc) = _Ma*_Mb+_Ma*_Mc
+ADDSPEC MatrixRules : (_Ma+_Mb)*_Mc = _Ma*_Mc+_Mb*_Mc
 # numbers commute with matrices and go to the front
-ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) Ma*Xnu = Xnu*Ma
-ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) (Xnu*Ma)*Mb = Xnu*(Ma*Mb)
-ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) Ma*(Xnu*Mb) = Xnu*(Ma*Mb)
-ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))), (not(sortleq(Ynu, nil))) Xnu*(Ynu*Ma) = (Xnu*Ynu)*Ma
+ADDSPEC MatrixRules : IF (not(sortleq(_Xnu, nil))) _Ma*_Xnu = _Xnu*_Ma
+ADDSPEC MatrixRules : IF (not(sortleq(_Xnu, nil))) (_Xnu*_Ma)*_Mb = _Xnu*(_Ma*_Mb)
+ADDSPEC MatrixRules : IF (not(sortleq(_Xnu, nil))) _Ma*(_Xnu*_Mb) = _Xnu*(_Ma*_Mb)
+ADDSPEC MatrixRules : IF (not(sortleq(_Xnu, nil))), (not(sortleq(_Ynu, nil))) _Xnu*(_Ynu*_Ma) = (_Xnu*_Ynu)*_Ma
 # identity, zero, inverse
-ADDSPEC MatrixRules : Ma*Id = Ma
-ADDSPEC MatrixRules : Id*Ma = Ma
-ADDSPEC MatrixRules : Ma+Zm = Ma
-ADDSPEC MatrixRules : Zm+Ma = Ma
-ADDSPEC MatrixRules : Ma*Zm = Zm
-ADDSPEC MatrixRules : Zm*Ma = Zm
-ADDSPEC MatrixRules : Ma-Ma = Zm
-ADDSPEC MatrixRules : Ma+Ma = 2*Ma
-ADDSPEC MatrixRules : (Ma+Mb)-Ma = Mb
-ADDSPEC MatrixRules : (Ma+Mb)-Mb = Ma
-ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))), (not(sortleq(Ynu, nil))) Xnu*Ma+Ynu*Ma = (Xnu+Ynu)*Ma
-ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) Ma+Xnu*Ma = (1+Xnu)*Ma
-ADDSPEC MatrixRules : Ma*inverse(Ma) = Id
-ADDSPEC MatrixRules : inverse(Ma)*Ma = Id
-ADDSPEC MatrixRules : Ma*Mb*inverse(Mb) = Ma
-ADDSPEC MatrixRules : Ma*inverse(Mb)*Mb = Ma
+ADDSPEC MatrixRules : _Ma*Id = _Ma
+ADDSPEC MatrixRules : Id*_Ma = _Ma
+ADDSPEC MatrixRules : _Ma+Zm = _Ma
+ADDSPEC MatrixRules : Zm+_Ma = _Ma
+ADDSPEC MatrixRules : _Ma*Zm = Zm
+ADDSPEC MatrixRules : Zm*_Ma = Zm
+ADDSPEC MatrixRules : _Ma-_Ma = Zm
+ADDSPEC MatrixRules : _Ma+_Ma = 2*_Ma
+ADDSPEC MatrixRules : (_Ma+_Mb)-_Ma = _Mb
+ADDSPEC MatrixRules : (_Ma+_Mb)-_Mb = _Ma
+ADDSPEC MatrixRules : IF (not(sortleq(_Xnu, nil))), (not(sortleq(_Ynu, nil))) _Xnu*_Ma+_Ynu*_Ma = (_Xnu+_Ynu)*_Ma
+ADDSPEC MatrixRules : IF (not(sortleq(_Xnu, nil))) _Ma+_Xnu*_Ma = (1+_Xnu)*_Ma
+ADDSPEC MatrixRules : _Ma*inverse(_Ma) = Id
+ADDSPEC MatrixRules : inverse(_Ma)*_Ma = Id
+ADDSPEC MatrixRules : _Ma*_Mb*inverse(_Mb) = _Ma
+ADDSPEC MatrixRules : _Ma*inverse(_Mb)*_Mb = _Ma
 # transpose, inverse and determinant of products: the order reverses
-ADDSPEC MatrixRules : transpose(transpose(Ma)) = Ma
-ADDSPEC MatrixRules : transpose(Ma*Mb) = transpose(Mb)*transpose(Ma)
-ADDSPEC MatrixRules : transpose(Ma*Va) = transpose(Va)*transpose(Ma)
-ADDSPEC MatrixRules : transpose(Ma+Mb) = transpose(Ma)+transpose(Mb)
-ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) transpose(Xnu*Ma) = Xnu*transpose(Ma)
+ADDSPEC MatrixRules : transpose(transpose(_Ma)) = _Ma
+ADDSPEC MatrixRules : transpose(_Ma*_Mb) = transpose(_Mb)*transpose(_Ma)
+ADDSPEC MatrixRules : transpose(_Ma*_Va) = transpose(_Va)*transpose(_Ma)
+ADDSPEC MatrixRules : transpose(_Ma+_Mb) = transpose(_Ma)+transpose(_Mb)
+ADDSPEC MatrixRules : IF (not(sortleq(_Xnu, nil))) transpose(_Xnu*_Ma) = _Xnu*transpose(_Ma)
 ADDSPEC MatrixRules : transpose(Id) = Id
-ADDSPEC MatrixRules : inverse(inverse(Ma)) = Ma
-ADDSPEC MatrixRules : inverse(Ma*Mb) = inverse(Mb)*inverse(Ma)
-ADDSPEC MatrixRules : IF (not(sortleq(Xnu, nil))) inverse(Xnu*Ma) = mi(Xnu)*inverse(Ma)
+ADDSPEC MatrixRules : inverse(inverse(_Ma)) = _Ma
+ADDSPEC MatrixRules : inverse(_Ma*_Mb) = inverse(_Mb)*inverse(_Ma)
+ADDSPEC MatrixRules : IF (not(sortleq(_Xnu, nil))) inverse(_Xnu*_Ma) = mi(_Xnu)*inverse(_Ma)
 ADDSPEC MatrixRules : inverse(Id) = Id
-ADDSPEC MatrixRules : det(Ma*Mb) = det(Ma)*det(Mb)
-ADDSPEC MatrixRules : det(transpose(Ma)) = det(Ma)
-ADDSPEC MatrixRules : det(inverse(Ma)) = mi(det(Ma))
+ADDSPEC MatrixRules : det(_Ma*_Mb) = det(_Ma)*det(_Mb)
+ADDSPEC MatrixRules : det(transpose(_Ma)) = det(_Ma)
+ADDSPEC MatrixRules : det(inverse(_Ma)) = mi(det(_Ma))
 ADDSPEC MatrixRules : det(Id) = 1
 
 # ---- matrix equations: solve(A*X == B, X) gives X = inverse(A)*B; the
@@ -129,17 +129,17 @@ FUNC  mfreeq    : algebra,algebra >> bool ATT SYMBOLIC freeq  # freeq of inc/hel
 FUNC  msolve    : bool,matrix >> matrix          # the solution of a matrix equation
 FUNC  isom      : matrix,matrix,matrix >> matrix # u = r with the unknown x only in u
 ALG MatrixSolve
-SPEC    MatrixSolve : msolve(Ma == Mb, Mc) = isom(Ma - Mb, Zm, Mc)
-ADDSPEC MatrixSolve : isom(Mc, Ma, Mc) = Ma
-ADDSPEC MatrixSolve : IF (mfreeq(Mb, Mc)) isom(Ma - Mb, Mc2, Mc) = isom(Ma, Mc2 + Mb, Mc)
-ADDSPEC MatrixSolve : IF (mfreeq(Mb, Mc)) isom(Ma + Mb, Mc2, Mc) = isom(Ma, Mc2 - Mb, Mc)
-ADDSPEC MatrixSolve : IF (mfreeq(Ma, Mc)) isom(Ma + Mb, Mc2, Mc) = isom(Mb, Mc2 - Ma, Mc)
-ADDSPEC MatrixSolve : IF (mfreeq(Ma, Mc)) isom(Ma * Mb, Mc2, Mc) = isom(Mb, inverse(Ma) * Mc2, Mc)
-ADDSPEC MatrixSolve : IF (mfreeq(Mb, Mc)) isom(Ma * Mb, Mc2, Mc) = isom(Ma, Mc2 * inverse(Mb), Mc)
-ADDSPEC MatrixSolve : IF (not(sortleq(Xnu, nil))) isom(Xnu * Ma, Mc2, Mc) = isom(Ma, mi(Xnu) * Mc2, Mc)
-ADDSPEC MatrixSolve : isom(transpose(Ma), Mc2, Mc) = isom(Ma, transpose(Mc2), Mc)
-ADDSPEC MatrixSolve : isom(inverse(Ma), Mc2, Mc) = isom(Ma, inverse(Mc2), Mc)
-ADDSPEC MatrixSolve : isom(- Ma, Mc2, Mc) = isom(Ma, - Mc2, Mc)
+SPEC    MatrixSolve : msolve(_Ma == _Mb, _Mc) = isom(_Ma - _Mb, Zm, _Mc)
+ADDSPEC MatrixSolve : isom(_Mc, _Ma, _Mc) = _Ma
+ADDSPEC MatrixSolve : IF (mfreeq(_Mb, _Mc)) isom(_Ma - _Mb, _Mc2, _Mc) = isom(_Ma, _Mc2 + _Mb, _Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(_Mb, _Mc)) isom(_Ma + _Mb, _Mc2, _Mc) = isom(_Ma, _Mc2 - _Mb, _Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(_Ma, _Mc)) isom(_Ma + _Mb, _Mc2, _Mc) = isom(_Mb, _Mc2 - _Ma, _Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(_Ma, _Mc)) isom(_Ma * _Mb, _Mc2, _Mc) = isom(_Mb, inverse(_Ma) * _Mc2, _Mc)
+ADDSPEC MatrixSolve : IF (mfreeq(_Mb, _Mc)) isom(_Ma * _Mb, _Mc2, _Mc) = isom(_Ma, _Mc2 * inverse(_Mb), _Mc)
+ADDSPEC MatrixSolve : IF (not(sortleq(_Xnu, nil))) isom(_Xnu * _Ma, _Mc2, _Mc) = isom(_Ma, mi(_Xnu) * _Mc2, _Mc)
+ADDSPEC MatrixSolve : isom(transpose(_Ma), _Mc2, _Mc) = isom(_Ma, transpose(_Mc2), _Mc)
+ADDSPEC MatrixSolve : isom(inverse(_Ma), _Mc2, _Mc) = isom(_Ma, inverse(_Mc2), _Mc)
+ADDSPEC MatrixSolve : isom(- _Ma, _Mc2, _Mc) = isom(_Ma, - _Mc2, _Mc)
 
 # help for ?name
 HELP "det" "det(m)   the determinant of the matrix m (fraction-free elimination)"

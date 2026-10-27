@@ -11,12 +11,12 @@ P4 = 0
 P3 = x
 FUNC Picard : real,real >> real   # e.g. Picard(2,x)
 
-P0 = Picard(N- 1,X)
+P0 = Picard(_N- 1,_X)
 ALG Pic
 
-SPEC    Pic : Picard(0,X)=P3
-ADDSPEC Pic : IF (N>0) Picard(N,X)= P1+I(P4,x,P2,x)
-ADDSPEC Pic : IF (N>1) (X+Y)^N=(X+Y)*(X+Y)^(N- 1)
+SPEC    Pic : Picard(0,_X)=P3
+ADDSPEC Pic : IF (_N>0) Picard(_N,_X)= P1+I(P4,x,P2,x)
+ADDSPEC Pic : IF (_N>1) (_X+_Y)^_N=(_X+_Y)*(_X+_Y)^(_N- 1)
 
 ALG Pica
 SPEC Pica : (Pic;Real;Mulord;integr)

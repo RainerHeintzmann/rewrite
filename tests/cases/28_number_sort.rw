@@ -6,10 +6,11 @@ TERM TN : number
 SYM im2 : number
 FUNC never : real >> real
 ALG raw
+PAT X : real
 SPEC raw : never(X) = X
 # a rule for number matches a real term; its conditions are calculated with
 # the real variants (Uq > 2, 2*Uq)
-PAT Uq : number
+PAT Uq, Xv : number
 ALG Tnum
 SPEC Tnum : IF (Uq > 2), (integerq(2*Uq)) Int(Uq,Xv) = Uq*Xv
 TN = REWR Int(3,x) : Tnum

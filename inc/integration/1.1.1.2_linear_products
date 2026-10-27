@@ -12,7 +12,7 @@
 #    Int[ExpandIntegrand[(a + b*x)^m*(c + d*x)^n, x], x] /;
 #    FreeQ[{a, b, c, d, n}, x] && NeQ[b*c - a*d, 0] && IGtQ[m, 0] &&
 #    (Not[IntegerQ[n]] || EqQ[c, 0] && LeQ[7*m + 4*n + 4, 0] || LtQ[9*m + 5*(n + 1), 0] || GtQ[m + n + 2, 0])
-ADDSPEC IntRubi : IF NIN(Xv,Qa,Qb,Qc,Qd,Qn), (neq(Qb*Qc-Qa*Qd,0)), (igtq(Qm,0)), \
-                  ((not(integerq(Qn))) || (eqq(Qc,0) && (7*Qm+4*Qn+4 <= 0)) || (9*Qm+5*(Qn+1) < 0) || (Qm+Qn+2 > 0)) \
-                  Int((Qa+Qb*Xv)^Qm*(Qc+Qd*Xv)^Qn,Xv) = \
-                  Int(expandintegrand((Qa+Qb*Xv)^Qm*(Qc+Qd*Xv)^Qn,Xv),Xv)
+ADDSPEC IntRubi : IF NIN(_Xv,_Qa,_Qb,_Qc,_Qd,_Qn), (neq(_Qb*_Qc-_Qa*_Qd,0)), (igtq(_Qm,0)), \
+                  ((not(integerq(_Qn))) || (eqq(_Qc,0) && (7*_Qm+4*_Qn+4 <= 0)) || (9*_Qm+5*(_Qn+1) < 0) || (_Qm+_Qn+2 > 0)) \
+                  Int((_Qa+_Qb*_Xv)^_Qm*(_Qc+_Qd*_Xv)^_Qn,_Xv) = \
+                  Int(expandintegrand((_Qa+_Qb*_Xv)^_Qm*(_Qc+_Qd*_Xv)^_Qn,_Xv),_Xv)
