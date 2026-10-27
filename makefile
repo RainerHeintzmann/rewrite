@@ -28,7 +28,7 @@ real.o bool.o complex.o matrix.o vector.o \
 fatal.o strsave.o expand.o symfn.o listmatch.o numsort.o exact.o specfun.o apart.o latex.o console.o help.o)
 
 T	= rewrite
-VERSION	= 2026.1
+VERSION	= 2026.2
 EXE	=
 SYSTEM	= $(shell uname -s | tr A-Z a-z)
 ifeq ($(OS),Windows_NT)
@@ -39,7 +39,9 @@ PREFIX	= /usr/local
 LIBDIR	= $(PREFIX)/share/rewrite
 
 CC	= gcc
-CFLAGS	= -I$(S)/include -DDEBUG -DBISON -std=gnu99 -g -DREWRITE_VERSION='"$(VERSION)"'
+# -O2: about twice as fast as without optimization. The trace of DEBUG n
+# needs -DDEBUG:  make CFLAGS+=-DDEBUG  (after make clean)
+CFLAGS	= -I$(S)/include -O2 -DBISON -std=gnu99 -g -DREWRITE_VERSION='"$(VERSION)"'
 ifneq ($(OS),Windows_NT)
 # the library of make install (INC "inc/all" from any folder, see src/sync.c)
 CFLAGS	+= -DREWRITE_LIBDIR='"$(LIBDIR)"'

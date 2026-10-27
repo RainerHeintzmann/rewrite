@@ -654,7 +654,7 @@ This prints `10 20 30`.
 | `DATA "file"` | Opens a data file. |
 | `DATA Const` | Reads the next number from the data file into `Const`. Non-numeric text up to the end of the line is skipped. |
 | `SYS "command"` | Runs a shell command. |
-| `DEBUG n` | Sets the debug level of the interpreter. |
+| `DEBUG n` | The trace of the interpreter at level `n`, only in a build with `make CFLAGS+=-DDEBUG` (after `make clean`); the normal build is optimized (`-O2`). The rules applied to an integral show with `STEPS`. |
 | `ALIAS "name" = "symbol"` | The name is read as the symbol from now on, e.g. `ALIAS "×" = "*"`; mainly for Unicode operators. |
 | `SYMBOLIC "role" = "symbol"` | The symbolic C functions (helpers) use `symbol` where they need the function or constant `role` (`"cos"`, `"+"`, `"pi"`, ...), see [Symbolic helper functions](#symbolic-helper-functions). `SYMBOLIC` alone clears the mapping. |
 | `MAXSTEPS n`, `MAXDEPTH n` | The step and the depth limit of `REWR` (default 100000 and 1000); without `n` they are shown, see [Rule sets](#rule-sets-algebras-and-rewriting). |
