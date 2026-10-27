@@ -104,9 +104,9 @@ ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(coeff(_Ve,_Vt,0),0)), (freeq(_Ve,
 ADDSPEC FourierT : IF (linearq(_Ve,_Vt)), (eqq(coeff(_Ve,_Vt,0),0)), (freeq(_Ve,im)) \
                    fourier(sin(_Ve)*_Vf,_Vt,_Vw) = (subst(fourier(_Vf,_Vt,_Vw),_Vw,_Vw-coeff(_Ve,_Vt)) \
                        -subst(fourier(_Vf,_Vt,_Vw),_Vw,_Vw+coeff(_Ve,_Vt)))/(2*im)
-ADDSPEC FourierT : fourier(_Vt*_Vf,_Vt,_Vw) = im*D(fourier(_Vf,_Vt,_Vw),_Vw)
-ADDSPEC FourierT : fourier(_Vt,_Vt,_Vw) = 2*pi*im*D(dirac(_Vw),_Vw)
-ADDSPEC FourierT : fourier(D(_Vf,_Vt),_Vt,_Vw) = im*_Vw*fourier(_Vf,_Vt,_Vw)
+ADDSPEC FourierT : fourier(_Vt*_Vf,_Vt,_Vw) = im*Dt(fourier(_Vf,_Vt,_Vw),_Vw)
+ADDSPEC FourierT : fourier(_Vt,_Vt,_Vw) = 2*pi*im*Dt(dirac(_Vw),_Vw)
+ADDSPEC FourierT : fourier(Dt(_Vf,_Vt),_Vt,_Vw) = im*_Vw*fourier(_Vf,_Vt,_Vw)
 # the integral for the rest; fourint gives the transform back if it stays
 ADDSPEC FourierT : fourier(_Vf,_Vt,_Vw) = fourint(Int(_Vf*exp(-im*_Vw*_Vt),_Vt,-infinity,infinity),_Vf,_Vt,_Vw)
 ADDSPEC FourierT : IF (freeq(_Vi,_Vt)) fourint(_Vi,_Vf,_Vt,_Vw) = _Vi

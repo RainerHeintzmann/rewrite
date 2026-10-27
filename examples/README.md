@@ -14,7 +14,7 @@ it to see the input. `?name` explains a keyword or function.
 | File | Contents |
 | --- | --- |
 | [01_basics.rw](01_basics.rw) | numbers, symbols (`SYM`) with and without a value, terms (`TERM`), `TYPEOF` |
-| [02_differentiation.rw](02_differentiation.rw) | derivatives with `D`, second and partial derivatives (`deriv`) |
+| [02_differentiation.rw](02_differentiation.rw) | derivatives: `D` (partial, as in Mathematica), second derivatives, `Dt` (total, implicit differentiation) |
 | [03_integration.rw](03_integration.rw) | indefinite integrals with `Integrate` and `RubiIntegrate`, a check by differentiation |
 | [04_exact.rw](04_exact.rw) | exact fractions and big integers, exact values of functions |
 | [05_lists_matrices.rw](05_lists_matrices.rw) | lists, vectors, matrices, `det`, `inverse`, `linsolve`, covectors |

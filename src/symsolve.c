@@ -183,7 +183,7 @@ static Node * s_cancel (Node * a[], int n, Symbol * f)
 	MPoly pn, pd;
 	int i;
 	if (n != 1) return NULL;
-	u = s_normform(a, 1, NULL);		/* deriv leaves 0*u, 1*u, mi(u) */
+	u = s_normform(a, 1, NULL);		/* D leaves 0*u, 1*u, mi(u) */
 	expand_to(u, & l);
 	delete(u);
 	u = NULL;

@@ -22,7 +22,7 @@ ADDSPEC     pdiff : Dp(e^X,Z)  = e^X * Dp(X,Z)
 ADDSPEC     pdiff : Dp(sin X,Z)= cos X * Dp(X,Z)
 ADDSPEC     pdiff : Dp(cos X,Z)= ai  sin X * Dp(X,Z)
 
-ADDSPEC     pdiff : NIN (X,Y) Dp(D(X,Y),X) = 0      # Variable ist unabhaengig
+ADDSPEC     pdiff : NIN (X,Y) Dp(Dt(X,Y),X) = 0      # Variable ist unabhaengig
 
 ADDSPEC     pdiff : Dp(N*X,Z)=N*Dp(X,Z)             # wird so schneller
 ADDSPEC     pdiff : Dp(X*Y,Z)=Dp(X,Z)*Y+Dp(Y,Z)*X   # Allg. Differenziationsregeln

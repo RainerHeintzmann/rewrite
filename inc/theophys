@@ -6,7 +6,7 @@ TERM V : real	# generalized potential
 TERM L : real # Lagrange function
 TERM H : real # Hamilton function
 
-Tkin=.5*m*D(z,t)^2   # example preset : free fall
+Tkin=.5*m*Dt(z,t)^2   # example preset : free fall
 V=m*g*z
 L=Tkin-V
 Coordinate = z

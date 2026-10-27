@@ -19,8 +19,8 @@ FUNC newton : real,real,real,real >> real # newton(start,f,f',x) find local zero
 ALG num1
 SPEC    num1 : IF NIN(_x,_B) I(_X,_Y,_A,_B)=I(_X,_Y,Sub(_A,_B,_x),_x)
 ADDSPEC num1 : IF NIN(_x,_B) newton(_X,_A,_C,_B)=newton(_X,Sub(_A,_B,_x),Sub(_C,_B,_x),_x)
-ADDSPEC num1 : IF NIN(_x,_B) flzero(_X,_A,_B)=newton(_X,Sub(_A,_B,_x),D(Sub(_A,_B,_x),_x),_x)
-ADDSPEC num1 : IF NIN(_x,_B) flext(_X,_A,_B)=flzero(_X,D(Sub(_A,_B,_x),_x),_x)
+ADDSPEC num1 : IF NIN(_x,_B) flzero(_X,_A,_B)=newton(_X,Sub(_A,_B,_x),Dt(Sub(_A,_B,_x),_x),_x)
+ADDSPEC num1 : IF NIN(_x,_B) flext(_X,_A,_B)=flzero(_X,Dt(Sub(_A,_B,_x),_x),_x)
 ADDSPEC num1 : IF NIN(_x,_B) fmin(_X,_Y,_A,_B)=fmin(_X,_Y,Sub(_A,_B,_x),_x)
 ADDSPEC num1 : IF NIN(_x,_B) fmax(_X,_Y,_A,_B)=fmin(_X,_Y,- _A,_B)
 

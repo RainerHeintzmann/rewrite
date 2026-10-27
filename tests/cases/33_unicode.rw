@@ -5,7 +5,7 @@ INC "inc/all"
 SYM a, b : real
 SYM α, \beta, x\_1 : real
 α + 2*\beta
-REWR D(sin(\alpha^2), α) : All
+REWR Dt(sin(\alpha^2), α) : All
 α = 3
 α*2
 TYPEOF α
@@ -19,7 +19,7 @@ PRT "\alphax and \alpha and \hbar\n"
 3×4, 12÷4−1, 2·5, 3\times 4
 2≤3, 3≥4, 2≠2, (1≤2)∧(2≤1), (1≤2)∨(2≤1), ¬(1≤2)
 √16, \sqrt(9), π
-REWR D(x^2−3×x,x) : All
+REWR Dt(x^2−3×x,x) : All
 REWR (a≤b) : All
 SYM x² : real
 x² = 4

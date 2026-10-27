@@ -23,9 +23,9 @@ TN
 REWR collect(im*im*x + 2*im*x - im*x) : raw
 REWR simp(im*y*im,x) : raw
 # derivatives of terms with im (inc/alg, ALG diff for number)
-TN = REWR deriv(im*x^2,x) : All
+TN = REWR D(im*x^2,x) : All
 REWR collect(TN) : raw
-TN = REWR deriv(sin(im*x),x) : All
+TN = REWR D(sin(im*x),x) : All
 REWR collect(TN) : raw
 # integrals with im (Rubi)
 TN = REWR Int(sin(im*x),x) : RubiIntegrate

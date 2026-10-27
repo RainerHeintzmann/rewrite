@@ -9,7 +9,7 @@
 4 / (x ^ 2 + y ^ 2 )- 4 * x ^ 2 / (x ^ 2 + y ^ 2 )^ 2 - 4 * y ^ 2 / (x ^ 2 + y ^ 2 )^ 2 
 0 
 ---- separation of variables: u = XF(x) TF(t) in the heat equation
-D (TF (t ),t )/ (TF (t )* a )- D (D (XF (x ),x ),x )/ XF (x )
+Dt (TF (t ),t )/ (TF (t )* a )- Dt (Dt (XF (x ),x ),x )/ XF (x )
 a function of t minus a function of x: both are the same constant -k^2,
 XF'' = -k^2 XF and TF' = -a k^2 TF give the decaying mode above
 ---- the heat equation on the line, with the Fourier transform in x

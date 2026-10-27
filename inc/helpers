@@ -68,13 +68,13 @@ FUNC polyquotient  : real,real,real >> real ATT SYMBOLIC polyquotient  # polynom
 FUNC polyremainder : real,real,real >> real ATT SYMBOLIC polyremainder # remainder
 FUNC normpoly  : real,real >> real        ATT SYMBOLIC normpoly   # polynomials: c0+c1*x+...
 # derivative: a function defined by rules (ATT RULES), with the rules Linear, diff
-# of inc/alg; unlike D, every term without x counts as a constant
+# of inc/alg; unlike Dt, every term without x counts as a constant
 ALG DerivDef
 ALG DerivConst
-FUNC deriv     : real,real >> real        ATT RULES DerivDef,(DerivConst,Linear,diff)
-OTHER deriv    : number,number >> number  ATT RULES DerivDef,(DerivConst,Linear,diff)
-SPEC DerivDef : deriv(_Xnu,_Ynu) = D(_Xnu,_Ynu)
-SPEC DerivConst : IF NIN(_Znu,_Xnu) D(_Xnu,_Znu) = 0
+FUNC D     : real,real >> real        ATT RULES DerivDef,(DerivConst,Linear,diff)
+OTHER D    : number,number >> number  ATT RULES DerivDef,(DerivConst,Linear,diff)
+SPEC DerivDef : D(_Xnu,_Ynu) = Dt(_Xnu,_Ynu)
+SPEC DerivConst : IF NIN(_Znu,_Xnu) Dt(_Xnu,_Znu) = 0
 FUNC collect   : real >> real             ATT SYMBOLIC collect    # collect like summands
 FUNC cancel    : real >> real             ATT SYMBOLIC cancel     # N/D over a common denominator, gcd cancelled
 OTHER cancel   : number >> number         ATT SYMBOLIC cancel
@@ -225,7 +225,7 @@ OTHER falseq            : number >> bool ATT SYMBOLIC falseq
 # All only removed them at the end. The rules of Ring do not see these terms:
 # they are of the sort number (the variants of Rubi's results)
 NUMPAT _Dz : number
-ADDSPEC diff : IF (constq(_Xnu)) D(_Xnu,_Znu) = 0
+ADDSPEC diff : IF (constq(_Xnu)) Dt(_Xnu,_Znu) = 0
 ADDSPEC diff : IF (_Dz == 0) _Dz * _Xnu = _Dz
 ADDSPEC diff : IF (_Dz == 0) _Xnu * _Dz = _Dz
 ADDSPEC diff : IF (_Dz == 0) _Dz + _Xnu = _Xnu
@@ -241,8 +241,8 @@ ADDSPEC Combine1 : IF (not(matchq(_Y, mi(_Cm)))) mi _X * _Y = _Y * mi _X
 # Taylor polynomial Tay(u,x,a,n), the rules Taylor (in All): the sum of
 # u^(k)(a)/k! (x-a)^k for k = 0..n, each derivative taken from the one
 # before and brought into normal form (Dn from scratch took minutes for
-# order 9 of cos(x)). Not in diff, so that deriv(Tay(..)) leaves Tay to All:
-# inside deriv, an inner deriv is not calculated.
+# order 9 of cos(x)). Not in diff, so that D(Tay(..)) leaves Tay to All:
+# inside D, an inner D is not calculated.
 ALG Taylor
 FUNC  taysum : real,real,real,real,real >> real               # internal: u^(k), x, a, n, k
 NUMPAT _Gn,_Gk : real
@@ -250,4 +250,4 @@ PAT _Gu,_Gx,_Ga : real
 SPEC    Taylor : Tay(_Gu,_Gx,_Ga,_Gn) = taysum(_Gu,_Gx,_Ga,_Gn,0)
 ADDSPEC Taylor : IF (_Gk > _Gn) taysum(_Gu,_Gx,_Ga,_Gn,_Gk) = 0
 ADDSPEC Taylor : IF (_Gk <= _Gn) taysum(_Gu,_Gx,_Ga,_Gn,_Gk) = subst(_Gu,_Gx,_Ga)*mi(_Gk!)*(_Gx-_Ga)^_Gk \
-                   + taysum(normform(deriv(_Gu,_Gx)),_Gx,_Ga,_Gn,_Gk+1)
+                   + taysum(normform(D(_Gu,_Gx)),_Gx,_Ga,_Gn,_Gk+1)

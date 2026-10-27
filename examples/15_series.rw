@@ -22,4 +22,4 @@ subst(p6, x, 1), exp(1), exp(1) - subst(p6, x, 1)    # 1/7! + 1/8! + ... = 0.000
 PRTNUM "%g "
 
 "---- a Taylor polynomial is a polynomial: its derivative is again one"
-REWR deriv(Tay(sin(x), x, 0, 7), x) : All
+REWR D(Tay(sin(x), x, 0, 7), x) : All

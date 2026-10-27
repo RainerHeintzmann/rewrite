@@ -40,7 +40,7 @@ SYM yy : real
 x = yy
 T1 = REWR x*1 + 0*x + (1/2)*x : All
 T1
-T1 = REWR D(x^3/3,x) : All
+T1 = REWR Dt(x^3/3,x) : All
 T1
 # ---- sorts with a known sign (nonneg, positive) and natural numbers
 2+3, 2-5, 2^10, 2^-1
@@ -72,5 +72,5 @@ T1 = REWR x*(2^(1/2))^2 : All
 T1
 T1 = REWR x*2^(1/2)*0.5 : All
 T1
-T1 = REWR D(x^2*(2+3^(1/2)),x) : All
+T1 = REWR Dt(x^2*(2+3^(1/2)),x) : All
 T1

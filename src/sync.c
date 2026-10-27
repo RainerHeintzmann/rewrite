@@ -797,7 +797,7 @@ BOOLEAN IS_follows(Symbol * from,Symbol * to) /* to is in an IS connection */
 
 /* 2026: a pattern with a symbolic variant of a function (one without a
    numerical C function, like + : number,number, or a symbolic C function
-   like deriv) also matches the variants on narrower
+   like D) also matches the variants on narrower
    sorts: + : real,real and + : complex,real, as a method for Number in
    Julia applies to Float64. Variants with a C function (+ : real,real,
    + : integer,integer) match only themselves, as before. */

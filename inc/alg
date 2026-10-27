@@ -261,9 +261,9 @@ FUNC Im     : complex >> real         ATT c_imag
 FUNC asqr   : complex >> real         ATT c_asqr
 
 FUNC Cpx    : real,real >> complex    ATT cpx    # complex number
-FUNC D      : real,real >> real           # derivative
-OTHER D      : complex,complex >> complex  # derivative
-OTHER D      : complex,real >> complex     # derivative
+FUNC Dt      : real,real >> real           # derivative
+OTHER Dt      : complex,complex >> complex  # derivative
+OTHER Dt      : complex,real >> complex     # derivative
 FUNC Dn     : real,real,real >> real      # n-th derivative
 OTHER Dn     : complex,complex,complex >> complex # n-th derivative
 FUNC Tay    : real,real,real,real >> real # Taylor expansion Tay(1/x^2,x,point,order)
@@ -355,7 +355,7 @@ OTHER mi        : algebra >> algebra
 OTHER ^         : algebra,number >> algebra
 OTHER abs       : number >> number
 OTHER sgn       : number >> number
-OTHER D         : number,number >> number
+OTHER Dt         : number,number >> number
 
 LIFT (_F(_As)) TO (_Fg(_Ag))
 LIFT (_Fg(_Ag)) TO (_Fr(_Ar))
@@ -363,7 +363,7 @@ LIFT (_Fr(_Ar)) TO (_Fre(_A))
 LIFT (_Fre(_A)) TO (_Fc(_Ac))
 LIFT (_Fg(_Ag,_Ag),_Fg(_Ag,_Ag),_Fg(_Ag)) TO (_Ag+_Ag,_Ag-_Ag,-_Ag)
 LIFT (_Fre(_A),_Fre(_A),_Fre(_A),_Fre(_A),_Fre(_A),_Fre(_A)) TO (sin _A,arcsin _A,cos _A,arccos _A,tan _A,arctan _A)
-LIFT (_lFre(_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A),_lFre(_A,_A,_A,_A)) TO (D(_A,_A),I(_A,_A,_A,_A),Tay(_A,_A,_A,_A),Tay(_Ac,_Ac,_Ac,_A),Dn(_A,_A,_A),Sum(_A,_A,_A,_A))
+LIFT (_lFre(_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A,_A),_lFre(_A,_A,_A),_lFre(_A,_A,_A,_A)) TO (Dt(_A,_A),I(_A,_A,_A,_A),Tay(_A,_A,_A,_A),Tay(_Ac,_Ac,_Ac,_A),Dn(_A,_A,_A),Sum(_A,_A,_A,_A))
 
 LIFT (_Ag+_Ag,_Ag-_Ag,-_Ag,0g) TO (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag)
 LIFT (_Aag+_Aag,_Aag-_Aag,-_Aag,0ag) TO (_Ar+_Ar,_Ar-_Ar,-_Ar,0r)
@@ -475,8 +475,8 @@ ADDSPEC SumUnroll :         Sum(_X,_N,_N,_Y)=Sub(_Y,_X,_N)
 im=Cpx(0,1)
 ALG Compl
 SPEC  Compl : Cpx(_X,_Y) = _X+im*_Y
-ADDSPEC Compl : D(_Xc,_Y+im*_Z) = im*D(_Xc,_Z)+D(_Xc,_Y)
-ADDSPEC Compl : D(_Xc,im*_Z+_Y) = im*D(_Xc,_Z)+D(_Xc,_Y)
+ADDSPEC Compl : Dt(_Xc,_Y+im*_Z) = im*Dt(_Xc,_Z)+Dt(_Xc,_Y)
+ADDSPEC Compl : Dt(_Xc,im*_Z+_Y) = im*Dt(_Xc,_Z)+Dt(_Xc,_Y)
 
 # ++++++++++++++++++ ordering of terms, multiplicative ++++++++++++++++++++++++
 # caution : -2 * x
@@ -499,90 +499,90 @@ ADDSPEC     Addord : _Y+_N*_X+_K*_X = _Y+(_N+_K)*_X
 
 # ++++++++++++++++++++++++ DIFFERENTIAL CALCULUS ++++++++++++++++++++++++++
 ALG diff
-SPEC        diff : D(e,_Xnu) = 0         # order matters (first check e, then replace X)
-ADDSPEC     diff : D(pi,_Xnu)= 0
-ADDSPEC     diff : D(im,_Xnu)= 0         # 2026
-ADDSPEC     diff : D(_x,_Xnu)= 0
-ADDSPEC     diff : D(_N,_Xnu) = 0         # numbers are constant
-ADDSPEC     diff : D(_Xnu,_Xnu) = 1         # special constants
+SPEC        diff : Dt(e,_Xnu) = 0         # order matters (first check e, then replace X)
+ADDSPEC     diff : Dt(pi,_Xnu)= 0
+ADDSPEC     diff : Dt(im,_Xnu)= 0         # 2026
+ADDSPEC     diff : Dt(_x,_Xnu)= 0
+ADDSPEC     diff : Dt(_N,_Xnu) = 0         # numbers are constant
+ADDSPEC     diff : Dt(_Xnu,_Xnu) = 1         # special constants
 # 2026: linearity for terms of sort number (Linear of the real terms
 # works through _lFre)
-ADDSPEC     diff : D(_Xnu+_Ynu,_Znu) = D(_Xnu,_Znu)+D(_Ynu,_Znu)
-ADDSPEC     diff : D(_Xnu-_Ynu,_Znu) = D(_Xnu,_Znu)-D(_Ynu,_Znu)
-ADDSPEC     diff : D(-_Xnu,_Znu) = -D(_Xnu,_Znu)
+ADDSPEC     diff : Dt(_Xnu+_Ynu,_Znu) = Dt(_Xnu,_Znu)+Dt(_Ynu,_Znu)
+ADDSPEC     diff : Dt(_Xnu-_Ynu,_Znu) = Dt(_Xnu,_Znu)-Dt(_Ynu,_Znu)
+ADDSPEC     diff : Dt(-_Xnu,_Znu) = -Dt(_Xnu,_Znu)
 
 ADDSPEC     diff : Dn(_X,_Y,0) = _X
-ADDSPEC     diff : Dn(_X,_Y,_N) = Dn(D(_X,_Y),_Y,_N-1)
+ADDSPEC     diff : Dn(_X,_Y,_N) = Dn(Dt(_X,_Y),_Y,_N-1)
 
-ADDSPEC     diff : D(mi _Xnu,_Ynu) = - D(_Xnu,_Ynu)*mi(_Xnu^2)
-ADDSPEC     diff : D(ln _Xnu,_Znu) = D(_Xnu,_Znu)*mi _Xnu
-ADDSPEC     diff : D(lg _Xnu,_Znu) = D(_Xnu,_Znu)*mi (_Xnu*ln 10)
-ADDSPEC     diff : D(sin _Xnu,_Znu)= D(_Xnu,_Znu)*cos _Xnu
-ADDSPEC     diff : D(arcsin _Xnu,_Znu)= D(_Xnu,_Znu)*mi((1+(-(_Xnu^2)))^.5)   # 2026: was (1+X^2)
-ADDSPEC     diff : D(cos _Xnu,_Znu)   = - D(_Xnu,_Znu)*sin _Xnu
-ADDSPEC     diff : D(arccos _Xnu,_Znu)= - D(_Xnu,_Znu)*mi((1+(-(_Xnu^2)))^.5) # 2026: was (1+X^2)
-ADDSPEC     diff : D(tan _Xnu,_Znu)   = D(_Xnu,_Znu)*mi(cos(_Xnu)^2)
-ADDSPEC     diff : D(arctan _Xnu,_Znu)= D(_Xnu,_Znu)*mi(1+_Xnu^2)
-ADDSPEC     diff : D(exp _Xnu,_Znu)   = D(_Xnu,_Znu)*exp _Xnu                  # 2026 added
-ADDSPEC     diff : D(sqrt _Xnu,_Znu)  = D(_Xnu,_Znu)*mi(2*sqrt _Xnu)           # 2026 added
-ADDSPEC     diff : D(sinh _Xnu,_Znu)  = D(_Xnu,_Znu)*cosh _Xnu                 # 2026 added
-ADDSPEC     diff : D(cosh _Xnu,_Znu)  = D(_Xnu,_Znu)*sinh _Xnu                 # 2026 added
-ADDSPEC     diff : D(tanh _Xnu,_Znu)  = D(_Xnu,_Znu)*mi(cosh(_Xnu)^2)          # 2026 added
-ADDSPEC     diff : D(abs _Xnu,_Znu)   = D(_Xnu,_Znu)*_Xnu*mi(abs _Xnu)            # 2026 added (X not equal to 0)
-ADDSPEC     diff : D(csc _Xnu,_Znu)     = - D(_Xnu,_Znu)*cot(_Xnu)*csc(_Xnu)      # 2026 added
-ADDSPEC     diff : D(sec _Xnu,_Znu)     = D(_Xnu,_Znu)*tan(_Xnu)*sec(_Xnu)        # 2026 added
-ADDSPEC     diff : D(cot _Xnu,_Znu)     = - D(_Xnu,_Znu)*csc(_Xnu)^2           # 2026 added
-ADDSPEC     diff : D(arccot _Xnu,_Znu)  = - D(_Xnu,_Znu)*mi(1+_Xnu^2)          # 2026 added
-ADDSPEC     diff : D(coth _Xnu,_Znu)    = - D(_Xnu,_Znu)*csch(_Xnu)^2          # 2026 added
-ADDSPEC     diff : D(sech _Xnu,_Znu)    = - D(_Xnu,_Znu)*tanh(_Xnu)*sech(_Xnu)    # 2026 added
-ADDSPEC     diff : D(csch _Xnu,_Znu)    = - D(_Xnu,_Znu)*coth(_Xnu)*csch(_Xnu)    # 2026 added
-ADDSPEC     diff : D(arcsinh _Xnu,_Znu) = D(_Xnu,_Znu)*mi((1+_Xnu^2)^.5)       # 2026 added
-ADDSPEC     diff : D(arccosh _Xnu,_Znu) = D(_Xnu,_Znu)*mi((_Xnu^2+(-1))^.5)    # 2026 added
-ADDSPEC     diff : D(arctanh _Xnu,_Znu) = D(_Xnu,_Znu)*mi(1+(-(_Xnu^2)))       # 2026 added
-ADDSPEC     diff : D(arccoth _Xnu,_Znu) = D(_Xnu,_Znu)*mi(1+(-(_Xnu^2)))       # 2026 added
-ADDSPEC     diff : D(polylog(_N,_Xnu),_Znu)  = D(_Xnu,_Znu)*polylog(_N+(-1),_Xnu)*mi(_Xnu)                  # 2026 added
-ADDSPEC     diff : D(productlog _Xnu,_Znu)  = D(_Xnu,_Znu)*productlog(_Xnu)*mi(_Xnu*(1+productlog(_Xnu)))  # 2026 added
+ADDSPEC     diff : Dt(mi _Xnu,_Ynu) = - Dt(_Xnu,_Ynu)*mi(_Xnu^2)
+ADDSPEC     diff : Dt(ln _Xnu,_Znu) = Dt(_Xnu,_Znu)*mi _Xnu
+ADDSPEC     diff : Dt(lg _Xnu,_Znu) = Dt(_Xnu,_Znu)*mi (_Xnu*ln 10)
+ADDSPEC     diff : Dt(sin _Xnu,_Znu)= Dt(_Xnu,_Znu)*cos _Xnu
+ADDSPEC     diff : Dt(arcsin _Xnu,_Znu)= Dt(_Xnu,_Znu)*mi((1+(-(_Xnu^2)))^.5)   # 2026: was (1+X^2)
+ADDSPEC     diff : Dt(cos _Xnu,_Znu)   = - Dt(_Xnu,_Znu)*sin _Xnu
+ADDSPEC     diff : Dt(arccos _Xnu,_Znu)= - Dt(_Xnu,_Znu)*mi((1+(-(_Xnu^2)))^.5) # 2026: was (1+X^2)
+ADDSPEC     diff : Dt(tan _Xnu,_Znu)   = Dt(_Xnu,_Znu)*mi(cos(_Xnu)^2)
+ADDSPEC     diff : Dt(arctan _Xnu,_Znu)= Dt(_Xnu,_Znu)*mi(1+_Xnu^2)
+ADDSPEC     diff : Dt(exp _Xnu,_Znu)   = Dt(_Xnu,_Znu)*exp _Xnu                  # 2026 added
+ADDSPEC     diff : Dt(sqrt _Xnu,_Znu)  = Dt(_Xnu,_Znu)*mi(2*sqrt _Xnu)           # 2026 added
+ADDSPEC     diff : Dt(sinh _Xnu,_Znu)  = Dt(_Xnu,_Znu)*cosh _Xnu                 # 2026 added
+ADDSPEC     diff : Dt(cosh _Xnu,_Znu)  = Dt(_Xnu,_Znu)*sinh _Xnu                 # 2026 added
+ADDSPEC     diff : Dt(tanh _Xnu,_Znu)  = Dt(_Xnu,_Znu)*mi(cosh(_Xnu)^2)          # 2026 added
+ADDSPEC     diff : Dt(abs _Xnu,_Znu)   = Dt(_Xnu,_Znu)*_Xnu*mi(abs _Xnu)            # 2026 added (X not equal to 0)
+ADDSPEC     diff : Dt(csc _Xnu,_Znu)     = - Dt(_Xnu,_Znu)*cot(_Xnu)*csc(_Xnu)      # 2026 added
+ADDSPEC     diff : Dt(sec _Xnu,_Znu)     = Dt(_Xnu,_Znu)*tan(_Xnu)*sec(_Xnu)        # 2026 added
+ADDSPEC     diff : Dt(cot _Xnu,_Znu)     = - Dt(_Xnu,_Znu)*csc(_Xnu)^2           # 2026 added
+ADDSPEC     diff : Dt(arccot _Xnu,_Znu)  = - Dt(_Xnu,_Znu)*mi(1+_Xnu^2)          # 2026 added
+ADDSPEC     diff : Dt(coth _Xnu,_Znu)    = - Dt(_Xnu,_Znu)*csch(_Xnu)^2          # 2026 added
+ADDSPEC     diff : Dt(sech _Xnu,_Znu)    = - Dt(_Xnu,_Znu)*tanh(_Xnu)*sech(_Xnu)    # 2026 added
+ADDSPEC     diff : Dt(csch _Xnu,_Znu)    = - Dt(_Xnu,_Znu)*coth(_Xnu)*csch(_Xnu)    # 2026 added
+ADDSPEC     diff : Dt(arcsinh _Xnu,_Znu) = Dt(_Xnu,_Znu)*mi((1+_Xnu^2)^.5)       # 2026 added
+ADDSPEC     diff : Dt(arccosh _Xnu,_Znu) = Dt(_Xnu,_Znu)*mi((_Xnu^2+(-1))^.5)    # 2026 added
+ADDSPEC     diff : Dt(arctanh _Xnu,_Znu) = Dt(_Xnu,_Znu)*mi(1+(-(_Xnu^2)))       # 2026 added
+ADDSPEC     diff : Dt(arccoth _Xnu,_Znu) = Dt(_Xnu,_Znu)*mi(1+(-(_Xnu^2)))       # 2026 added
+ADDSPEC     diff : Dt(polylog(_N,_Xnu),_Znu)  = Dt(_Xnu,_Znu)*polylog(_N+(-1),_Xnu)*mi(_Xnu)                  # 2026 added
+ADDSPEC     diff : Dt(productlog _Xnu,_Znu)  = Dt(_Xnu,_Znu)*productlog(_Xnu)*mi(_Xnu*(1+productlog(_Xnu)))  # 2026 added
 # 2026: derivatives of the special functions (w.r.t. the argument that depends on Z)
-ADDSPEC     diff : D(arcsec _Xnu,_Znu)  = D(_Xnu,_Znu)*mi(_Xnu^2*(1+(-(mi(_Xnu^2))))^.5)
-ADDSPEC     diff : D(arccsc _Xnu,_Znu)  = - D(_Xnu,_Znu)*mi(_Xnu^2*(1+(-(mi(_Xnu^2))))^.5)
-ADDSPEC     diff : D(arcsech _Xnu,_Znu) = - D(_Xnu,_Znu)*mi(_Xnu*(1+(-(_Xnu^2)))^.5)
-ADDSPEC     diff : D(arccsch _Xnu,_Znu) = - D(_Xnu,_Znu)*mi(_Xnu^2*(1+mi(_Xnu^2))^.5)
-ADDSPEC     diff : D(erf _Xnu,_Znu)     = D(_Xnu,_Znu)*2*mi(pi^.5)*exp(-(_Xnu^2))
-ADDSPEC     diff : D(erfc _Xnu,_Znu)    = - D(_Xnu,_Znu)*2*mi(pi^.5)*exp(-(_Xnu^2))
-ADDSPEC     diff : D(erfi _Xnu,_Znu)    = D(_Xnu,_Znu)*2*mi(pi^.5)*exp(_Xnu^2)
-ADDSPEC     diff : D(fresnels _Xnu,_Znu) = D(_Xnu,_Znu)*sin(pi*_Xnu^2*.5)
-ADDSPEC     diff : D(fresnelc _Xnu,_Znu) = D(_Xnu,_Znu)*cos(pi*_Xnu^2*.5)
-ADDSPEC     diff : D(sinint _Xnu,_Znu)  = D(_Xnu,_Znu)*sin(_Xnu)*mi(_Xnu)
-ADDSPEC     diff : D(cosint _Xnu,_Znu)  = D(_Xnu,_Znu)*cos(_Xnu)*mi(_Xnu)
-ADDSPEC     diff : D(sinhint _Xnu,_Znu) = D(_Xnu,_Znu)*sinh(_Xnu)*mi(_Xnu)
-ADDSPEC     diff : D(coshint _Xnu,_Znu) = D(_Xnu,_Znu)*cosh(_Xnu)*mi(_Xnu)
-ADDSPEC     diff : D(expint _Xnu,_Znu)  = D(_Xnu,_Znu)*exp(_Xnu)*mi(_Xnu)
-ADDSPEC     diff : D(logint _Xnu,_Znu)  = D(_Xnu,_Znu)*mi(ln _Xnu)
-ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(expinte(_Ynu,_Xnu),_Znu) = - D(_Xnu,_Znu)*expinte(_Ynu+(-1),_Xnu)
-ADDSPEC     diff : D(Gamma _Xnu,_Znu)   = D(_Xnu,_Znu)*Gamma(_Xnu)*polygamma(0,_Xnu)
-ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(Gamma(_Ynu,_Xnu),_Znu) = - D(_Xnu,_Znu)*_Xnu^(_Ynu+(-1))*exp(-_Xnu)
-ADDSPEC     diff : D(loggamma _Xnu,_Znu) = D(_Xnu,_Znu)*polygamma(0,_Xnu)
-ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(polygamma(_Ynu,_Xnu),_Znu) = D(_Xnu,_Znu)*polygamma(_Ynu+1,_Xnu)
-ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(zeta(_Ynu,_Xnu),_Znu) = - D(_Xnu,_Znu)*_Ynu*zeta(_Ynu+1,_Xnu)
-ADDSPEC     diff : D(elliptice _Xnu,_Znu) = D(_Xnu,_Znu)*(elliptice(_Xnu)+(-(elliptick(_Xnu))))*mi(2*_Xnu)
-ADDSPEC     diff : D(elliptick _Xnu,_Znu) = D(_Xnu,_Znu)*(elliptice(_Xnu)+(-((1+(-_Xnu))*elliptick(_Xnu))))*mi(2*_Xnu*(1+(-_Xnu)))
-ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(ellipticf(_Xnu,_Ynu),_Znu) = D(_Xnu,_Znu)*mi((1+(-(_Ynu*sin(_Xnu)^2)))^.5)
-ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(elliptice(_Xnu,_Ynu),_Znu) = D(_Xnu,_Znu)*(1+(-(_Ynu*sin(_Xnu)^2)))^.5
-ADDSPEC     diff : IF NIN(_Znu,_Anu,_Ynu) D(ellipticpi(_Anu,_Xnu,_Ynu),_Znu) = D(_Xnu,_Znu)*mi((1+(-(_Anu*sin(_Xnu)^2)))*(1+(-(_Ynu*sin(_Xnu)^2)))^.5)
-ADDSPEC     diff : IF NIN(_Znu,_Anu,_Bnu,_Cnu) D(hyp2f1(_Anu,_Bnu,_Cnu,_Xnu),_Znu) = D(_Xnu,_Znu)*_Anu*_Bnu*mi(_Cnu)*hyp2f1(_Anu+1,_Bnu+1,_Cnu+1,_Xnu)
-ADDSPEC     diff : IF NIN(_Znu,_Ynu) D(besselj(_Ynu,_Xnu),_Znu) = D(_Xnu,_Znu)*(besselj(_Ynu+(-1),_Xnu)+(-(besselj(_Ynu+1,_Xnu))))*.5
+ADDSPEC     diff : Dt(arcsec _Xnu,_Znu)  = Dt(_Xnu,_Znu)*mi(_Xnu^2*(1+(-(mi(_Xnu^2))))^.5)
+ADDSPEC     diff : Dt(arccsc _Xnu,_Znu)  = - Dt(_Xnu,_Znu)*mi(_Xnu^2*(1+(-(mi(_Xnu^2))))^.5)
+ADDSPEC     diff : Dt(arcsech _Xnu,_Znu) = - Dt(_Xnu,_Znu)*mi(_Xnu*(1+(-(_Xnu^2)))^.5)
+ADDSPEC     diff : Dt(arccsch _Xnu,_Znu) = - Dt(_Xnu,_Znu)*mi(_Xnu^2*(1+mi(_Xnu^2))^.5)
+ADDSPEC     diff : Dt(erf _Xnu,_Znu)     = Dt(_Xnu,_Znu)*2*mi(pi^.5)*exp(-(_Xnu^2))
+ADDSPEC     diff : Dt(erfc _Xnu,_Znu)    = - Dt(_Xnu,_Znu)*2*mi(pi^.5)*exp(-(_Xnu^2))
+ADDSPEC     diff : Dt(erfi _Xnu,_Znu)    = Dt(_Xnu,_Znu)*2*mi(pi^.5)*exp(_Xnu^2)
+ADDSPEC     diff : Dt(fresnels _Xnu,_Znu) = Dt(_Xnu,_Znu)*sin(pi*_Xnu^2*.5)
+ADDSPEC     diff : Dt(fresnelc _Xnu,_Znu) = Dt(_Xnu,_Znu)*cos(pi*_Xnu^2*.5)
+ADDSPEC     diff : Dt(sinint _Xnu,_Znu)  = Dt(_Xnu,_Znu)*sin(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : Dt(cosint _Xnu,_Znu)  = Dt(_Xnu,_Znu)*cos(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : Dt(sinhint _Xnu,_Znu) = Dt(_Xnu,_Znu)*sinh(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : Dt(coshint _Xnu,_Znu) = Dt(_Xnu,_Znu)*cosh(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : Dt(expint _Xnu,_Znu)  = Dt(_Xnu,_Znu)*exp(_Xnu)*mi(_Xnu)
+ADDSPEC     diff : Dt(logint _Xnu,_Znu)  = Dt(_Xnu,_Znu)*mi(ln _Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) Dt(expinte(_Ynu,_Xnu),_Znu) = - Dt(_Xnu,_Znu)*expinte(_Ynu+(-1),_Xnu)
+ADDSPEC     diff : Dt(Gamma _Xnu,_Znu)   = Dt(_Xnu,_Znu)*Gamma(_Xnu)*polygamma(0,_Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) Dt(Gamma(_Ynu,_Xnu),_Znu) = - Dt(_Xnu,_Znu)*_Xnu^(_Ynu+(-1))*exp(-_Xnu)
+ADDSPEC     diff : Dt(loggamma _Xnu,_Znu) = Dt(_Xnu,_Znu)*polygamma(0,_Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) Dt(polygamma(_Ynu,_Xnu),_Znu) = Dt(_Xnu,_Znu)*polygamma(_Ynu+1,_Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) Dt(zeta(_Ynu,_Xnu),_Znu) = - Dt(_Xnu,_Znu)*_Ynu*zeta(_Ynu+1,_Xnu)
+ADDSPEC     diff : Dt(elliptice _Xnu,_Znu) = Dt(_Xnu,_Znu)*(elliptice(_Xnu)+(-(elliptick(_Xnu))))*mi(2*_Xnu)
+ADDSPEC     diff : Dt(elliptick _Xnu,_Znu) = Dt(_Xnu,_Znu)*(elliptice(_Xnu)+(-((1+(-_Xnu))*elliptick(_Xnu))))*mi(2*_Xnu*(1+(-_Xnu)))
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) Dt(ellipticf(_Xnu,_Ynu),_Znu) = Dt(_Xnu,_Znu)*mi((1+(-(_Ynu*sin(_Xnu)^2)))^.5)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) Dt(elliptice(_Xnu,_Ynu),_Znu) = Dt(_Xnu,_Znu)*(1+(-(_Ynu*sin(_Xnu)^2)))^.5
+ADDSPEC     diff : IF NIN(_Znu,_Anu,_Ynu) Dt(ellipticpi(_Anu,_Xnu,_Ynu),_Znu) = Dt(_Xnu,_Znu)*mi((1+(-(_Anu*sin(_Xnu)^2)))*(1+(-(_Ynu*sin(_Xnu)^2)))^.5)
+ADDSPEC     diff : IF NIN(_Znu,_Anu,_Bnu,_Cnu) Dt(hyp2f1(_Anu,_Bnu,_Cnu,_Xnu),_Znu) = Dt(_Xnu,_Znu)*_Anu*_Bnu*mi(_Cnu)*hyp2f1(_Anu+1,_Bnu+1,_Cnu+1,_Xnu)
+ADDSPEC     diff : IF NIN(_Znu,_Ynu) Dt(besselj(_Ynu,_Xnu),_Znu) = Dt(_Xnu,_Znu)*(besselj(_Ynu+(-1),_Xnu)+(-(besselj(_Ynu+1,_Xnu))))*.5
 
-ADDSPEC     diff : D(_Xnu*_Ynu,_Znu)=D(_Xnu,_Znu)*_Ynu+D(_Ynu,_Znu)*_Xnu   # general differentiation rules
-ADDSPEC     diff : D(_Xnu/_Ynu,_Znu)=D(_Xnu,_Znu)/_Ynu-_Xnu*D(_Ynu,_Znu)/_Ynu^2   # 2026 added: quotient rule
-ADDSPEC     diff : IF NIN (_Z,_X) D(_Fre(_X),_Z)=D(_X,_Z)*D(_Fre(_X),_X)  # chain rule
+ADDSPEC     diff : Dt(_Xnu*_Ynu,_Znu)=Dt(_Xnu,_Znu)*_Ynu+Dt(_Ynu,_Znu)*_Xnu   # general differentiation rules
+ADDSPEC     diff : Dt(_Xnu/_Ynu,_Znu)=Dt(_Xnu,_Znu)/_Ynu-_Xnu*Dt(_Ynu,_Znu)/_Ynu^2   # 2026 added: quotient rule
+ADDSPEC     diff : IF NIN (_Z,_X) Dt(_Fre(_X),_Z)=Dt(_X,_Z)*Dt(_Fre(_X),_X)  # chain rule
 
-ADDSPEC     diff : D(e^_Xnu,_Znu)  = D(_Xnu,_Znu)*e^_Xnu
-ADDSPEC     diff : D(_Xnu^_N,_Xnu)=_N*_Xnu^(_N-1)      # this is faster
-ADDSPEC     diff : D(_Xnu^_Ynu,_Znu)=D(_Xnu,_Znu)*_Ynu*_Xnu^(_Ynu+(-1))+D(_Ynu,_Znu)*ln _Xnu*_Xnu^_Ynu
+ADDSPEC     diff : Dt(e^_Xnu,_Znu)  = Dt(_Xnu,_Znu)*e^_Xnu
+ADDSPEC     diff : Dt(_Xnu^_N,_Xnu)=_N*_Xnu^(_N-1)      # this is faster
+ADDSPEC     diff : Dt(_Xnu^_Ynu,_Znu)=Dt(_Xnu,_Znu)*_Ynu*_Xnu^(_Ynu+(-1))+Dt(_Ynu,_Znu)*ln _Xnu*_Xnu^_Ynu
 
-ADDSPEC     diff : D(I(_A,_B,_C,_x),_Z)=Sub(_C,_x,_B)*D(_B,_Z)-Sub(_C,_x,_A)*D(_A,_Z)+I(_A,_B,D(_C,_Z),_x) # Leibnitz
+ADDSPEC     diff : Dt(I(_A,_B,_C,_x),_Z)=Sub(_C,_x,_B)*Dt(_B,_Z)-Sub(_C,_x,_A)*Dt(_A,_Z)+I(_A,_B,Dt(_C,_Z),_x) # Leibnitz
 
-# Tay(u,x,a,n), the Taylor polynomial: the rules Taylor of inc/helpers (they use deriv)
+# Tay(u,x,a,n), the Taylor polynomial: the rules Taylor of inc/helpers (they use D)
 
 # ++++++++++++++++++++++++ Substitution ++++++++++++++++++++++++++
 ALG Subst

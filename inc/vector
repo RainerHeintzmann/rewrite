@@ -18,8 +18,8 @@ OTHER *  : vector,vector >> real     # scalar product
 OTHER *  : vector,real >> vector     # real times vector
 OTHER *  : real,vector >> vector     # real times vector
 OTHER ^  : vector,real >> real       # e.g. a_v ^ 2
-OTHER D  : vector,real >> vector     # e.g. D(a_v,t)
-OTHER Dp : real,vector >> real       # e.g. D(a_v,t)
+OTHER Dt  : vector,real >> vector     # e.g. Dt(a_v,t)
+OTHER Dp : real,vector >> real       # e.g. Dt(a_v,t)
 
 FUNC vec  : real,real,real >> vector # definition of a 3-vector
 BRA  [ ]  : real ++ >> vector # definition of an n-vector

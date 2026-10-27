@@ -3,13 +3,13 @@
 #
 #   laplace(f, t, s)      F(s) = Int(f(t)*exp(-s*t), t, 0, infinity)
 #   invlaplace(F, s, t)   f(t) with laplace(f, t, s) = F (for t > 0)
-#   initial(u, t)         u at t = 0; initial(D(y(t),t), t) stays, so
+#   initial(u, t)         u at t = 0; initial(Dt(y(t),t), t) stays, so
 #                         that the initial values can be given by rules
 #
 # laplace uses, in this order: linearity, a table (constants, powers of t,
 # exp, sin, cos, sinh, cosh, heaviside, dirac), the theorems (shift by
 # exp(a*t), multiplication by t, delay by heaviside(t-c), derivatives
-# D(y(t),t)), and finally the integral (inc/limits), which needs s > 0
+# Dt(y(t),t)), and finally the integral (inc/limits), which needs s > 0
 # (SYM s : positive). invlaplace: linearity, the table backwards, the delay
 # exp(-c*s), a linear numerator over a quadratic (damped oscillations), and
 # partial fractions of rational functions with exact coefficients. A part
@@ -27,7 +27,7 @@ FUNC  invlaplace : real,real,real >> real         ATT RULES InvLaplaceT,All
 OTHER invlaplace : number,number,number >> number ATT RULES InvLaplaceT,All
 FUNC  initial    : real,real >> real              ATT RULES Initial
 OTHER initial    : number,number >> number        ATT RULES Initial
-FUNC  derivq     : real >> bool                   ATT RULES DerivQ     # u is D(..)
+FUNC  derivq     : real >> bool                   ATT RULES DerivQ     # u is Dt(..)
 OTHER derivq     : number >> bool                 ATT RULES DerivQ
 FUNC  lapint     : real,real,real,real >> real         # internal: the integral, f, t, s
 OTHER lapint     : number,number,number,number >> number
@@ -40,7 +40,7 @@ COMM +,*
 # ---- initial values
 PAT _Iu,_It : number
 PAT _Ju,_Ja,_Jb : number
-SPEC    DerivQ : derivq(D(_Ja,_Jb)) = true
+SPEC    DerivQ : derivq(Dt(_Ja,_Jb)) = true
 ADDSPEC DerivQ : derivq(_Ju) = false
 SPEC    Initial : IF (not(derivq(_Iu))) initial(_Iu,_It) = subst(_Iu,_It,0)
 
@@ -87,12 +87,12 @@ ADDSPEC LaplaceT : IF (linearq(_Le,_Lt)), (eqq(coeff(_Le,_Lt,0),0)) \
 # the theorems
 ADDSPEC LaplaceT : IF (linearq(_Le,_Lt)) \
                    laplace(exp(_Le)*_Lf,_Lt,_Ls) = exp(coeff(_Le,_Lt,0))*subst(laplace(_Lf,_Lt,_Ls),_Ls,_Ls-coeff(_Le,_Lt))
-ADDSPEC LaplaceT : laplace(_Lt*_Lf,_Lt,_Ls) = -D(laplace(_Lf,_Lt,_Ls),_Ls)
-ADDSPEC LaplaceT : IF (igeq(_Ln,2)) laplace(_Lt^_Ln*_Lf,_Lt,_Ls) = -D(laplace(_Lt^(_Ln-1)*_Lf,_Lt,_Ls),_Ls)
+ADDSPEC LaplaceT : laplace(_Lt*_Lf,_Lt,_Ls) = -Dt(laplace(_Lf,_Lt,_Ls),_Ls)
+ADDSPEC LaplaceT : IF (igeq(_Ln,2)) laplace(_Lt^_Ln*_Lf,_Lt,_Ls) = -Dt(laplace(_Lt^(_Ln-1)*_Lf,_Lt,_Ls),_Ls)
 ADDSPEC LaplaceT : IF (linearq(_Le,_Lt)), (knownpos(coeff(_Le,_Lt))), (knownneg(coeff(_Le,_Lt,0))) \
                    laplace(heaviside(_Le)*_Lf,_Lt,_Ls) = exp(coeff(_Le,_Lt,0)/coeff(_Le,_Lt)*_Ls) \
                        *laplace(subst(_Lf,_Lt,_Lt-coeff(_Le,_Lt,0)/coeff(_Le,_Lt)),_Lt,_Ls)
-ADDSPEC LaplaceT : laplace(D(_Lf,_Lt),_Lt,_Ls) = _Ls*laplace(_Lf,_Lt,_Ls)-initial(_Lf,_Lt)
+ADDSPEC LaplaceT : laplace(Dt(_Lf,_Lt),_Lt,_Ls) = _Ls*laplace(_Lf,_Lt,_Ls)-initial(_Lf,_Lt)
 # the integral, for s > 0; lapint gives the transform back if it stays
 ADDSPEC LaplaceT : IF (knownpos(_Ls)), (entireq(_Lf,_Lt)) \
                    laplace(_Lf,_Lt,_Ls) = lapint(Int(_Lf*exp(-_Ls*_Lt),_Lt,0,infinity),_Lf,_Lt,_Ls)

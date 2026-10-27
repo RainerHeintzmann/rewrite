@@ -3,9 +3,9 @@
 2 * x * sin (x )+ x ^ 2 * cos (x )
 1 / x 
 cos (x )^ 2 - sin (x )^ 2 
-1 / y - x * D (y ,x )/ y ^ 2 
+1 / y - x * Dt (y ,x )/ y ^ 2 
 6 * x 
-x * D (b ,x )+ 3 * a * x ^ 2 + x ^ 3 * D (a ,x )+ b 
+x * Dt (b ,x )+ 3 * a * x ^ 2 + x ^ 3 * Dt (a ,x )+ b 
 1 / (1 - x ^ 2 )^ 0.5 
 - 1 / (1 - x ^ 2 )^ 0.5 
 exp (x )

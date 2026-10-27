@@ -61,7 +61,7 @@ FUNC nget  : real,real >> real LA3
 ATT  nget 3
 FUNC ^     : real,real >> real LA4
 ATT  ^ 4
-FUNC D     : real,real >> real           # Ableitung
+FUNC Dt     : real,real >> real           # Ableitung
 FUNC Dn    : real,real,real >> real      # n. Ableitung
 FUNC Tay   : real,real,real >> real      # Taylor-entwicklung Tay(1/x^2,x,3)
 FUNC S     : real,real,real,real >> real # Summe
@@ -116,8 +116,8 @@ ADDSPEC     Real : ln (X+Y)=ln X * ln Y
 # ADDSPEC     Real : LB(X*Y,Y*X) Y*X = X*Y
 
 # ++++++++++++++++++++++++ Lineare Funktionen  ++++++++++++++++++++++++++
-ADDSPEC     Real : D(X+Y,Z)    = D(X,Z)+D(Y,Z)
-ADDSPEC     Real : D(N*X,Z)    = N*D(X,Z)
+ADDSPEC     Real : Dt(X+Y,Z)    = Dt(X,Z)+Dt(Y,Z)
+ADDSPEC     Real : Dt(N*X,Z)    = N*Dt(X,Z)
 ADDSPEC     Real : Dn(X+Y,Z,M) = Dn(X,Z,M)+Dn(Y,Z,M)
 ADDSPEC     Real : Dn(N*X,Z,M) = N*Dn(X,Z,M)
 ADDSPEC     Real : Tay(X+Y,Z,A,B) = Tay(X,Z,A,B)+Tay(Y,Z,A,B)
@@ -138,24 +138,24 @@ ADDSPEC     diff1 : 0*X=0,X*0=0,X+0=X,0+X=X
 ADDSPEC     diff1 : X^1=X,1^X=1,X^0=1,0^X=0
 
 ADDSPEC     diff1 : Dn(X,Y,0) = X
-ADDSPEC     diff1 : Dn(X,Y,N) = Dn(D(X,Y),Y,N nmin 1)
-ADDSPEC     diff1 : D(X,X) = 1         # spezielle Konstanten
-ADDSPEC     diff1 : D(N,X) = 0         # Zahlen sind konstant
-ADDSPEC     diff1 : D(e,X) = 0
-ADDSPEC     diff1 : D(pi,X)= 0
+ADDSPEC     diff1 : Dn(X,Y,N) = Dn(Dt(X,Y),Y,N nmin 1)
+ADDSPEC     diff1 : Dt(X,X) = 1         # spezielle Konstanten
+ADDSPEC     diff1 : Dt(N,X) = 0         # Zahlen sind konstant
+ADDSPEC     diff1 : Dt(e,X) = 0
+ADDSPEC     diff1 : Dt(pi,X)= 0
 
-ADDSPEC     diff1 : D(ai X,Y) = ai D(X,Y)
-ADDSPEC     diff1 : D(mi X,Y) = D(X^ai 1,Y)
-ADDSPEC     diff1 : D(ln X,Z) = mi X * D(X,Z)
-ADDSPEC     diff1 : D(e^X,Z)  = e^X * D(X,Z)
-ADDSPEC     diff1 : D(sin X,Z)= cos X * D(X,Z)
-ADDSPEC     diff1 : D(cos X,Z)= ai  sin X * D(X,Z)
+ADDSPEC     diff1 : Dt(ai X,Y) = ai Dt(X,Y)
+ADDSPEC     diff1 : Dt(mi X,Y) = Dt(X^ai 1,Y)
+ADDSPEC     diff1 : Dt(ln X,Z) = mi X * Dt(X,Z)
+ADDSPEC     diff1 : Dt(e^X,Z)  = e^X * Dt(X,Z)
+ADDSPEC     diff1 : Dt(sin X,Z)= cos X * Dt(X,Z)
+ADDSPEC     diff1 : Dt(cos X,Z)= ai  sin X * Dt(X,Z)
 
-ADDSPEC     diff1 : D(N*X,Z)=N*D(X,Z)            # wird so schneller
-ADDSPEC     diff1 : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # Allg. Differenziationsregeln
-ADDSPEC     diff1 : D(X+Y,Z)=D(X,Z)+D(Y,Z)
-ADDSPEC     diff1 : D(X^N,Z)=N*X^(N nmin 1)      # wird so schneller
-ADDSPEC     diff1 : D(X^Y,Z)=X^Y*D(ln X * Y,Z)
+ADDSPEC     diff1 : Dt(N*X,Z)=N*Dt(X,Z)            # wird so schneller
+ADDSPEC     diff1 : Dt(X*Y,Z)=Dt(X,Z)*Y+Dt(Y,Z)*X   # Allg. Differenziationsregeln
+ADDSPEC     diff1 : Dt(X+Y,Z)=Dt(X,Z)+Dt(Y,Z)
+ADDSPEC     diff1 : Dt(X^N,Z)=N*X^(N nmin 1)      # wird so schneller
+ADDSPEC     diff1 : Dt(X^Y,Z)=X^Y*Dt(ln X * Y,Z)
 
 ADDSPEC     diff1 : Tay(X,Y,Z,0) = Sub(X,Y,Z)
 ADDSPEC     diff1 : Tay(X,Y,Z,N) = Tay(X,Y,Z,N nmin 1)+Sub(Dn(X,Y,N),Y,Z)*mi(N fac)*(Y+ai Z)^N 

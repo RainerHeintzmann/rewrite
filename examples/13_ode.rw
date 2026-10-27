@@ -10,7 +10,7 @@ SYM lambda : complex
 "---- a solution checked: u'' + 2 u' + 5 u = 0"
 TERM u : real
 u = exp(-t)*(c1*cos(2*t) + c2*sin(2*t))
-REWR deriv(deriv(u,t),t) + 2*deriv(u,t) + 5*u : All
+REWR D(D(u,t),t) + 2*D(u,t) + 5*u : All
 
 "---- where it comes from: u = exp(lambda t) gives the characteristic equation"
 REWR solve(lambda^2 + 2*lambda + 5 == 0, lambda) : Solve    # exp(-t) cos(2 t), exp(-t) sin(2 t)
@@ -22,7 +22,7 @@ TERM pint, ysol : real
 pint = REWR Int(2, x) : RubiIntegrate
 ysol = REWR exp(-pint)*(Int(x*exp(pint), x) + c1) : RubiIntegrate, All
 ysol
-REWR deriv(ysol,x) + 2*ysol - x : All                             # the check
+REWR D(ysol,x) + 2*ysol - x : All                             # the check
 "y' + y/x = x^2"
 pint = REWR Int(1/x, x) : RubiIntegrate
 ysol = REWR exp(-pint)*(Int(x^2*exp(pint), x) + c1) : RubiIntegrate, All
@@ -40,11 +40,11 @@ FUNC v : real >> real     # the unknown function
 SYM V : real              # its transform
 ALG Init
 SPEC    Init : v(0) = 0
-ADDSPEC Init : initial(D(v(t),t),t) = 0
+ADDSPEC Init : initial(Dt(v(t),t),t) = 0
 ADDSPEC Init : laplace(v(t),t,s) = V
 TERM E, Vs : real
 TERM R : vector
-E = REWR laplace(D(D(v(t),t),t) + v(t) - sin(t), t, s) : Init, All
+E = REWR laplace(Dt(Dt(v(t),t),t) + v(t) - sin(t), t, s) : Init, All
 R = REWR solve(E == 0, V) : Solve
 Vs = REWR part(R,1) : All
 Vs

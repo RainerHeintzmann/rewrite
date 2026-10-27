@@ -2,7 +2,7 @@
 INC "inc/all"
 
 SYM α, \beta, \theta : real
-REWR deriv(sin(α*θ) + \beta^2, θ) : All
+REWR D(sin(α*θ) + \beta^2, θ) : All
 REWR Int(exp(-α*x), x) : RubiIntegrate
 SYM x\_1, x\_2 : real
 x₁ + x₂

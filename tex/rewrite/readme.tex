@@ -276,7 +276,7 @@ x+y*2                                       # gibt 4 + y * 2 aus
   \item[ATT RULES algliste] die Funktion wird durch Umschreiben berechnet:
     \kw{f(a,b)} wird zu \kw{REWR f(a,b) : algliste}. Ist das Ergebnis
     wieder ein Aufruf von \kw{f}, so bleibt der Aufruf stehen. So ist die
-    Ableitung \kw{deriv} in \kw{inc/helpers} definiert.
+    Ableitung \kw{D} in \kw{inc/helpers} definiert.
   \item[ATT ( Argdefs ) Block] eine in der Sprache selbst geschriebene
     Funktion. \kw{( Argdefs )} sind Definitionen der Argumente (Symbole,
     Terme oder Funktionen). Der Block wird ausgeführt, wenn der Term
@@ -525,7 +525,7 @@ Datei & Inhalt \\
 \midrule
 \kw{inc/alg} & Grundsorten (\kw{real}, \kw{bool}, \kw{complex},
   \kw{number}, \kw{algebra}, Gruppe, Ring, Körper), Operatoren, elementare
-  und spezielle Funktionen, Vereinfachung, Ableitung \kw{D}, die
+  und spezielle Funktionen, Vereinfachung, Ableitung \kw{Dt}, die
   Regelliste \kw{All}, die Unicode-Operatoren \\
 \kw{inc/pdiff} & partielle Ableitungen \\
 \kw{inc/numerik} & Numerik mit \kw{numerik,calc}: Integral
@@ -534,7 +534,7 @@ Datei & Inhalt \\
 \kw{inc/mathnum} & die Zahlenwerte von \kw{e} und \kw{pi}, Winkeleinheiten \\
 \kw{inc/integration/all} & exakte Zahlen (\kw{inc/exact}: \kw{integer},
   \kw{rational}), die symbolischen Hilfsfunktionen (\kw{inc/helpers}:
-  \kw{deriv}, \kw{expand}, \kw{cancel}, \ldots), Integration mit
+  \kw{D}, \kw{expand}, \kw{cancel}, \ldots), Integration mit
   \kw{Integrate} \\
 \kw{inc/integration/rubi/all} & die übersetzten Rubi-Regeln,
   \kw{RubiIntegrate} \\
@@ -583,10 +583,11 @@ Terme über Rollen (\kw{is\_head(t, "+", 2)}, \kw{fsym("cos")}), die
   Schleifen laufen ohne Speicherverlust.
 \item Nicht jede Regel, die man erwarten könnte, ist vorhanden; so werden
   \kw{ln(exp x)} und $\sin^2 x+\cos^2 x$ nicht vereinfacht.
-\item Symbole ohne Wert dürfen von jeder Variablen abhängen, deshalb
-  bleibt \kw{D(a,x)} im Ergebnis stehen (gewollt: Differentialgleichungen
-  benutzen \kw{D(y,x)}). \kw{deriv} behandelt dagegen jeden Term ohne
-  \kw{x} als Konstante.
+\item In der totalen Ableitung \kw{Dt} dürfen Symbole ohne Wert von jeder
+  Variablen abhängen, deshalb bleibt \kw{Dt(a,x)} im Ergebnis stehen
+  (gewollt: implizites Ableiten, Differentialgleichungen). Die partielle
+  Ableitung \kw{D} behandelt dagegen jeden Term ohne \kw{x} als Konstante;
+  die Namen sind die von Mathematica.
 \item Das kommutative Matching vertauscht nur die zwei Operanden eines
   Operators; Summen und Produkte sind binäre Bäume, deren Summanden nicht
   über Ebenen hinweg umgeordnet werden. \kw{COMM *} gilt auch für Regeln

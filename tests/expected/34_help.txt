@@ -4,13 +4,13 @@ rewrite: term rewriting with rule sets, see README.md and examples/.
   REWR t : All   simplifies t;  REWR Int(x*sin(x),x) : RubiIntegrate
   QUIT           ends rewrite
 
-Help on: ADDSPEC ALG ALIAS ATT AUTOSYM All BRA COMM D DATA DEBUG DEFAULT Dn EXE
-        FOR FUNC HELP HOLD I IF IN INC INFO INTNUM Int Integrate LA1 LB LIFT
-        MAXDEPTH MAXSTEPS MatrixRules MatrixSolve NIN NUMPAT OPT OTHER OUT PAT
-        PRT PRTNUM QUIT RA REALNUM RETURN REWR RIGHT RU RULES RubiIntegrate
+Help on: ADDSPEC ALG ALIAS ATT AUTOSYM All BRA COMM D DATA DEBUG DEFAULT Dn Dt
+        EXE FOR FUNC HELP HOLD I IF IN INC INFO INTNUM Int Integrate LA1 LB
+        LIFT MAXDEPTH MAXSTEPS MatrixRules MatrixSolve NIN NUMPAT OPT OTHER OUT
+        PAT PRT PRTNUM QUIT RA REALNUM RETURN REWR RIGHT RU RULES RubiIntegrate
         SHOW SORT SPEC STEPS SUBSORT SYM SYMBOLIC SYS Solve Sub Sum TERM TYPEOF
-        Tay WHILE [ cancel coeff collect deriv det dirac dot expand expon
-        fourier freeq heaviside identity im infinity initial inverse invfourier
+        Tay WHILE [ cancel coeff collect det dirac dot expand expon fourier
+        freeq heaviside identity im infinity initial inverse invfourier
         invlaplace knownpos laplace length limit linsolve list newton nil
         normform part pi polyq range select solve subst table thread total
         transpose
@@ -43,7 +43,7 @@ SORT real : with values (computed in C)
   symbols (SYM): Xre, e, infinity, kk, maxreal, minreal, nothing, pi, x, y, z; 14 internal (_name)
   terms (TERM): num; 1 internal (_name)
   pattern variables (PAT): 21 internal (_name)
-  functions with this result: !, *, +, -, /, D, Dn, Dp, Dpn, Gamma, I, Im, ... (148); 2 internal (_name)
+  functions with this result: !, *, +, -, /, D, Dn, Dp, Dpn, Dt, Gamma, I, ... (148); 2 internal (_name)
 no help on nosuchname (? alone lists the names)
 my own help
 a second line

@@ -108,4 +108,4 @@ ADDSPEC RubiRules : IF NIN(_Xv,_P_n), (not(falseq(derivdivides(_P_v,((_P_u)*(_P_
 
 # Rule 26 (4 variants):
 #   Int[u_*Log[w_]*PolyLog[n_, v_], x_Symbol] := With[{z = DerivativeDivides[v, u*v, x]}, z*Log[w]*PolyLog[n + 1, v] - Int[SimplifyIntegrand[z*D[w, x]*PolyLog[n + 1, v]/w, x], x] /; Not[FalseQ[z]]] /; FreeQ[n, x] && InverseFunctionFreeQ[w, x]
-ADDSPEC RubiRules : IF NIN(_Xv,_P_n), (inversefunctionfreeq(_P_w,_Xv)), (not(falseq(derivdivides(_P_v,((_P_u)*(_P_v)),_Xv)))) Int((_P_u)*(ln(_P_w))*(polylog(_P_n,_P_v)),_Xv) = ((((derivdivides(_P_v,((_P_u)*(_P_v)),_Xv))*(ln(_P_w))*(polylog(((_P_n)+(1)),_P_v))))+((((-1))*(Int(simp(((derivdivides(_P_v,((_P_u)*(_P_v)),_Xv))*(deriv(_P_w,_Xv))*(polylog(((_P_n)+(1)),_P_v))*(((_P_w)^((-1))))),_Xv),_Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_P_n), (inversefunctionfreeq(_P_w,_Xv)), (not(falseq(derivdivides(_P_v,((_P_u)*(_P_v)),_Xv)))) Int((_P_u)*(ln(_P_w))*(polylog(_P_n,_P_v)),_Xv) = ((((derivdivides(_P_v,((_P_u)*(_P_v)),_Xv))*(ln(_P_w))*(polylog(((_P_n)+(1)),_P_v))))+((((-1))*(Int(simp(((derivdivides(_P_v,((_P_u)*(_P_v)),_Xv))*(D(_P_w,_Xv))*(polylog(((_P_n)+(1)),_P_v))*(((_P_w)^((-1))))),_Xv),_Xv)))))

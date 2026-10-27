@@ -387,7 +387,7 @@ it numeric, as Mathematica's numeric contagion: $\sqrt{2}\cdot 0.5$ is
 1, since the rules of the old library were written with real numbers. For
 the same reason, an operation on such integers alone whose value is not an
 integer is done exactly: the derivative rule
-\texttt{D(sqrt(\_X),\_Z) = D(\_X,\_Z)*mi(2*sqrt(\_X))} gives $\frac12$, not
+\texttt{Dt(sqrt(\_X),\_Z) = Dt(\_X,\_Z)*mi(2*sqrt(\_X))} gives $\frac12$, not
 0.5, so that the derivative of $\sqrt{\pi t}$ keeps the symbol $\pi$.
 
 \subsection{Interleaving rewriting and numerics}
@@ -538,7 +538,7 @@ sine, can be kept in rules as well: a function declared with
 \texttt{ATT RULES alglist} is calculated by rewriting its call with the
 rule list, also inside a condition and from C. The derivative used by
 \texttt{DerivativeDivides} is such a function, defined with the rules for
-\texttt{D} of the library; Rubi's \texttt{FixInertTrigFunction} is another,
+\texttt{Dt} of the library; Rubi's \texttt{FixInertTrigFunction} is another,
 translated from Rubi's definitions (44 of 60 are used: in Rubi they act on
 inert functions only, which the translation does not distinguish, and 12
 of them would take integrands away from the rules that solve them). A
@@ -797,7 +797,7 @@ The Heaviside step and the Dirac delta are handled before the integration.
 \paragraph{Laplace transform.} \texttt{laplace(f,t,s)} combines a table
 with the theorems (shift, damping, multiplication by $t$, derivatives) and
 the definite integral for the rest. The transform of a derivative refers to
-the initial values, \texttt{v(0)} and \texttt{initial(D(v(t),t),t)}, which
+the initial values, \texttt{v(0)} and \texttt{initial(Dt(v(t),t),t)}, which
 a user supplies as rules. The inverse uses partial fractions; quadratic
 denominators give damped oscillations and \texttt{exp(-c*s)} a delay. An
 initial value problem is then solved in three steps, here a driven
@@ -809,9 +809,9 @@ FUNC v : real >> real     # the unknown function
 SYM V : real              # its transform
 ALG Init
 SPEC    Init : v(0) = 0
-ADDSPEC Init : initial(D(v(t),t),t) = 0
+ADDSPEC Init : initial(Dt(v(t),t),t) = 0
 ADDSPEC Init : laplace(v(t),t,s) = V
-E = REWR laplace(D(D(v(t),t),t) + v(t) - sin(t), t, s) : Init, All
+E = REWR laplace(Dt(Dt(v(t),t),t) + v(t) - sin(t), t, s) : Init, All
 R = REWR solve(E == 0, V) : Solve
 Vs = REWR part(R,1) : All               # prints 1 / (1 + s ^ 2 )^ 2
 invlaplace(Vs, s, t)      # prints (1/2) * sin (t )- (1/2) * t * cos (t )
@@ -846,7 +846,7 @@ In the same way an initial Gaussian $e^{-x^2}$ spreads to
 $e^{-x^2/(1+4at)}/\sqrt{1+4at}$, and the transport equation
 $u_t+cu_x=0$, with $U=U_0\,e^{-icwt}$, moves it to $e^{-(x-ct)^2}$.
 
-\paragraph{Checking and other methods.} Since \texttt{deriv} differentiates
+\paragraph{Checking and other methods.} Since \texttt{D} differentiates
 partially, a proposed solution is checked by substituting it: the wave,
 heat and Laplace equations with $\sin(x-ct)$, $e^{-ak^2t}\sin kx$,
 $e^{-x^2/(4at)}/\sqrt t$ or $\ln(x^2+y^2)$ reduce to 0 with \texttt{All}

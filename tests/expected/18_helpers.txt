@@ -2,19 +2,19 @@
 1.31304 0.648054 0.850918 
 0.881374 1.31696 0.549306 0.549306 
 0.582241 0.693147 0.567143 
-D csc(x): true 
-D sec(x): true 
-D cot(x): true 
-D arccot(x): true 
-D coth(x): true 
-D sech(x): true 
-D csch(x): true 
-D arcsinh(x): true 
-D arccosh(x+1): true 
-D arctanh(x): true 
-D arccoth(x+1): true 
-D polylog(3,x): true 
-D productlog(x): true 
+Dt csc(x): true 
+Dt sec(x): true 
+Dt cot(x): true 
+Dt arccot(x): true 
+Dt coth(x): true 
+Dt sech(x): true 
+Dt csch(x): true 
+Dt arcsinh(x): true 
+Dt arccosh(x+1): true 
+Dt arctanh(x): true 
+Dt arccoth(x+1): true 
+Dt polylog(3,x): true 
+Dt productlog(x): true 
 false true 
 true false false true false 
 true false true false true false 

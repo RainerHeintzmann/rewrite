@@ -18,7 +18,7 @@ ADDSPEC     pdiff : Dp(e^_X,_Z)  = e^_X * Dp(_X,_Z)
 ADDSPEC     pdiff : Dp(sin _X,_Z)= cos _X * Dp(_X,_Z)
 ADDSPEC     pdiff : Dp(cos _X,_Z)= - sin _X * Dp(_X,_Z)
 
-ADDSPEC     pdiff : IF NIN(_X,_Y) Dp(D(_X,_Y),_X) = 0      # variable is independent
+ADDSPEC     pdiff : IF NIN(_X,_Y) Dp(Dt(_X,_Y),_X) = 0      # variable is independent
 
 ADDSPEC     pdiff : Dp(_N*_X,_Z)=_N*Dp(_X,_Z)             # this is faster
 ADDSPEC     pdiff : Dp(_X*_Y,_Z)=Dp(_X,_Z)*_Y+Dp(_Y,_Z)*_X   # general differentiation rules

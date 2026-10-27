@@ -126,7 +126,7 @@ ADDSPEC Real : ln(_Y*_Ap) = ln(_Y) + ln(_Ap)
 
 # A term of sort rational without an exact value (2+3^(1/2)) contains no
 # variable (those are real): a constant
-ADDSPEC diff : D(_Aq,_X) = 0
+ADDSPEC diff : Dt(_Aq,_X) = 0
 
 # from here on, numbers without a point are natural numbers (natural); -3 is
 # -(3) and therefore integer

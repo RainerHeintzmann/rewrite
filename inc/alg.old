@@ -110,7 +110,7 @@ FUNC sgn    : real >> real 			      ATT 19 		# Vorzeichen (+ ->1,- ->-1)
 BRA | |     : real >> real 			            		# Abs.Wert |Cpx(1,2)|
 
 FUNC Cpx    : real,real >> real           # Komplexe Zahl
-FUNC D      : real,real >> real           # Ableitung
+FUNC Dt      : real,real >> real           # Ableitung
 FUNC Dn     : real,real,real >> real      # n. Ableitung
 FUNC Tay    : real,real,real,real >> real # Taylor-entwicklung Tay(1/x^2,x,Stelle,bis)
 FUNC S      : real,real,real,real >> real # Summe
@@ -256,8 +256,8 @@ ADDSPEC     Addord : LB(X,Y) X+Y = Y+X
 ADDSPEC     Addord : LB(Y,Z) X+Y+Z = X+Z+Y
 
 # ++++++++++++++++++++++++ Lineare Funktionen  ++++++++++++++++++++++++++
-ADDSPEC     Real : D(X+Y,Z)    = D(X,Z)+D(Y,Z)
-ADDSPEC     Real : D(N*X,Z)    = N*D(X,Z)
+ADDSPEC     Real : Dt(X+Y,Z)    = Dt(X,Z)+Dt(Y,Z)
+ADDSPEC     Real : Dt(N*X,Z)    = N*Dt(X,Z)
 ADDSPEC     Real : Dn(X+Y,Z,M) = Dn(X,Z,M)+Dn(Y,Z,M)
 ADDSPEC     Real : Dn(N*X,Z,M) = N*Dn(X,Z,M)
 ADDSPEC     Real : Tay(X+Y,Z,A,B) = Tay(X,Z,A,B)+Tay(Y,Z,A,B)
@@ -270,35 +270,35 @@ SPEC        diff : 1*X=X,X*1=X
 ADDSPEC     diff : 0*X=0,X*0=0,X+0=X,0+X=X
 ADDSPEC     diff : X^1=X,1^X=1,X^0=1,0^X=0
 
-ADDSPEC     diff : D(e,X) = 0         # Rheinfolge wichtig (erst e pruefen dann X ersetzen)
-ADDSPEC     diff : D(pi,X)= 0
-ADDSPEC     diff : D(_x,X)= 0
-ADDSPEC     diff : D(N,X) = 0         # Zahlen sind konstant
-ADDSPEC     diff : D(X,X) = 1         # spezielle Konstanten
+ADDSPEC     diff : Dt(e,X) = 0         # Rheinfolge wichtig (erst e pruefen dann X ersetzen)
+ADDSPEC     diff : Dt(pi,X)= 0
+ADDSPEC     diff : Dt(_x,X)= 0
+ADDSPEC     diff : Dt(N,X) = 0         # Zahlen sind konstant
+ADDSPEC     diff : Dt(X,X) = 1         # spezielle Konstanten
 
 ADDSPEC     diff : Dn(X,Y,0) = X
-ADDSPEC     diff : Dn(X,Y,N) = Dn(D(X,Y),Y,N - 1)
+ADDSPEC     diff : Dn(X,Y,N) = Dn(Dt(X,Y),Y,N - 1)
 
-ADDSPEC     diff : D(ai X,Y) = ai D(X,Y)
-ADDSPEC     diff : D(mi X,Y) = ai D(X,Y)*mi(X^2)
-ADDSPEC     diff : D(ln X,Z) = D(X,Z)*mi X
-ADDSPEC     diff : D(lg X,Z) = D(X,Z)*mi (X*ln 10)
-ADDSPEC     diff : D(sin X,Z)= D(X,Z)*cos X
-ADDSPEC     diff : D(arcsin X,Z)= D(X,Z)*mi((1+X^2)^.5)
-ADDSPEC     diff : D(cos X,Z)   = ai D(X,Z)*sin X
-ADDSPEC     diff : D(arccos X,Z)= ai D(X,Z)*mi((1+X^2)^.5)
-ADDSPEC     diff : D(tan X,Z)   = D(X,Z)*mi(cos(X)^2)
-ADDSPEC     diff : D(arctan X,Z)= D(X,Z)*mi(1+X^2)
+ADDSPEC     diff : Dt(ai X,Y) = ai Dt(X,Y)
+ADDSPEC     diff : Dt(mi X,Y) = ai Dt(X,Y)*mi(X^2)
+ADDSPEC     diff : Dt(ln X,Z) = Dt(X,Z)*mi X
+ADDSPEC     diff : Dt(lg X,Z) = Dt(X,Z)*mi (X*ln 10)
+ADDSPEC     diff : Dt(sin X,Z)= Dt(X,Z)*cos X
+ADDSPEC     diff : Dt(arcsin X,Z)= Dt(X,Z)*mi((1+X^2)^.5)
+ADDSPEC     diff : Dt(cos X,Z)   = ai Dt(X,Z)*sin X
+ADDSPEC     diff : Dt(arccos X,Z)= ai Dt(X,Z)*mi((1+X^2)^.5)
+ADDSPEC     diff : Dt(tan X,Z)   = Dt(X,Z)*mi(cos(X)^2)
+ADDSPEC     diff : Dt(arctan X,Z)= Dt(X,Z)*mi(1+X^2)
 
-ADDSPEC     diff : D(N*X,Z)=N*D(X,Z)            # wird so schneller
-ADDSPEC     diff : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # Allg. Differenziationsregeln
-ADDSPEC     diff : D(X+Y,Z)=D(X,Z)+D(Y,Z)
+ADDSPEC     diff : Dt(N*X,Z)=N*Dt(X,Z)            # wird so schneller
+ADDSPEC     diff : Dt(X*Y,Z)=Dt(X,Z)*Y+Dt(Y,Z)*X   # Allg. Differenziationsregeln
+ADDSPEC     diff : Dt(X+Y,Z)=Dt(X,Z)+Dt(Y,Z)
 
-ADDSPEC     diff : D(e^X,Z)  = D(X,Z)*e^X
-ADDSPEC     diff : D(X^N,X)=N*X^(N - 1)      # wird so schneller
-ADDSPEC     diff : D(X^Y,Z)=D(X,Z)*Y*X^(Y+ai 1)+D(Y,Z)*ln X*X^Y
+ADDSPEC     diff : Dt(e^X,Z)  = Dt(X,Z)*e^X
+ADDSPEC     diff : Dt(X^N,X)=N*X^(N - 1)      # wird so schneller
+ADDSPEC     diff : Dt(X^Y,Z)=Dt(X,Z)*Y*X^(Y+ai 1)+Dt(Y,Z)*ln X*X^Y
 
-ADDSPEC     diff : D(I(A,B,C,_x),Z)=Sub(C,_x,B)*D(B,Z)-Sub(C,_x,A)*D(A,Z)+I(A,B,D(C,Z),_x)
+ADDSPEC     diff : Dt(I(A,B,C,_x),Z)=Sub(C,_x,B)*Dt(B,Z)-Sub(C,_x,A)*Dt(A,Z)+I(A,B,Dt(C,Z),_x)
 
 ADDSPEC     diff : Tay(X,Y,Z,0) = Sub(X,Y,Z)
 ADDSPEC     diff : Tay(X,Y,Z,N) = Tay(X,Y,Z,N - 1)+Sub(Dn(X,Y,N),Y,Z)*mi(N!)*(Y+ai Z)^N 

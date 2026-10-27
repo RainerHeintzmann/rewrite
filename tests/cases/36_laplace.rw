@@ -22,11 +22,11 @@ FUNC u : real >> real
 SYM U : real
 ALG Init
 SPEC    Init : u(0) = 1
-ADDSPEC Init : initial(D(u(t),t),t) = 0
+ADDSPEC Init : initial(Dt(u(t),t),t) = 0
 ADDSPEC Init : laplace(u(t),t,s) = U
 TERM E : real
 TERM R : vector
-E = REWR laplace(D(D(u(t),t),t) + 2*D(u(t),t) + 5*u(t), t, s) : Init, All
+E = REWR laplace(Dt(Dt(u(t),t),t) + 2*Dt(u(t),t) + 5*u(t), t, s) : Init, All
 R = REWR solve(E == 0, U) : Solve
 R
 invlaplace(part(R,1), s, t)

@@ -34,8 +34,8 @@ PAT _hu,_hx : number
 SPEC    Heaviside : IF (_hn > 0) heaviside(_hn) = 1
 ADDSPEC Heaviside : IF (_hn < 0) heaviside(_hn) = 0
 SPEC    Dirac     : IF (_hn != 0) dirac(_hn) = 0
-ADDSPEC diff       : D(heaviside(_hu),_hx) = D(_hu,_hx)*dirac(_hu)
-ADDSPEC DerivConst : D(heaviside(_hu),_hx) = D(_hu,_hx)*dirac(_hu)
+ADDSPEC diff       : Dt(heaviside(_hu),_hx) = Dt(_hu,_hx)*dirac(_hu)
+ADDSPEC DerivConst : Dt(heaviside(_hu),_hx) = Dt(_hu,_hx)*dirac(_hu)
 
 # The rules below are rule lists (COMM): they are tried in order until one
 # matches with its conditions, and a pattern u*f(x) finds f(x) among all

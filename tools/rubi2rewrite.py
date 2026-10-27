@@ -341,7 +341,7 @@ RHS_HELPERS = {
     'Subst': 'subst', 'ExpandIntegrand': 'expandintegrand', 'Expand': 'expand',
     'Coeff': 'coeff', 'Coefficient': 'coeff', 'Expon': 'expon', 'Rt': 'rt',
     'IntPart': 'intpart', 'FracPart': 'fracpart', 'IntHide': 'inthide',
-    'Unintegrable': 'unintegrable', 'D': 'deriv',
+    'Unintegrable': 'unintegrable', 'D': 'D',
     'GCD': 'gcd', 'Cancel': 'cancel', 'Together': 'cancel', 'Numerator': 'numerator', 'Denominator': 'denominator',
     'Denom': 'denominator', 'FreeFactors': 'freefactors',
     'NonfreeFactors': 'nonfreefactors', 'ExpandToSum': 'expandtosum',

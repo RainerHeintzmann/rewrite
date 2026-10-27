@@ -8,21 +8,21 @@ TERM u, lap : real
 
 "---- the wave equation u_tt = c^2 u_xx: any f(x - c t) + g(x + c t)"
 u = sin(x - c*t) + ln(x + c*t)
-REWR deriv(deriv(u,t),t) - c^2*deriv(deriv(u,x),x) : All
+REWR D(D(u,t),t) - c^2*D(D(u,x),x) : All
 
 "---- the heat equation u_t = a u_xx: a decaying mode and the heat kernel"
 u = exp(-a*k^2*t)*sin(k*x)
-REWR deriv(u,t) - a*deriv(deriv(u,x),x) : All
+REWR D(u,t) - a*D(D(u,x),x) : All
 u = exp(-x^2/(4*a*t))*t^(-1/2)
-REWR deriv(u,t) - a*deriv(deriv(u,x),x) : All
+REWR D(u,t) - a*D(D(u,x),x) : All
 
 "---- the Laplace equation u_xx + u_yy = 0: harmonic functions"
 u = x^3 - 3*x*y^2
-REWR deriv(deriv(u,x),x) + deriv(deriv(u,y),y) : All
+REWR D(D(u,x),x) + D(D(u,y),y) : All
 u = exp(x)*cos(y)
-REWR deriv(deriv(u,x),x) + deriv(deriv(u,y),y) : All
+REWR D(D(u,x),x) + D(D(u,y),y) : All
 u = ln(x^2 + y^2)
-lap = REWR deriv(deriv(u,x),x) + deriv(deriv(u,y),y) : All
+lap = REWR D(D(u,x),x) + D(D(u,y),y) : All
 lap
 REWR cancel(lap) : All    # over a common denominator: 0
 
@@ -30,13 +30,13 @@ REWR cancel(lap) : All    # over a common denominator: 0
 FUNC XF : real >> real
 FUNC TF : real >> real
 u = XF(x)*TF(t)
-REWR (deriv(u,t) - a*deriv(deriv(u,x),x))/(a*u) : All
+REWR (D(u,t) - a*D(D(u,x),x))/(a*u) : All
 "a function of t minus a function of x: both are the same constant -k^2,"
 "XF'' = -k^2 XF and TF' = -a k^2 TF give the decaying mode above"
 
 "---- the heat equation on the line, with the Fourier transform in x"
 FUNC v : real,real >> real
-REWR fourier(D(D(v(x,t),x),x), x, w) : All       # u_xx becomes -w^2 U
+REWR fourier(D(D(v(x,t),x),x), x, w) : All         # u_xx becomes -w^2 U
 "U_t = -a w^2 U, so U = U0(w) exp(-a w^2 t); a point source, U0 = 1:"
 invfourier(exp(-a*w^2*t), w, x)                  # the heat kernel
 "a Gaussian u(x,0) = exp(-x^2) spreads:"

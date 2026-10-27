@@ -21,7 +21,7 @@ nb = abs(novec+vx)
 "survived"
 # A TERM without a term in REWR crashed (2026): now an error message.
 TERM tq : real
-REWR D(tq,x) : All
+REWR Dt(tq,x) : All
 tq
 # A rule that makes the term deeper on every step overflowed the C stack
 # (2026): REWR stops at the depth MAXDEPTH, MAXSTEPS limits the rewrites.

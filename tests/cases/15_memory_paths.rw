@@ -3,9 +3,9 @@
 INC "inc/all"
 SYM a, b : real
 SYM kk : real
-FOR kk = 1 TO 3 DO REWR D(x^kk,x) : All
+FOR kk = 1 TO 3 DO REWR Dt(x^kk,x) : All
 TERM t3,t4 : real
-t3 = REWR D(x^3,x) : All
+t3 = REWR Dt(x^3,x) : All
 t3
 t4 = t3*2
 t3 = a

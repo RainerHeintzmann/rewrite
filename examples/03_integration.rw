@@ -20,4 +20,4 @@ REWR Int(ln(x)^2, x) : RubiIntegrate
 TERM Fx : number
 Fx = REWR Int(x^2*cos(x), x) : RubiIntegrate
 Fx
-REWR cancel(deriv(Fx, x)) : All
+REWR cancel(D(Fx, x)) : All

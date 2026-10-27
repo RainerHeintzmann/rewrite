@@ -48,7 +48,7 @@ FUNC +     : real,real >> real LA2
 FUNC *     : real,real >> real LA3
 FUNC /     : real,real >> real LA3    
 FUNC ^     : real,real >> real LA4
-FUNC D     : real,real >> real
+FUNC Dt     : real,real >> real
 FUNC S     : real,real >> real           # fuer solve z.B. S(x^2 (=0),x)
 FUNC I     : real,real,real,real >> real
 
@@ -93,22 +93,22 @@ ADDSPEC     Real : S(X*Y,Z)= (S(X,Z)) or (S(Y,Z))
 # ++++++++++++++++++++++++ DIFFERENTIALRECHNUNG ++++++++++++++++++++++++++
 
 SPEC        diff1 : 0*X = 0,X*0=0,X+0=X,0+X=X
-ADDSPEC     diff1 : D(X,X) = 1         # spezielle Konstanten
-ADDSPEC     diff1 : D(e,X) = 0
-ADDSPEC     diff1 : D(pi,X)= 0
-ADDSPEC     diff1 : D(m1,X) = 0
-ADDSPEC     diff1 : D(0,X) = 0
-ADDSPEC     diff1 : D(1,X) = 0
-ADDSPEC     diff1 : D(2,X) = 0
+ADDSPEC     diff1 : Dt(X,X) = 1         # spezielle Konstanten
+ADDSPEC     diff1 : Dt(e,X) = 0
+ADDSPEC     diff1 : Dt(pi,X)= 0
+ADDSPEC     diff1 : Dt(m1,X) = 0
+ADDSPEC     diff1 : Dt(0,X) = 0
+ADDSPEC     diff1 : Dt(1,X) = 0
+ADDSPEC     diff1 : Dt(2,X) = 0
 
-ADDSPEC     diff1 : D(ln X,Z) = X^m1 * D(X,Z)
-ADDSPEC     diff1 : D(e^X,Z)  = e^X * D(X,Z)
-ADDSPEC     diff1 : D(sin X,Z)= cos X * D(X,Z)
-ADDSPEC     diff1 : D(cos X,Z)= m1 * sin X * D(X,Z)
+ADDSPEC     diff1 : Dt(ln X,Z) = X^m1 * Dt(X,Z)
+ADDSPEC     diff1 : Dt(e^X,Z)  = e^X * Dt(X,Z)
+ADDSPEC     diff1 : Dt(sin X,Z)= cos X * Dt(X,Z)
+ADDSPEC     diff1 : Dt(cos X,Z)= m1 * sin X * Dt(X,Z)
 
-ADDSPEC     diff1 : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # Allg. Differenziationsregeln
-ADDSPEC     diff1 : D(X+Y,Z)=D(X,Z)+D(Y,Z)
-ADDSPEC     diff1 : D(X^Y,Z)=X^Y*D(ln X * Y,Z)
+ADDSPEC     diff1 : Dt(X*Y,Z)=Dt(X,Z)*Y+Dt(Y,Z)*X   # Allg. Differenziationsregeln
+ADDSPEC     diff1 : Dt(X+Y,Z)=Dt(X,Z)+Dt(Y,Z)
+ADDSPEC     diff1 : Dt(X^Y,Z)=X^Y*Dt(ln X * Y,Z)
 
 # ++++++++++++++++++++++++ INTERALE ++++++++++++++++++++++++++++++++++++++
 

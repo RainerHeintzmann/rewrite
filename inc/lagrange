@@ -3,5 +3,5 @@
 
 # L = T - V
 
-DGL = D(Dp(L,D(Coordinate,t)),t) - Dp(L,Coordinate)  # Lagrange-2 formalism
+DGL = Dt(Dp(L,Dt(Coordinate,t)),t) - Dp(L,Coordinate)  # Lagrange-2 formalism
 

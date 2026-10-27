@@ -1,7 +1,7 @@
 # inc/simplify (2026), loaded by inc/all after inc/helpers:
 # the rule list All ends with the normal form (normform, symfn.c): like
 # terms collected, also inside subtracted sums (a + b - (a + b) is 0), sums
-# sorted, positive terms first, quotients as A/B. Without it, D and deriv
+# sorted, positive terms first, quotients as A/B. Without it, Dt and D
 # left results such as  2*x*cos(x) + x^2*sin(x) - (2*x*cos(x)).
 # normalq(u) is true if normform would not change u, so the rule ends.
 FUNC  normalq : real >> bool    ATT SYMBOLIC normalq

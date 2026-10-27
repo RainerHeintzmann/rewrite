@@ -1,6 +1,6 @@
 # inc/all: the mathematical standard library, in this order:
 #   inc/alg        sorts, operators, elementary and special functions, the
-#                  rules (simplification, derivatives D), the rule list All
+#                  rules (simplification, derivatives Dt), the rule list All
 #   inc/pdiff      partial derivatives
 #   inc/numerik    numerics: I, newton, fmin, fmax, ... (numerik,calc)
 #   inc/mathnum    numerical values of e and pi, angle units _deg, ...

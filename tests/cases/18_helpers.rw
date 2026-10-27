@@ -16,82 +16,82 @@ TERM FF : real
 SYM yy,zz,hh : real
 hh = 1e-6
 x = yy
-FF = REWR D(csc(x),x) : All
+FF = REWR Dt(csc(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D csc(x): "
+PRT "Dt csc(x): "
 abs(FF - (csc((zz+hh))-csc((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(sec(x),x) : All
+FF = REWR Dt(sec(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D sec(x): "
+PRT "Dt sec(x): "
 abs(FF - (sec((zz+hh))-sec((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(cot(x),x) : All
+FF = REWR Dt(cot(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D cot(x): "
+PRT "Dt cot(x): "
 abs(FF - (cot((zz+hh))-cot((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(arccot(x),x) : All
+FF = REWR Dt(arccot(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D arccot(x): "
+PRT "Dt arccot(x): "
 abs(FF - (arccot((zz+hh))-arccot((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(coth(x),x) : All
+FF = REWR Dt(coth(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D coth(x): "
+PRT "Dt coth(x): "
 abs(FF - (coth((zz+hh))-coth((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(sech(x),x) : All
+FF = REWR Dt(sech(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D sech(x): "
+PRT "Dt sech(x): "
 abs(FF - (sech((zz+hh))-sech((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(csch(x),x) : All
+FF = REWR Dt(csch(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D csch(x): "
+PRT "Dt csch(x): "
 abs(FF - (csch((zz+hh))-csch((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(arcsinh(x),x) : All
+FF = REWR Dt(arcsinh(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D arcsinh(x): "
+PRT "Dt arcsinh(x): "
 abs(FF - (arcsinh((zz+hh))-arcsinh((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(arccosh(x+1),x) : All
+FF = REWR Dt(arccosh(x+1),x) : All
 x = 0.6
 zz = 0.6
-PRT "D arccosh(x+1): "
+PRT "Dt arccosh(x+1): "
 abs(FF - (arccosh((zz+hh)+1)-arccosh((zz-hh)+1))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(arctanh(x),x) : All
+FF = REWR Dt(arctanh(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D arctanh(x): "
+PRT "Dt arctanh(x): "
 abs(FF - (arctanh((zz+hh))-arctanh((zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(arccoth(x+1),x) : All
+FF = REWR Dt(arccoth(x+1),x) : All
 x = 0.6
 zz = 0.6
-PRT "D arccoth(x+1): "
+PRT "Dt arccoth(x+1): "
 abs(FF - (arccoth((zz+hh)+1)-arccoth((zz-hh)+1))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(polylog(3,x),x) : All
+FF = REWR Dt(polylog(3,x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D polylog(3,x): "
+PRT "Dt polylog(3,x): "
 abs(FF - (polylog(3,(zz+hh))-polylog(3,(zz-hh)))/(2*hh)) < 1e-5
 x = yy
-FF = REWR D(productlog(x),x) : All
+FF = REWR Dt(productlog(x),x) : All
 x = 0.6
 zz = 0.6
-PRT "D productlog(x): "
+PRT "Dt productlog(x): "
 abs(FF - (productlog((zz+hh))-productlog((zz-hh)))/(2*hh)) < 1e-5
 x = yy
 # ---- predicates

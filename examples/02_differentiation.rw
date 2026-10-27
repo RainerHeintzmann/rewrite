@@ -1,4 +1,5 @@
-# 02_differentiation.rw: derivatives with the rule set All
+# 02_differentiation.rw: derivatives, D(f,x) (partial, as Mathematica's D)
+# and Dt(f,x) (total, as Mathematica's Dt), simplified with the rule set All
 INC "inc/all"
 
 REWR D(x^3 + 2*x, x) : All
@@ -10,8 +11,10 @@ REWR D(arctan(2*x), x) : All
 "---- a second derivative"
 REWR D(D(x^4*cos(x), x), x) : All
 
-"---- D(f,x) does not assume that other symbols are constant (D(y,x) stays);"
-"---- deriv(f,x) does: a partial derivative"
+"---- D(f,x) takes every other symbol as a constant (a partial derivative)"
 SYM kk : real
-REWR deriv(x^2*y + y^3, y) : All
-REWR deriv(kk*x^2 + sin(kk*x), x) : All
+REWR D(x^2*y + y^3, y) : All
+REWR D(kk*x^2 + sin(kk*x), x) : All
+
+"---- Dt(f,x) does not: y may depend on x (implicit differentiation)"
+REWR Dt(x^2 + y^2, x) : All

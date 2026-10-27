@@ -36,7 +36,7 @@ ADDSPEC RubiRules : IF NIN(_Xv,_P_a,_O_b,_P_c,_O_m,_P_n,_O_p), (polyq(_P_Pq,((_X
 
 # Rule 8 (48 variants):
 #   Int[x_^m_.*Pq_*(a_ + b_.*x_^n_)^p_, x_Symbol] := Pq*(a + b*x^n)^(p + 1)/(b*n*(p + 1)) - 1/(b*n*(p + 1))*Int[D[Pq, x]*(a + b*x^n)^(p + 1), x] /; FreeQ[{a, b, m, n}, x] && PolyQ[Pq, x] && EqQ[m - n + 1, 0] && LtQ[p, -1]
-ADDSPEC RubiRules : IF NIN(_Xv,_P_a,_O_b,_O_m,_P_n), (polyq(_P_Pq,_Xv)), (eqq(((_O_m)+((((-1))*(_P_n)))+(1)),0)), (((ltq(_P_p,(-1))))) Int(((_Xv)^(_O_m))*(_P_Pq)*(((_P_a)+((_O_b)*((_Xv)^(_P_n))))^(_P_p)),_Xv) = ((((_P_Pq)*(((((_P_a)+(((_O_b)*(((_Xv)^(_P_n)))))))^(((_P_p)+(1)))))*(((_O_b)^((-1))))*(((_P_n)^((-1))))*(((((_P_p)+(1)))^((-1))))))+((((-1))*(((_O_b)^((-1))))*(((_P_n)^((-1))))*(((((_P_p)+(1)))^((-1))))*(Int(((deriv(_P_Pq,_Xv))*(((((_P_a)+(((_O_b)*(((_Xv)^(_P_n)))))))^(((_P_p)+(1)))))),_Xv)))))
+ADDSPEC RubiRules : IF NIN(_Xv,_P_a,_O_b,_O_m,_P_n), (polyq(_P_Pq,_Xv)), (eqq(((_O_m)+((((-1))*(_P_n)))+(1)),0)), (((ltq(_P_p,(-1))))) Int(((_Xv)^(_O_m))*(_P_Pq)*(((_P_a)+((_O_b)*((_Xv)^(_P_n))))^(_P_p)),_Xv) = ((((_P_Pq)*(((((_P_a)+(((_O_b)*(((_Xv)^(_P_n)))))))^(((_P_p)+(1)))))*(((_O_b)^((-1))))*(((_P_n)^((-1))))*(((((_P_p)+(1)))^((-1))))))+((((-1))*(((_O_b)^((-1))))*(((_P_n)^((-1))))*(((((_P_p)+(1)))^((-1))))*(Int(((D(_P_Pq,_Xv))*(((((_P_a)+(((_O_b)*(((_Xv)^(_P_n)))))))^(((_P_p)+(1)))))),_Xv)))))
 
 # Rule 9 (288 variants):
 #   Int[(d_.*x_)^m_.*Pq_*(a_ + b_.*x_^n_.)^p_, x_Symbol] := 1/d*Int[(d*x)^(m + 1)*PolynomialQuotient[Pq, x, x]*(a + b*x^n)^p, x] /; FreeQ[{a, b, d, m, n, p}, x] && PolyQ[Pq, x] && EqQ[Coeff[Pq, x, 0], 0]

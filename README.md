@@ -322,13 +322,13 @@ PAT X,Y,Z : real
 ALG PdDef
 ALG PdConst
 FUNC pd : real,real >> real ATT RULES PdDef,(PdConst,Linear,diff)
-SPEC PdDef : pd(X,Y) = D(X,Y)
-SPEC PdConst : IF NIN(Z,X) D(X,Z) = 0     # every term without x is constant
+SPEC PdDef : pd(X,Y) = Dt(X,Y)
+SPEC PdConst : IF NIN(Z,X) Dt(X,Z) = 0     # every term without x is constant
 REWR pd(nn*sin(x)^2,x) : All              # prints 2 * cos (x )* sin (x )* nn
 ```
 
 This is how knowledge of the library reaches the C helpers: the derivative
-`deriv` of [inc/helpers](inc/helpers) is defined like `pd` above, with the
+`D` of [inc/helpers](inc/helpers) is defined like `pd` above, with the
 rules `diff` of [inc/alg](inc/alg), and Rubi's `FixInertTrigFunction` is the
 rule function `fixinert`, translated from Rubi.
 
@@ -535,7 +535,7 @@ variant is symbolic (no numerical C function), so the order of the sorts
 alone decides which rules apply.
 
 The derivative rules (ALG `diff`) and the Rubi rules are written for
-`number` in this way, so `deriv(sin(im*x),x)` gives `im*cos(im*x)` and
+`number` in this way, so `D(sin(im*x),x)` gives `im*cos(im*x)` and
 `REWR Int(sin(im*x),x) : RubiIntegrate` gives `im * cos (im * x )`. The
 general simplification `All` is still written for `real`.
 
@@ -669,11 +669,11 @@ The comments in the older files are in German.
 
 | File | Contents |
 | --- | --- |
-| [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, `number`, `algebra`, group, ring, field), operators, elementary functions, simplification rules and differentiation `D`. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
+| [inc/alg](inc/alg) | Basic sorts (`real`, `bool`, `complex`, `number`, `algebra`, group, ring, field), operators, elementary functions, simplification rules and differentiation `Dt`. Defines the rule list `All`. Besides `sin`, `ln`, `exp` and so on, it has `csc`, `sec`, `cot`, `arccot`, `sinh`, `cosh`, `tanh`, `coth`, `sech`, `csch`, `arcsinh`, `arccosh`, `arctanh`, `arccoth`, `polylog(n,x)` and `productlog` (Lambert W), and special functions (see below), each with a derivative rule. |
 | [inc/pdiff](inc/pdiff) | Partial derivatives. |
 | [inc/numerik](inc/numerik) | Numerics with the rule lists `numerik,calc`: integral `I(a,b,f,x)`, Newton zero `newton(start,f,f',x)`, `fmin`, `fmax`, `flzero`, `flext`. |
 | [inc/mathnum](inc/mathnum) | The numerical values of `e` and `pi`, angle units `_deg`, `_rad`. |
-| [inc/integration/all](inc/integration/all) | Exact numbers ([inc/exact](inc/exact): `integer` and `rational`, GMP), the symbolic helpers ([inc/helpers](inc/helpers): `deriv`, `normform`, `cancel`, `expand`, ...), and integration with `Integrate`. |
+| [inc/integration/all](inc/integration/all) | Exact numbers ([inc/exact](inc/exact): `integer` and `rational`, GMP), the symbolic helpers ([inc/helpers](inc/helpers): `D`, `normform`, `cancel`, `expand`, ...), and integration with `Integrate`. |
 | [inc/integration/rubi/all](inc/integration/rubi/all) | The translated Rubi rules, `RubiIntegrate` (about 1 s to load). |
 | [inc/limits](inc/limits) | `heaviside`, `dirac`, `infinity`, limits `limit(u,x,infinity)` and definite integrals `Int(f,x,a,b)`. |
 | [inc/laplace](inc/laplace) | The Laplace transform `laplace(f,t,s)` and its inverse `invlaplace(F,s,t)`. |
@@ -681,7 +681,7 @@ The comments in the older files are in German.
 | [inc/list](inc/list) | Lists `[a,b,c]` (sort `vector`) and `nil`, matrices `[[a,b],[c,d]]` (sort `matrix`), their arithmetic, `part`, `length`, `table`, `select`, ... |
 | [inc/linalg](inc/linalg) | Matrices: `transpose`, `dot`, `identity`, `det`, `linsolve`, `inverse`, `thread`, covectors, symbolic matrices with `MatrixRules` and `MatrixSolve`. |
 | [inc/solve](inc/solve) | Equations: `solve(lhs == rhs, x)` with PRESS-style rules (isolation, polynomials, a new unknown, ...), systems. |
-| [inc/simplify](inc/simplify) | `All` ends with the normal form (`normform`): like terms collected, also in subtracted sums, so `D` and `deriv` give tidy results. |
+| [inc/simplify](inc/simplify) | `All` ends with the normal form (`normform`): like terms collected, also in subtracted sums, so `Dt` and `D` give tidy results. |
 | [inc/help](inc/help) | The help texts for `?name`. |
 
 Optional libraries, loaded after `inc/all`:
@@ -976,7 +976,7 @@ invlaplace(exp(-s)/(s+1), s, t)          # prints exp (1 - t )* heaviside (t - 1
 
 - `laplace` uses linearity, a table (constants, powers of `t`, `exp`,
   `sin`, `cos`, `sinh`, `cosh`, `heaviside`, `dirac`), the theorems (shift
-  by `exp(a*t)`, multiplication by `t` as `-D(F,s)`, delay by
+  by `exp(a*t)`, multiplication by `t` as `-Dt(F,s)`, delay by
   `heaviside(t-c)`, derivatives) and finally the definite integral of
   [inc/limits](inc/limits), which needs `s` declared positive. Results
   are not always in the simplest form; `cancel(...)` brings a rational
@@ -987,9 +987,9 @@ invlaplace(exp(-s)/(s+1), s, t)          # prints exp (1 - t )* heaviside (t - 1
   rational functions with exact coefficients.
 - A part that is not known stays as `laplace(...)` or `invlaplace(...)`.
 
-**Differential equations.** `laplace(D(u(t),t),t,s)` is
+**Differential equations.** `laplace(Dt(u(t),t),t,s)` is
 `s*laplace(u(t),t,s) - initial(u(t),t)`, and `initial(u(t),t)` is `u(0)`;
-for a derivative, `initial(D(u(t),t),t)` stays, so the initial values are
+for a derivative, `initial(Dt(u(t),t),t)` stays, so the initial values are
 given by rules. Then the transformed equation is solved for the transform
 `U`, and `invlaplace` gives the solution:
 
@@ -998,11 +998,11 @@ FUNC u : real >> real                         # the unknown function
 SYM U : real                                  # its transform
 ALG Init
 SPEC    Init : u(0) = 1
-ADDSPEC Init : initial(D(u(t),t),t) = 0       # u'(0) = 0
+ADDSPEC Init : initial(Dt(u(t),t),t) = 0       # u'(0) = 0
 ADDSPEC Init : laplace(u(t),t,s) = U
 TERM E : real
 TERM R : vector
-E = REWR laplace(D(D(u(t),t),t) + u(t), t, s) : Init, All   # U * s ^ 2 + U - s
+E = REWR laplace(Dt(Dt(u(t),t),t) + u(t), t, s) : Init, All   # U * s ^ 2 + U - s
 R = REWR solve(E == 0, U) : Solve                           # [s / (s ^ 2 + 1 )]
 invlaplace(part(R,1), s, t)                                 # cos (t )
 ```
@@ -1033,14 +1033,14 @@ REWR invfourier(2*a/(a^2+w^2), w, t) : All     # prints exp (- a * abs (t ))
   `1/(t^2+c)`, `1/(c+im*b*t)`, `sin(a*t)/t`, Gaussians
   `exp(-c*t^2+b*t+d)` with `c > 0`), whose entries are
   distributions or need contour integrals; then the theorems (modulation by
-  `exp(im*a*t)`, `cos`, `sin`; multiplication by `t` as `im*D(F,w)`;
+  `exp(im*a*t)`, `cos`, `sin`; multiplication by `t` as `im*Dt(F,w)`;
   derivatives as `im*w*F`); and for the rest the definite integral of
   [inc/limits](inc/limits), which does one-sided exponentials and
   rectangles.
 - `invfourier(F, w, t)` is `fourier(F, w, -t)/(2*pi)` (duality), so the
   same table and the same integrals work backwards.
 - A part that is not known stays as `fourier(...)`.
-- With `fourier(D(u(x,t),x), x, w) = im*w*U`, a linear partial differential
+- With `fourier(Dt(u(x,t),x), x, w) = im*w*U`, a linear partial differential
   equation in `x` becomes an ordinary one in `t`: the heat and the transport
   equation in [examples/14_pde.rw](examples/14_pde.rw).
 
@@ -1099,7 +1099,7 @@ integration rules and can also be used on their own.
 
 The helpers know the operators and functions of the library through
 **roles**: `"+"`, `"*"`, `"^"`, `"-"`, `"/"`, `"mi"` (1/x), `"sin"`, `"cos"`,
-..., `"ln"`, `"exp"`, the constants `"pi"` and `"eE"`, `"Int"` and `"D"`. By
+..., `"ln"`, `"exp"`, the constants `"pi"` and `"eE"`, `"Int"` and `"Dt"`. By
 default a role is played by the symbol of the same name, which fits
 [inc/alg](inc/alg). A library with other names maps them; all variants of an
 operator for different sorts count as the same function:
@@ -1116,7 +1116,7 @@ commutative and associative, `mi(x)` is 1/x, `cos` is the cosine, and so on.
 The rules themselves make no such assumptions. Where a helper needs more
 than the name, such as a derivative, it uses a function of the library
 defined by rules (`ATT RULES`, see above), so that this knowledge stays in
-the rules: `deriv` and `fixinert`.
+the rules: `D` and `fixinert`.
 
 `matchq(u, pattern, cond)` is Rubi's `MatchQ[u, pattern /; cond]` (the
 translator also inlines Rubi's `LinearMatchQ`, `BinomialMatchQ`, ... as
@@ -1155,9 +1155,9 @@ The helpers are:
 | `expandtosum(u,x)`, `expandtosum(u,v,x)` | polynomial `u` as `c0+c1*x+...`; `u` times that of `v` |
 | `polyquotient(p,q,x)`, `polyremainder(p,q,x)` | polynomial division |
 | `normpoly(u,x)` | every polynomial sum in `u` as `c0+c1*x+...` with collected coefficients |
-| `deriv(u,x)` | derivative, every term without `x` constant; defined by rules (`ATT RULES`, the rules `diff` of inc/alg); `D(f(x),x)` remains for unknown functions |
+| `D(u,x)` | derivative, every term without `x` constant; defined by rules (`ATT RULES`, the rules `diff` of inc/alg); `Dt(f(x),x)` remains for unknown functions |
 | `collect(u)` | like summands combined, e.g. `2*a+b-a` gives `a+b` |
-| `cancel(u)` | `u` over a common denominator, `N/D`, with the greatest common divisor of `N` and `D` cancelled: `(x^2-y^2)/(x-y)` gives `x+y` (Mathematica's `Cancel` and `Together`); roots of numbers in the coefficients are reduced (`(2^(1/2))^2 = 2`) and denominators equal up to a constant factor are combined, so `cancel(deriv(Int(1/(1+x^4),x),x))` gives `1/(1+x^4)` |
+| `cancel(u)` | `u` over a common denominator, `N/D`, with the greatest common divisor of `N` and `D` cancelled: `(x^2-y^2)/(x-y)` gives `x+y` (Mathematica's `Cancel` and `Together`); roots of numbers in the coefficients are reduced (`(2^(1/2))^2 = 2`) and denominators equal up to a constant factor are combined, so `cancel(D(Int(1/(1+x^4),x),x))` gives `1/(1+x^4)` |
 | `polygcd(a,b)` | greatest common divisor of two polynomials in several variables (primitive remainder sequence; exact coefficients) |
 | `replaceall(u,x,v)` | `u` with `x` replaced by `v` at once |
 | `expandtrigreduce(u,x)`, `expandtrigreduce(v,u,x)` | products and powers of `sin`, `cos`, `sinh`, `cosh` as sums of multiple angles, e.g. `sin(x)^3` gives `(3/4)*sin(x) - (1/4)*sin(3*x)`; times `v` |
@@ -1263,8 +1263,10 @@ where the library [inc/](inc) and the tests are used from.
   redefined. Repeated calculations, rewriting and loops no longer leak.
 - Not every rule one might expect exists. For example `ln(exp x)` and
   `sin(x)^2+cos(x)^2` are not simplified.
-- Symbols without a value may depend on any variable, so `D(a,x)` stays in
-  the result. This is intended: differential equations use `D(y,x)`.
+- In the total derivative `Dt`, symbols without a value may depend on any
+  variable, so `Dt(a,x)` stays in the result (for implicit differentiation
+  and differential equations); the partial derivative `D` takes them as
+  constants.
 - There are no general container types. Vectors and matrices are
   implemented as C functions.
 - Commutative matching only swaps the two operands of one operator; sums
@@ -1296,19 +1298,24 @@ where the library [inc/](inc) and the tests are used from.
 - Taylor polynomials `Tay(u,x,a,n)` take each derivative from the one
   before (order 9 of `cos(x)` took minutes, now well under a second),
   substitute with `subst` (`exp`, `tan`, `sqrt` were left as `Sub(...)`),
-  and `deriv(Tay(...))` is right (it was 0). A polynomial in one variable is
+  and `D(Tay(...))` is right (it was 0). A polynomial in one variable is
   printed in ascending powers, `1 - (1/2) * x ^ 2 + (1/24) * x ^ 4`
   (descending if that avoids a leading minus: `x - 1`).
-- Derivatives: `D` of a term without a variable (`5^(1/2)`, `constq`) is 0
+- The derivatives are named as in Mathematica: `D(f,x)` is the partial
+  derivative (formerly `deriv`: every other symbol is a constant, computed
+  at once), `Dt(f,x)` the total derivative (formerly `D`: `Dt(a,x)` stays;
+  the rules `diff`). The derivative of an unknown function `u(x)` is
+  written `Dt(u(x),x)`, also in the result of `D(u(x),x)`.
+- Derivatives: `Dt` of a term without a variable (`5^(1/2)`, `constq`) is 0
   at once, and `0*u`, `u+0` are removed during differentiation, also for
   terms of the sort `number` (Rubi's results), which the rules of `Ring` do
-  not see. `REWR D(Int(1/(1+x^5),x),x) : All` took 100000 steps (80 s; the
+  not see. `REWR Dt(Int(1/(1+x^5),x),x) : All` took 100000 steps (80 s; the
   intermediate term had 1800 summands), now 4200 steps (1 s). Fixed: the
   rule `mi(a)*b = b*mi(a)` of `Combine1` swapped `mi(a)*mi(b)` back and
   forth until the step limit.
 - `cancel` reduces roots of numbers (`(2^(1/2))^2 = 2`, also between
   `2^(1/2)` and `2^(-1/2)`), combines denominators equal up to a constant
-  factor, normalizes its argument first (the raw result of `deriv`), and
+  factor, normalizes its argument first (the raw result of `D`), and
   gives up quickly (stays unevaluated) when the common denominator would be
   huge, as with the nested roots of `Int(1/(1+x^5),x)`.
 - `AUTOSYM real` (set by `inc/all`): new names are declared as symbols,
@@ -1329,8 +1336,8 @@ where the library [inc/](inc) and the tests are used from.
   of `mi _X = 1/_X`) become exact next to exact expressions such as `2*pi`,
   so `t*mi(2*pi)` stays `t/(2*pi)` instead of `t*0.159155`. A
   calculation of such integers alone that has no integer value (the
-  `mi(2)` of `D(sqrt(_X),_Z) = D(_X,_Z)*mi(2*sqrt(_X))`) is done exactly, so
-  `D(sqrt(pi*t),t)` is `(1/2)*pi/sqrt(pi*t)`, not `1.5708/sqrt(pi*t)`.
+  `mi(2)` of `Dt(sqrt(_X),_Z) = Dt(_X,_Z)*mi(2*sqrt(_X))`) is done exactly, so
+  `Dt(sqrt(pi*t),t)` is `(1/2)*pi/sqrt(pi*t)`, not `1.5708/sqrt(pi*t)`.
 - Fixed: a number of a sort that is not below `real` (complex, bool) was
   shared instead of copied by the symbolic helpers, so freeing a copy freed
   the original as well (wrong results that changed from run to run); and
@@ -1395,7 +1402,7 @@ where the library [inc/](inc) and the tests are used from.
   rules written for `number` apply to real and complex terms, and the
   integration rules know the imaginary unit `im` (`im^2 = -1`).
 - Functions defined by rule lists (`ATT RULES`), also usable in conditions
-  and from C: the derivative `deriv` and Rubi's `FixInertTrigFunction`
+  and from C: the derivative `D` and Rubi's `FixInertTrigFunction`
   are rules now instead of C tables.
 - Symbolic C functions are connected with `ATT SYMBOLIC` (`HOLD` for
   unevaluated arguments) and know the library's operators through roles,

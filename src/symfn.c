@@ -35,8 +35,8 @@
  *	  expandtosum(u,v,x)   u*expandtosum(v,x), distributed
  *	  polyquotient(p,q,x), polyremainder(p,q,x)  polynomial division
  *	  normpoly(u,x)        polynomial sums in u as c0 + c1*x + c2*x^2 + ...
- *	  (deriv(u,x), the derivative, is a function of inc/helpers defined by
- *	  rules, see ATT RULES below; deriv() here calls it)
+ *	  (D(u,x), the partial derivative, is a function of inc/helpers defined
+ *	  by rules, see ATT RULES below; deriv() here calls it)
  *	  collect(u)           like summands combined, e.g. 2*a+b-a -> a+b
  */
 
@@ -162,7 +162,7 @@ static int num_value_exact (Node * t)
 /* ---- roles: the functions and constants the helpers know ----
  * The helpers recognize and build terms with the operators and functions
  * of the library (inc/alg): "+", "*", "^", "-", "/", "mi" (1/x), "sin",
- * "cos", ..., "ln", "exp", the constants "pi" and "eE", "Int", "D". These
+ * "cos", ..., "ln", "exp", the constants "pi" and "eE", "Int", "Dt", "D". These
  * strings are roles. By default a role is played by the symbol of the
  * same name; a library with other names declares
  *     SYMBOLIC "cos" = "kos"
@@ -2721,15 +2721,15 @@ static Node * s_rules (Node * a[], int n, Symbol * f);
 static Node * collect_deep (Node * u);
 
 /* derivative of u with respect to x, or NULL for unknown functions: the
- * library's function deriv, defined by rules (inc/helpers) */
+ * library's partial derivative D, defined by rules (inc/helpers) */
 static Node * deriv (Node * u, Node * x)
 {
-	Symbol * f = role_find("deriv");
+	Symbol * f = role_find("D");
 	Node * a[2], * r;
 	if (! f) return NULL;
 	a[0] = u; a[1] = x;
 	r = s_rules(a, 2, f);
-	if (r && contains_head(r, "D")) { delete(r); return NULL; }	/* unknown function */
+	if (r && contains_head(r, "Dt")) { delete(r); return NULL; }	/* unknown function */
 	if (r)				/* 0+1+4*(2*x) from the rules: collected */
 		{
 		Node * c = collect_deep(r);
@@ -3482,7 +3482,7 @@ static int invfunfreeq (Node * u, Node * x)
 {
 	static const char * inv[] = { "ln", "arcsin", "arccos", "arctan", "arccot", "arcsec",
 		"arccsc", "arcsinh", "arccosh", "arctanh", "arccoth", "arcsech", "arccsch",
-		"polylog", "Int", "D", "deriv", "subst", "hyp2f1", "appellf1", NULL };
+		"polylog", "Int", "Dt", "D", "subst", "hyp2f1", "appellf1", NULL };
 	int i, k, n;
 	u = deref(u);
 	if (! u || u->type != Func) return 1;
@@ -4549,7 +4549,7 @@ static int expo_test (Node * u, Node * x, ExpoState * s)
 	u = deref(u);
 	if (! contains(u, x)) return 1;
 	if (tequal(u, x) || u->type != Func) return 0;
-	if (is_head(u, "Int", -1) || is_head(u, "D", -1) || is_head(u, "deriv", -1)) return 0;
+	if (is_head(u, "Int", -1) || is_head(u, "Dt", -1) || is_head(u, "D", -1)) return 0;
 	/* (e^x - e^-x)^n with symbolic n: the result would need complex values
 	 * ((1 + a^x)^n with one exponential summand is fine) */
 	if (is_head(u, "^", 2) && contains(arg(u, 0), x) && ! num_sym(arg(u, 1))

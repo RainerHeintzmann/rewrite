@@ -1,37 +1,37 @@
 # Symbolic differentiation by rewriting in the algebra list 'All'.
 INC "inc/all"
 SYM a, b : real
-REWR D(sin cos x,x) : All
-REWR D(x^2,x) : All
-REWR D(x^2*sin x,x) : All
-REWR D(ln x,x) : All
-REWR D(sin(x)*cos(x),x) : All
-REWR D(x/y,x) : All
-REWR D(D(x^3,x),x) : All
-REWR D(a*x^3+b*x,x) : All
+REWR Dt(sin cos x,x) : All
+REWR Dt(x^2,x) : All
+REWR Dt(x^2*sin x,x) : All
+REWR Dt(ln x,x) : All
+REWR Dt(sin(x)*cos(x),x) : All
+REWR Dt(x/y,x) : All
+REWR Dt(Dt(x^3,x),x) : All
+REWR Dt(a*x^3+b*x,x) : All
 # Rules fixed or added in 2026
-REWR D(arcsin x,x) : All
-REWR D(arccos x,x) : All
-REWR D(exp x,x) : All
-REWR D(sqrt x,x) : All
-REWR D(sinh x,x) : All
-REWR D(cosh x,x) : All
-REWR D(tanh x,x) : All
-REWR D(abs x,x) : All
-REWR D(exp(x^2),x) : All
-REWR D(sqrt(1+x^2),x) : All
-REWR D(arcsin(2*x),x) : All
-# 2026: the quotient rule; deriv treats y as a constant, D does not;
+REWR Dt(arcsin x,x) : All
+REWR Dt(arccos x,x) : All
+REWR Dt(exp x,x) : All
+REWR Dt(sqrt x,x) : All
+REWR Dt(sinh x,x) : All
+REWR Dt(cosh x,x) : All
+REWR Dt(tanh x,x) : All
+REWR Dt(abs x,x) : All
+REWR Dt(exp(x^2),x) : All
+REWR Dt(sqrt(1+x^2),x) : All
+REWR Dt(arcsin(2*x),x) : All
+# 2026: the quotient rule; D treats y as a constant, Dt does not;
 # normalq is strict, so Final leaves no 0 + ... behind
-REWR deriv(x/y,x) : All
-REWR deriv(sin(x)/(x+y),x) : All
-REWR D(x/(1+x^2),x) : All
+REWR D(x/y,x) : All
+REWR D(sin(x)/(x+y),x) : All
+REWR Dt(x/(1+x^2),x) : All
 # numerical check at x = 0.5: 1.1547 -1.1547 0.707107 0.786448 1
 TERM t1,t2,t3,t4,t5 : real
-t1 = REWR D(arcsin x,x) : All
-t2 = REWR D(arccos x,x) : All
-t3 = REWR D(sqrt x,x) : All
-t4 = REWR D(tanh x,x) : All
-t5 = REWR D(abs x,x) : All
+t1 = REWR Dt(arcsin x,x) : All
+t2 = REWR Dt(arccos x,x) : All
+t3 = REWR Dt(sqrt x,x) : All
+t4 = REWR Dt(tanh x,x) : All
+t5 = REWR Dt(abs x,x) : All
 x = 0.5
 t1, t2, t3, t4, t5

@@ -17,7 +17,7 @@ fourier(heaviside(t)*exp(-a*t), t, w)   # a one-sided exponential
 fourier(heaviside(t+T)-heaviside(t-T), t, w)    # a rectangle: 2 sin(T w)/w
 
 "---- the theorems"
-fourier(t*exp(-t^2), t, w)              # multiplication by t: im*D(F,w)
+fourier(t*exp(-t^2), t, w)              # multiplication by t: im*Dt(F,w)
 fourier(cos(3*t)*exp(-t^2), t, w)       # modulation shifts the spectrum
 
 "---- the inverse, and back again"

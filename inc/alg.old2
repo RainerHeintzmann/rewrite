@@ -168,9 +168,9 @@ FUNC Im     : complex >> real         ATT c_imag
 FUNC asqr   : complex >> real         ATT c_asqr
 
 FUNC Cpx    : real,real >> complex    ATT cpx    # Komplexe Zahl
-FUNC D      : real,real >> real           # Ableitung
-OTHER D      : complex,complex >> complex  # Ableitung
-OTHER D      : complex,real >> complex     # Ableitung
+FUNC Dt      : real,real >> real           # Ableitung
+OTHER Dt      : complex,complex >> complex  # Ableitung
+OTHER Dt      : complex,real >> complex     # Ableitung
 FUNC Dn     : real,real,real >> real      # n. Ableitung
 OTHER Dn     : complex,complex,complex >> complex # n. Ableitung
 FUNC Tay    : real,real,real,real >> real # Taylor-entwicklung Tay(1/x^2,x,Stelle,bis)
@@ -185,7 +185,7 @@ LIFT (_Fr(Ar)) TO (_Fre(A))
 LIFT (_Fre(A)) TO (_Fc(Ac))
 LIFT (_Fg(Ag,Ag),_Fg(Ag,Ag),_Fg(Ag)) TO (Ag+Ag,Ag-Ag,-Ag)
 LIFT (_Fre(A),_Fre(A),_Fre(A),_Fre(A),_Fre(A),_Fre(A)) TO (sin A,arcsin A,cos A,arccos A,tan A,arctan A)
-LIFT (_lFre(A,A),_lFre(A,A,A,A),_lFre(A,A,A,A),_lFre(A,A,A,A),_lFre(A,A,A),_lFre(A,A,A,A)) TO (D(A,A),I(A,A,A,A),Tay(A,A,A,A),Tay(Ac,Ac,Ac,A),Dn(A,A,A),Sum(A,A,A,A))
+LIFT (_lFre(A,A),_lFre(A,A,A,A),_lFre(A,A,A,A),_lFre(A,A,A,A),_lFre(A,A,A),_lFre(A,A,A,A)) TO (Dt(A,A),I(A,A,A,A),Tay(A,A,A,A),Tay(Ac,Ac,Ac,A),Dn(A,A,A),Sum(A,A,A,A))
 
 LIFT (Ag+Ag,Ag-Ag,-Ag,0g) TO (Aag+Aag,Aag-Aag,-Aag,0ag)
 LIFT (Aag+Aag,Aag-Aag,-Aag,0ag) TO (Ar+Ar,Ar-Ar,-Ar,0r)
@@ -312,33 +312,33 @@ ADDSPEC     Addord : Y+N*X+M*X = Y+(N+M)*X
 
 # ++++++++++++++++++++++++ DIFFERENTIALRECHNUNG ++++++++++++++++++++++++++
 ALG diff
-SPEC        diff : D(e,X) = 0         # Rheinfolge wichtig (erst e pruefen dann X ersetzen)
-ADDSPEC     diff : D(pi,X)= 0
-ADDSPEC     diff : D(_x,X)= 0
-ADDSPEC     diff : D(N,X) = 0         # Zahlen sind konstant
-ADDSPEC     diff : D(X,X) = 1         # spezielle Konstanten
+SPEC        diff : Dt(e,X) = 0         # Rheinfolge wichtig (erst e pruefen dann X ersetzen)
+ADDSPEC     diff : Dt(pi,X)= 0
+ADDSPEC     diff : Dt(_x,X)= 0
+ADDSPEC     diff : Dt(N,X) = 0         # Zahlen sind konstant
+ADDSPEC     diff : Dt(X,X) = 1         # spezielle Konstanten
 
 ADDSPEC     diff : Dn(X,Y,0) = X
-ADDSPEC     diff : Dn(X,Y,N) = Dn(D(X,Y),Y,N-1)
+ADDSPEC     diff : Dn(X,Y,N) = Dn(Dt(X,Y),Y,N-1)
 
-ADDSPEC     diff : D(mi X,Y) = - D(X,Y)*mi(X^2)
-ADDSPEC     diff : D(ln X,Z) = D(X,Z)*mi X
-ADDSPEC     diff : D(lg X,Z) = D(X,Z)*mi (X*ln 10)
-ADDSPEC     diff : D(sin X,Z)= D(X,Z)*cos X
-ADDSPEC     diff : D(arcsin X,Z)= D(X,Z)*mi((1+X^2)^.5)
-ADDSPEC     diff : D(cos X,Z)   = - D(X,Z)*sin X
-ADDSPEC     diff : D(arccos X,Z)= - D(X,Z)*mi((1+X^2)^.5)
-ADDSPEC     diff : D(tan X,Z)   = D(X,Z)*mi(cos(X)^2)
-ADDSPEC     diff : D(arctan X,Z)= D(X,Z)*mi(1+X^2)
+ADDSPEC     diff : Dt(mi X,Y) = - Dt(X,Y)*mi(X^2)
+ADDSPEC     diff : Dt(ln X,Z) = Dt(X,Z)*mi X
+ADDSPEC     diff : Dt(lg X,Z) = Dt(X,Z)*mi (X*ln 10)
+ADDSPEC     diff : Dt(sin X,Z)= Dt(X,Z)*cos X
+ADDSPEC     diff : Dt(arcsin X,Z)= Dt(X,Z)*mi((1+X^2)^.5)
+ADDSPEC     diff : Dt(cos X,Z)   = - Dt(X,Z)*sin X
+ADDSPEC     diff : Dt(arccos X,Z)= - Dt(X,Z)*mi((1+X^2)^.5)
+ADDSPEC     diff : Dt(tan X,Z)   = Dt(X,Z)*mi(cos(X)^2)
+ADDSPEC     diff : Dt(arctan X,Z)= Dt(X,Z)*mi(1+X^2)
 
-ADDSPEC     diff : D(X*Y,Z)=D(X,Z)*Y+D(Y,Z)*X   # Allg. Differenziationsregeln
-ADDSPEC     diff : IF NIN (Z,X) D(_Fre(X),Z)=D(X,Z)*D(_Fre(X),X)  # Kettenregel
+ADDSPEC     diff : Dt(X*Y,Z)=Dt(X,Z)*Y+Dt(Y,Z)*X   # Allg. Differenziationsregeln
+ADDSPEC     diff : IF NIN (Z,X) Dt(_Fre(X),Z)=Dt(X,Z)*Dt(_Fre(X),X)  # Kettenregel
 
-ADDSPEC     diff : D(e^X,Z)  = D(X,Z)*e^X
-ADDSPEC     diff : D(X^N,X)=N*X^(N-1)      # wird so schneller
-ADDSPEC     diff : D(X^Y,Z)=D(X,Z)*Y*X^(Y+(-1))+D(Y,Z)*ln X*X^Y
+ADDSPEC     diff : Dt(e^X,Z)  = Dt(X,Z)*e^X
+ADDSPEC     diff : Dt(X^N,X)=N*X^(N-1)      # wird so schneller
+ADDSPEC     diff : Dt(X^Y,Z)=Dt(X,Z)*Y*X^(Y+(-1))+Dt(Y,Z)*ln X*X^Y
 
-ADDSPEC     diff : D(I(A,B,C,_x),Z)=Sub(C,_x,B)*D(B,Z)-Sub(C,_x,A)*D(A,Z)+I(A,B,D(C,Z),_x) # Leibnitz
+ADDSPEC     diff : Dt(I(A,B,C,_x),Z)=Sub(C,_x,B)*Dt(B,Z)-Sub(C,_x,A)*Dt(A,Z)+I(A,B,Dt(C,Z),_x) # Leibnitz
 
 ADDSPEC     diff : Tay(X,Y,Z,0) = Sub(X,Y,Z)
 ADDSPEC     diff : Tay(X,Y,Z,N) = Tay(X,Y,Z,N-1)+Sub(Dn(X,Y,N),Y,Z)*mi(N!)*(Y+(-Z))^N 

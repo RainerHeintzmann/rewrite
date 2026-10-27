@@ -264,11 +264,11 @@ ADDSPEC RubiRules : IF NIN(_Xv,_O_a,_O_b,_O_c,_O_d,_O_e,_O_f), (igtq(_O_m,0)), (
 
 # Rule 65 (1 variants):
 #   Int[ArcTanh[u_], x_Symbol] := x*ArcTanh[u] - Int[SimplifyIntegrand[x*D[u, x]/(1 - u^2), x], x] /; InverseFunctionFreeQ[u, x]
-ADDSPEC RubiRules : IF (inversefunctionfreeq(_P_u,_Xv)) Int(arctanh(_P_u),_Xv) = ((((_Xv)*(arctanh(_P_u))))+((((-1))*(Int(simp(((_Xv)*(deriv(_P_u,_Xv))*(((((1)+((((-1))*(((_P_u)^(2)))))))^((-1))))),_Xv),_Xv)))))
+ADDSPEC RubiRules : IF (inversefunctionfreeq(_P_u,_Xv)) Int(arctanh(_P_u),_Xv) = ((((_Xv)*(arctanh(_P_u))))+((((-1))*(Int(simp(((_Xv)*(D(_P_u,_Xv))*(((((1)+((((-1))*(((_P_u)^(2)))))))^((-1))))),_Xv),_Xv)))))
 
 # Rule 66 (1 variants):
 #   Int[ArcCoth[u_], x_Symbol] := x*ArcCoth[u] - Int[SimplifyIntegrand[x*D[u, x]/(1 - u^2), x], x] /; InverseFunctionFreeQ[u, x]
-ADDSPEC RubiRules : IF (inversefunctionfreeq(_P_u,_Xv)) Int(arccoth(_P_u),_Xv) = ((((_Xv)*(arccoth(_P_u))))+((((-1))*(Int(simp(((_Xv)*(deriv(_P_u,_Xv))*(((((1)+((((-1))*(((_P_u)^(2)))))))^((-1))))),_Xv),_Xv)))))
+ADDSPEC RubiRules : IF (inversefunctionfreeq(_P_u,_Xv)) Int(arccoth(_P_u),_Xv) = ((((_Xv)*(arccoth(_P_u))))+((((-1))*(Int(simp(((_Xv)*(D(_P_u,_Xv))*(((((1)+((((-1))*(((_P_u)^(2)))))))^((-1))))),_Xv),_Xv)))))
 
 # Rule 67 not translated: function PowerVariableExpn
 #   Int[(c_. + d_.*x_)^m_.*(a_. + b_.*ArcTanh[u_]), x_Symbol] := (c + d*x)^(m + 1)*(a + b*ArcTanh[u])/(d*(m + 1)) - b/(d*(m + 1))* Int[SimplifyIntegrand[(c + d*x)^(m + 1)*D[u, x]/(1 - u^2), x], x] /; FreeQ[{a, b, c, d, m}, x] && NeQ[m, -1] && InverseFunctionFreeQ[u, x] && Not[FunctionOfQ[(c + d*x)^(m + 1), u, x]] && FalseQ[PowerVariableExpn[u, m + 1, x]]

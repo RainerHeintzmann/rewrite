@@ -4,7 +4,7 @@ s / (s ^ 2 - 4 )- 2 / (s ^ 2 - 4 )
 1 exp (- a * s )
 exp (1 - s )/ (s - 1 )
 2 * a ^ 2 / ((s + a )^ 2 + w ^ 2 )^ 2 + 2 * s ^ 2 / ((s + a )^ 2 + w ^ 2 )^ 2 + 4 * a * s / ((s + a )^ 2 + w ^ 2 )^ 2 - 1 / ((s + a )^ 2 + w ^ 2 )
-- D (laplace (erf (t ),t ,s ),s )
+- Dt (laplace (erf (t ),t ,s ),s )
 t ^ 2 * exp (- 3 * t )
 cos (2 * t )* exp (- t )
 3 + exp (4 * t )- 2 * t 
