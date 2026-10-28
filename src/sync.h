@@ -43,6 +43,9 @@ extern void printnl (Node * np);
 extern void setdebug (Node * np);
 extern void maxsteps_fn (Node * np);
 extern void alias_fn (Node * np);
+extern void alias_show_fn (Node * np);       /* 2026: ALIAS .. SHOW */
+extern void pretty_fn (Node * np);           /* 2026: PRETTY n */
+extern int pretty_output;                    /* 2026: Unicode output (PRETTY 1) */
 extern void maxdepth_fn (Node * np);
 extern void autosym_fn (Node * sort);        /* 2026: AUTOSYM sort (NULL: off) */
 extern Symbol * auto_symbol (Symbol * sp);    /* a new name declared by AUTOSYM, or NULL */

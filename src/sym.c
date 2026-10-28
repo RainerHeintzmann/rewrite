@@ -65,6 +65,7 @@ static const Reserved words [] = {	/* sorted */
 	{ "OTHER",  OTHER },
 	{ "OUT",    OUT },
 	{ "PAT",    PAT },      /* pattern variables (2026, formerly VAR) */
+	{ "PRETTY", PRETTY },  /* PRETTY 1: output with Unicode, x², √x, π (2026) */
 	{ "PRT",    PRT },
 	{ "PRTNUM", PRTNUM },
 	{ "QUIT",   QUIT },
@@ -110,13 +111,21 @@ static int scmp _2a ((va, vb), const void * va, const void * vb)
 }
 
 /* 2026: ALIAS "×" = "*": the name × is read as *. The libraries give the
-   Unicode operators (≤, ×, ...) their meaning this way, and printing keeps
-   the original name. */
+   Unicode operators (≤, ×, ...) their meaning this way. With SHOW
+   (ALIAS "π" = "pi" SHOW) it is also the name printed by PRETTY 1. */
 #define MAXALIAS 128
-static struct { char * from, * to; } aliases[MAXALIAS];
+static struct { char * from, * to; int show; } aliases[MAXALIAS];
 static int naliases = 0;
 
-void alias_def (const char * from, const char * to)
+const char * print_alias (const char * name)	/* the SHOW alias of name, or NULL */
+{
+	int i;
+	for (i = naliases - 1; i >= 0; i--)
+		if (aliases[i].show && strcmp(aliases[i].to, name) == 0) return aliases[i].from;
+	return NULL;
+}
+
+void alias_def (const char * from, const char * to, int show)
 {
 	int i;
 	for (i = 0; i < naliases; i++)
@@ -129,6 +138,7 @@ void alias_def (const char * from, const char * to)
 	else
 		free(aliases[i].to);
 	aliases[i].to = strdup(to);
+	aliases[i].show = show;
 }
 
 static const char * unalias (const char * name)

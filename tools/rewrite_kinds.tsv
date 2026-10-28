@@ -38,6 +38,7 @@ OPT	keyword
 OTHER	keyword
 OUT	keyword
 PAT	keyword
+PRETTY	keyword
 PRT	keyword
 PRTNUM	keyword
 QUIT	keyword

@@ -2606,9 +2606,61 @@ const char * latex_symbol (const char * s, int * len)
 	return NULL;
 }
 
-/* a copy of the line with the names replaced (\alpha -> α); NULL if there
-   is none. The caller frees it. */
+/* the ASCII character of a superscript at s (² -> '2', ⁻ -> '-'), its
+   length in *len; 0 if there is none */
+static char superscript (const unsigned char * s, int * len)
+{
+	if (s[0] == 0xC2 && (s[1] == 0xB2 || s[1] == 0xB3 || s[1] == 0xB9))
+		{ * len = 2; return s[1] == 0xB2 ? '2' : s[1] == 0xB3 ? '3' : '1'; }
+	if (s[0] == 0xE2 && s[1] == 0x81 && (s[2] == 0xB0 || (s[2] >= 0xB4 && s[2] <= 0xB9) || s[2] == 0xBB))
+		{ * len = 3; return s[2] == 0xBB ? '-' : s[2] == 0xB0 ? '0' : '0' + s[2] - 0xB0; }
+	return 0;
+}
+
+/* 2026: superscripts (the output of PRETTY 1) as powers, outside of strings:
+   x² -> x^(2), x⁻¹ -> x^(-1). A copy, or NULL if there is none. */
+static char * superscript_convert (const char * line)
+{
+	const unsigned char * p;
+	char * out, * q;
+	int len, quote = 0, any = 0;
+	for (p = (const unsigned char *) line; * p && ! any; p++)
+		if (* p == '"') quote = ! quote;
+		else if (! quote && superscript(p, & len)) any = 1;
+	if (! any) return NULL;
+	out = (char *) malloc(3 * strlen(line) + 1);
+	if (! out) return NULL;
+	quote = 0;
+	for (p = (const unsigned char *) line, q = out; * p; )
+		{
+		if (* p == '"') quote = ! quote;
+		if (! quote && superscript(p, & len))
+			{
+			* q++ = '^'; * q++ = '(';
+			while (superscript(p, & len)) { * q++ = superscript(p, & len); p += len; }
+			* q++ = ')';
+			}
+		else
+			* q++ = (char) * p++;
+		}
+	* q = 0;
+	return out;
+}
+
+static char * names_convert (const char * line);
+
+/* a copy of the line with the names replaced (\alpha -> α) and the
+   superscripts as powers (x² -> x^(2)); NULL if there is none. The caller
+   frees it. */
 char * latex_convert (const char * line)
+{
+	char * a = names_convert(line), * b = superscript_convert(a ? a : line);
+	if (! b) return a;
+	free(a);
+	return b;
+}
+
+static char * names_convert (const char * line)
 {
 	const char * p, * u;
 	char * out, * q;

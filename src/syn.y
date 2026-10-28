@@ -62,7 +62,7 @@ static Node * sym_att (Node * id, int hold);	/* below */
 %token			SYM PAT SORT FUNC ALG SPEC ADDSPEC REWR PRT GRAPH PFEIL TERM NUMPAT ATT IS EQ INFO
 %token			LA1 LA2 LA3 LA4 LA5 LOCAL RU RA COMMU LB IN NIN PARAM FOR TO STEP DO DBG LAST
 %token			BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT RETURN
-%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS MAXSTEPS MAXDEPTH SYMBOLIC HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS AUTOSYM
+%token			OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS MAXSTEPS MAXDEPTH SYMBOLIC HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS AUTOSYM PRETTY
 %token	<y_sym>	Id String
 %token	<y_sym>	Sort Alg Term
 %token	<y_sym>	La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -277,10 +277,13 @@ aninstruction	: /* Nothing */ 	{$$=NULL;}
 			| MAXDEPTH			{$$=mknod(FUNC,(Node *) maxdepth_fn,NULL);}
 			| AUTOSYM Sort			{autosym_fn((Node *) $2); $$=NULL;}	/* 2026: at once, for the next lines */
 			| AUTOSYM			{autosym_fn(NULL); $$=NULL;}
+			| PRETTY Const			{$$=mknod(FUNC,(Node *) pretty_fn,(Node *) ($2));}	/* 2026: Unicode output */
+			| PRETTY			{$$=mknod(FUNC,(Node *) pretty_fn,NULL);}
 			| STEPS Alg String		{$$=mknod(FUNC,(Node *) steps_fn,mknod(PARAM,(Node *) $2,(Node *) $3));} /* 2026 */
 			| SYMBOLIC String EQ String	{$$=mknod(FUNC,(Node *) role_fn,mknod(PARAM,(Node *) $2,(Node *) $4));} /* 2026: role */
 			| SYMBOLIC			{$$=mknod(FUNC,(Node *) role_fn,NULL);  /* delete roles */}
 			| ALIAS String EQ String	{$$=mknod(FUNC,(Node *) alias_fn,mknod(PARAM,(Node *) $2,(Node *) $4));} /* 2026 */
+			| ALIAS String EQ String SHOW	{$$=mknod(FUNC,(Node *) alias_show_fn,mknod(PARAM,(Node *) $2,(Node *) $4));} /* also printed */
 			| RETURN term								{$$=mknod(FUNC,(Node *) return_fn,$2);}
 			| QUIT                      {$$=mknod(FUNC,(Node *) quit_fn,NULL);}
 			| OPT idlist                {$$=mknod(FUNC,(Node *) opt_fn,$2);}

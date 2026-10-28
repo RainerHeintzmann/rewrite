@@ -20,7 +20,7 @@
 # change those of the rule that calls it.
 
 SYM infinity : real
-ALIAS "∞" = "infinity"
+ALIAS "∞" = "infinity" SHOW
 
 ALG Heaviside
 ALG Dirac

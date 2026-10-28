@@ -484,6 +484,7 @@ void tprint _2a((np,last_func_type),Node * np,int last_func_type)
 int	this_type;					/* since La1 .. La5 are entered in the tree as Func ! */
 
 	if (! np)	return;
+	if (pretty_output && pretty_tprint(np, last_func_type)) return;	/* 2026: PRETTY 1 */
 	this_type = (np -> type);
 
 	switch(this_type)

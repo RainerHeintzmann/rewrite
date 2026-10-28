@@ -5969,3 +5969,4 @@ Node * call_builtin (Node * term)
 
 /* equation solving (2026) */
 #include "symsolve.c"
+#include "pretty.c"	/* 2026: PRETTY 1 */

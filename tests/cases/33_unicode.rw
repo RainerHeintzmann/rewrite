@@ -21,8 +21,22 @@ PRT "\alphax and \alpha and \hbar\n"
 √16, \sqrt(9), π
 REWR Dt(x^2−3×x,x) : All
 REWR (a≤b) : All
-SYM x² : real
-x² = 4
-x²×2
+# superscripts are powers (also the output of PRETTY 1): x² is x^(2)
+REWR x²×2 + x⁻¹ + 2³ : All
+SYM x2 : real
+x2 = 4
+x2×2
 ALIAS "⊕" = "+"
 2⊕3
+# PRETTY 1: the output with Unicode (on in an interactive session)
+PRETTY 1
+REWR D(sin(x)^2,x) : All
+REWR Tay(cos(x),x,0,4) : All
+REWR Int(sqrt(1-x^2), x) : RubiIntegrate
+(1 + x)^(-2), x^(3/2), sqrt(1+x)*pi, x <= y
+[[1, x^2], [sqrt(x), 3]]
+REWR D(x² + √(1 + x), x) : All
+PRT "x² in a string stays"
+""
+PRETTY 0
+REWR D(sin(x)^2,x) : All

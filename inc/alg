@@ -227,19 +227,20 @@ FUNC mi     : ring >> ring                       # multiplicative inverse
 
 # 2026: Unicode operators (each a token of its own, also in a≤b) and names,
 # read as the ASCII ones; typed as \le, \times, \pi, ... + TAB in rewrite-rl
-ALIAS "≤" = "<="
-ALIAS "≥" = ">="
-ALIAS "≠" = "!="
+# SHOW: also the name printed by PRETTY 1 (on in an interactive session)
+ALIAS "≤" = "<=" SHOW
+ALIAS "≥" = ">=" SHOW
+ALIAS "≠" = "!=" SHOW
 ALIAS "×" = "*"
 ALIAS "⋅" = "*"
-ALIAS "·" = "*"
+ALIAS "·" = "*" SHOW
 ALIAS "÷" = "/"
 ALIAS "−" = "-"
-ALIAS "∧" = "&&"
-ALIAS "∨" = "||"
-ALIAS "¬" = "not"
-ALIAS "√" = "sqrt"
-ALIAS "π" = "pi"
+ALIAS "∧" = "&&" SHOW
+ALIAS "∨" = "||" SHOW
+ALIAS "¬" = "not" SHOW
+ALIAS "√" = "sqrt" SHOW
+ALIAS "π" = "pi" SHOW
 OTHER mi    : field >> field                  
 OTHER mi    : cfield >> cfield               
 OTHER mi    : complex >> complex                ATT c_mi

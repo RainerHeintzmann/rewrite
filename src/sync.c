@@ -274,6 +274,7 @@ else if (term_has_builtin(np -> r))	/* 2026: symbolic C functions, e.g. [1,2] + 
 	delete(rslt);
 	}
 else print(np -> r);
+if (pretty_output) printfOut(" ");	/* 2026: a, b: the plain output ends with a blank */
 
 /* printfOut("\t"); */ /* print tab */
 
@@ -389,7 +390,25 @@ void setdebug (Node * np)
 /* 2026: ALIAS "from" = "to": the name from is read as to (sym.c) */
 void alias_fn (Node * np)
 {
-	alias_def(name((Symbol *) np->r->l), name((Symbol *) np->r->r));
+	alias_def(name((Symbol *) np->r->l), name((Symbol *) np->r->r), 0);
+}
+
+void alias_show_fn (Node * np)		/* ALIAS "π" = "pi" SHOW: also the printed name */
+{
+	alias_def(name((Symbol *) np->r->l), name((Symbol *) np->r->r), 1);
+}
+
+/* 2026: PRETTY 1: the output with Unicode (x², √x, π, ·), PRETTY 0: plain
+   text that can be read in again by any program; PRETTY alone shows it.
+   On at the start of an interactive session. */
+int pretty_output = 0;
+
+void pretty_fn (Node * np)
+{
+	double d;
+	if (! np->r) { printf("PRETTY %d\n", pretty_output); return; }
+	if (! num_to_double((Symbol *) np->r, & d)) { printfErr("PRETTY : expected 0 or 1\n"); return; }
+	pretty_output = d != 0;
 }
 
 /* 2026: MAXSTEPS n, MAXDEPTH n set a limit of REWR; without n they show it */
@@ -1306,6 +1325,7 @@ int main(int argc, char * argv []) /* no space between main and '(' ! */
 	   computation instead of ending rewrite; the startup file first */
 	if (force || (! files && isatty(fileno(stdin))))
 		{
+		pretty_output = 1;		/* x², √x; scripts, pipes and tests stay plain */
 		signal(SIGINT, on_interrupt);
 		if (! nostart && (start = startup_file()) != NULL)
 			include(start);

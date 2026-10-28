@@ -21,3 +21,7 @@ TERM Fx : number
 Fx = REWR Int(x^2*cos(x), x) : RubiIntegrate
 Fx
 REWR cancel(D(Fx, x)) : All
+
+Fx = REWR Int(1/(1+x^4), x) : RubiIntegrate
+Fx
+REWR cancel(D(Fx, x)) : All

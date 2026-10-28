@@ -655,7 +655,8 @@ This prints `10 20 30`.
 | `DATA Const` | Reads the next number from the data file into `Const`. Non-numeric text up to the end of the line is skipped. |
 | `SYS "command"` | Runs a shell command. |
 | `DEBUG n` | The trace of the interpreter at level `n`, only in a build with `make CFLAGS+=-DDEBUG` (after `make clean`); the normal build is optimized (`-O2`). The rules applied to an integral show with `STEPS`. |
-| `ALIAS "name" = "symbol"` | The name is read as the symbol from now on, e.g. `ALIAS "×" = "*"`; mainly for Unicode operators. |
+| `ALIAS "name" = "symbol"` | The name is read as the symbol from now on, e.g. `ALIAS "×" = "*"`; mainly for Unicode operators. With `SHOW` at the end it is also the name printed by `PRETTY 1` (`ALIAS "π" = "pi" SHOW`). |
+| `PRETTY 1`, `PRETTY 0` | The output with Unicode, `1 - (1/2)·x² + (1/24)·x⁴`, `√(1 - x²)`, `π`, `x ≤ y`, or as plain text, `1 - (1/2) * x ^ 2 + ...`. On in an interactive session, off for scripts, pipes and the tests. Both forms can be read in again: superscripts are powers (`x²` is `x^(2)`), `√x` is `sqrt(x)`. `PRETTY` alone shows the setting. |
 | `SYMBOLIC "role" = "symbol"` | The symbolic C functions (helpers) use `symbol` where they need the function or constant `role` (`"cos"`, `"+"`, `"pi"`, ...), see [Symbolic helper functions](#symbolic-helper-functions). `SYMBOLIC` alone clears the mapping. |
 | `MAXSTEPS n`, `MAXDEPTH n` | The step and the depth limit of `REWR` (default 100000 and 1000); without `n` they are shown, see [Rule sets](#rule-sets-algebras-and-rewriting). |
 | `AUTOSYM sort` | A new name in a term is declared as `SYM name : sort`, with a note (it may be a typo); `inc/all` ends with `AUTOSYM real`. `AUTOSYM` alone switches this off: a new name is then an error. |
@@ -1306,6 +1307,11 @@ where the library [inc/](inc) and the tests are used from.
   at once), `Dt(f,x)` the total derivative (formerly `D`: `Dt(a,x)` stays;
   the rules `diff`). The derivative of an unknown function `u(x)` is
   written `Dt(u(x),x)`, also in the result of `D(u(x),x)`.
+- `PRETTY 1` (on in an interactive session): the output with Unicode,
+  `x²`, `x⁻¹`, `√(1 + x)`, `π`, `2·x`, `x ≤ y`, `f(a, b)`; the names come
+  from `ALIAS ... SHOW` in the library. Superscripts in the input are
+  powers, so the output can be read in again (a name such as `x²` is no
+  longer possible).
 - Derivatives: `Dt` of a term without a variable (`5^(1/2)`, `constq`) is 0
   at once, and `0*u`, `u+0` are removed during differentiation, also for
   terms of the sort `number` (Rubi's results), which the rules of `Ring` do

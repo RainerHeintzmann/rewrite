@@ -5,7 +5,7 @@
 %token BRA OTHER DATA OUT INC EXE VARPAR SYS IF ELSE WHILE PRTNUM LIFT QUIT
 %token   RETURN
 %token OPT COMM DEFAULT RIGHT SUBSORT INTNUM STEPS MAXSTEPS MAXDEPTH SYMBOLIC
-%token   HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS AUTOSYM
+%token   HOLD RULES SHOW REALNUM TYPEOF HELP ALIAS AUTOSYM PRETTY
 %token <y_sym> Id String
 %token <y_sym> Sort Alg Term
 %token <y_sym> La1 La2 La3 La4 La5 Ru Ra Func Const Var Bra Bra1 Bra2
@@ -47,6 +47,8 @@ definition : FUNC namedId ':' vsortlist PFEIL Sort PRECEDENCE att
         | SYM idlist ':' Sort
         | TYPEOF term
         | TYPEOF func
+        | TYPEOF Alg
+        | TYPEOF Sort
         | HELP String String
         | SPEC Alg ':' alglist
         | SPEC Alg ':' formlist
@@ -142,10 +144,13 @@ aninstruction :
         | MAXDEPTH
         | AUTOSYM Sort
         | AUTOSYM
+        | PRETTY Const
+        | PRETTY
         | STEPS Alg String
         | SYMBOLIC String EQ String
         | SYMBOLIC
         | ALIAS String EQ String
+        | ALIAS String EQ String SHOW
         | RETURN term
         | QUIT
         | OPT idlist

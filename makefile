@@ -28,7 +28,7 @@ real.o bool.o complex.o matrix.o vector.o \
 fatal.o strsave.o expand.o symfn.o listmatch.o numsort.o exact.o specfun.o apart.o latex.o console.o help.o)
 
 T	= rewrite
-VERSION	= 2026.2
+VERSION	= 2026.3
 EXE	=
 SYSTEM	= $(shell uname -s | tr A-Z a-z)
 ifeq ($(OS),Windows_NT)
