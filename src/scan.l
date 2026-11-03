@@ -118,6 +118,7 @@ sp_ops2 ([\-\+])
 {sp_ops1}	{ return lookup(yytext); }	/* 2026: one bracket per token: [[1,2],[3,4]] */
 {sp_ops2}*	{ return lookup(yytext); }	/* Id, etc */
 {numb}		{ return number_token(yytext); }
+{alfa}{alnum}*"!"/"("	{ return lookup(yytext); }	/* 2026: plot!(..) as in Julia (n! is the factorial) */
 {alnum}*		{ int i, n = 0;		/* 2026: up to a Unicode operator, or that alone */
 			  for (i = 0; yytext[i] && ! (n = unicode_op((unsigned char *) yytext + i)); i++)
 				;

@@ -51,6 +51,7 @@ OPT
 OTHER
 OUT
 PAT
+PLOT
 PRETTY
 PRT
 PRTNUM
@@ -63,6 +64,7 @@ REWR
 RIGHT
 RU
 RULES
+RationalInterpolation
 Re
 RubiIntegrate
 SHOW
@@ -2748,6 +2750,8 @@ numerik
 onemat
 onevec
 part
+plot
+plot!
 polygamma
 polylog
 polyroots

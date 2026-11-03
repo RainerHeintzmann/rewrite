@@ -14,6 +14,7 @@
 #   inc/linalg     det, inverse, linsolve, transpose, covectors, symbolic matrices
 #   inc/solve      equations: solve(lhs == rhs, x) : Solve
 #   inc/simplify   All ends with the normal form
+#   inc/plot       plot(u,x,a,b), plot!(..): plots by gnuplot
 #   inc/help       the help texts for ?name
 # Optional, after it: inc/rvector, inc/rmatrix (numerical vectors and
 # matrices), inc/eqnsolve (the old equation solver), and the physics:
@@ -32,6 +33,7 @@ INC "inc/list"
 INC "inc/linalg"
 INC "inc/solve"
 INC "inc/simplify"
+INC "inc/plot"
 INC "inc/help"
 
 # 2026: a new name in a term is declared as SYM name : real (with a note);

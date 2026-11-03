@@ -205,22 +205,36 @@ static Node * s_cancel (Node * a[], int n, Symbol * f)
  * deg Q <= n, Q(0) = 1: the coefficients q_1..q_n of Q from
  * sum_j q_j c_(k-j) = 0 for k = m+1..m+n (linsolve), P the terms of Q*T
  * up to t^m; the result P/Q cancelled. NULL if the system is singular. */
-static Node * pade_sign (Node * r, Node * t)	/* (-2-t)/(t-2) -> (2+t)/(2-t) (takes r) */
+static Node * quotient_nf (Node * num, Node * den)	/* N/D, each in normal form (takes them) */
 {
-	Node * d, * c0, * s[1];
+	Node * s[1], * n, * d;
+	s[0] = num;
+	n = s_normform(s, 1, NULL);
+	s[0] = den;
+	d = s_normform(s, 1, NULL);
+	delete(num);
+	delete(den);
+	return mk_f2("/", n, d);
+}
+
+/* the constant term of the denominator positive, Q(0) = 1 of the Pade
+ * approximant: (-2-t)/(t-2) -> (2+t)/(2-t), -(t/(t-2)) -> t/(2-t) (takes r) */
+static Node * pade_sign (Node * r, Node * t)
+{
+	Node * q, * d, * c0, * nu;
 	double deg, v;
-	int neg;
-	if (! is_head(r, "/", 2)) return r;
-	d = arg(deref(r), 1);
+	int outer = is_head(r, "-", 1) && is_head(arg(deref(r), 0), "/", 2), neg;
+	q = outer ? arg(deref(r), 0) : deref(r);
+	if (! is_head(q, "/", 2)) return r;
+	d = arg(q, 1);
 	if (! poly_info(d, t, & deg, 0, & c0)) return r;
 	neg = c0 && is_num(c0, & v) && v < 0;
 	delete(c0);
 	if (! neg) return r;
-	s[0] = mk_f2("/", mk_neg(tcpy(arg(deref(r), 0))), mk_neg(tcpy(d)));
+	nu = outer ? tcpy(arg(q, 0)) : mk_neg(tcpy(arg(q, 0)));
+	q = quotient_nf(nu, mk_neg(tcpy(d)));
 	delete(r);
-	r = s_normform(s, 1, NULL);
-	delete(s[0]);
-	return r;
+	return q;
 }
 
 static Node * s_pade (Node * a[], int n, Symbol * f)
@@ -277,6 +291,84 @@ static Node * s_pade (Node * a[], int n, Symbol * f)
 	if (! r) return sys[0];
 	delete(sys[0]);
 	return pade_sign(r, a[1]);
+}
+
+/* u at x = p: exact if calculated exactly (rational points of a rational
+ * function), else its numerical value; NULL if it has none (*exact: 0) */
+static Node * point_value (Node * u, Node * x, Node * p, int * exact)
+{
+	Node * t = replace(u, x, p), * r = tcalc(tcpy(t));
+	double v;
+	if (r && is_exact(r) && is_exact(p)) { delete(t); return r; }
+	delete(r);
+	* exact = 0;
+	r = num_value_r(t, & v) && isfinite(v) ? mk_num(v) : NULL;
+	delete(t);
+	return r;
+}
+
+/* ratinterp(u, x, m, n, [x0, .., x(m+n)]): the rational function P/Q with
+ * deg P <= m, deg Q <= n, Q(0) = 1 through the points (x_i, u(x_i)): the
+ * linear equations P(x_i) - u(x_i) Q(x_i) = 0 for the coefficients;
+ * ratinterp(u, x, m, n, a, b): through m+n+1 Chebyshev points of [a, b],
+ * close to the best approximation there. Exact with exact values, else
+ * with numbers. NULL if a value is missing or the system is singular. */
+static Node * s_ratinterp (Node * a[], int n, Symbol * f)
+{
+	Node * pt[2 * MAXDIM + 1], * e[2 * MAXDIM + 1], * rows[2 * MAXDIM + 1], * rhs[2 * MAXDIM + 1];
+	Node * sys[2], * sol, * num = NULL, * den = NULL, * r, * x = a[1];
+	double vm, vn, lo, hi;
+	int m, nq, np, i, j, exact = 1, ok = 1;
+	if ((n != 5 && n != 6) || ! num_value(a[2], & vm) || ! num_value(a[3], & vn)
+	    || vm < 0 || vn < 0 || vm != floor(vm) || vn != floor(vn) || vm + vn + 1 > MAXDIM) return NULL;
+	m = (int) vm;
+	nq = (int) vn;
+	np = m + nq + 1;
+	if (n == 5)		/* the given points */
+		{
+		if (! is_head(a[4], "list", -1) || list_len(a[4]) != np) return NULL;
+		for (i = 0; i < np; i++) pt[i] = tcpy(arg(deref(a[4]), i));
+		}
+	else			/* Chebyshev points of [a, b] */
+		{
+		if (! num_value_r(a[4], & lo) || ! num_value_r(a[5], & hi) || ! (lo < hi)) return NULL;
+		for (i = 0; i < np; i++)
+			pt[i] = mk_num((lo + hi) / 2 - (hi - lo) / 2 * cos((2 * i + 1) * M_PI / (2 * np)));
+		}
+	for (i = 0; i < np; i++)	/* row: 1, x_i, .., x_i^m, -u_i x_i, .., -u_i x_i^n = u_i */
+		{
+		Node * u = ok ? point_value(a[0], x, pt[i], & exact) : NULL;
+		if (! u) { ok = 0; rows[i] = rhs[i] = NULL; continue; }
+		for (j = 0; j <= m; j++) e[j] = mk_pow(tcpy(pt[i]), mk_int(j));
+		for (j = 1; j <= nq; j++)
+			e[m + j] = mk_neg(mk_mul(tcpy(u), mk_pow(tcpy(pt[i]), mk_int(j))));
+		rows[i] = mk_list(e, np);
+		rhs[i] = u;
+		}
+	for (i = 0; i < np; i++) delete(pt[i]);
+	if (! ok)
+		{
+		for (i = 0; i < np; i++) { delete(rows[i]); delete(rhs[i]); }
+		return NULL;
+		}
+	sys[0] = mk_list(rows, np);
+	sys[1] = mk_list(rhs, np);
+	sol = linsolve_impl(sys, 2, f);
+	delete(sys[0]);
+	delete(sys[1]);
+	if (! sol) return NULL;
+	for (j = 0; j <= m; j++)
+		num = mk_add(num, mk_mul(tcpy(arg(deref(sol), j)), mk_pow(tcpy(x), mk_int(j))));
+	den = mk_int(1);
+	for (j = 1; j <= nq; j++)
+		den = mk_add(den, mk_mul(tcpy(arg(deref(sol), m + j)), mk_pow(tcpy(x), mk_int(j))));
+	delete(sol);
+	if (! exact) return quotient_nf(num, den);	/* no gcd of rounded numbers */
+	sys[0] = mk_f2("/", num, den);
+	r = s_cancel(sys, 1, f);
+	if (! r) return sys[0];
+	delete(sys[0]);
+	return pade_sign(r, x);
 }
 
 /* polygcd(a, b): the greatest common divisor of two polynomials */

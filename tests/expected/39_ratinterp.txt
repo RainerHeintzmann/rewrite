@@ -1,0 +1,12 @@
+---- a rational function is found again
+1 / (1 + x ^ 2 )
+(4/3) * x / ((7/3) - x )
+x ^ 2 / (1 + x )
+---- with numbers: exp through 0, 1, 2 and arctan on [-4, 4]
+(1 + 0.859141 * x )/ (1 - 0.31606 * x )
+(0.976975 * x + 0.130556 * x ^ 3 )/ (1 + 0.396381 * x ^ 2 + 0.0074587 * x ^ 4 )
+-0.0006975 -0.004549 
+---- no solution or wrong arguments: unevaluated
+RationalInterpolation (x ^ 2 + 1 ,x ,1 ,1 ,[-1, 0, 1] )
+RationalInterpolation (arctan (x ),x ,3 ,4 ,[1, 2] )
+RationalInterpolation (arctan (x ),x ,1 ,1 ,2 ,1 )

@@ -651,6 +651,7 @@ This prints `10 20 30`.
 | `PRT list` | Prints without a line break at the end. |
 | `PRTNUM "format"` | Sets the C format for printing real numbers. Example: `PRTNUM "%.10g "` |
 | `OUT "file"` | Redirects the output into a file, which is overwritten. `OUT "stdout"` switches back. Useful for producing data for plotting programs. |
+| `PLOT "command"` | A gnuplot setting for the following plots of `plot(..)` (see [Plots](#plots)); `PLOT` alone removes them. |
 | `DATA "file"` | Opens a data file. |
 | `DATA Const` | Reads the next number from the data file into `Const`. Non-numeric text up to the end of the line is skipped. |
 | `SYS "command"` | Runs a shell command. |
@@ -936,6 +937,51 @@ REWR Pade(tan(x), x, 0, 3, 4) : All    # (105 * x - 10 * x ^ 3 )/ (105 - 45 * x 
 
 If the approximant does not exist (`Pade(x^2, x, 0, 1, 1)`: the
 equations are singular), `pade(...)` stays unevaluated.
+
+`RationalInterpolation(u, x, m, n, [x0, .., xk])` (as in Mathematica) is
+the quotient `P/Q` of degrees `m` and `n`, `Q(0) = 1`, through the
+`k+1 = m+n+1` points `(x_i, u(x_i))`, exact for exact values;
+`RationalInterpolation(u, x, m, n, a, b)` takes the Chebyshev points of
+`[a, b]` and numbers. A Padé approximant is best near its point, the
+interpolation spreads the error over the interval and comes close to the
+best (minimax) approximation there; for `arctan` on `[-4, 4]` see
+[examples/16_plot.rw](examples/16_plot.rw). The best approximation itself
+(Remez) and least squares are numerical iterations and better done in
+Julia (Remez.jl, BaryRational.jl) with the functions of RewriteCAS.jl.
+
+### Plots
+
+`plot(u, x, a, b)` draws `u` for `x` from `a` to `b` with
+[gnuplot](http://www.gnuplot.info), which is installed separately
+(Windows: `winget install gnuplot.gnuplot`, Debian: `apt install gnuplot`,
+macOS: `brew install gnuplot`). As in Julia, `plot!(u, x, a, b)` adds
+curves to the last plot; `u` may be a list `[u, v, ..]`, a fifth argument
+is the number of points (400). The term draws when it is printed as a
+result ([inc/plot](inc/plot), [src/plot.c](src/plot.c)), so `REWR` can
+simplify the curves first; inside another term it stays a term. The legend
+is the name of a `TERM`, else the term. Where `u` has no real value (a pole
+of `tan`, `ln` of a negative number), the curve has a gap.
+
+```text
+plot(sin(x)/x, x, -20, 20)
+TERM P : real
+P = REWR Pade(arctan(x), x, 0, 3, 4) : All
+plot(arctan(x), x, -4, 4)
+plot!(P, x, -4, 4)                      # legend: arctan(x), P
+REWR plot([exp(x), Pade(exp(x), x, 0, 2, 2)], x, -3, 3) : All
+```
+
+`PLOT "gnuplot command"` adds a setting for the following plots, `PLOT`
+alone removes them all: `PLOT "set logscale y"`, `PLOT "set yrange [-2:2]"`,
+`PLOT "set term dumb"` (the plot as text in the terminal, in its place in
+the output), `PLOT "set term pngcairo"` with `PLOT "set output 'f.png'"`
+(a file). One gnuplot process draws into its window, which stays open
+after rewrite ends; with a `set term` or `set output` setting, gnuplot is
+started for each plot and rewrite waits for it. The program is
+`REWRITE_GNUPLOT` if set (`none`: nothing is drawn, as in the tests),
+else `gnuplot` in the `PATH` or, on Windows, in
+`C:\Program Files\gnuplot\bin`. More in
+[examples/16_plot.rw](examples/16_plot.rw).
 
 ### Limits and definite integrals
 
@@ -1349,6 +1395,10 @@ where the library [inc/](inc) and the tests are used from.
   `(-2 - x)/(x - 2)`.
 - Padé approximants `Pade(u,x,a,m,n)` (from the Taylor polynomial, the
   linear equations solved by the C function `pade`).
+- `RationalInterpolation(u,x,m,n,points)`: rational interpolation through
+  points or the Chebyshev points of an interval.
+- Plots with gnuplot: `plot(u,x,a,b)`, `plot!(..)` as in Julia, settings
+  with `PLOT "..."` ([inc/plot](inc/plot), [src/plot.c](src/plot.c)).
 - `AUTOSYM real` (set by `inc/all`): new names are declared as symbols,
   with a note; an unknown function `f(..)` and, with `AUTOSYM` off, an
   unknown name are reported as such instead of "syntax error".

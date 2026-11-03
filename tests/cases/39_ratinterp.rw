@@ -1,0 +1,20 @@
+# RationalInterpolation(u, x, m, n, points): P/Q of degrees m, n, Q(0) = 1,
+# through m+n+1 points, given as a list (exact for exact values) or as an
+# interval a, b (Chebyshev points, with numbers)
+INC "inc/all"
+"---- a rational function is found again"
+RationalInterpolation(1/(1+x^2), x, 2, 2, [0, 1, 2, 3, 4])
+RationalInterpolation(x^3, x, 1, 1, [0, 1, 2])
+RationalInterpolation(x^2/(1+x), x, 2, 1, [0, 1/2, 1, 2])
+"---- with numbers: exp through 0, 1, 2 and arctan on [-4, 4]"
+RationalInterpolation(exp(x), x, 1, 1, [0, 1, 2])
+TERM R : real
+R = REWR RationalInterpolation(arctan(x), x, 3, 4, -4, 4) : All
+R
+PRTNUM "%.4g "
+subst(R, x, 3) - arctan(3), subst(R, x, 0.5) - arctan(0.5)
+PRTNUM "%g "
+"---- no solution or wrong arguments: unevaluated"
+RationalInterpolation(x^2 + 1, x, 1, 1, [-1, 0, 1])
+RationalInterpolation(arctan(x), x, 3, 4, [1, 2])
+RationalInterpolation(arctan(x), x, 1, 1, 2, 1)

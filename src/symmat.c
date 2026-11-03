@@ -1019,7 +1019,8 @@ static Node * inverse_impl (Node * a[], int n, Symbol * f)
 /* ---- thread(u): arithmetic on lists element by element (Listable) ----
  * [1,2] + [a,b] = [1+a, 2+b], x*[a,b] = [x*a, x*b],
  * sin([a,b]) = [sin(a), sin(b)]; nested lists (matrices) too.
- * Symbolic C functions (det, dot, length, ...) are not threaded. */
+ * Symbolic C functions (det, dot, length, ...) and functions with their own
+ * print function (SHOW plot) are not threaded. */
 
 static int has_list (Node * u)
 {
@@ -1044,7 +1045,7 @@ static Node * thread_f (Node * u, int force)
 	n = term_nargs(u);
 	if (n > MAXDIM) return tcpy(u);
 	for (k = 0; k < n; k++) t[k] = thread_f(arg(u, k), 0);
-	if (! is_head(u, "list", -1) && (force || ! builtin(TERM_HEAD(u))))
+	if (! is_head(u, "list", -1) && (force || ! (builtin(TERM_HEAD(u)) || showfn(TERM_HEAD(u)))))
 		for (k = 0; k < n; k++)
 			if (is_head(t[k], "list", -1))
 				{
@@ -1104,7 +1105,8 @@ static Node * s_threadq (Node * a[], int n, Symbol * f)	/* thread(u) would chang
 	int k, m;
 	if (n != 1) return NULL;
 	u = deref(a[0]);
-	if (! u || u->type != Func || is_head(u, "list", -1) || builtin(TERM_HEAD(u)))
+	if (! u || u->type != Func || is_head(u, "list", -1) || builtin(TERM_HEAD(u))
+	    || showfn(TERM_HEAD(u)))		/* own print function: plot([u, v], ..) */
 		return mk_bool(0, f);
 	m = term_nargs(u);
 	for (k = 0; k < m; k++)
@@ -1409,9 +1411,12 @@ static int show_covec (Node * t, int prec)
 	return 1;
 }
 
+static int show_plot (Node * t, int prec);	/* plot.c */
+
 static const struct { const char * name; show_function * fn; } pfn_tab[] = {
 	{ "show_list", show_list },
 	{ "show_covec", show_covec },
+	{ "show_plot", show_plot },
 	{ NULL, NULL } };
 
 show_function * give_pfn (const char * name)

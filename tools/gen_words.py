@@ -14,7 +14,7 @@ root = os.path.dirname(here)
 
 OPTIONAL = ['inc/list', 'inc/linalg', 'inc/solve', 'inc/rvector', 'inc/rmatrix']
 # libraries of internal helpers: only these names of them are offered
-ENTRY_ONLY = {'inc/helpers': {'Pade'},
+ENTRY_ONLY = {'inc/helpers': {'Pade', 'RationalInterpolation'},
               'inc/integration': {'Int', 'Integrate', 'RubiIntegrate'}}
 # internal steps of inc/solve and inc/linalg
 INTERNAL = re.compile(r'^(sol|solker|solcheck|solfilter|iso|isom|isomap|isoeach|ker|kernel|kernelq|'
@@ -38,6 +38,9 @@ alg_decl = re.compile(r'^\s*ALG\s+([^:#]*)')
 
 decl = re.compile(r'^\s*(?:FUNC|OTHER|BRA|SORT|ALG)\s+([^:#]*)')
 inc = re.compile(r'^\s*INC\s+"([^"]+)"')
+# ALIAS "plot!" = "plotadd" SHOW: the name to type instead of the symbol
+alias_decl = re.compile(r'^\s*ALIAS\s+"([A-Za-z]\w*!?)"\s*=\s*"(\w+)"\s+SHOW')
+aliased = {}
 seen = set()
 
 def scan(name):
@@ -53,6 +56,10 @@ def scan(name):
         m = inc.match(line)
         if m:
             scan(m.group(1))
+            continue
+        m = alias_decl.match(line)
+        if m:
+            aliased[m.group(2)] = m.group(1)
             continue
         m = decl.match(line)
         if not m:
@@ -75,6 +82,10 @@ def scan(name):
 
 for name in ['inc/all'] + OPTIONAL:
     scan(name)
+for target, alias in aliased.items():
+    if target in words:
+        words.discard(target)
+        words.add(alias)
 
 for line in open(os.path.join(here, 'latex_symbols.tsv'), encoding='utf-8'):
     words.add(line.split('\t', 1)[0])

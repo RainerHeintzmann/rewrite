@@ -1,0 +1,24 @@
+
+
+
+---- inside a term or a list it is a term, n! stays the factorial
+[plot (x ,x ,0 ,1 ),
+ 2] 
+24 
+---- errors
+
+>> plot(sin(x), x, 1)
+Error in stdin : Used wrong argumenttype or -number for Funktion 'plot' !
+plot : expected plot(u, x, a, b)  or  plot(u, x, a, b, n)
+
+plot : the second argument must be the variable, a symbol without a value
+
+plot : the range a, b must be numbers with a < b
+
+plot : the number of points must be 2 .. 100000
+
+plot : no real values of the term for x from -3 to 3
+
+plot : x has a value (x = nothing removes it)
+
+done

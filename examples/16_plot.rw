@@ -1,0 +1,45 @@
+# 16_plot.rw: plots with gnuplot (installed separately: gnuplot.info), as
+# in Julia: plot(u, x, a, b) draws, plot!(u, x, a, b) adds to the last plot;
+# u may be a list [u, v, ..], a fifth argument the number of points.
+# arctan(x) against three approximations with the same degrees, P/Q of
+# degree 3 over degree 4 (or a polynomial of degree 7):
+#   T  the Taylor polynomial at 0, good only for |x| < 1 (the radius of
+#      convergence of the series of arctan)
+#   P  the Pade approximant at 0: the same derivatives at 0 as T, but close
+#      to arctan far beyond |x| = 1
+#   R  the rational interpolation at the 8 Chebyshev points of [-4, 4]: its
+#      error is spread evenly over the interval, close to the best there
+# PLOT "gnuplot command" is a setting for the following plots, PLOT alone
+# removes them; PLOT "set term dumb" draws in the terminal.
+INC "inc/all"
+
+TERM P, T, R : real
+P = REWR Pade(arctan(x), x, 0, 3, 4) : All
+T = REWR Tay(arctan(x), x, 0, 7) : All
+R = REWR RationalInterpolation(arctan(x), x, 3, 4, -4, 4) : All
+P
+T
+R
+
+"---- arctan(x), then the approximations added"
+PLOT "set grid"
+PLOT "set yrange [-2:2]"
+PLOT "set title 'arctan(x) and its approximations P (Pade), T (Taylor), R (interpolation)'"
+plot(arctan(x), x, -4, 4)
+plot!([P, T, R], x, -4, 4)
+
+"---- the errors, on a logarithmic scale (a TERM name is the legend)"
+TERM errP, errT, errR : real
+errP = abs(P - arctan(x))
+errT = abs(T - arctan(x))
+errR = abs(R - arctan(x))
+PLOT
+PLOT "set grid"
+PLOT "set logscale y"
+PLOT "set yrange [1e-12:10]"
+PLOT "set title 'the errors |P - arctan(x)|, |T - arctan(x)|, |R - arctan(x)|'"
+plot([errP, errT, errR], x, -4, 4)
+PLOT
+
+"---- REWR simplifies the curves first, here the Pade approximant of exp"
+REWR plot([exp(x), Pade(exp(x), x, 0, 2, 2)], x, -3, 3) : All

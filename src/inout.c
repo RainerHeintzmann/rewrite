@@ -42,6 +42,11 @@ void out_capture_begin (void)
 	cap_depth++;
 }
 
+int out_capturing (void)		/* is the output going into a string? */
+{
+	return cap_depth > 0;
+}
+
 char * out_capture_end (void)		/* the captured text (malloc), "" if none */
 {
 	char * s;

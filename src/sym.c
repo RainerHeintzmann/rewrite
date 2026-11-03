@@ -65,6 +65,7 @@ static const Reserved words [] = {	/* sorted */
 	{ "OTHER",  OTHER },
 	{ "OUT",    OUT },
 	{ "PAT",    PAT },      /* pattern variables (2026, formerly VAR) */
+	{ "PLOT",   PLOT },     /* PLOT "set grid": a gnuplot setting for plot(..) (2026) */
 	{ "PRETTY", PRETTY },  /* PRETTY 1: output with Unicode, x², √x, π (2026) */
 	{ "PRT",    PRT },
 	{ "PRTNUM", PRTNUM },

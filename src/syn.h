@@ -124,32 +124,33 @@ extern int yydebug;
     ALIAS = 325,                   /* ALIAS  */
     AUTOSYM = 326,                 /* AUTOSYM  */
     PRETTY = 327,                  /* PRETTY  */
-    Id = 328,                      /* Id  */
-    String = 329,                  /* String  */
-    Sort = 330,                    /* Sort  */
-    Alg = 331,                     /* Alg  */
-    Term = 332,                    /* Term  */
-    La1 = 333,                     /* La1  */
-    La2 = 334,                     /* La2  */
-    La3 = 335,                     /* La3  */
-    La4 = 336,                     /* La4  */
-    La5 = 337,                     /* La5  */
-    Ru = 338,                      /* Ru  */
-    Ra = 339,                      /* Ra  */
-    Func = 340,                    /* Func  */
-    Const = 341,                   /* Const  */
-    Var = 342,                     /* Var  */
-    Bra = 343,                     /* Bra  */
-    Bra1 = 344,                    /* Bra1  */
-    Bra2 = 345,                    /* Bra2  */
-    Terms = 346,                   /* Terms  */
-    Form = 347,                    /* Form  */
-    Sorts = 348,                   /* Sorts  */
-    Functs = 349,                  /* Functs  */
-    Forms = 350,                   /* Forms  */
-    Algs = 351,                    /* Algs  */
-    Cond2 = 352,                   /* Cond2  */
-    Cond = 353                     /* Cond  */
+    PLOT = 328,                    /* PLOT  */
+    Id = 329,                      /* Id  */
+    String = 330,                  /* String  */
+    Sort = 331,                    /* Sort  */
+    Alg = 332,                     /* Alg  */
+    Term = 333,                    /* Term  */
+    La1 = 334,                     /* La1  */
+    La2 = 335,                     /* La2  */
+    La3 = 336,                     /* La3  */
+    La4 = 337,                     /* La4  */
+    La5 = 338,                     /* La5  */
+    Ru = 339,                      /* Ru  */
+    Ra = 340,                      /* Ra  */
+    Func = 341,                    /* Func  */
+    Const = 342,                   /* Const  */
+    Var = 343,                     /* Var  */
+    Bra = 344,                     /* Bra  */
+    Bra1 = 345,                    /* Bra1  */
+    Bra2 = 346,                    /* Bra2  */
+    Terms = 347,                   /* Terms  */
+    Form = 348,                    /* Form  */
+    Sorts = 349,                   /* Sorts  */
+    Functs = 350,                  /* Functs  */
+    Forms = 351,                   /* Forms  */
+    Algs = 352,                    /* Algs  */
+    Cond2 = 353,                   /* Cond2  */
+    Cond = 354                     /* Cond  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -166,7 +167,7 @@ union YYSTYPE
 	char 	* y_chr;
 	
 
-#line 170 "syn.tab.h"
+#line 171 "syn.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

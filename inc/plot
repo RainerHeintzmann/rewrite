@@ -1,0 +1,21 @@
+# inc/plot (2026): plots by gnuplot (installed separately, gnuplot.info), as
+# in Julia. Loaded by inc/all.
+#   plot(u, x, a, b)      the curve of u for x from a to b; u may be a list
+#   plot(u, x, a, b, n)   [u, v, ..] of curves; n points (400 if not given)
+#   plot!(u, x, a, b)     adds the curves to the last plot
+# The term draws when it is printed as a result, so
+#   REWR plot([arctan(x), Pade(arctan(x),x,0,3,4)], x, -4, 4) : All
+# simplifies the curves first. The legend is the name of a TERM, else the
+# term. The statement PLOT "gnuplot command" adds a setting for the
+# following plots (PLOT "set logscale y", PLOT "set term dumb" for a plot
+# in the terminal, PLOT "set term png" and PLOT "set output 'f.png'" for a
+# file), PLOT alone removes them. ENV REWRITE_GNUPLOT: the program (none:
+# nothing is drawn). The C functions are in src/plot.c.
+
+FUNC  plot    : number,number,number,number >> number
+OTHER plot    : number,number,number,number,number >> number
+FUNC  plotadd : number,number,number,number >> number
+OTHER plotadd : number,number,number,number,number >> number
+SHOW plot ATT show_plot
+SHOW plotadd ATT show_plot
+ALIAS "plot!" = "plotadd" SHOW

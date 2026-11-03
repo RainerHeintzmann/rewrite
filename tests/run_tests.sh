@@ -13,6 +13,7 @@
 
 cd "$(dirname "$0")/.." || exit 2   # INC paths are relative to the project root
 
+export REWRITE_GNUPLOT=none         # PLOT checks its arguments, draws nothing
 EXE=${REWRITE:-./rewrite.exe}       # executable can be chosen with REWRITE=...
 [ -f "$EXE" ] || [ -n "$REWRITE" ] || EXE=./rewrite
 if [ ! -f "$EXE" ]; then

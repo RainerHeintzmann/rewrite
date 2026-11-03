@@ -38,6 +38,7 @@ Node * term_copy (Node * t);                  /* copy of a term */
 int term_has_builtin (Node * t);              /* a symbolic C function somewhere in t */
 int pretty_tprint (Node * np, int last);      /* PRETTY 1: the Unicode form of np, 0: tprint does it */
 int term_has_nan (Node * t);                  /* contains NaN, infinity, 1/0 or a failed polyquotient */
+void plot_set_fn (Node * np);                 /* 2026: PLOT "gnuplot command" for plot(..), PLOT alone: none */
 Node * numeric_contagion (Node * t);          /* 2^(1/2)*0.7 as a real number, or NULL */
 Node * numeric_real (Node * t);               /* value with real numbers, or NULL */
 void exact_integers (Node * t);               /* 1.0 next to an exact number as 1 */

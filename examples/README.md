@@ -28,6 +28,7 @@ it to see the input. `?name` explains a keyword or function.
 | [13_ode.rw](13_ode.rw) | ordinary differential equations: a solution checked, characteristic equation, integrating factor, separation of variables, an initial value problem (Laplace), Picard iteration, Runge-Kutta |
 | [14_pde.rw](14_pde.rw) | partial differential equations: wave, heat and Laplace equation, separation of variables, heat and transport equation with the Fourier transform |
 | [15_series.rw](15_series.rw) | Taylor polynomials around 0 and another point, of a product, the error, the derivative; Padé approximants |
+| [16_plot.rw](16_plot.rw) | plots with gnuplot: arctan against its Padé approximant and Taylor polynomial, the errors |
 
 The tests run them as well (`tests/cases/ex_example_*.rw`), so they stay
 correct.

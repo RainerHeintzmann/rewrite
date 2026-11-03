@@ -5347,7 +5347,7 @@ static Node * s_linsys (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_linsysq (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_cancel (Node * a[], int n, Symbol * f);	/* symsolve.c */
 static Node * s_pade (Node * a[], int n, Symbol * f);	/* symsolve.c */
-static Node * s_igeq (Node * a[], int n, Symbol * f);
+static Node * s_ratinterp (Node * a[], int n, Symbol * f);	/* symsolve.c */static Node * s_igeq (Node * a[], int n, Symbol * f);
 static Node * s_ileq (Node * a[], int n, Symbol * f);
 static Node * s_oddq (Node * a[], int n, Symbol * f);
 static Node * s_polygcd (Node * a[], int n, Symbol * f);	/* symsolve.c */
@@ -5541,7 +5541,7 @@ static struct { const char * name; s_function * fn; } symfunction[] = {
 	{ "linsysq", s_linsysq },
 	{ "cancel", s_cancel },
 	{ "pade", s_pade },
-	{ "igeq", s_igeq },
+	{ "ratinterp", s_ratinterp },	{ "igeq", s_igeq },
 	{ "ileq", s_ileq },
 	{ "oddq", s_oddq },
 	{ "polygcd", s_polygcd },
@@ -5972,3 +5972,4 @@ Node * call_builtin (Node * term)
 /* equation solving (2026) */
 #include "symsolve.c"
 #include "pretty.c"	/* 2026: PRETTY 1 */
+#include "plot.c"	/* 2026: PLOT with gnuplot */

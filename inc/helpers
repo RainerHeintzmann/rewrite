@@ -262,3 +262,11 @@ SYM   _pt : real
 NUMPAT _Gm : real
 ADDSPEC Taylor : Pade(_Gu,_Gx,_Ga,_Gm,_Gn) = padestep(Tay(subst(_Gu,_Gx,_Ga+_pt),_pt,0,_Gm+_Gn),_Gx,_Ga,_Gm,_Gn)
 ADDSPEC Taylor : IF (polyq(_Gu,_pt)) padestep(_Gu,_Gx,_Ga,_Gm,_Gn) = subst(pade(_Gu,_pt,_Gm,_Gn),_pt,_Gx-_Ga)
+
+# Rational interpolation (Mathematica's RationalInterpolation): P/Q with
+# deg P <= m, deg Q <= n, Q(0) = 1 through m+n+1 points, given as a list
+# [x0, .., x(m+n)] or as an interval a, b (its Chebyshev points: close to the
+# best approximation on [a, b]); computed at once (C, symsolve.c), exact for
+# exact values, else with numbers
+FUNC  RationalInterpolation : real,real,real,real,number >> real     ATT SYMBOLIC ratinterp
+OTHER RationalInterpolation : real,real,real,real,real,real >> real  ATT SYMBOLIC ratinterp

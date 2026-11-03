@@ -1,0 +1,26 @@
+# plot(u, x, a, b [, n]) and plot!(..): the tests run with
+# REWRITE_GNUPLOT=none, so the arguments are checked and nothing is drawn
+INC "inc/all"
+TERM P : real
+P = REWR Pade(arctan(x), x, 0, 3, 4) : All
+PLOT "set grid"
+plot([arctan(x), P], x, -4, 4)
+plot!(tan(x), x, -3, 3, 200)
+REWR plot(Pade(exp(x), x, 0, 2, 2), x, -1, 1) : All
+PLOT
+"---- inside a term or a list it is a term, n! stays the factorial"
+[plot(x, x, 0, 1), 2]
+SYM n : real
+n = 4
+n!
+n = nothing
+"---- errors"
+plot(sin(x), x, 1)
+plot(sin(x), 2, 0, 1)
+plot(sin(x), x, 1, 0)
+plot(sin(x), x, 0, 1, 1)
+plot(Pade(arctan(x), x, 0, 3, 3), x, -3, 3)
+x = 1
+plot(x^2, x, 0, 1)
+x = nothing
+"done"

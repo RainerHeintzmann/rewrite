@@ -28,7 +28,7 @@ real.o bool.o complex.o matrix.o vector.o \
 fatal.o strsave.o expand.o symfn.o listmatch.o numsort.o exact.o specfun.o apart.o latex.o console.o help.o)
 
 T	= rewrite
-VERSION	= 2026.3
+VERSION	= 2026.4
 EXE	=
 SYSTEM	= $(shell uname -s | tr A-Z a-z)
 ifeq ($(OS),Windows_NT)
@@ -64,7 +64,7 @@ $(S)/syn.c $(S)/syn.h: $(S)/syn.y
 
 $(O): $(S)/syn.h
 
-$(S)/symfn.o: $(S)/symmat.c $(S)/symsolve.c
+$(S)/symfn.o: $(S)/symmat.c $(S)/symsolve.c $(S)/pretty.c $(S)/plot.c
 
 $(S)/%.o: $(S)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@

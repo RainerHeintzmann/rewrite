@@ -34,6 +34,8 @@ extern void typeof_func (Node * np);	/* 2026: TYPEOF f */
 void console_utf8 (void);			/* 2026: console.c */
 const char * windows_home (void);	/* 2026: console.c */
 const char * program_dir (void);	/* 2026: console.c */
+FILE * child_open (const char * prog, const char * args, int quiet, void ** proc);	/* 2026: console.c */
+int child_close (FILE * fp, void * proc);	/* its exit status */
 void print_variants (Symbol * f);	/* 2026: TYPEOF f, ?f */
 
 extern void printstring (Node * np);
