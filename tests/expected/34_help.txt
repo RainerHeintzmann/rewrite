@@ -7,7 +7,7 @@ rewrite: term rewriting with rule sets, see README.md and examples/.
 Help on: ADDSPEC ALG ALIAS ATT AUTOSYM All BRA COMM D DATA DEBUG DEFAULT Dn Dt
         EXE FOR FUNC HELP HOLD I IF IN INC INFO INTNUM Int Integrate LA1 LB
         LIFT MAXDEPTH MAXSTEPS MatrixRules MatrixSolve NIN NUMPAT OPT OTHER OUT
-        PAT PRETTY PRT PRTNUM QUIT RA REALNUM RETURN REWR RIGHT RU RULES
+        PAT PRETTY PRT PRTNUM Pade QUIT RA REALNUM RETURN REWR RIGHT RU RULES
         RubiIntegrate SHOW SORT SPEC STEPS SUBSORT SYM SYMBOLIC SYS Solve Sub
         Sum TERM TYPEOF Tay WHILE [ cancel coeff collect det dirac dot expand
         expon fourier freeq heaviside identity im infinity initial inverse
@@ -40,10 +40,10 @@ SORT real : with values (computed in C)
   number literals like 1.5 have this sort (REALNUM)
   wider sorts (SUBSORT): complex, number
   narrower sorts: rational, nonneg
-  symbols (SYM): Xre, e, infinity, kk, maxreal, minreal, nothing, pi, x, y, z; 14 internal (_name)
+  symbols (SYM): Xre, e, infinity, kk, maxreal, minreal, nothing, pi, x, y, z; 15 internal (_name)
   terms (TERM): num; 1 internal (_name)
-  pattern variables (PAT): 21 internal (_name)
-  functions with this result: !, *, +, -, /, D, Dn, Dp, Dpn, Dt, Gamma, I, ... (148); 2 internal (_name)
+  pattern variables (PAT): 22 internal (_name)
+  functions with this result: !, *, +, -, /, D, Dn, Dp, Dpn, Dt, Gamma, I, ... (151); 2 internal (_name)
 no help on nosuchname (? alone lists the names)
 my own help
 a second line

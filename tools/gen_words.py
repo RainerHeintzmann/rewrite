@@ -14,7 +14,7 @@ root = os.path.dirname(here)
 
 OPTIONAL = ['inc/list', 'inc/linalg', 'inc/solve', 'inc/rvector', 'inc/rmatrix']
 # libraries of internal helpers: only these names of them are offered
-ENTRY_ONLY = {'inc/helpers': set(),
+ENTRY_ONLY = {'inc/helpers': {'Pade'},
               'inc/integration': {'Int', 'Integrate', 'RubiIntegrate'}}
 # internal steps of inc/solve and inc/linalg
 INTERNAL = re.compile(r'^(sol|solker|solcheck|solfilter|iso|isom|isomap|isoeach|ker|kernel|kernelq|'

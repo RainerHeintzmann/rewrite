@@ -200,6 +200,85 @@ static Node * s_cancel (Node * a[], int n, Symbol * f)
 	return mp_quotient_free(& pn, & pd);
 }
 
+/* pade(T, t, m, n): the Pade approximant P/Q of the polynomial T in t (a
+ * Taylor polynomial of degree m+n, coefficients c_k), deg P <= m,
+ * deg Q <= n, Q(0) = 1: the coefficients q_1..q_n of Q from
+ * sum_j q_j c_(k-j) = 0 for k = m+1..m+n (linsolve), P the terms of Q*T
+ * up to t^m; the result P/Q cancelled. NULL if the system is singular. */
+static Node * pade_sign (Node * r, Node * t)	/* (-2-t)/(t-2) -> (2+t)/(2-t) (takes r) */
+{
+	Node * d, * c0, * s[1];
+	double deg, v;
+	int neg;
+	if (! is_head(r, "/", 2)) return r;
+	d = arg(deref(r), 1);
+	if (! poly_info(d, t, & deg, 0, & c0)) return r;
+	neg = c0 && is_num(c0, & v) && v < 0;
+	delete(c0);
+	if (! neg) return r;
+	s[0] = mk_f2("/", mk_neg(tcpy(arg(deref(r), 0))), mk_neg(tcpy(d)));
+	delete(r);
+	r = s_normform(s, 1, NULL);
+	delete(s[0]);
+	return r;
+}
+
+static Node * s_pade (Node * a[], int n, Symbol * f)
+{
+	Node * c[2 * MAXDIM + 1], * q[MAXDIM + 1], * e[MAXDIM], * rows[MAXDIM], * rhs[MAXDIM];
+	Node * sys[2], * sol = NULL, * num = NULL, * den = NULL, * r;
+	double vm, vn, deg;
+	int m, nq, i, j, k, ok = 1;
+	if (n != 4 || ! num_value(a[2], & vm) || ! num_value(a[3], & vn)
+	    || vm < 0 || vn < 0 || vm != floor(vm) || vn != floor(vn)
+	    || vn > MAXDIM || vm + vn > 2 * MAXDIM) return NULL;
+	m = (int) vm;
+	nq = (int) vn;
+	for (k = 0; k <= m + nq; k++)
+		{
+		if (ok && ! poly_info(a[0], a[1], & deg, k, & c[k])) ok = 0;
+		if (! ok) c[k] = NULL;
+		else if (! c[k]) c[k] = mk_int(0);
+		}
+	if (ok && nq > 0)
+		{
+		for (i = 0; i < nq; i++)	/* row k = m+1+i: c_(k-1) .. c_(k-n) */
+			{
+			k = m + 1 + i;
+			for (j = 0; j < nq; j++)
+				e[j] = k - 1 - j >= 0 ? tcpy(c[k - 1 - j]) : mk_int(0);
+			rows[i] = mk_list(e, nq);
+			rhs[i] = mk_neg(tcpy(c[k]));
+			}
+		sys[0] = mk_list(rows, nq);
+		sys[1] = mk_list(rhs, nq);
+		sol = linsolve_impl(sys, 2, f);
+		delete(sys[0]);
+		delete(sys[1]);
+		if (! sol) ok = 0;
+		}
+	if (ok)
+		{
+		q[0] = mk_int(1);
+		for (j = 1; j <= nq; j++) q[j] = tcpy(arg(deref(sol), j - 1));
+		for (j = 0; j <= nq; j++)
+			den = mk_add(den, mk_mul(tcpy(q[j]), mk_pow(tcpy(a[1]), mk_int(j))));
+		for (k = 0; k <= m; k++)
+			for (j = 0; j <= nq && j <= k; j++)
+				num = mk_add(num, mk_mul(mk_mul(tcpy(q[j]), tcpy(c[k - j])),
+				                         mk_pow(tcpy(a[1]), mk_int(k))));
+		for (j = 0; j <= nq; j++) delete(q[j]);
+		}
+	delete(sol);
+	for (k = 0; k <= m + nq; k++) delete(c[k]);
+	if (! ok) return NULL;
+	sys[0] = mk_f2("/", num ? num : mk_int(0), den);
+	r = s_cancel(sys, 1, f);
+	if (! r) return sys[0];
+	delete(sys[0]);
+	return pade_sign(r, a[1]);
+}
+
 /* polygcd(a, b): the greatest common divisor of two polynomials */
 static Node * s_polygcd (Node * a[], int n, Symbol * f)
 {

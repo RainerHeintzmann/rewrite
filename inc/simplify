@@ -16,4 +16,9 @@ ALG Expprod
 SPEC    Expprod : exp _Xnu * exp _Ynu = exp(normform(_Xnu+_Ynu))
 ADDSPEC Expprod : _Znu * exp _Xnu * exp _Ynu = _Znu * exp(normform(_Xnu+_Ynu))
 
-SPEC All : Std,Doit,(Linear,Compl,diff,Taylor,GrRi),AGroup,integr,(Subst,GrRi),Std,Combine,NoMi,Final,Expprod,Final
+# a sum over a common denominator (cancel), if that is smaller: the
+# derivative of an integral, a sum of fractions, becomes the integrand
+ALG Together
+SPEC Together : IF (sumq(_Xnu)), (leafcount(cancel(_Xnu)) < leafcount(_Xnu)) _Xnu = cancel(_Xnu)
+
+SPEC All : Std,Doit,(Linear,Compl,diff,Taylor,GrRi),AGroup,integr,(Subst,GrRi),Std,Combine,NoMi,Final,Expprod,Final,Together

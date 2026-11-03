@@ -251,3 +251,14 @@ SPEC    Taylor : Tay(_Gu,_Gx,_Ga,_Gn) = taysum(_Gu,_Gx,_Ga,_Gn,0)
 ADDSPEC Taylor : IF (_Gk > _Gn) taysum(_Gu,_Gx,_Ga,_Gn,_Gk) = 0
 ADDSPEC Taylor : IF (_Gk <= _Gn) taysum(_Gu,_Gx,_Ga,_Gn,_Gk) = subst(_Gu,_Gx,_Ga)*mi(_Gk!)*(_Gx-_Ga)^_Gk \
                    + taysum(normform(D(_Gu,_Gx)),_Gx,_Ga,_Gn,_Gk+1)
+
+# Pade approximant Pade(u,x,a,m,n): P/Q with deg P <= m, deg Q <= n, equal to
+# u up to (x-a)^(m+n). The Taylor polynomial in _pt = x - a, then pade (C,
+# symsolve.c) solves for the coefficients of Q; padestep waits for Tay.
+FUNC  Pade     : real,real,real,real,real >> real
+FUNC  padestep : real,real,real,real,real >> real            # internal: Tay(..), x, a, m, n
+FUNC  pade     : real,real,real,real >> real ATT SYMBOLIC pade  # T, t, m, n
+SYM   _pt : real
+NUMPAT _Gm : real
+ADDSPEC Taylor : Pade(_Gu,_Gx,_Ga,_Gm,_Gn) = padestep(Tay(subst(_Gu,_Gx,_Ga+_pt),_pt,0,_Gm+_Gn),_Gx,_Ga,_Gm,_Gn)
+ADDSPEC Taylor : IF (polyq(_Gu,_pt)) padestep(_Gu,_Gx,_Ga,_Gm,_Gn) = subst(pade(_Gu,_pt,_Gm,_Gn),_pt,_Gx-_Ga)

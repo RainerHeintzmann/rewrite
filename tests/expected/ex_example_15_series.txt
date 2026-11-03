@@ -12,3 +12,10 @@ x + x ^ 2 + (1/3) * x ^ 3 - (1/30) * x ^ 5
 2.718055556 2.718281828 0.0002262729035 
 ---- a Taylor polynomial is a polynomial: its derivative is again one
 1 - (1/2) * x ^ 2 + (1/24) * x ^ 4 - (1/720) * x ^ 6 
+---- Pade approximants Pade(u, x, a, m, n): P/Q of degrees m, n that agrees
+---- with u up to (x-a)^(m+n); often better than the Taylor polynomial
+(12 + 6 * x + x ^ 2 )/ (12 - 6 * x + x ^ 2 )
+(105 * x - 10 * x ^ 3 )/ (105 - 45 * x ^ 2 + x ^ 4 )
+(6 * x + 3 * x ^ 2 )/ (6 + 6 * x + x ^ 2 )
+(exp (1 )+ x * exp (1 ))/ (3 - x )
+0.0008394882523 0.1098138472 

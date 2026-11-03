@@ -887,7 +887,12 @@ static void mp_cancel (MPoly * nu, MPoly * de)
 			g = dgcd(g, c);
 			}
 	if (g <= 0) g = 1;
-	if (de->n > 0 && de->m[mp_lead(de)].c < 0) g = -g;
+	{			/* the leading coefficient of de > 0, unless all of a sum nu */
+	int neg = de->n > 0 && de->m[mp_lead(de)].c < 0, all = nu->n > 1;	/* would be < 0: */
+	for (i = 0; i < nu->n; i++)		/* (2 + x)/(2 - x), not (-2 - x)/(x - 2) */
+		all &= (nu->m[i].c < 0) != neg;
+	if (neg != all) g = -g;
+	}
 	if (g != 1)
 		for (s = 0; s < 2; s++)
 			for (i = 0; i < ps[s]->n; i++)

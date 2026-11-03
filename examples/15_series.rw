@@ -23,3 +23,16 @@ PRTNUM "%g "
 
 "---- a Taylor polynomial is a polynomial: its derivative is again one"
 REWR D(Tay(sin(x), x, 0, 7), x) : All
+
+"---- Pade approximants Pade(u, x, a, m, n): P/Q of degrees m, n that agrees"
+"---- with u up to (x-a)^(m+n); often better than the Taylor polynomial"
+REWR Pade(exp(x), x, 0, 2, 2) : All
+REWR Pade(tan(x), x, 0, 3, 4) : All
+REWR Pade(ln(1+x), x, 0, 2, 2) : All
+REWR Pade(exp(x), x, 1, 1, 1) : All
+TERM r4, p4 : real
+r4 = REWR Pade(ln(1+x), x, 0, 2, 2) : All
+p4 = REWR Tay(ln(1+x), x, 0, 4) : All
+PRTNUM "%.10g "
+ln(2) - subst(r4, x, 1), ln(2) - subst(p4, x, 1)    # at x = 1: Pade 0.0008, Taylor 0.11
+PRTNUM "%g "

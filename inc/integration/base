@@ -22,6 +22,7 @@ FUNC inthide      : real,real >> real ATT SYMBOLIC inthide       # Rubi IntHide 
 OTHER inthide     : number,number >> number ATT SYMBOLIC inthide
 FUNC unintegrable : real,real >> real                   # Rubi Unintegrable: stays as is, IntOut turns it into Int
 OTHER unintegrable : number,number >> number
+ADDSPEC diff : Dt(Int(_Xnu,_Ynu),_Ynu) = _Xnu         # 2026: the derivative of an integral not found
 
 PAT _Uv,_Vv,_Wv,_Xv : number                  # arbitrary terms
 PAT _Pa,_Pb,_Pc,_Pd,_Pe,_Pf,_Pm,_Pn : number      # Rubi a_ , b_ , ...

@@ -922,6 +922,21 @@ At a pole or a removable singularity (`x/(exp(x)-1)` at 0) the derivatives
 are not defined there, and the result contains a division by 0. More in
 [examples/15_series.rw](examples/15_series.rw).
 
+`Pade(u, x, a, m, n)` is the Padé approximant: the quotient `P/Q` of
+polynomials in `x - a` of degrees `m` and `n`, `Q(a) = 1`, that agrees with
+`u` up to `(x-a)^(m+n)`. It is computed from `Tay(u, x, a, m+n)`; the C
+function `pade` solves the linear equations for the coefficients of `Q`.
+It is often much better than the Taylor polynomial of the same order, also
+farther from `a`:
+
+```text
+REWR Pade(exp(x), x, 0, 2, 2) : All    # (12 + 6 * x + x ^ 2 )/ (12 - 6 * x + x ^ 2 )
+REWR Pade(tan(x), x, 0, 3, 4) : All    # (105 * x - 10 * x ^ 3 )/ (105 - 45 * x ^ 2 + x ^ 4 )
+```
+
+If the approximant does not exist (`Pade(x^2, x, 0, 1, 1)`: the
+equations are singular), `pade(...)` stays unevaluated.
+
 ### Limits and definite integrals
 
 [inc/limits](inc/limits) adds the symbol `infinity` (also `∞`), the unit
@@ -1324,6 +1339,16 @@ where the library [inc/](inc) and the tests are used from.
   factor, normalizes its argument first (the raw result of `D`), and
   gives up quickly (stays unevaluated) when the common denominator would be
   huge, as with the nested roots of `Int(1/(1+x^5),x)`.
+- `All` ends with `Together`: a sum is put over a common denominator
+  (`cancel`) when that is shorter, so the derivative of an antiderivative
+  is the integrand again (`D` of the result of `Int(1/(1+x^4),x)` gives
+  `1/(1+x^4)`, a harmonic function gives `u_xx + u_yy = 0`), and
+  `1/(1+x^2) - x^2/(1+x^2)` becomes `(1 - x^2)/(1 + x^2)`.
+  `Dt(Int(f,x),x)` is `f` (for an integral that was not found).
+  `cancel` keeps a sum in the numerator positive: `(2 + x)/(2 - x)`, not
+  `(-2 - x)/(x - 2)`.
+- Padé approximants `Pade(u,x,a,m,n)` (from the Taylor polynomial, the
+  linear equations solved by the C function `pade`).
 - `AUTOSYM real` (set by `inc/all`): new names are declared as symbols,
   with a note; an unknown function `f(..)` and, with `AUTOSYM` off, an
   unknown name are reported as such instead of "syntax error".
